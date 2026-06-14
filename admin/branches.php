@@ -1,6 +1,7 @@
 <?php
 $pageTitle = 'Branches';
 require_once '../includes/admin-layout.php';
+require_once '../includes/nepal-geo.php';
 
 // Ensure branches table exists
 try {
@@ -205,11 +206,23 @@ $selectedClient = $clientId
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
           <label class="form-label fs-2xs2">District</label>
-          <input name="district" class="form-input fs-sm2" value="<?=e($editing['district']??'')?>">
+          <input name="district" class="form-input fs-sm2" value="<?=e($editing['district']??'')?>"
+                 list="br-district-list" autocomplete="off" placeholder="e.g. Kaski">
+          <datalist id="br-district-list">
+            <?php foreach (nepalDistricts() as $d): ?>
+              <option value="<?=e($d)?>">
+            <?php endforeach; ?>
+          </datalist>
         </div>
         <div>
           <label class="form-label fs-2xs2">Province</label>
-          <input name="province" class="form-input fs-sm2" value="<?=e($editing['province']??'')?>">
+          <input name="province" class="form-input fs-sm2" value="<?=e($editing['province']??'')?>"
+                 list="br-province-list" autocomplete="off" placeholder="e.g. Gandaki Province">
+          <datalist id="br-province-list">
+            <?php foreach (nepalProvinces() as $p): ?>
+              <option value="<?=e($p)?>">
+            <?php endforeach; ?>
+          </datalist>
         </div>
       </div>
 

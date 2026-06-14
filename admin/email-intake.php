@@ -36,31 +36,49 @@ $log = query("SELECT * FROM email_intake_log ORDER BY fetched_at DESC LIMIT 50")
   <?php if ($success): ?><div class="alert alert-success mb-1"><?= e($success) ?></div><?php endif; ?>
   <?php if ($error):   ?><div class="alert alert-error mb-1"  ><?= e($error) ?></div><?php endif; ?>
 
-  <form method="post" class="card" style="padding:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;margin-bottom:2rem;">
+  <div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
+  <form method="post">
     <?= csrfField() ?>
-    <label style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1rem;font-weight:600;">
+    <label style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1.25rem;font-weight:600;cursor:pointer;">
       <input type="checkbox" name="imap_enabled" <?= $cfg['imap_enabled']==='1'?'checked':'' ?>>
-      Enable IMAP email intake
+      <span>Enable IMAP email intake</span>
     </label>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.75rem;">
-      <label>IMAP Host <input name="imap_host" value="<?= e($cfg['imap_host']) ?>" class="input input-bordered" placeholder="imap.gmail.com"></label>
-      <label>Port      <input name="imap_port" value="<?= e($cfg['imap_port']) ?: '993' ?>" class="input input-bordered"></label>
-      <label>Security
-        <select name="imap_secure" class="select select-bordered">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.875rem;margin-bottom:1rem;">
+      <div>
+        <label class="form-label">IMAP Host</label>
+        <input name="imap_host" value="<?= e($cfg['imap_host']) ?>" class="form-input fs-sm2" placeholder="imap.gmail.com">
+      </div>
+      <div>
+        <label class="form-label">Port</label>
+        <input name="imap_port" value="<?= e($cfg['imap_port']) ?: '993' ?>" class="form-input fs-sm2" placeholder="993">
+      </div>
+      <div>
+        <label class="form-label">Security</label>
+        <select name="imap_secure" class="form-input fs-sm2">
           <?php foreach (['ssl','tls','none'] as $o): ?>
             <option value="<?= $o ?>" <?= $cfg['imap_secure']===$o?'selected':'' ?>><?= strtoupper($o) ?></option>
           <?php endforeach; ?>
         </select>
-      </label>
-      <label>Folder    <input name="imap_folder" value="<?= e($cfg['imap_folder']) ?: 'INBOX' ?>" class="input input-bordered"></label>
-      <label>Username  <input name="imap_user" value="<?= e($cfg['imap_user']) ?>" class="input input-bordered" placeholder="support@yourdomain.com"></label>
-      <label>Password  <input type="password" name="imap_pass" value="<?= e($cfg['imap_pass']) ?>" class="input input-bordered"></label>
+      </div>
+      <div>
+        <label class="form-label">Folder</label>
+        <input name="imap_folder" value="<?= e($cfg['imap_folder']) ?: 'INBOX' ?>" class="form-input fs-sm2" placeholder="INBOX">
+      </div>
+      <div>
+        <label class="form-label">Username</label>
+        <input name="imap_user" value="<?= e($cfg['imap_user']) ?>" class="form-input fs-sm2" placeholder="support@yourdomain.com">
+      </div>
+      <div>
+        <label class="form-label">Password</label>
+        <input type="password" name="imap_pass" value="<?= e($cfg['imap_pass']) ?>" class="form-input fs-sm2">
+      </div>
     </div>
-    <button class="btn btn-primary mt-1">Save Settings</button>
-    <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:0.75rem;">
-      Requires <code>php-imap</code> extension. Schedule <code>cron/email-to-ticket.php</code> every 5 minutes via cPanel cron.
-    </p>
+    <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+      <button class="btn btn-primary">Save Settings</button>
+      <span class="form-hint">Requires <code>php-imap</code> extension. Schedule <code>cron/email-to-ticket.php</code> every 5 min via cron.</span>
+    </div>
   </form>
+  </div>
 
   <h2 style="font-weight:700;margin-bottom:0.75rem;">Recent Intake Log</h2>
   <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;font-size:0.875rem;">

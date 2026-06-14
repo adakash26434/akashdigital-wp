@@ -80,19 +80,41 @@ if (!empty($_GET['edit'])) {
   </div>
 
   <?php if ($tab === 'categories'): ?>
-    <form method="post" class="card" style="padding:1rem;margin-bottom:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
+    <div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
+    <form method="post">
       <?= csrfField() ?>
       <input type="hidden" name="action" value="cat_save">
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:0.75rem;">
-        <input name="name" placeholder="Category name" required class="input input-bordered">
-        <input name="slug" placeholder="slug (optional)" class="input input-bordered">
-        <input name="icon" placeholder="Lucide icon (e.g. book-open)" class="input input-bordered" value="book-open">
-        <input name="position" type="number" value="0" class="input input-bordered">
-        <label style="display:flex;align-items:center;gap:0.5rem;"><input type="checkbox" name="active" checked> Active</label>
+      <h3 class="h-eyebrow" style="margin-bottom:1rem;">Add Category</h3>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:0.75rem;">
+        <div>
+          <label class="form-label">Name <span class="text-danger-token">*</span></label>
+          <input name="name" placeholder="e.g. Getting Started" required class="form-input fs-sm2">
+        </div>
+        <div>
+          <label class="form-label">Slug</label>
+          <input name="slug" placeholder="getting-started (auto)" class="form-input fs-sm2">
+        </div>
+        <div>
+          <label class="form-label">Icon</label>
+          <input name="icon" placeholder="book-open" class="form-input fs-sm2" value="book-open">
+        </div>
+        <div>
+          <label class="form-label">Position</label>
+          <input name="position" type="number" value="0" class="form-input fs-sm2">
+        </div>
+        <div style="display:flex;align-items:flex-end;padding-bottom:0.25rem;">
+          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.8125rem;font-weight:500;">
+            <input type="checkbox" name="active" checked> Active
+          </label>
+        </div>
       </div>
-      <textarea name="description" placeholder="Short description" class="textarea textarea-bordered" style="margin-top:0.5rem;width:100%;"></textarea>
-      <button class="btn btn-primary" style="margin-top:0.5rem;">Add Category</button>
+      <div style="margin-bottom:0.75rem;">
+        <label class="form-label">Description</label>
+        <textarea name="description" placeholder="Short description" class="form-input fs-sm2" rows="2"></textarea>
+      </div>
+      <button class="btn btn-primary btn-sm">Add Category</button>
     </form>
+    </div>
     <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
       <thead><tr><th>Name</th><th>Slug</th><th>Articles</th><th>Active</th><th></th></tr></thead>
       <tbody>
@@ -113,40 +135,66 @@ if (!empty($_GET['edit'])) {
       </tbody>
     </table>
   <?php else: ?>
-    <form method="post" class="card" style="padding:1rem;margin-bottom:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
+    <div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
+    <form method="post">
       <?= csrfField() ?>
       <input type="hidden" name="action" value="art_save">
       <input type="hidden" name="id" value="<?= (int)($editArt['id'] ?? 0) ?>">
-      <h2 style="font-weight:600;margin-bottom:0.75rem;"><?= $editArt ? 'Edit' : 'New' ?> Article</h2>
-      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.75rem;">
-        <input name="title" placeholder="Title" required value="<?= e($editArt['title'] ?? '') ?>" class="input input-bordered">
-        <input name="slug"  placeholder="slug (optional)" value="<?= e($editArt['slug'] ?? '') ?>" class="input input-bordered">
-        <select name="category_id" class="select select-bordered">
-          <option value="0">— Category —</option>
-          <?php foreach ($cats as $c): ?>
-            <option value="<?= $c['id'] ?>" <?= ($editArt['category_id'] ?? 0) == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
-          <?php endforeach; ?>
-        </select>
+      <h3 class="h-eyebrow" style="margin-bottom:1rem;"><?= $editArt ? 'Edit' : 'New' ?> Article</h3>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
+        <div>
+          <label class="form-label">Title <span class="text-danger-token">*</span></label>
+          <input name="title" placeholder="Article title" required value="<?= e($editArt['title'] ?? '') ?>" class="form-input fs-sm2">
+        </div>
+        <div>
+          <label class="form-label">Slug</label>
+          <input name="slug" placeholder="auto-generated" value="<?= e($editArt['slug'] ?? '') ?>" class="form-input fs-sm2">
+        </div>
+        <div>
+          <label class="form-label">Category</label>
+          <select name="category_id" class="form-input fs-sm2">
+            <option value="0">— Select —</option>
+            <?php foreach ($cats as $c): ?>
+              <option value="<?= $c['id'] ?>" <?= ($editArt['category_id'] ?? 0) == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
       </div>
-      <input name="excerpt" placeholder="Short excerpt" value="<?= e($editArt['excerpt'] ?? '') ?>" class="input input-bordered" style="width:100%;margin-top:0.5rem;">
-      <textarea name="body" placeholder="Article body (HTML allowed)" rows="14" class="textarea textarea-bordered" style="width:100%;margin-top:0.5rem;font-family:monospace;"><?= e($editArt['body'] ?? '') ?></textarea>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-top:0.5rem;">
-        <input name="tags" placeholder="comma,separated,tags" value="<?= e($editArt['tags'] ?? '') ?>" class="input input-bordered">
-        <select name="status" class="select select-bordered">
-          <?php foreach (['draft','published','archived'] as $s): ?>
-            <option value="<?= $s ?>" <?= ($editArt['status'] ?? 'draft') === $s ? 'selected' : '' ?>><?= ucfirst($s) ?></option>
-          <?php endforeach; ?>
-        </select>
-        <select name="language" class="select select-bordered">
-          <option value="en" <?= ($editArt['language'] ?? 'en')==='en'?'selected':'' ?>>English</option>
-          <option value="ne" <?= ($editArt['language'] ?? '')==='ne'?'selected':'' ?>>नेपाली</option>
-        </select>
+      <div style="margin-bottom:0.75rem;">
+        <label class="form-label">Excerpt</label>
+        <input name="excerpt" placeholder="Short summary shown in listings" value="<?= e($editArt['excerpt'] ?? '') ?>" class="form-input fs-sm2">
       </div>
-      <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
-        <button class="btn btn-primary"><?= $editArt ? 'Update' : 'Create' ?></button>
+      <div style="margin-bottom:0.75rem;">
+        <label class="form-label">Body <span class="text-danger-token">*</span></label>
+        <textarea name="body" placeholder="Article body (HTML allowed)" rows="14" class="form-input fs-sm2" style="font-family:var(--font-mono);resize:vertical;"><?= e($editArt['body'] ?? '') ?></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.75rem;margin-bottom:0.875rem;">
+        <div>
+          <label class="form-label">Tags</label>
+          <input name="tags" placeholder="comma, separated, tags" value="<?= e($editArt['tags'] ?? '') ?>" class="form-input fs-sm2">
+        </div>
+        <div>
+          <label class="form-label">Status</label>
+          <select name="status" class="form-input fs-sm2">
+            <?php foreach (['draft','published','archived'] as $s): ?>
+              <option value="<?= $s ?>" <?= ($editArt['status'] ?? 'draft') === $s ? 'selected' : '' ?>><?= ucfirst($s) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Language</label>
+          <select name="language" class="form-input fs-sm2">
+            <option value="en" <?= ($editArt['language'] ?? 'en')==='en'?'selected':'' ?>>English</option>
+            <option value="ne" <?= ($editArt['language'] ?? '')==='ne'?'selected':'' ?>>नेपाली</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:0.5rem;">
+        <button class="btn btn-primary"><?= $editArt ? 'Update Article' : 'Create Article' ?></button>
         <?php if ($editArt): ?><a href="?tab=articles" class="btn btn-ghost">Cancel</a><?php endif; ?>
       </div>
     </form>
+    </div>
     <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
       <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Views</th><th>Updated</th><th></th></tr></thead>
       <tbody>

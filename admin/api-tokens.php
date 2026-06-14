@@ -36,48 +36,61 @@ $clients = query("SELECT id,org_name FROM clients ORDER BY org_name LIMIT 500");
 
 require_once '../includes/admin-layout.php';
 ?>
-<div class="card">
-  <h1>API Tokens</h1>
-  <p class="muted">Issue bearer tokens for API access and partner integrations. Tokens are SHA-256 hashed; the raw value is shown only once.</p>
+<div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
+  <h3 class="h-eyebrow" style="margin-bottom:0.25rem;">API Tokens</h3>
+  <p class="caption-meta" style="margin-bottom:1.25rem;">Issue bearer tokens for API access and partner integrations. Tokens are SHA-256 hashed — raw value shown only once.</p>
 
-  <?php if ($error): ?><div class="alert error"><?= htmlspecialchars($error) ?></div><?php endif; ?>
-  <?php if ($success): ?><div class="alert success"><?= htmlspecialchars($success) ?></div><?php endif; ?>
+  <?php if ($error):   ?><div class="alert alert-error mb-1"><?= e($error) ?></div><?php endif; ?>
+  <?php if ($success): ?><div class="alert alert-success mb-1"><?= e($success) ?></div><?php endif; ?>
 
   <?php if ($newToken): ?>
-    <div class="alert info">
-      <strong>New token:</strong>
-      <code style="display:block;padding:10px;background:#0b1220;color:var(--border);border-radius:8px;margin-top:6px;word-break:break-all;"><?= htmlspecialchars($newToken) ?></code>
+    <div class="alert alert-info mb-1">
+      <strong>New token — copy now, it won't be shown again:</strong>
+      <code style="display:block;padding:0.625rem 0.875rem;background:#0b1220;color:#a5f3fc;border-radius:var(--radius);margin-top:0.5rem;word-break:break-all;font-size:0.8125rem;"><?= e($newToken) ?></code>
     </div>
   <?php endif; ?>
 
-  <form method="post" class="grid" style="grid-template-columns:repeat(5,1fr);gap:10px;align-items:end;">
+  <form method="post">
     <?= csrfField() ?>
     <input type="hidden" name="action" value="create">
-    <label>Name<input name="name" required placeholder="API Integration — Branch Name"></label>
-    <label>Client (optional)
-      <select name="client_id">
-        <option value="">— System / All —</option>
-        <?php foreach ($clients as $c): ?>
-          <option value="<?= $c['id'] ?>"><?= htmlspecialchars($c['org_name']) ?></option>
-        <?php endforeach; ?>
-      </select>
-    </label>
-    <label>Scopes
-      <select name="scopes[]" multiple size="3">
-        <option value="read" selected>read</option>
-        <option value="write">write</option>
-        <option value="sync">sync</option>
-      </select>
-    </label>
-    <label>Rate / min<input type="number" name="rate_limit" value="120" min="10" max="6000"></label>
-    <label>Expires<input type="date" name="expires_at"></label>
-    <button class="btn primary grid-full">Create token</button>
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0.75rem;align-items:end;margin-bottom:0.75rem;">
+      <div>
+        <label class="form-label">Name <span class="text-danger-token">*</span></label>
+        <input name="name" required placeholder="e.g. Branch Portal Integration" class="form-input fs-sm2">
+      </div>
+      <div>
+        <label class="form-label">Client (optional)</label>
+        <select name="client_id" class="form-input fs-sm2">
+          <option value="">— System / All —</option>
+          <?php foreach ($clients as $c): ?>
+            <option value="<?= $c['id'] ?>"><?= e($c['org_name']) ?></option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Scopes</label>
+        <select name="scopes[]" multiple size="3" class="form-input fs-sm2">
+          <option value="read" selected>read</option>
+          <option value="write">write</option>
+          <option value="sync">sync</option>
+        </select>
+      </div>
+      <div>
+        <label class="form-label">Rate / min</label>
+        <input type="number" name="rate_limit" value="120" min="10" max="6000" class="form-input fs-sm2">
+      </div>
+      <div>
+        <label class="form-label">Expires</label>
+        <input type="date" name="expires_at" class="form-input fs-sm2">
+      </div>
+    </div>
+    <button class="btn btn-primary btn-sm">Create Token</button>
   </form>
 </div>
 
-<div class="card">
-  <h2>Existing tokens</h2>
-  <table class="data">
+<div class="st-card p-card-lg">
+  <h3 class="h-eyebrow" style="margin-bottom:1rem;">Existing Tokens</h3>
+  <table class="table" style="width:100%;">
     <thead><tr><th>Name</th><th>Prefix</th><th>Client</th><th>Scopes</th><th>Rate</th><th>Last used</th><th>Expires</th><th>Status</th><th></th></tr></thead>
     <tbody>
       <?php foreach ($tokens as $t): ?>

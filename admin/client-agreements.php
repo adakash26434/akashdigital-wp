@@ -266,56 +266,50 @@ adminListFilters([
       <input type="hidden" name="action" value="upload">
       <?= csrfField() ?>
       
-      <div style="display:flex;flex-direction:column;gap:1rem;">
+      <div class="col-stack">
         <div>
-          <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;color:var(--foreground);">Client *</label>
-          <select name="client_id" required style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);">
+          <label class="form-label">Client <span class="text-danger-token">*</span></label>
+          <select name="client_id" required class="form-input fs-sm2">
             <option value="">Select client...</option>
             <?php foreach($clients as $cl): ?>
             <option value="<?= e($cl['id']) ?>"><?= e($cl['org_name'] ?: $cl['name']) ?></option>
             <?php endforeach; ?>
           </select>
         </div>
-        
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
-            <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Type</label>
-            <select name="agreement_type" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);">
+            <label class="form-label">Type</label>
+            <select name="agreement_type" class="form-input fs-sm2">
               <?php foreach($TYPE_LABELS as $v => $l): ?>
               <option value="<?= e($v) ?>"><?= e($l) ?></option>
               <?php endforeach; ?>
             </select>
           </div>
           <div>
-            <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Amount (NPR)</label>
-            <input type="number" name="amount" step="0.01" min="0" placeholder="0.00" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);">
+            <label class="form-label">Amount (NPR)</label>
+            <input type="number" name="amount" step="0.01" min="0" placeholder="0.00" class="form-input fs-sm2">
           </div>
         </div>
-        
         <div>
-          <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Title *</label>
-          <input type="text" name="title" required placeholder="e.g., Annual Service Contract 2025" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);">
+          <label class="form-label">Title <span class="text-danger-token">*</span></label>
+          <input type="text" name="title" required placeholder="e.g., Annual Service Contract 2082" class="form-input fs-sm2">
         </div>
-        
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
-            <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Effective Date *</label>
-            <input type="date" name="effective_date" required value="<?= date('Y-m-d') ?>" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);">
+            <label class="form-label">Effective Date <span class="text-danger-token">*</span></label>
+            <input type="date" name="effective_date" required value="<?= date('Y-m-d') ?>" class="form-input fs-sm2">
           </div>
           <div>
-            <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Expiry Date</label>
-            <input type="date" name="expiry_date" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);">
+            <label class="form-label">Expiry Date</label>
+            <input type="date" name="expiry_date" class="form-input fs-sm2">
           </div>
         </div>
-        
         <div>
-          <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Document (PDF, DOC, Images)</label>
-          <input type="file" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="width:100%;padding:0.625rem;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);">
+          <label class="form-label">Document</label>
+          <input type="file" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="form-input fs-sm2">
+          <span class="form-hint">PDF, DOC, DOCX, JPG, PNG supported.</span>
         </div>
-        
-        <button type="submit" class="btn btn-primary" style="padding:0.75rem 1.5rem;">
-          Upload Agreement
-        </button>
+        <button type="submit" class="btn btn-primary">Upload Agreement</button>
       </div>
     </form>
   </div>
