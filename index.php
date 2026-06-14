@@ -390,20 +390,27 @@ include 'includes/stats-bar.php';
 <?php if($__logoClients): ?>
 <section class="band-tinted" style="overflow:hidden;">
 
-  <!-- Stat card like partners page -->
-  <div class="partner-stats">
+  <!-- Partner stat cards — same style as stats-bar -->
+  <div class="st-stats" style="padding:2rem 0 1rem;">
     <div class="container">
-      <div class="partner-stats__grid">
-        <?php 
-        $partnerCount = count($partnerClients);
-        foreach ([
-          ['204+', 'Cooperative clients'],
-          ['15+', 'Technology partners'],
-          ['7', 'Provinces covered'],
-        ] as [$n, $l]): ?>
-        <div class="partner-stats__item">
-          <div class="partner-stats__value"><?= e($n) ?></div>
-          <div class="partner-stats__label"><?= e($l) ?></div>
+      <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
+        <?php foreach ([
+          ['204+', 'Cooperative Clients',  'building-2'],
+          ['15+',  'Technology Partners',  'layers'],
+          ['7',    'Provinces Covered',    'map-pin'],
+        ] as [$n, $l, $ic]):
+          preg_match('/^([\d,.]+)/', $n, $mm);
+          $nNum = $mm[1] ?? $n;
+          $nSuf = $nNum ? ltrim(substr($n, strlen($nNum))) : '';
+        ?>
+        <div class="st-stat">
+          <div class="st-stat__icon-wrap">
+            <i data-lucide="<?= e($ic) ?>" class="st-stat__icon"></i>
+          </div>
+          <div class="st-stat__value">
+            <span><?= e($nNum) ?></span><?php if ($nSuf): ?><span class="st-stat__accent"><?= e($nSuf) ?></span><?php endif; ?>
+          </div>
+          <div class="st-stat__label"><?= e($l) ?></div>
         </div>
         <?php endforeach; ?>
       </div>
