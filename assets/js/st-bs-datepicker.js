@@ -298,11 +298,33 @@
 
     function openPopup() {
       renderPopup();
-      // Position popup below the display element
-      var rect = disp.getBoundingClientRect();
-      popup.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-      popup.style.left = Math.max(8, Math.min(rect.left + window.scrollX, window.innerWidth - 300)) + 'px';
+      // Show offscreen first to measure real height
+      popup.style.visibility = 'hidden';
       popup.style.display = 'block';
+
+      var rect   = disp.getBoundingClientRect();
+      var popH   = popup.offsetHeight;
+      var popW   = popup.offsetWidth || 272;
+      var vw     = window.innerWidth;
+      var vh     = window.innerHeight;
+      var GAP    = 6;
+
+      // Vertical: prefer below; flip above if not enough space below
+      var top;
+      if (rect.bottom + GAP + popH <= vh) {
+        top = rect.bottom + GAP;           // below
+      } else if (rect.top - GAP - popH >= 0) {
+        top = rect.top - GAP - popH;       // above
+      } else {
+        top = Math.max(GAP, vh - popH - GAP); // best fit within viewport
+      }
+
+      // Horizontal: align to left edge of input, clamp within viewport
+      var left = Math.max(GAP, Math.min(rect.left, vw - popW - GAP));
+
+      popup.style.top        = top + 'px';
+      popup.style.left       = left + 'px';
+      popup.style.visibility = '';
     }
     function closePopup() {
       popup.style.display = 'none';
