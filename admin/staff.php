@@ -71,7 +71,7 @@ $ROLE_CFG = [
     ['Open Tickets', array_sum(array_column($staff,'open_tickets')),   'var(--warning-soft)','var(--warning-fg)'],
     ['Resolved',     array_sum(array_column($staff,'resolved_tickets')),'var(--success-soft)','var(--success-fg)'],
   ];
-  foreach($cards as [$lbl,$val,$bg,$col]):?>
+  <?php foreach($cards as [$lbl,$val,$bg,$col]):?>
   <div style="padding:1rem;border-radius:0.875rem;border:1px solid var(--border);background:var(--card);">
     <div style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:<?=$col?>;"><?=$val?></div>
     <div style="font-size:0.6875rem;color:var(--muted-foreground);font-weight:500;"><?=e($lbl)?></div>
