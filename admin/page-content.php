@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['chairman_photo_upload']) && $_FILES['chairman_photo_upload']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = '../uploads/leadership/';
             if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+                mkdir($uploadDir, 0755, true);
             }
             $fileName = uniqid() . '_' . basename($_FILES['chairman_photo_upload']['name']);
             $uploadFile = $uploadDir . $fileName;
@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (isset($_FILES['ceo_photo_upload']) && $_FILES['ceo_photo_upload']['error'] === UPLOAD_ERR_OK) {
             $uploadDir = '../uploads/leadership/';
             if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0777, true);
+                mkdir($uploadDir, 0755, true);
             }
             $fileName = uniqid() . '_' . basename($_FILES['ceo_photo_upload']['name']);
             $uploadFile = $uploadDir . $fileName;

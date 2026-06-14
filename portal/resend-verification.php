@@ -53,3 +53,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <?php endif; ?>
 </div>
+
+<?php require_once '../includes/portal-layout-end.php'; ?>

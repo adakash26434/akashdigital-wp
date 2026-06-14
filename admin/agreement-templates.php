@@ -335,4 +335,4 @@ function editTemplate(data) {
 }
 </script>
 
-<?php includeAdminFooter(); ?>
+<?php require_once '../includes/admin-layout-close.php'; ?>

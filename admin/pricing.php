@@ -197,3 +197,5 @@ $showForm = !empty($_GET['new']) || $editing;
   </form>
 </div>
 </div>
+
+<?php require_once '../includes/admin-layout-close.php'; ?>

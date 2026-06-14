@@ -215,11 +215,66 @@ function sqliteCompat(string $sql): string {
     );
 
     // 8. DATE_ADD(expr, INTERVAL n UNIT)
+    //    n may be a literal number, a ?, or a column reference (e.g. rc.renewal_cycle).
+    //    For column references SQLite datetime() modifier requires a concatenation trick.
     $sql = preg_replace_callback(
-        "/DATE_ADD\s*\(([^,]+),\s*INTERVAL\s+([^)]+)\s+(\w+)\)/i",
-        fn($m) => "datetime(" . trim($m[1]) . ", '+{$m[2]} {$m[3]}s')",
+        "/DATE_ADD\s*\(\s*([^,]+?)\s*,\s*INTERVAL\s+([\w.?]+)\s+(\w+)\s*\)/i",
+        function ($m) {
+            $expr = trim($m[1]); $n = trim($m[2]); $unit = strtolower($m[3]);
+            // Literal number or placeholder — standard datetime modifier string
+            if (ctype_digit($n) || $n === '?') {
+                return "datetime($expr, '+{$n} {$unit}s')";
+            }
+            // Column reference — must build modifier string at runtime via ||
+            return "datetime($expr, '+' || {$n} || ' {$unit}s')";
+        },
         $sql
     );
+
+    // 9. TIMESTAMPDIFF(UNIT, a, b)
+    //    Only HOUR and DAY are commonly used in this codebase.
+    $sql = preg_replace_callback(
+        '/TIMESTAMPDIFF\s*\(\s*(HOUR|MINUTE|DAY|MONTH|YEAR)\s*,\s*([^,]+),\s*([^)]+)\)/i',
+        function ($m) {
+            $unit = strtoupper($m[1]);
+            $a = trim($m[2]); $b = trim($m[3]);
+            return match ($unit) {
+                'YEAR'   => "CAST((julianday($b) - julianday($a)) / 365.25 AS INTEGER)",
+                'MONTH'  => "CAST((julianday($b) - julianday($a)) / 30.44 AS INTEGER)",
+                'DAY'    => "CAST(julianday($b) - julianday($a) AS INTEGER)",
+                'HOUR'   => "CAST((julianday($b) - julianday($a)) * 24 AS INTEGER)",
+                'MINUTE' => "CAST((julianday($b) - julianday($a)) * 1440 AS INTEGER)",
+                default  => "CAST((julianday($b) - julianday($a)) * 24 AS INTEGER)",
+            };
+        },
+        $sql
+    );
+
+    // 10. YEAR(expr) → strftime('%Y', expr) cast to integer
+    $sql = preg_replace_callback('/\bYEAR\s*\(([^)]+)\)/i',
+        fn($m) => "CAST(strftime('%Y', " . trim($m[1]) . ") AS INTEGER)", $sql);
+
+    // 11. MONTH(expr) → strftime('%m', expr) cast to integer
+    $sql = preg_replace_callback('/\bMONTH\s*\(([^)]+)\)/i',
+        fn($m) => "CAST(strftime('%m', " . trim($m[1]) . ") AS INTEGER)", $sql);
+
+    // 12. DAY(expr) → strftime('%d', expr) cast to integer
+    $sql = preg_replace_callback('/\bDAY\s*\(([^)]+)\)/i',
+        fn($m) => "CAST(strftime('%d', " . trim($m[1]) . ") AS INTEGER)", $sql);
+
+    // 13. QUARTER(expr) → ((strftime('%m', expr) - 1) / 3 + 1) — approximate
+    $sql = preg_replace_callback('/\bQUARTER\s*\(([^)]+)\)/i',
+        fn($m) => "((CAST(strftime('%m', " . trim($m[1]) . ") AS INTEGER) - 1) / 3 + 1)", $sql);
+
+    // 14. GROUP_CONCAT(expr SEPARATOR sep) → GROUP_CONCAT(expr, sep)
+    $sql = preg_replace_callback(
+        '/GROUP_CONCAT\s*\((.+?)\s+SEPARATOR\s+([\'"][^\'"]*[\'"])\)/i',
+        fn($m) => "GROUP_CONCAT({$m[1]}, {$m[2]})",
+        $sql
+    );
+
+    // 15. IFNULL(a, b) → COALESCE(a, b)  (SQLite has COALESCE but not IFNULL in older builds)
+    $sql = preg_replace_callback('/\bIFNULL\s*\(/i', fn() => 'COALESCE(', $sql);
 
     return $sql;
 }

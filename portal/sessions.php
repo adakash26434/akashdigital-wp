@@ -83,5 +83,5 @@ function _ua_short(string $ua): string {
   </div>
 </div>
 <?php
-if ($isAdminCtx) require_once __DIR__ . '/../includes/admin-layout-end.php';
+if ($isAdminCtx) require_once __DIR__ . '/../includes/admin-layout-close.php';
 else            require_once __DIR__ . '/../includes/portal-layout-end.php';

@@ -18,6 +18,8 @@ $stats = [
 ];
 
 // ── Today's Follow-ups ───────────────────────────────────────
+// NOTE: fetchAll() used instead of query()->rowCount() because PDO/SQLite
+// returns 0 for rowCount() on SELECT statements (driver limitation).
 $todayFollowups = query("
     SELECT l.id, l.name, l.org_name, l.stage, l.products_interest, l.district,
            l.phone, l.email, l.next_followup, l.deal_value, l.assigned_to,
@@ -27,20 +29,20 @@ $todayFollowups = query("
     LEFT JOIN users u ON u.id=l.assigned_to
     WHERE l.next_followup = ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
-", [$today]);
+", [$today])->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Overdue Follow-ups ────────────────────────────────────────
 $overdueFollowups = query("
     SELECT l.id, l.name, l.org_name, l.stage, l.products_interest, l.district,
            l.phone, l.email, l.next_followup, l.deal_value, l.assigned_to,
            u.display_name as assigned_name,
-           DATEDIFF('now', l.next_followup) as days_overdue
+           CAST((julianday('now') - julianday(l.next_followup)) AS INTEGER) as days_overdue
     FROM crm_leads l
     LEFT JOIN users u ON u.id=l.assigned_to
     WHERE l.next_followup < ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
     LIMIT 20
-", [$today]);
+", [$today])->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Upcoming Follow-ups (next 7 days) ────────────────────────
 $nextWeek = date('Y-m-d', strtotime('+7 days'));
@@ -52,13 +54,13 @@ $upcomingFollowups = query("
     WHERE l.next_followup > ? AND l.next_followup <= ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
     LIMIT 10
-", [$today, $nextWeek]);
+", [$today, $nextWeek])->fetchAll(PDO::FETCH_ASSOC);
 
 // ── New Demo Requests ────────────────────────────────────────
-$newDemos = query("SELECT * FROM demo_requests WHERE status='pending' ORDER BY created_at DESC LIMIT 5");
+$newDemos = query("SELECT * FROM demo_requests WHERE status='pending' ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── New Contact Inquiries ─────────────────────────────────────
-$newContacts = query("SELECT * FROM contact_submissions WHERE status='new' ORDER BY created_at DESC LIMIT 5");
+$newContacts = query("SELECT * FROM contact_submissions WHERE status='new' ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Recent Activity (last 5 follow-ups) ─────────────────────
 $recentActivity = query("
@@ -68,7 +70,7 @@ $recentActivity = query("
     LEFT JOIN users u ON u.id=f.user_id
     ORDER BY f.followup_at DESC
     LIMIT 8
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Deal Pipeline Summary ────────────────────────────────────
 $pipeline = queryOne("
@@ -86,7 +88,7 @@ $stageDist = query("
     FROM crm_leads
     GROUP BY stage
     ORDER BY cnt DESC
-");
+")->fetchAll(PDO::FETCH_ASSOC);
 
 $stageLabels = [
     'prospect' => 'Prospect',
@@ -248,7 +250,7 @@ $stageLabels = [
             <div class="flex gap-2 flex-wrap">
                 <?php 
                 $totalLeads = max(1, $stats['total_leads']);
-                while ($s = $stageDist->fetch(PDO::FETCH_ASSOC)): 
+                foreach ($stageDist as $s):
                     $pct = round(($s['cnt'] / $totalLeads) * 100);
                     $color = match($s['stage']) {
                         'won' => 'var(--success)',
@@ -265,7 +267,7 @@ $stageLabels = [
                     <span class="font-medium"><?= $stageLabels[$s['stage']] ?? $s['stage'] ?></span>
                     <span class="text-muted-foreground">(<?= $s['cnt'] ?>)</span>
                 </div>
-                <?php endwhile; ?>
+                <?php endforeach; ?>
             </div>
         </div>
     </div>
@@ -276,15 +278,15 @@ $stageLabels = [
         <div class="lg:col-span-2 space-y-6">
             
             <!-- Overdue Follow-ups -->
-            <?php if ($overdueFollowups->rowCount() > 0): ?>
+            <?php if (count($overdueFollowups) > 0): ?>
             <div class="card bg-base-100 shadow-sm border-l-4 border-l-red-500">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-red-600">⚠️ Overdue Follow-ups (<?= $overdueFollowups->rowCount() ?>)</h3>
+                        <h3 class="font-semibold text-red-600">⚠️ Overdue Follow-ups (<?= count($overdueFollowups) ?>)</h3>
                         <a href="<?= url('admin/crm.php?filter=overdue') ?>" class="btn btn-ghost btn-sm">View All</a>
                     </div>
                     <ul class="followup-list">
-                        <?php while ($l = $overdueFollowups->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($overdueFollowups as $l): ?>
                         <li class="followup-item">
                             <div class="followup-icon" style="background: rgba(239,68,68,0.1); color: var(--danger);">📞</div>
                             <div class="followup-content">
@@ -296,26 +298,26 @@ $stageLabels = [
                                 </div>
                             </div>
                             <div class="followup-date overdue">
-                                <?= $l['days_overdue'] ?>d overdue
+                                <?= (int)$l['days_overdue'] ?>d overdue
                                 <div class="text-xs opacity-60"><?= date('M j', strtotime($l['next_followup'])) ?></div>
                             </div>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
             <?php endif; ?>
 
             <!-- Today's Follow-ups -->
-            <?php if ($todayFollowups->rowCount() > 0): ?>
+            <?php if (count($todayFollowups) > 0): ?>
             <div class="card bg-base-100 shadow-sm border-l-4 border-l-yellow-500">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-semibold text-yellow-600">⏰ Today's Follow-ups (<?= $todayFollowups->rowCount() ?>)</h3>
+                        <h3 class="font-semibold text-yellow-600">⏰ Today's Follow-ups (<?= count($todayFollowups) ?>)</h3>
                         <a href="<?= url('admin/crm.php?filter=today') ?>" class="btn btn-ghost btn-sm">View All</a>
                     </div>
                     <ul class="followup-list">
-                        <?php while ($l = $todayFollowups->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($todayFollowups as $l): ?>
                         <li class="followup-item">
                             <div class="followup-icon" style="background: rgba(234,179,8,0.1); color: #ca8a04;">📞</div>
                             <div class="followup-content">
@@ -328,21 +330,21 @@ $stageLabels = [
                             </div>
                             <div class="followup-date today">Today</div>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
             <?php endif; ?>
 
             <!-- Upcoming Follow-ups -->
-            <?php if ($upcomingFollowups->rowCount() > 0): ?>
+            <?php if (count($upcomingFollowups) > 0): ?>
             <div class="card bg-base-100 shadow-sm">
                 <div class="card-body">
                     <div class="flex items-center justify-between mb-3">
                         <h3 class="font-semibold">📅 Upcoming (Next 7 Days)</h3>
                     </div>
                     <ul class="followup-list">
-                        <?php while ($l = $upcomingFollowups->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($upcomingFollowups as $l): ?>
                         <li class="followup-item">
                             <div class="followup-icon" style="background: var(--muted); color: var(--muted-foreground);">📆</div>
                             <div class="followup-content">
@@ -356,14 +358,14 @@ $stageLabels = [
                                 <?= date('M j', strtotime($l['next_followup'])) ?>
                             </div>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                 </div>
             </div>
             <?php endif; ?>
 
             <!-- No Follow-ups State -->
-            <?php if ($overdueFollowups->rowCount() == 0 && $todayFollowups->rowCount() == 0): ?>
+            <?php if (!$overdueFollowups && !$todayFollowups): ?>
             <div class="card bg-base-100 shadow-sm p-8 text-center">
                 <div class="text-4xl mb-3">🎉</div>
                 <h3 class="font-semibold">All caught up!</h3>
@@ -383,9 +385,9 @@ $stageLabels = [
                         <h3 class="font-semibold">🎯 New Demo Requests</h3>
                         <a href="<?= url('admin/demo-requests.php') ?>" class="btn btn-ghost btn-sm">All</a>
                     </div>
-                    <?php if ($newDemos->rowCount() > 0): ?>
+                    <?php if ($newDemos): ?>
                     <ul class="space-y-3">
-                        <?php while ($d = $newDemos->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($newDemos as $d): ?>
                         <li class="flex items-start gap-3 p-3 rounded-lg bg-muted">
                             <div class="flex-1 min-w-0">
                                 <a href="<?= url('admin/crm-lead.php?id='.$d['id'].'&from=demo') ?>" class="font-semibold text-sm hover:text-primary">
@@ -398,7 +400,7 @@ $stageLabels = [
                             </div>
                             <span class="badge badge-sm badge-primary">New</span>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                     <?php else: ?>
                     <p class="text-sm text-muted-foreground text-center py-4">No pending demo requests</p>
@@ -413,9 +415,9 @@ $stageLabels = [
                         <h3 class="font-semibold">📩 New Inquiries</h3>
                         <a href="<?= url('admin/contact-submissions.php') ?>" class="btn btn-ghost btn-sm">All</a>
                     </div>
-                    <?php if ($newContacts->rowCount() > 0): ?>
+                    <?php if ($newContacts): ?>
                     <ul class="space-y-3">
-                        <?php while ($c = $newContacts->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($newContacts as $c): ?>
                         <li class="p-3 rounded-lg bg-muted">
                             <a href="<?= url('admin/contact-submissions.php?id='.$c['id']) ?>" class="font-semibold text-sm hover:text-primary block">
                                 <?= e($c['name'] ?? 'Unknown') ?>
@@ -425,7 +427,7 @@ $stageLabels = [
                                 <?php if ($c['subject']): ?> · <?= e(substr($c['subject'], 0, 40)) ?><?php endif; ?>
                             </div>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                     <?php else: ?>
                     <p class="text-sm text-muted-foreground text-center py-4">No new inquiries</p>
@@ -437,9 +439,9 @@ $stageLabels = [
             <div class="card bg-base-100 shadow-sm">
                 <div class="card-body">
                     <h3 class="font-semibold mb-3">📝 Recent Activity</h3>
-                    <?php if ($recentActivity->rowCount() > 0): ?>
+                    <?php if ($recentActivity): ?>
                     <ul class="space-y-3">
-                        <?php while ($a = $recentActivity->fetch(PDO::FETCH_ASSOC)): ?>
+                        <?php foreach ($recentActivity as $a): ?>
                         <li class="text-sm">
                             <div class="flex items-start gap-2">
                                 <span class="text-muted-foreground">
@@ -463,7 +465,7 @@ $stageLabels = [
                                 </div>
                             </div>
                         </li>
-                        <?php endwhile; ?>
+                        <?php endforeach; ?>
                     </ul>
                     <?php else: ?>
                     <p class="text-sm text-muted-foreground text-center py-4">No recent activity</p>

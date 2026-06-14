@@ -9,7 +9,16 @@ if (session_status() === PHP_SESSION_NONE) session_start();
 // Determine language: URL param → session → cookie → default (en)
 if (isset($_GET['lang']) && in_array($_GET['lang'], ['en','np'], true)) {
     $_SESSION['lang'] = $_GET['lang'];
-    setcookie('st_lang', $_GET['lang'], time() + 60*60*24*365, '/', '', false, true);
+    $__isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+                  || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
+    setcookie('st_lang', $_GET['lang'], [
+        'expires'  => time() + 60*60*24*365,
+        'path'     => '/',
+        'secure'   => $__isHttps,
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    unset($__isHttps);
     // Redirect to clean URL (absolute, to avoid cPanel rewrite ambiguity)
     $raw  = $_SERVER['REQUEST_URI'] ?? '/';
     $path = parse_url($raw, PHP_URL_PATH) ?: '/';

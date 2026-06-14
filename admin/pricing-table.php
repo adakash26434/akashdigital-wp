@@ -214,3 +214,5 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
 </form>
 
 <?php endif; ?>
+
+<?php require_once '../includes/admin-layout-close.php'; ?>

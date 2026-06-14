@@ -273,22 +273,34 @@ function runDbMigrations() {
 
     try {
         // Migration 15: Add indexes for performance
-        execute("CREATE INDEX IF NOT EXISTS idx_clients_status ON clients(status)");
-        execute("CREATE INDEX IF NOT EXISTS idx_clients_user_id ON clients(user_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_invoices_client_id ON invoices(client_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status)");
-        execute("CREATE INDEX IF NOT EXISTS idx_tickets_client_id ON tickets(client_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_tickets_status ON tickets(status)");
-        execute("CREATE INDEX IF NOT EXISTS idx_client_subscriptions_client_id ON client_subscriptions(client_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_notices_active ON notices(is_active, starts_at, ends_at)");
-        execute("CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)");
-        execute("CREATE INDEX IF NOT EXISTS idx_users_status ON users(status)");
-        execute("CREATE INDEX IF NOT EXISTS idx_crm_leads_stage ON crm_leads(stage)");
-        execute("CREATE INDEX IF NOT EXISTS idx_crm_leads_next_followup ON crm_leads(next_followup)");
-        execute("CREATE INDEX IF NOT EXISTS idx_crm_leads_assigned ON crm_leads(assigned_to)");
-        execute("CREATE INDEX IF NOT EXISTS idx_crm_followups_lead_id ON crm_followups(lead_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_api_tokens_client ON api_tokens(client_id)");
-        execute("CREATE INDEX IF NOT EXISTS idx_demo_requests_status ON demo_requests(status)");
-        execute("CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions(status)");
+        // Each index is guarded individually so a missing column in one table
+        // does not prevent all subsequent indexes from being created.
+        $m15 = [
+            "CREATE INDEX IF NOT EXISTS idx_clients_status        ON clients(status)",
+            "CREATE INDEX IF NOT EXISTS idx_clients_user_id       ON clients(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_invoices_client_id    ON invoices(client_id)",
+            "CREATE INDEX IF NOT EXISTS idx_invoices_status       ON invoices(status)",
+            // tickets uses user_id, not client_id
+            "CREATE INDEX IF NOT EXISTS idx_tickets_user_id       ON tickets(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_tickets_status        ON tickets(status)",
+            // client_subscriptions uses user_id, not client_id
+            "CREATE INDEX IF NOT EXISTS idx_client_subscriptions_user_id ON client_subscriptions(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_notices_active        ON notices(is_active, starts_at, ends_at)",
+            "CREATE INDEX IF NOT EXISTS idx_users_email           ON users(email)",
+            // users uses active flag, not a status column
+            "CREATE INDEX IF NOT EXISTS idx_users_active          ON users(active)",
+            "CREATE INDEX IF NOT EXISTS idx_crm_leads_stage       ON crm_leads(stage)",
+            "CREATE INDEX IF NOT EXISTS idx_crm_leads_next_followup ON crm_leads(next_followup)",
+            "CREATE INDEX IF NOT EXISTS idx_crm_leads_assigned    ON crm_leads(assigned_to)",
+            "CREATE INDEX IF NOT EXISTS idx_crm_followups_lead_id ON crm_followups(lead_id)",
+            "CREATE INDEX IF NOT EXISTS idx_api_tokens_client     ON api_tokens(client_id)",
+            "CREATE INDEX IF NOT EXISTS idx_demo_requests_status  ON demo_requests(status)",
+            "CREATE INDEX IF NOT EXISTS idx_contact_submissions_status ON contact_submissions(status)",
+        ];
+        foreach ($m15 as $idxSql) {
+            try { execute($idxSql); } catch (\Throwable $e2) {
+                error_log('[db-migrations] M15 index: ' . $e2->getMessage() . ' | SQL: ' . substr($idxSql, 0, 80));
+            }
+        }
     } catch (\Throwable $e) { error_log('[db-migrations] M15: ' . $e->getMessage()); }
 }

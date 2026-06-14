@@ -41,3 +41,10 @@ externalPort = 3001
 [deployment]
 deploymentTarget = "autoscale"
 run = ["php", "-S", "0.0.0.0:5000", "router.php"]
+
+[userenv]
+
+[userenv.development]
+APP_ENV = "development"
+SUPERADMIN_EMAIL = "dev@localhost.dev"
+SUPERADMIN_PASS_PLAIN = "DevAdmin@2026"

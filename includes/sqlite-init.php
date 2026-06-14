@@ -973,17 +973,32 @@ function sqliteMigrate(PDO $pdo): void {
         amount      REAL NOT NULL DEFAULT 0,
         sort_order  INTEGER NOT NULL DEFAULT 0
     );
+    ");
 
 }
 
 function _sqliteInitSeedData(PDO $pdo): void
 {
-    // Seed admin user (password: Admin@12345)
-    $siteHost = parse_url(defined('SITE_URL') ? SITE_URL : '', PHP_URL_HOST) ?: 'example.com';
-    $siteName = defined('SITE_NAME') ? SITE_NAME : 'Company';
-    $hash = password_hash('Admin@12345', PASSWORD_BCRYPT, ['cost' => 10]);
+    // Seed dev admin user — password comes from env vars (same as superadmin.php).
+    // SUPERADMIN_PASS_HASH (bcrypt) or SUPERADMIN_PASS_PLAIN must be set; falls back to
+    // a random one-time token printed to error_log so the developer can log in once and change it.
+    $siteHost  = parse_url(defined('SITE_URL') ? SITE_URL : '', PHP_URL_HOST) ?: 'example.com';
+    $siteName  = defined('SITE_NAME') ? SITE_NAME : 'Company';
+    $saHash    = getenv('SUPERADMIN_PASS_HASH') ?: '';
+    $saPlain   = getenv('SUPERADMIN_PASS_PLAIN') ?: '';
+    if ($saHash) {
+        $hash = $saHash;
+    } elseif ($saPlain) {
+        $hash = password_hash($saPlain, PASSWORD_BCRYPT, ['cost' => 12]);
+    } else {
+        // No env var set — generate a random one-time password for first login.
+        $onetime = bin2hex(random_bytes(8));
+        $hash    = password_hash($onetime, PASSWORD_BCRYPT, ['cost' => 10]);
+        error_log('[sqlite-init] Dev admin seeded. One-time password: ' . $onetime . ' — change immediately after first login.');
+    }
+    $seedEmail = getenv('SUPERADMIN_EMAIL') ?: ('admin@' . $siteHost);
     $pdo->prepare("INSERT OR IGNORE INTO users (display_name, email, password_hash, role, email_verified, active)
-        VALUES ('Admin', ?, ?, 'admin', 1, 1)")->execute(['admin@' . $siteHost, $hash]);
+        VALUES ('Admin', ?, ?, 'admin', 1, 1)")->execute([$seedEmail, $hash]);
 
     // Seed site settings
     $settings = [

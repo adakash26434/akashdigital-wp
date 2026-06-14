@@ -507,4 +507,4 @@ function setInvoiceMode(mode) {
 
 <?php adminListPagination($total, $perPage, $page, ['q' => $client_search, 'status' => $status_filter]); ?>
 
-<?php includeAdminFooter(); ?>
+<?php require_once '../includes/admin-layout-close.php'; ?>

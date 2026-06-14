@@ -96,6 +96,25 @@ if (getenv('APP_ENV') !== 'development') {
     ini_set('log_errors', '1');
 }
 
+// ── HTTP Security Headers ──────────────────────────────────────
+// Applied on every PHP response (static assets served by router.php are unaffected).
+// Override per-response only when a specific page requires different behaviour
+// (e.g., an embed-allowed page may send its own X-Frame-Options: ALLOWALL).
+if (!headers_sent()) {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('X-XSS-Protection: 1; mode=block');
+    // Permissions-Policy: disable unused powerful features
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()');
+    // HSTS: only send on HTTPS connections (production)
+    $__proto = $_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ($_SERVER['HTTPS'] ?? '');
+    if ($__proto === 'https' || $__proto === 'on') {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+    unset($__proto);
+}
+
 // ── PHP Settings ──────────────────────────────────────────────
 ini_set('session.cookie_httponly', 1);
 ini_set('session.use_strict_mode', 1);

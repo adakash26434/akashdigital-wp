@@ -1,10 +1,6 @@
 <?php
 $pageTitle = 'Client Growth Analytics';
-require_once '../includes/config.php';
-require_once '../includes/db.php';
-require_once '../includes/auth.php';
-require_once '../includes/helpers.php';
-requireAdmin();
+require_once '../includes/admin-layout.php';
 
 $error = $success = '';
 
@@ -124,8 +120,6 @@ $activeClients = $statusCounts['active'];
 $totalNewThisYear = array_sum($growthData);
 
 $csrf = generateCsrf();
-
-require_once '../includes/admin-layout.php';
 ?>
 
 <style>
