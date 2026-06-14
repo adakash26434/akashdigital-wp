@@ -92,7 +92,7 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
 <?php else: ?>
 
 <form method="POST" style="display:flex;flex-direction:column;gap:1.5rem;">
-  <?= csrf() ?>
+  <?= csrfField() ?>
   <input type="hidden" name="action" value="save-table">
 
   <div class="af-split">
