@@ -52,6 +52,14 @@ if (!empty($_GET['edit'])) {
     try { $editing = queryOne("SELECT * FROM testimonials WHERE id=?", [(int)$_GET['edit']]); }
     catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 }
+
+// Client list for org dropdown
+$clientOrgs = [];
+try { $clientOrgs = query("SELECT id, org_name FROM clients WHERE status='active' AND org_name != '' ORDER BY org_name ASC"); }
+catch (\Throwable $e) {
+    try { $clientOrgs = query("SELECT id, org_name FROM clients WHERE org_name != '' ORDER BY org_name ASC"); }
+    catch (\Throwable $e2) { /* no clients table yet */ }
+}
 ?>
 
 <?php if($success):?><div class="alert alert-success mb-1"><?=e($success)?></div><?php endif;?>
@@ -116,7 +124,19 @@ if (!empty($_GET['edit'])) {
       </div>
       <div>
         <label class="form-label fs-2xs2">Organization / Cooperative</label>
-        <input type="text" name="author_org" class="form-input fs-sm2" value="<?=e($editing['author_org']??'')?>" placeholder="e.g. Himalayan Saving Co-op">
+        <input type="text" name="author_org" class="form-input fs-sm2"
+               value="<?=e($editing['author_org']??'')?>"
+               placeholder="Select a client or type manually"
+               list="tst-org-list"
+               autocomplete="off">
+        <?php if (!empty($clientOrgs)): ?>
+        <datalist id="tst-org-list">
+          <?php foreach ($clientOrgs as $co): ?>
+            <option value="<?=e($co['org_name'])?>">
+          <?php endforeach; ?>
+        </datalist>
+        <?php endif; ?>
+        <span class="form-hint">Select from existing clients or type a custom name.</span>
       </div>
       <div>
         <label class="form-label fs-2xs2">Quote / Review <span class="text-danger-token">*</span></label>
