@@ -134,7 +134,7 @@ return [
     'footer_products'         => 'Products',
     'footer_support_24'       => '24/7 Support',
     'footer_copyright'        => '© %d %s. All rights reserved.',
-    'footer_tagline'          => "IT Solutions & Services | Butwal, Nepal 🇳🇵",
+    'footer_tagline'          => "IT Solutions & Services | Nepal 🇳🇵",
     'footer_portal'           => 'Client Portal',
     'footer_tools'            => 'Free Tools',
 
@@ -155,7 +155,7 @@ return [
 
     // ── Public page heroes (uniform) ──
     'about_hero_eyebrow'     => 'About us',
-    'about_hero_title'       => 'Your dedicated IT partner in<br><span class="text-gradient">Butwal, Nepal</span>',
+    'about_hero_title'       => 'Your dedicated IT partner in<br><span class="text-gradient">Nepal</span>',
     'about_hero_sub'         => '%s is based in our location, and delivers reliable IT solutions and software services for businesses across Nepal.',
 
     'services_hero_eyebrow'  => 'What we offer',
@@ -228,7 +228,7 @@ return [
     'home_hero_h1_a'       => 'Leading the',
     'home_hero_h1_b'       => 'Financial Digital Era',
     'home_hero_h1_c'       => 'in Nepal',
-    'home_hero_sub'        => "Digitization, Digitalization and Automation — we build scalable, secure and user-friendly software and IT solutions for businesses across Nepal. Based in Butwal, we are your trusted local technology partner.",
+    'home_hero_sub'        => "Digitization, Digitalization and Automation — we build scalable, secure and user-friendly software and IT solutions for businesses across Nepal. We are your trusted local technology partner.",
     'home_hero_book_demo'  => 'Book a free demo',
     'home_hero_explore'    => 'Explore services',
     'home_members'         => 'Members',
