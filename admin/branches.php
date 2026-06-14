@@ -86,7 +86,7 @@ $selectedClient = $clientId
 <div class="st-card" style="margin-bottom:1.5rem;padding:1rem 1.25rem;">
   <form method="get" style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
     <label style="font-size:0.8125rem;font-weight:600;color:var(--foreground);white-space:nowrap;">Select Client</label>
-    <select name="client_id" onchange="this.form.submit()" class="form-input fs-sm2" style="max-width:22rem;">
+    <select name="client_id" onchange="this.form.submit()" class="form-input" style="max-width:22rem;">
       <option value="">— choose a client —</option>
       <?php foreach($clients as $c):?>
       <option value="<?=$c['id']?>" <?=$clientId===$c['id']?'selected':''?>><?=e($c['org_name'])?></option>
@@ -178,35 +178,35 @@ $selectedClient = $clientId
   </div>
 
   <!-- Add / Edit form -->
-  <div class="st-card">
-    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;">
+  <div class="st-card p-card-lg">
+    <h3 class="h-eyebrow" style="margin-bottom:1.25rem;">
       <?=$editing ? 'Edit Branch' : 'Add Branch'?>
     </h3>
-    <form method="post" action="?client_id=<?=$clientId?>" style="display:flex;flex-direction:column;gap:0.875rem;">
+    <form method="post" action="?client_id=<?=$clientId?>" class="col-stack">
       <?=csrfField()?>
       <input type="hidden" name="action" value="save">
       <input type="hidden" name="id"     value="<?=(int)($editing['id']??0)?>">
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
-          <label class="form-label fs-2xs2">Code</label>
-          <input name="code" class="form-input fs-sm2" value="<?=e($editing['code']??'')?>" placeholder="e.g. BTW-01">
+          <label class="form-label">Code</label>
+          <input name="code" class="form-input" value="<?=e($editing['code']??'')?>" placeholder="e.g. BTW-01">
         </div>
         <div>
-          <label class="form-label fs-2xs2">Name <span class="text-danger-token">*</span></label>
-          <input name="name" required class="form-input fs-sm2" value="<?=e($editing['name']??'')?>">
+          <label class="form-label">Name <span class="text-danger-token">*</span></label>
+          <input name="name" required class="form-input" value="<?=e($editing['name']??'')?>">
         </div>
       </div>
 
       <div>
-        <label class="form-label fs-2xs2">Address</label>
-        <input name="address" class="form-input fs-sm2" value="<?=e($editing['address']??'')?>" placeholder="Street / locality">
+        <label class="form-label">Address</label>
+        <input name="address" class="form-input" value="<?=e($editing['address']??'')?>" placeholder="Street / locality">
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
-          <label class="form-label fs-2xs2">District</label>
-          <input name="district" class="form-input fs-sm2" value="<?=e($editing['district']??'')?>"
+          <label class="form-label">District</label>
+          <input name="district" class="form-input" value="<?=e($editing['district']??'')?>"
                  list="br-district-list" autocomplete="off" placeholder="e.g. Kaski">
           <datalist id="br-district-list">
             <?php foreach (nepalDistricts() as $d): ?>
@@ -215,8 +215,8 @@ $selectedClient = $clientId
           </datalist>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Province</label>
-          <input name="province" class="form-input fs-sm2" value="<?=e($editing['province']??'')?>"
+          <label class="form-label">Province</label>
+          <input name="province" class="form-input" value="<?=e($editing['province']??'')?>"
                  list="br-province-list" autocomplete="off" placeholder="e.g. Gandaki Province">
           <datalist id="br-province-list">
             <?php foreach (nepalProvinces() as $p): ?>
@@ -228,12 +228,12 @@ $selectedClient = $clientId
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
-          <label class="form-label fs-2xs2">Phone</label>
-          <input name="phone" class="form-input fs-sm2" value="<?=e($editing['phone']??'')?>">
+          <label class="form-label">Phone</label>
+          <input name="phone" class="form-input" value="<?=e($editing['phone']??'')?>">
         </div>
         <div>
-          <label class="form-label fs-2xs2">Manager</label>
-          <input name="manager" class="form-input fs-sm2" value="<?=e($editing['manager']??'')?>">
+          <label class="form-label">Manager</label>
+          <input name="manager" class="form-input" value="<?=e($editing['manager']??'')?>">
         </div>
       </div>
 

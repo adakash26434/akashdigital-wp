@@ -156,58 +156,58 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
       <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
 
       <div>
-        <label class="form-label fs-2xs2">Job Title <span class="text-danger-token">*</span></label>
-        <input type="text" name="title" required class="form-input fs-sm2" value="<?=e($editing['title']??'')?>" placeholder="e.g., Senior Backend Developer" minlength="3" maxlength="150">
+        <label class="form-label">Job Title <span class="text-danger-token">*</span></label>
+        <input type="text" name="title" required class="form-input" value="<?=e($editing['title']??'')?>" placeholder="e.g., Senior Backend Developer" minlength="3" maxlength="150">
         <span class="form-hint">Job position title (3-150 chars).</span>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Short Summary <span style="color:var(--muted-foreground);font-weight:400;">(shown on listing cards)</span></label>
-        <input type="text" name="short_desc" class="form-input fs-sm2" maxlength="300" value="<?=e($editing['short_desc']??'')?>" placeholder="Build and scale our Core Banking platform.">
+        <label class="form-label">Short Summary <span style="color:var(--muted-foreground);font-weight:400;">(shown on listing cards)</span></label>
+        <input type="text" name="short_desc" class="form-input" maxlength="300" value="<?=e($editing['short_desc']??'')?>" placeholder="Build and scale our Core Banking platform.">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Slug</label>
-        <input type="text" name="slug" class="form-input fs-sm2" value="<?=e($editing['slug']??'')?>" placeholder="auto">
+        <label class="form-label">Slug</label>
+        <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
         <div>
-          <label class="form-label fs-2xs2">Department</label>
-          <input type="text" name="department" class="form-input fs-sm2" value="<?=e($editing['department']??'')?>" placeholder="Engineering">
+          <label class="form-label">Department</label>
+          <input type="text" name="department" class="form-input" value="<?=e($editing['department']??'')?>" placeholder="Engineering">
         </div>
         <div>
-          <label class="form-label fs-2xs2">Location</label>
-          <input type="text" name="location" class="form-input fs-sm2" value="<?=e($editing['location']??'Kathmandu, Nepal')?>">
+          <label class="form-label">Location</label>
+          <input type="text" name="location" class="form-input" value="<?=e($editing['location']??'Kathmandu, Nepal')?>">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
         <div>
-          <label class="form-label fs-2xs2">Job Type</label>
-          <select name="type" class="form-input fs-sm2">
+          <label class="form-label">Job Type</label>
+          <select name="type" class="form-input">
             <?php foreach($TYPE_LABELS as $tv=>$tl):?>
             <option value="<?=$tv?>" <?=($editing['type']??'full-time')===$tv?'selected':''?>><?=$tl?></option>
             <?php endforeach;?>
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Salary Range</label>
-          <input type="text" name="salary_range" class="form-input fs-sm2" value="<?=e($editing['salary_range']??'')?>" placeholder="NPR 40k–60k">
+          <label class="form-label">Salary Range</label>
+          <input type="text" name="salary_range" class="form-input" value="<?=e($editing['salary_range']??'')?>" placeholder="NPR 40k–60k">
         </div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
         <div>
-          <label class="form-label fs-2xs2">Experience Required</label>
-          <input type="text" name="experience" class="form-input fs-sm2" value="<?=e($editing['experience']??'')?>" placeholder="2+ years PHP">
+          <label class="form-label">Experience Required</label>
+          <input type="text" name="experience" class="form-input" value="<?=e($editing['experience']??'')?>" placeholder="2+ years PHP">
         </div>
         <div>
-          <label class="form-label fs-2xs2">Application Deadline</label>
-          <input type="date" name="deadline" class="form-input fs-sm2" value="<?=e(substr($editing['deadline']??'',0,10))?>">
+          <label class="form-label">Application Deadline</label>
+          <input type="date" name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
         </div>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Job Description</label>
+        <label class="form-label">Job Description</label>
         <textarea name="description" class="form-input fs-sm-r" rows="4"><?=e($editing['description']??'')?></textarea>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Requirements</label>
+        <label class="form-label">Requirements</label>
         <textarea name="requirements" class="form-input fs-sm-r" rows="3" placeholder="- 2+ years PHP&#10;- MySQL experience"><?=e($editing['requirements']??'')?></textarea>
       </div>
       <label class="row-check">

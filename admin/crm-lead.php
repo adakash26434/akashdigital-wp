@@ -443,7 +443,7 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
               <option value="<?=$ps?>" <?=$p['status']===$ps?'selected':''?>><?=$pslbl?></option>
               <?php endforeach; ?>
             </select>
-            <button type="submit" class="btn btn-outline btn-sm fs-sm2">Update</button>
+            <button type="submit" class="btn btn-outline btn-sm">Update</button>
             <form method="POST" style="margin-left:auto;" onsubmit="return confirm('Delete this proposal?');">
               <?= csrfField() ?>
               <input type="hidden" name="action" value="delete_proposal">
@@ -534,13 +534,13 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
         ];
         foreach ($fields as [$fn,$fl,$ft,$fv]): ?>
         <div>
-          <label class="form-label fs-2xs2"><?= e($fl) ?></label>
+          <label class="form-label"><?= e($fl) ?></label>
           <input type="<?=$ft?>" name="<?=$fn?>" value="<?= e((string)$fv) ?>" class="form-input" style="font-size:0.8125rem;padding:0.5rem 0.625rem;">
         </div>
         <?php endforeach; ?>
         <!-- Products / Services Interest — dropdown from DB -->
         <div>
-          <label class="form-label fs-2xs2">Products Interest</label>
+          <label class="form-label">Products Interest</label>
           <?php
             $_piCurrent = array_filter(array_map('trim', explode(',', $lead['products_interest'] ?? '')));
           ?>
@@ -569,7 +569,7 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
           <?php endif; ?>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Source</label>
+          <label class="form-label">Source</label>
           <select name="source" class="form-input" style="font-size:0.8125rem;padding:0.5rem 0.625rem;">
             <?php foreach (['demo_request'=>'Demo Request','contact_form'=>'Contact Form','referral'=>'Referral','cold_call'=>'Cold Call','website'=>'Website','exhibition'=>'Exhibition','other'=>'Other'] as $sv=>$sl): ?>
             <option value="<?=$sv?>" <?=$lead['source']===$sv?'selected':''?>><?=$sl?></option>
@@ -577,7 +577,7 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Assigned To</label>
+          <label class="form-label">Assigned To</label>
           <select name="assigned_to" class="form-input" style="font-size:0.8125rem;padding:0.5rem 0.625rem;">
             <option value="">— Unassigned —</option>
             <?php foreach ($staff as $u): ?>
@@ -586,8 +586,8 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Stage Notes</label>
-          <textarea name="stage_notes" class="form-input fs-sm2" rows="2"><?= e($lead['stage_notes'] ?? '') ?></textarea>
+          <label class="form-label">Stage Notes</label>
+          <textarea name="stage_notes" class="form-input" rows="2"><?= e($lead['stage_notes'] ?? '') ?></textarea>
         </div>
         <button type="submit" class="btn btn-primary btn-sm w-100">Save Changes</button>
       </form>

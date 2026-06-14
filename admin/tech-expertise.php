@@ -156,15 +156,15 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
       <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
 
       <div>
-        <label class="form-label fs-2xs2">Name <span class="text-danger-token">*</span></label>
-        <input type="text" name="name" required class="form-input fs-sm2"
+        <label class="form-label">Name <span class="text-danger-token">*</span></label>
+        <input type="text" name="name" required class="form-input"
                value="<?=e($editing['name']??'')?>"
                placeholder="e.g. Laravel / PHP">
       </div>
 
       <div>
-        <label class="form-label fs-2xs2">Category</label>
-        <select name="category" class="form-input fs-sm2">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-input">
           <?php foreach($CATEGORIES as $c):?>
           <option value="<?=$c?>" <?=($editing['category']??'General')===$c?'selected':''?>><?=$c?></option>
           <?php endforeach;?>
@@ -172,15 +172,15 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
       </div>
 
       <div>
-        <label class="form-label fs-2xs2">Description <span style="color:var(--muted-foreground);font-weight:400;">(shown on website)</span></label>
-        <input type="text" name="description" class="form-input fs-sm2"
+        <label class="form-label">Description <span style="color:var(--muted-foreground);font-weight:400;">(shown on website)</span></label>
+        <input type="text" name="description" class="form-input"
                value="<?=e($editing['description']??'')?>"
                placeholder="e.g. Modern and reliable framework for rapid development.">
       </div>
 
       <div>
-        <label class="form-label fs-2xs2">Icon (Lucide)</label>
-        <select name="lucide_icon" class="form-input fs-sm2">
+        <label class="form-label">Icon (Lucide)</label>
+        <select name="lucide_icon" class="form-input">
           <?php foreach($ICONS as $ic):?>
           <option value="<?=$ic?>" <?=($editing['lucide_icon']??'cpu')===$ic?'selected':''?>><?=$ic?></option>
           <?php endforeach;?>
@@ -196,8 +196,8 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
 
       <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
         <div>
-          <label class="form-label fs-2xs2">Position</label>
-          <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+          <label class="form-label">Position</label>
+          <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
         <div style="padding-bottom:0.5rem;">
           <label class="row-check">

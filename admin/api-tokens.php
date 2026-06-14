@@ -56,11 +56,11 @@ require_once '../includes/admin-layout.php';
     <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:0.75rem;align-items:end;margin-bottom:0.75rem;">
       <div>
         <label class="form-label">Name <span class="text-danger-token">*</span></label>
-        <input name="name" required placeholder="e.g. Branch Portal Integration" class="form-input fs-sm2">
+        <input name="name" required placeholder="e.g. Branch Portal Integration" class="form-input">
       </div>
       <div>
         <label class="form-label">Client (optional)</label>
-        <select name="client_id" class="form-input fs-sm2">
+        <select name="client_id" class="form-input">
           <option value="">— System / All —</option>
           <?php foreach ($clients as $c): ?>
             <option value="<?= $c['id'] ?>"><?= e($c['org_name']) ?></option>
@@ -69,7 +69,7 @@ require_once '../includes/admin-layout.php';
       </div>
       <div>
         <label class="form-label">Scopes</label>
-        <select name="scopes[]" multiple size="3" class="form-input fs-sm2">
+        <select name="scopes[]" multiple size="3" class="form-input">
           <option value="read" selected>read</option>
           <option value="write">write</option>
           <option value="sync">sync</option>
@@ -77,11 +77,11 @@ require_once '../includes/admin-layout.php';
       </div>
       <div>
         <label class="form-label">Rate / min</label>
-        <input type="number" name="rate_limit" value="120" min="10" max="6000" class="form-input fs-sm2">
+        <input type="number" name="rate_limit" value="120" min="10" max="6000" class="form-input">
       </div>
       <div>
         <label class="form-label">Expires</label>
-        <input type="date" name="expires_at" class="form-input fs-sm2">
+        <input type="date" name="expires_at" class="form-input">
       </div>
     </div>
     <button class="btn btn-primary btn-sm">Create Token</button>

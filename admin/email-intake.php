@@ -46,15 +46,15 @@ $log = query("SELECT * FROM email_intake_log ORDER BY fetched_at DESC LIMIT 50")
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:0.875rem;margin-bottom:1rem;">
       <div>
         <label class="form-label">IMAP Host</label>
-        <input name="imap_host" value="<?= e($cfg['imap_host']) ?>" class="form-input fs-sm2" placeholder="imap.gmail.com">
+        <input name="imap_host" value="<?= e($cfg['imap_host']) ?>" class="form-input" placeholder="imap.gmail.com">
       </div>
       <div>
         <label class="form-label">Port</label>
-        <input name="imap_port" value="<?= e($cfg['imap_port']) ?: '993' ?>" class="form-input fs-sm2" placeholder="993">
+        <input name="imap_port" value="<?= e($cfg['imap_port']) ?: '993' ?>" class="form-input" placeholder="993">
       </div>
       <div>
         <label class="form-label">Security</label>
-        <select name="imap_secure" class="form-input fs-sm2">
+        <select name="imap_secure" class="form-input">
           <?php foreach (['ssl','tls','none'] as $o): ?>
             <option value="<?= $o ?>" <?= $cfg['imap_secure']===$o?'selected':'' ?>><?= strtoupper($o) ?></option>
           <?php endforeach; ?>
@@ -62,15 +62,15 @@ $log = query("SELECT * FROM email_intake_log ORDER BY fetched_at DESC LIMIT 50")
       </div>
       <div>
         <label class="form-label">Folder</label>
-        <input name="imap_folder" value="<?= e($cfg['imap_folder']) ?: 'INBOX' ?>" class="form-input fs-sm2" placeholder="INBOX">
+        <input name="imap_folder" value="<?= e($cfg['imap_folder']) ?: 'INBOX' ?>" class="form-input" placeholder="INBOX">
       </div>
       <div>
         <label class="form-label">Username</label>
-        <input name="imap_user" value="<?= e($cfg['imap_user']) ?>" class="form-input fs-sm2" placeholder="support@yourdomain.com">
+        <input name="imap_user" value="<?= e($cfg['imap_user']) ?>" class="form-input" placeholder="support@yourdomain.com">
       </div>
       <div>
         <label class="form-label">Password</label>
-        <input type="password" name="imap_pass" value="<?= e($cfg['imap_pass']) ?>" class="form-input fs-sm2">
+        <input type="password" name="imap_pass" value="<?= e($cfg['imap_pass']) ?>" class="form-input">
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">

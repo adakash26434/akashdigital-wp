@@ -114,25 +114,25 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <div>
-        <label class="form-label fs-2xs2">Category</label>
-        <select name="category" class="form-input fs-sm2">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-input">
           <?php foreach($CATS as $c):?>
           <option value="<?=$c?>" <?=($editing['category']??'General')===$c?'selected':''?>><?=$c?></option>
           <?php endforeach;?>
         </select>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Question <span class="text-danger-token">*</span></label>
+        <label class="form-label">Question <span class="text-danger-token">*</span></label>
         <textarea name="question" required class="form-input fs-sm-r" rows="3"><?=e($editing['question']??'')?></textarea>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Answer <span class="text-danger-token">*</span></label>
+        <label class="form-label">Answer <span class="text-danger-token">*</span></label>
         <textarea name="answer" required class="form-input fs-sm-r" rows="5"><?=e($editing['answer']??'')?></textarea>
       </div>
       <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
         <div>
-          <label class="form-label fs-2xs2">Position</label>
-          <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+          <label class="form-label">Position</label>
+          <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
         <div style="padding-bottom:0.5rem;">
           <label class="row-check">

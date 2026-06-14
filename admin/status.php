@@ -194,16 +194,16 @@ function stTab(id) {
       <input type="hidden" name="action" value="comp_save">
       <input type="hidden" name="id" value="<?=(int)($editComp['id']??0)?>">
       <div>
-        <label class="form-label fs-2xs2">Name <span class="text-danger-token">*</span></label>
+        <label class="form-label">Name <span class="text-danger-token">*</span></label>
         <input name="name" required class="form-input" value="<?=e($editComp['name']??'')?>">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Description</label>
+        <label class="form-label">Description</label>
         <input name="description" class="form-input" value="<?=e($editComp['description']??'')?>" placeholder="Brief description…">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
         <div>
-          <label class="form-label fs-2xs2">Status</label>
+          <label class="form-label">Status</label>
           <select name="status" class="form-input">
             <?php foreach(['operational','degraded','partial','major','maintenance'] as $s):?>
             <option value="<?=$s?>" <?=($editComp['status']??'operational')===$s?'selected':''?>><?=ucfirst($s)?></option>
@@ -211,7 +211,7 @@ function stTab(id) {
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Sort Order</label>
+          <label class="form-label">Sort Order</label>
           <input type="number" name="sort_order" class="form-input" value="<?=(int)($editComp['sort_order']??10)?>">
         </div>
       </div>
@@ -245,8 +245,8 @@ function stTab(id) {
       <?=csrfField()?>
       <input type="hidden" name="action" value="incident_update">
       <div>
-        <label class="form-label fs-2xs2">Incident</label>
-        <select name="incident_id" required class="form-input fs-sm2">
+        <label class="form-label">Incident</label>
+        <select name="incident_id" required class="form-input">
           <option value="">— Select</option>
           <?php foreach($openIncidents as $i):?>
           <option value="<?=$i['id']?>">[#<?=$i['id']?>] <?=e(truncate($i['title'],35))?></option>
@@ -254,16 +254,16 @@ function stTab(id) {
         </select>
       </div>
       <div>
-        <label class="form-label fs-2xs2">New Status</label>
-        <select name="severity" class="form-input fs-sm2">
+        <label class="form-label">New Status</label>
+        <select name="severity" class="form-input">
           <?php foreach(['investigating','identified','monitoring','resolved'] as $s):?>
           <option value="<?=$s?>"><?=ucfirst($s)?></option>
           <?php endforeach;?>
         </select>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Message <span class="text-danger-token">*</span></label>
-        <input name="message" required class="form-input fs-sm2" placeholder="Update message…">
+        <label class="form-label">Message <span class="text-danger-token">*</span></label>
+        <input name="message" required class="form-input" placeholder="Update message…">
       </div>
       <button type="submit" class="btn btn-primary btn-sm" style="white-space:nowrap;">Post Update</button>
     </form>
@@ -315,12 +315,12 @@ function stTab(id) {
       <?=csrfField()?>
       <input type="hidden" name="action" value="incident_new">
       <div>
-        <label class="form-label fs-2xs2">Title <span class="text-danger-token">*</span></label>
+        <label class="form-label">Title <span class="text-danger-token">*</span></label>
         <input name="title" required class="form-input" placeholder="e.g. CBS login delays">
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
         <div>
-          <label class="form-label fs-2xs2">Component</label>
+          <label class="form-label">Component</label>
           <select name="component_id" class="form-input">
             <option value="">— All systems</option>
             <?php foreach($components as $c):?>
@@ -329,7 +329,7 @@ function stTab(id) {
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Severity</label>
+          <label class="form-label">Severity</label>
           <select name="severity" class="form-input">
             <?php foreach(['investigating','identified','monitoring','resolved'] as $s):?>
             <option value="<?=$s?>"><?=ucfirst($s)?></option>
@@ -338,7 +338,7 @@ function stTab(id) {
         </div>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Impact</label>
+        <label class="form-label">Impact</label>
         <select name="impact" class="form-input">
           <?php foreach(['none','minor','major','critical'] as $s):?>
           <option value="<?=$s?>"><?=ucfirst($s)?></option>
@@ -346,7 +346,7 @@ function stTab(id) {
         </select>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Details <span class="text-danger-token">*</span></label>
+        <label class="form-label">Details <span class="text-danger-token">*</span></label>
         <textarea name="body" rows="4" required class="form-input" placeholder="What happened…"></textarea>
       </div>
       <button type="submit" class="btn btn-primary btn-md">Publish Incident</button>

@@ -166,17 +166,17 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
       <!-- Tab: Content -->
       <div class="af-tab-pane active" data-tab-pane="content" style="padding-bottom:2rem;">
         <div>
-          <label class="form-label fs-2xs2">Title <span class="text-danger-token">*</span></label>
-          <input type="text" name="title" required minlength="5" maxlength="200" class="form-input fs-sm2" value="<?=e($editing['title']??'')?>" placeholder="Post title (5-200 chars)">
+          <label class="form-label">Title <span class="text-danger-token">*</span></label>
+          <input type="text" name="title" required minlength="5" maxlength="200" class="form-input" value="<?=e($editing['title']??'')?>" placeholder="Post title (5-200 chars)">
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Slug (URL)</label>
-            <input type="text" name="slug" maxlength="100" class="form-input fs-sm2" value="<?=e($editing['slug']??'')?>" placeholder="auto-generated">
+            <label class="form-label">Slug (URL)</label>
+            <input type="text" name="slug" maxlength="100" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto-generated">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Category <span class="text-danger-token">*</span></label>
-            <select name="category" required class="form-input fs-sm2">
+            <label class="form-label">Category <span class="text-danger-token">*</span></label>
+            <select name="category" required class="form-input">
               <option value="">Select category</option>
               <?php foreach($CATS as $c):?>
               <option value="<?=$c?>" <?=($editing['category']??'General')===$c?'selected':''?>><?=$c?></option>
@@ -186,24 +186,24 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Author Name</label>
-            <input type="text" name="author_name" maxlength="100" class="form-input fs-sm2" value="<?=e($editing['author_name']??($__s['company_name']??($__s['site_name']??SITE_NAME)))?>">
+            <label class="form-label">Author Name</label>
+            <input type="text" name="author_name" maxlength="100" class="form-input" value="<?=e($editing['author_name']??($__s['company_name']??($__s['site_name']??SITE_NAME)))?>">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Read Time (min) <span class="text-danger-token">*</span></label>
-            <input type="number" name="read_time" required min="1" max="60" class="form-input fs-sm2" value="<?=e($editing['read_time']??5)?>">
+            <label class="form-label">Read Time (min) <span class="text-danger-token">*</span></label>
+            <input type="number" name="read_time" required min="1" max="60" class="form-input" value="<?=e($editing['read_time']??5)?>">
           </div>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Cover Image</label>
+          <label class="form-label">Cover Image</label>
           <?php $imgField = 'cover_url'; $imgValue = $editing['cover_url'] ?? ''; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Excerpt <span style="color:var(--muted-foreground);font-weight:400;">(for cards)</span></label>
+          <label class="form-label">Excerpt <span style="color:var(--muted-foreground);font-weight:400;">(for cards)</span></label>
           <textarea name="excerpt" maxlength="300" class="form-input fs-sm-r" rows="2" placeholder="Summary (max 300 chars)"><?=e($editing['excerpt']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Body Content <span style="color:var(--muted-foreground);font-weight:400;">(HTML allowed)</span> <span class="text-danger-token">*</span></label>
+          <label class="form-label">Body Content <span style="color:var(--muted-foreground);font-weight:400;">(HTML allowed)</span> <span class="text-danger-token">*</span></label>
           <textarea name="content" required minlength="20" class="form-input" rows="8" style="font-size:0.8125rem;resize:vertical;font-family:monospace;" placeholder="Post content (min 20 chars)"><?=e($editing['content']??'')?></textarea>
         </div>
       </div>
@@ -211,12 +211,12 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
       <!-- Tab: Publish -->
       <div class="af-tab-pane" data-tab-pane="publish">
         <div>
-          <label class="form-label fs-2xs2">Tags <span style="color:var(--muted-foreground);font-weight:400;">(comma-separated)</span></label>
-          <input type="text" name="tags" class="form-input fs-sm2" value="<?=e($editing['tags_text']??'')?>" placeholder="Software, IT, Nepal">
+          <label class="form-label">Tags <span style="color:var(--muted-foreground);font-weight:400;">(comma-separated)</span></label>
+          <input type="text" name="tags" class="form-input" value="<?=e($editing['tags_text']??'')?>" placeholder="Software, IT, Nepal">
         </div>
         <div>
-          <label class="form-label fs-2xs2">Publish Date / Time</label>
-          <input type="datetime-local" name="published_at" class="form-input fs-sm2" value="<?=e(isset($editing['published_at'])&&$editing['published_at']?str_replace(' ','T',substr($editing['published_at'],0,16)):'')?>">
+          <label class="form-label">Publish Date / Time</label>
+          <input type="datetime-local" name="published_at" class="form-input" value="<?=e(isset($editing['published_at'])&&$editing['published_at']?str_replace(' ','T',substr($editing['published_at'],0,16)):'')?>">
         </div>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
           <label class="row-check">

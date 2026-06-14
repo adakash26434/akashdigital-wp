@@ -110,14 +110,14 @@ $PRI_COLORS = [
 <form method="GET" style="display:flex;flex-wrap:wrap;gap:0.625rem;margin-bottom:1.25rem;align-items:center;">
   <input type="text" name="q" value="<?=e($q)?>" placeholder=" Search tickets, clients…" class="form-input" style="min-width:220px;font-size:0.8125rem;">
 
-  <select name="status" class="form-input fs-sm2" onchange="this.form.submit()">
+  <select name="status" class="form-input" onchange="this.form.submit()">
     <option value="">All Statuses</option>
     <?php foreach(['open','in_progress','replied','resolved','closed'] as $s):?>
     <option value="<?=$s?>" <?=$status_filter===$s?'selected':''?>><?=ucwords(str_replace('_',' ',$s))?></option>
     <?php endforeach;?>
   </select>
 
-  <select name="priority" class="form-input fs-sm2" onchange="this.form.submit()">
+  <select name="priority" class="form-input" onchange="this.form.submit()">
     <option value="">All Priorities</option>
     <?php foreach(['urgent','high','normal','low'] as $p):?>
     <option value="<?=$p?>" <?=$priority_filter===$p?'selected':''?>><?=ucfirst($p)?></option>

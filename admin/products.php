@@ -191,23 +191,23 @@ if (!empty($_GET['edit'])) {
       <div class="af-tab-pane active" data-tab-pane="basic" style="padding-bottom:2rem;">
         <div style="display:grid;grid-template-columns:54px 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Emoji</label>
+            <label class="form-label">Emoji</label>
             <input type="text" name="icon" class="form-input" style="font-size:1.125rem;text-align:center;padding:0.5rem;" value="<?=e($editing['icon']??'')?>">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Product Name <span class="text-danger-token">*</span></label>
-            <input type="text" name="name" required class="form-input fs-sm2" value="<?=e($editing['name']??'')?>" placeholder="e.g., Mobile Banking App" minlength="3" maxlength="100">
+            <label class="form-label">Product Name <span class="text-danger-token">*</span></label>
+            <input type="text" name="name" required class="form-input" value="<?=e($editing['name']??'')?>" placeholder="e.g., Mobile Banking App" minlength="3" maxlength="100">
             <span class="form-hint">3-100 characters. Main product name displayed everywhere.</span>
           </div>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Lucide Icon <a href="https://lucide.dev/icons" target="_blank" style="color:var(--primary);font-size:0.6rem;">browse ↗</a></label>
-            <input type="text" name="lucide_icon" class="form-input fs-sm2" value="<?=e($editing['lucide_icon']??'')?>" placeholder="monitor">
+            <label class="form-label">Lucide Icon <a href="https://lucide.dev/icons" target="_blank" style="color:var(--primary);font-size:0.6rem;">browse ↗</a></label>
+            <input type="text" name="lucide_icon" class="form-input" value="<?=e($editing['lucide_icon']??'')?>" placeholder="monitor">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Icon Color</label>
-            <select name="icon_color" class="form-input fs-sm2">
+            <label class="form-label">Icon Color</label>
+            <select name="icon_color" class="form-input">
               <?php foreach(['blue','teal','purple','green','amber','rose','indigo','cyan'] as $col): ?>
               <option value="<?=$col?>" <?=($editing['icon_color']??'blue')===$col?'selected':''?>><?=ucfirst($col)?></option>
               <?php endforeach; ?>
@@ -216,34 +216,34 @@ if (!empty($_GET['edit'])) {
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Slug</label>
-            <input type="text" name="slug" class="form-input fs-sm2" value="<?=e($editing['slug']??'')?>" placeholder="auto">
+            <label class="form-label">Slug</label>
+            <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Badge</label>
+            <label class="form-label">Badge</label>
             <div style="display:flex;gap:0.375rem;flex-wrap:wrap;margin-bottom:0.375rem;">
               <?php foreach(['Flagship','Popular','Essential','New','Add-on','Included',''] as $b):?>
               <button type="button" onclick="document.querySelector('[name=badge]').value='<?=e($b)?>';updatePreview()"
                 style="font-size:0.65rem;padding:0.15rem 0.5rem;border-radius:9999px;cursor:pointer;border:1px solid var(--border);background:<?=($editing['badge']??'')===$b?'var(--primary)':'var(--muted)'?>;color:<?=($editing['badge']??'')===$b?'#fff':'var(--muted-foreground)'?>;font-weight:600;"><?=$b===''?'None':e($b)?></button>
               <?php endforeach;?>
             </div>
-            <input type="text" name="badge" id="badge-input" class="form-input fs-sm2" value="<?=e($editing['badge']??'')?>" placeholder="or type custom…" oninput="updatePreview()">
+            <input type="text" name="badge" id="badge-input" class="form-input" value="<?=e($editing['badge']??'')?>" placeholder="or type custom…" oninput="updatePreview()">
           </div>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Tagline</label>
-          <input type="text" name="tagline" class="form-input fs-sm2" value="<?=e($editing['tagline']??'')?>" placeholder="e.g., Fast & Secure Banking" maxlength="80">
+          <label class="form-label">Tagline</label>
+          <input type="text" name="tagline" class="form-input" value="<?=e($editing['tagline']??'')?>" placeholder="e.g., Fast & Secure Banking" maxlength="80">
           <span class="form-hint">Optional. Short one-liner (max 80 chars) describing the product.</span>
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Price From</label>
-            <input type="number" name="price_from" class="form-input fs-sm2" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="4999">
+            <label class="form-label">Price From</label>
+            <input type="number" name="price_from" class="form-input" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="4999">
             <span class="form-hint">Optional. Base price in Rupees. Leave blank for "Custom" pricing.</span>
           </div>
           <div>
-            <label class="form-label fs-2xs2">Category</label>
-            <select name="category" class="form-input fs-sm2">
+            <label class="form-label">Category</label>
+            <select name="category" class="form-input">
               <option value="">Select</option>
               <?php foreach(['Banking Software','Mobile App','Document Management','HR Software','Website','Support'] as $c):?>
               <option value="<?=$c?>" <?=($editing['category']??'')===$c?'selected':''?>><?=$c?></option>
@@ -253,8 +253,8 @@ if (!empty($_GET['edit'])) {
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Position</label>
-            <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+            <label class="form-label">Position</label>
+            <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
           </div>
           <div style="display:flex;align-items:flex-end;padding-bottom:0.25rem;">
             <label class="row-check">
@@ -267,19 +267,19 @@ if (!empty($_GET['edit'])) {
       <!-- Tab: Content -->
       <div class="af-tab-pane" data-tab-pane="content" style="padding-bottom:2rem;">
         <div>
-          <label class="form-label fs-2xs2">Short Summary</label>
+          <label class="form-label">Short Summary</label>
           <textarea name="summary" class="form-input fs-sm-r" rows="2"><?=e($editing['summary']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Full Description <span style="color:var(--muted-foreground);font-weight:400;">(HTML ok)</span></label>
+          <label class="form-label">Full Description <span style="color:var(--muted-foreground);font-weight:400;">(HTML ok)</span></label>
           <textarea name="description" class="form-input fs-sm-r" rows="5"><?=e($editing['description']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Features <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
+          <label class="form-label">Features <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
           <textarea name="features" class="form-input fs-sm-r" rows="4" placeholder="NRB-compliant reports&#10;Mobile Banking&#10;Multi-branch support"><?=e($editing['features_text']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Highlights <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
+          <label class="form-label">Highlights <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
           <textarea name="highlights" class="form-input fs-sm-r" rows="2" placeholder="120+ cooperatives&#10;24/7 support"><?=e($editing['highlights_text']??'')?></textarea>
         </div>
       </div>
@@ -299,24 +299,24 @@ if (!empty($_GET['edit'])) {
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
-            <label class="form-label fs-2xs2">Home Position</label>
-            <input type="number" name="home_position" class="form-input fs-sm2" value="<?=e($editing['home_position']??0)?>">
+            <label class="form-label">Home Position</label>
+            <input type="number" name="home_position" class="form-input" value="<?=e($editing['home_position']??0)?>">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Tab Label <span style="color:var(--muted-foreground);font-weight:400;">(default: name)</span></label>
-            <input type="text" name="tab_label" class="form-input fs-sm2" value="<?=e($editing['tab_label']??'')?>" placeholder="e.g. Core Banking">
+            <label class="form-label">Tab Label <span style="color:var(--muted-foreground);font-weight:400;">(default: name)</span></label>
+            <input type="text" name="tab_label" class="form-input" value="<?=e($editing['tab_label']??'')?>" placeholder="e.g. Core Banking">
           </div>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Card Background CSS <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
-          <input type="text" name="home_bg_css" class="form-input fs-sm2" value="<?=e($editing['home_bg_css']??'')?>" placeholder="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
+          <label class="form-label">Card Background CSS <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
+          <input type="text" name="home_bg_css" class="form-input" value="<?=e($editing['home_bg_css']??'')?>" placeholder="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
         </div>
         <div>
-          <label class="form-label fs-2xs2">
+          <label class="form-label">
             Demo Screenshot URL
             <span style="color:var(--muted-foreground);font-weight:400;"> — "See it in action" tabs</span>
           </label>
-          <input type="url" name="demo_screenshot_url" id="dss_url_<?=($editing['id']??'new')?>" class="form-input fs-sm2"
+          <input type="url" name="demo_screenshot_url" id="dss_url_<?=($editing['id']??'new')?>" class="form-input"
                  value="<?=e($editing['demo_screenshot_url']??'')?>" placeholder="https://… or upload below">
           <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
             <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--muted);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">

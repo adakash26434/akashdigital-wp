@@ -84,7 +84,7 @@ function auditActionColor(string $action): array {
 
   <div>
     <label style="font-size:0.75rem;color:var(--muted-foreground);display:block;margin-bottom:0.25rem;">Action</label>
-    <select name="action" class="form-input fs-sm2" onchange="this.form.submit()">
+    <select name="action" class="form-input" onchange="this.form.submit()">
       <option value="">All Actions</option>
       <?php foreach($actions as $a):?>
       <option value="<?=e($a)?>" <?=$action===$a?'selected':''?>><?=e($a)?></option>
@@ -94,11 +94,11 @@ function auditActionColor(string $action): array {
 
   <div>
     <label style="font-size:0.75rem;color:var(--muted-foreground);display:block;margin-bottom:0.25rem;">From</label>
-    <input type="date" name="from" value="<?=e($dateFrom)?>" class="form-input fs-sm2">
+    <input type="date" name="from" value="<?=e($dateFrom)?>" class="form-input">
   </div>
   <div>
     <label style="font-size:0.75rem;color:var(--muted-foreground);display:block;margin-bottom:0.25rem;">To</label>
-    <input type="date" name="to" value="<?=e($dateTo)?>" class="form-input fs-sm2">
+    <input type="date" name="to" value="<?=e($dateTo)?>" class="form-input">
   </div>
 
   <button type="submit" class="btn btn-primary btn-sm">Filter</button>

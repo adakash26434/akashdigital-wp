@@ -88,19 +88,19 @@ if (!empty($_GET['edit'])) {
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:0.75rem;margin-bottom:0.75rem;">
         <div>
           <label class="form-label">Name <span class="text-danger-token">*</span></label>
-          <input name="name" placeholder="e.g. Getting Started" required class="form-input fs-sm2">
+          <input name="name" placeholder="e.g. Getting Started" required class="form-input">
         </div>
         <div>
           <label class="form-label">Slug</label>
-          <input name="slug" placeholder="getting-started (auto)" class="form-input fs-sm2">
+          <input name="slug" placeholder="getting-started (auto)" class="form-input">
         </div>
         <div>
           <label class="form-label">Icon</label>
-          <input name="icon" placeholder="book-open" class="form-input fs-sm2" value="book-open">
+          <input name="icon" placeholder="book-open" class="form-input" value="book-open">
         </div>
         <div>
           <label class="form-label">Position</label>
-          <input name="position" type="number" value="0" class="form-input fs-sm2">
+          <input name="position" type="number" value="0" class="form-input">
         </div>
         <div style="display:flex;align-items:flex-end;padding-bottom:0.25rem;">
           <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.8125rem;font-weight:500;">
@@ -110,7 +110,7 @@ if (!empty($_GET['edit'])) {
       </div>
       <div style="margin-bottom:0.75rem;">
         <label class="form-label">Description</label>
-        <textarea name="description" placeholder="Short description" class="form-input fs-sm2" rows="2"></textarea>
+        <textarea name="description" placeholder="Short description" class="form-input" rows="2"></textarea>
       </div>
       <button class="btn btn-primary btn-sm">Add Category</button>
     </form>
@@ -144,15 +144,15 @@ if (!empty($_GET['edit'])) {
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
         <div>
           <label class="form-label">Title <span class="text-danger-token">*</span></label>
-          <input name="title" placeholder="Article title" required value="<?= e($editArt['title'] ?? '') ?>" class="form-input fs-sm2">
+          <input name="title" placeholder="Article title" required value="<?= e($editArt['title'] ?? '') ?>" class="form-input">
         </div>
         <div>
           <label class="form-label">Slug</label>
-          <input name="slug" placeholder="auto-generated" value="<?= e($editArt['slug'] ?? '') ?>" class="form-input fs-sm2">
+          <input name="slug" placeholder="auto-generated" value="<?= e($editArt['slug'] ?? '') ?>" class="form-input">
         </div>
         <div>
           <label class="form-label">Category</label>
-          <select name="category_id" class="form-input fs-sm2">
+          <select name="category_id" class="form-input">
             <option value="0">— Select —</option>
             <?php foreach ($cats as $c): ?>
               <option value="<?= $c['id'] ?>" <?= ($editArt['category_id'] ?? 0) == $c['id'] ? 'selected' : '' ?>><?= e($c['name']) ?></option>
@@ -162,20 +162,20 @@ if (!empty($_GET['edit'])) {
       </div>
       <div style="margin-bottom:0.75rem;">
         <label class="form-label">Excerpt</label>
-        <input name="excerpt" placeholder="Short summary shown in listings" value="<?= e($editArt['excerpt'] ?? '') ?>" class="form-input fs-sm2">
+        <input name="excerpt" placeholder="Short summary shown in listings" value="<?= e($editArt['excerpt'] ?? '') ?>" class="form-input">
       </div>
       <div style="margin-bottom:0.75rem;">
         <label class="form-label">Body <span class="text-danger-token">*</span></label>
-        <textarea name="body" placeholder="Article body (HTML allowed)" rows="14" class="form-input fs-sm2" style="font-family:var(--font-mono);resize:vertical;"><?= e($editArt['body'] ?? '') ?></textarea>
+        <textarea name="body" placeholder="Article body (HTML allowed)" rows="14" class="form-input" style="font-family:var(--font-mono);resize:vertical;"><?= e($editArt['body'] ?? '') ?></textarea>
       </div>
       <div style="display:grid;grid-template-columns:2fr 1fr 1fr;gap:0.75rem;margin-bottom:0.875rem;">
         <div>
           <label class="form-label">Tags</label>
-          <input name="tags" placeholder="comma, separated, tags" value="<?= e($editArt['tags'] ?? '') ?>" class="form-input fs-sm2">
+          <input name="tags" placeholder="comma, separated, tags" value="<?= e($editArt['tags'] ?? '') ?>" class="form-input">
         </div>
         <div>
           <label class="form-label">Status</label>
-          <select name="status" class="form-input fs-sm2">
+          <select name="status" class="form-input">
             <?php foreach (['draft','published','archived'] as $s): ?>
               <option value="<?= $s ?>" <?= ($editArt['status'] ?? 'draft') === $s ? 'selected' : '' ?>><?= ucfirst($s) ?></option>
             <?php endforeach; ?>
@@ -183,7 +183,7 @@ if (!empty($_GET['edit'])) {
         </div>
         <div>
           <label class="form-label">Language</label>
-          <select name="language" class="form-input fs-sm2">
+          <select name="language" class="form-input">
             <option value="en" <?= ($editArt['language'] ?? 'en')==='en'?'selected':'' ?>>English</option>
             <option value="ne" <?= ($editArt['language'] ?? '')==='ne'?'selected':'' ?>>नेपाली</option>
           </select>

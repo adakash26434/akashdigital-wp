@@ -136,12 +136,12 @@ sort($DISTRICTS);
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <div>
-        <label class="form-label fs-2xs2">Name <span class="text-danger-token">*</span></label>
-        <input type="text" name="name" required class="form-input fs-sm2" value="<?=e($editing['name']??'')?>" placeholder="Himalayan Saving Co-op">
+        <label class="form-label">Name <span class="text-danger-token">*</span></label>
+        <input type="text" name="name" required class="form-input" value="<?=e($editing['name']??'')?>" placeholder="Himalayan Saving Co-op">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Type</label>
-        <select name="type" class="form-input fs-sm2" @change="type=$event.target.value">
+        <label class="form-label">Type</label>
+        <select name="type" class="form-input" @change="type=$event.target.value">
           <option value="client"   <?=($editing['type']??'client')==='client'  ?'selected':''?>>Client</option>
           <option value="partner"  <?=($editing['type']??'')==='partner' ?'selected':''?>>Technology Partner</option>
           <option value="channel"  <?=($editing['type']??'')==='channel'  ?'selected':''?>>Channel Partner</option>
@@ -158,8 +158,8 @@ sort($DISTRICTS);
         <strong style="color:var(--foreground);">💡 Homepage display:</strong> If you add a <strong>Client</strong> type with a logo, it automatically appears in the "Trusted by leading institutions" section on the homepage. Update the logo here, and it updates on the homepage instantly.
       </div>
       <div>
-        <label class="form-label fs-2xs2">Website URL</label>
-        <input type="url" name="url" class="form-input fs-sm2" value="<?=e($editing['url']??'')?>" placeholder="https://...">
+        <label class="form-label">Website URL</label>
+        <input type="url" name="url" class="form-input" value="<?=e($editing['url']??'')?>" placeholder="https://...">
       </div>
 
       <!-- ═══ Channel Partner Contact Details ═══ -->
@@ -169,23 +169,23 @@ sort($DISTRICTS);
         </div>
         <div style="display:grid;gap:0.75rem;">
           <div>
-            <label class="form-label fs-2xs2">Email Address</label>
-            <input type="email" name="email" class="form-input fs-sm2" value="<?=e($editing['email']??'')?>" placeholder="partner@example.com">
+            <label class="form-label">Email Address</label>
+            <input type="email" name="email" class="form-input" value="<?=e($editing['email']??'')?>" placeholder="partner@example.com">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Phone Number</label>
-            <input type="tel" name="phone" class="form-input fs-sm2" value="<?=e($editing['phone']??'')?>" placeholder="98X-XXXXXXX">
+            <label class="form-label">Phone Number</label>
+            <input type="tel" name="phone" class="form-input" value="<?=e($editing['phone']??'')?>" placeholder="98X-XXXXXXX">
           </div>
           <div>
-            <label class="form-label fs-2xs2">Address</label>
-            <textarea name="address" class="form-input fs-sm2" rows="2" placeholder="Full address…"><?=e($editing['address']??'')?></textarea>
+            <label class="form-label">Address</label>
+            <textarea name="address" class="form-input" rows="2" placeholder="Full address…"><?=e($editing['address']??'')?></textarea>
           </div>
         </div>
       </div>
 
       <div>
-        <label class="form-label fs-2xs2">District</label>
-        <select name="district" class="form-input fs-sm2">
+        <label class="form-label">District</label>
+        <select name="district" class="form-input">
           <option value="">Select district</option>
           <?php foreach($DISTRICTS as $d):?>
           <option value="<?=$d?>" <?=($editing['district']??'')===$d?'selected':''?>><?=$d?></option>
@@ -194,8 +194,8 @@ sort($DISTRICTS);
       </div>
       <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
         <div>
-          <label class="form-label fs-2xs2">Position</label>
-          <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+          <label class="form-label">Position</label>
+          <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
         <div style="padding-bottom:0.5rem;">
           <label class="row-check">

@@ -269,7 +269,7 @@ adminListFilters([
       <div class="col-stack">
         <div>
           <label class="form-label">Client <span class="text-danger-token">*</span></label>
-          <select name="client_id" required class="form-input fs-sm2">
+          <select name="client_id" required class="form-input">
             <option value="">Select client...</option>
             <?php foreach($clients as $cl): ?>
             <option value="<?= e($cl['id']) ?>"><?= e($cl['org_name'] ?: $cl['name']) ?></option>
@@ -279,7 +279,7 @@ adminListFilters([
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
             <label class="form-label">Type</label>
-            <select name="agreement_type" class="form-input fs-sm2">
+            <select name="agreement_type" class="form-input">
               <?php foreach($TYPE_LABELS as $v => $l): ?>
               <option value="<?= e($v) ?>"><?= e($l) ?></option>
               <?php endforeach; ?>
@@ -287,26 +287,26 @@ adminListFilters([
           </div>
           <div>
             <label class="form-label">Amount (NPR)</label>
-            <input type="number" name="amount" step="0.01" min="0" placeholder="0.00" class="form-input fs-sm2">
+            <input type="number" name="amount" step="0.01" min="0" placeholder="0.00" class="form-input">
           </div>
         </div>
         <div>
           <label class="form-label">Title <span class="text-danger-token">*</span></label>
-          <input type="text" name="title" required placeholder="e.g., Annual Service Contract 2082" class="form-input fs-sm2">
+          <input type="text" name="title" required placeholder="e.g., Annual Service Contract 2082" class="form-input">
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
             <label class="form-label">Effective Date <span class="text-danger-token">*</span></label>
-            <input type="date" name="effective_date" required value="<?= date('Y-m-d') ?>" class="form-input fs-sm2">
+            <input type="date" name="effective_date" required value="<?= date('Y-m-d') ?>" class="form-input">
           </div>
           <div>
             <label class="form-label">Expiry Date</label>
-            <input type="date" name="expiry_date" class="form-input fs-sm2">
+            <input type="date" name="expiry_date" class="form-input">
           </div>
         </div>
         <div>
           <label class="form-label">Document</label>
-          <input type="file" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="form-input fs-sm2">
+          <input type="file" name="document" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" class="form-input">
           <span class="form-hint">PDF, DOC, DOCX, JPG, PNG supported.</span>
         </div>
         <button type="submit" class="btn btn-primary">Upload Agreement</button>

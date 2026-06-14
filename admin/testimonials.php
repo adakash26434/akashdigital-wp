@@ -115,20 +115,20 @@ catch (\Throwable $e) {
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <div>
-        <label class="form-label fs-2xs2">Author Name <span class="text-danger-token">*</span></label>
-        <input type="text" name="author_name" required class="form-input fs-sm2" value="<?=e($editing['author_name']??'')?>">
+        <label class="form-label">Author Name <span class="text-danger-token">*</span></label>
+        <input type="text" name="author_name" required class="form-input" value="<?=e($editing['author_name']??'')?>">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Role / Title</label>
-        <input type="text" name="author_role" class="form-input fs-sm2" value="<?=e($editing['author_role']??'')?>" placeholder="e.g. IT Manager">
+        <label class="form-label">Role / Title</label>
+        <input type="text" name="author_role" class="form-input" value="<?=e($editing['author_role']??'')?>" placeholder="e.g. IT Manager">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Organization / Cooperative</label>
-        <input type="text" name="author_org" id="tst-author-org" class="form-input fs-sm2"
+        <label class="form-label">Organization / Cooperative</label>
+        <input type="text" name="author_org" id="tst-author-org" class="form-input"
                value="<?=e($editing['author_org']??'')?>"
                placeholder="Type organization name">
         <?php if (!empty($clientOrgs)): ?>
-        <select class="form-input fs-sm2" style="margin-top:0.375rem;"
+        <select class="form-input" style="margin-top:0.375rem;"
                 onchange="if(this.value){document.getElementById('tst-author-org').value=this.value;}this.selectedIndex=0;">
           <option value="">— Select from existing clients —</option>
           <?php foreach ($clientOrgs as $co): ?>
@@ -139,7 +139,7 @@ catch (\Throwable $e) {
         <span class="form-hint">Pick from the list above or type a custom name.</span>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Quote / Review <span class="text-danger-token">*</span></label>
+        <label class="form-label">Quote / Review <span class="text-danger-token">*</span></label>
         <textarea name="quote" required class="form-input fs-sm-r" rows="4"><?=e($editing['quote']??'')?></textarea>
       </div>
       <?php
@@ -148,8 +148,8 @@ catch (\Throwable $e) {
         require __DIR__ . '/../includes/admin-img-upload.php';
       ?>
       <div>
-        <label class="form-label fs-2xs2">Product Referenced</label>
-        <select name="product_ref" class="form-input fs-sm2">
+        <label class="form-label">Product Referenced</label>
+        <select name="product_ref" class="form-input">
           <option value="">Any / General</option>
           <?php foreach(['Software','IT Support','Web Development','HR & Payroll','DMS','Support'] as $p):?>
           <option value="<?=$p?>" <?=($editing['product_ref']??'')===$p?'selected':''?>><?=$p?></option>
@@ -158,16 +158,16 @@ catch (\Throwable $e) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 80px;gap:0.5rem;">
         <div>
-          <label class="form-label fs-2xs2">Rating (1–5 )</label>
-          <select name="rating" class="form-input fs-sm2">
+          <label class="form-label">Rating (1–5 )</label>
+          <select name="rating" class="form-input">
             <?php for($i=5;$i>=1;$i--):?>
             <option value="<?=$i?>" <?=($editing['rating']??5)==$i?'selected':''?>><?=str_repeat('',$i)?></option>
             <?php endfor;?>
           </select>
         </div>
         <div>
-          <label class="form-label fs-2xs2">Position</label>
-          <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+          <label class="form-label">Position</label>
+          <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
       </div>
       <label class="row-check">

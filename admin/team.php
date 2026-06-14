@@ -125,17 +125,17 @@ if (!empty($_GET['edit'])) {
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <div>
-        <label class="form-label fs-2xs2">Full Name <span class="text-danger-token">*</span></label>
-        <input type="text" name="name" required class="form-input fs-sm2" value="<?=e($editing['name']??'')?>" placeholder="John Doe" minlength="2" maxlength="100">
+        <label class="form-label">Full Name <span class="text-danger-token">*</span></label>
+        <input type="text" name="name" required class="form-input" value="<?=e($editing['name']??'')?>" placeholder="John Doe" minlength="2" maxlength="100">
         <span class="form-hint">Full name of the team member (2-100 chars).</span>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Role / Title</label>
-        <input type="text" name="role" class="form-input fs-sm2" value="<?=e($editing['role']??'')?>" placeholder="e.g., Chief Technology Officer" maxlength="80">
+        <label class="form-label">Role / Title</label>
+        <input type="text" name="role" class="form-input" value="<?=e($editing['role']??'')?>" placeholder="e.g., Chief Technology Officer" maxlength="80">
         <span class="form-hint">Job title or position (max 80 chars).</span>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Bio</label>
+        <label class="form-label">Bio</label>
         <textarea name="bio" class="form-input fs-sm-r" rows="3" placeholder="Brief background and expertise..." maxlength="500"><?=e($editing['bio']??'')?></textarea>
         <span class="form-hint">Short biography or experience summary (max 500 chars).</span>
       </div>
@@ -145,19 +145,19 @@ if (!empty($_GET['edit'])) {
         require __DIR__ . '/../includes/admin-img-upload.php';
       ?>
       <div>
-        <label class="form-label fs-2xs2">Email</label>
-        <input type="email" name="email" class="form-input fs-sm2" value="<?=e($editing['email']??'')?>" placeholder="john@example.com">
+        <label class="form-label">Email</label>
+        <input type="email" name="email" class="form-input" value="<?=e($editing['email']??'')?>" placeholder="john@example.com">
         <span class="form-hint">Optional. Email address for contact.</span>
       </div>
       <div>
-        <label class="form-label fs-2xs2">LinkedIn URL</label>
-        <input type="url" name="linkedin_url" class="form-input fs-sm2" value="<?=e($editing['linkedin_url']??'')?>" placeholder="https://linkedin.com/in/username">
+        <label class="form-label">LinkedIn URL</label>
+        <input type="url" name="linkedin_url" class="form-input" value="<?=e($editing['linkedin_url']??'')?>" placeholder="https://linkedin.com/in/username">
         <span class="form-hint">Optional. LinkedIn profile link.</span>
       </div>
       <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
         <div>
-          <label class="form-label fs-2xs2">Position</label>
-          <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+          <label class="form-label">Position</label>
+          <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
         <div style="display:flex;flex-direction:column;gap:0.25rem;padding-bottom:0.5rem;">
           <label class="row-check">
@@ -169,8 +169,8 @@ if (!empty($_GET['edit'])) {
         </div>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Team Category</label>
-        <select name="category" class="form-input fs-sm2">
+        <label class="form-label">Team Category</label>
+        <select name="category" class="form-input">
           <option value="management" <?=($editing['category']??'management')==='management'?'selected':''?>>Management Team</option>
           <option value="board" <?=($editing['category']??'management')==='board'?'selected':''?>>Board Members</option>
         </select>

@@ -110,20 +110,20 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
         require __DIR__ . '/../includes/admin-img-upload.php';
       ?>
       <div>
-        <label class="form-label fs-2xs2">Title</label>
-        <input type="text" name="title" class="form-input fs-sm2" value="<?=e($editing['title']??'')?>">
+        <label class="form-label">Title</label>
+        <input type="text" name="title" class="form-input" value="<?=e($editing['title']??'')?>">
       </div>
       <div>
-        <label class="form-label fs-2xs2">Category</label>
-        <select name="category" class="form-input fs-sm2">
+        <label class="form-label">Category</label>
+        <select name="category" class="form-input">
           <?php foreach($CATS as $c):?>
           <option value="<?=$c?>" <?=($editing['category']??'General')===$c?'selected':''?>><?=$c?></option>
           <?php endforeach;?>
         </select>
       </div>
       <div>
-        <label class="form-label fs-2xs2">Position</label>
-        <input type="number" name="position" class="form-input fs-sm2" value="<?=e($editing['position']??0)?>">
+        <label class="form-label">Position</label>
+        <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
       </div>
       <label class="row-check">
         <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible
