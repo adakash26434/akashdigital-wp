@@ -15,7 +15,7 @@ function currentUser(): ?array {
             'role'         => 'superadmin',
             'active'       => 1,
             'org_name'     => defined('SITE_NAME') ? SITE_NAME : 'Company',
-            'theme_pref'   => $_SESSION['sa_theme'] ?? 'light',
+            'theme_pref'   => $_SESSION['sa_theme'] ?? 'dark',
         ];
         return $cache;
     }

@@ -129,7 +129,7 @@ endif; ?>
   var loc = localStorage.getItem('st-theme');
   var pref = srv || loc || '';
   var mode = pref === 'system' ? '' : pref;
-  var isDark = mode === 'dark' || (!mode && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  var isDark = mode !== 'light';
   if (isDark) document.documentElement.classList.add('dark');
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   if (srv) localStorage.setItem('st-theme', srv);
@@ -195,8 +195,14 @@ echo __brandCss();
 function toggleTheme() {
   var h = document.documentElement;
   var dark = h.classList.toggle('dark');
-  h.setAttribute('data-theme', dark ? 'dark' : 'light');
-  localStorage.setItem('st-theme', dark ? 'dark' : 'light');
+  var t = dark ? 'dark' : 'light';
+  h.setAttribute('data-theme', t);
+  localStorage.setItem('st-theme', t);
+  // Persist server-side for logged-in users (fire-and-forget)
+  try {
+    var fd = new FormData(); fd.append('theme', t);
+    fetch('/api/set-theme.php', {method:'POST', body:fd, credentials:'same-origin'});
+  } catch(e) {}
   // sync sun/moon icons wherever they appear on the page
   document.querySelectorAll('#icon-sun, #icon-moon, #icon-sun-mobile, #icon-moon-mobile').forEach(function(el) {
     var isSun = (el.id === 'icon-sun' || el.id === 'icon-sun-mobile');

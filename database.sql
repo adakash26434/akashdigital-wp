@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS users (
   bio           TEXT,
   email_verified TINYINT NOT NULL DEFAULT 0,
   active        TINYINT NOT NULL DEFAULT 1,
-  theme_pref    VARCHAR(20) NOT NULL DEFAULT 'light',
+  theme_pref    VARCHAR(20) NOT NULL DEFAULT 'dark',
   totp_secret   VARCHAR(255) DEFAULT NULL,
   totp_enabled  TINYINT NOT NULL DEFAULT 0,
   totp_backup_code VARCHAR(20) DEFAULT NULL,

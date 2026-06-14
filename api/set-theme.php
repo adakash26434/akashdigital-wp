@@ -24,7 +24,11 @@ if (!in_array($theme, ['light', 'dark'])) {
 
 try {
     $user = currentUser();
-    execute("UPDATE users SET theme_pref=? WHERE id=?", [$theme, $user['id']]);
+    if ((int)($user['id'] ?? -1) === 0 && ($user['role'] ?? '') === 'superadmin') {
+        $_SESSION['sa_theme'] = $theme;
+    } else {
+        execute("UPDATE users SET theme_pref=? WHERE id=?", [$theme, $user['id']]);
+    }
     echo json_encode(['ok' => true]);
 } catch (\Throwable $e) {
     http_response_code(500);
