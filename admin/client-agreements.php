@@ -245,6 +245,7 @@ adminListHeader('Client Agreements', "$total agreements", [
   </select>
 </form>
 
+<?php
 // ── Filters ──────────────────────────────────────────────────────
 adminListFilters([
     'search' => ['name' => 'q', 'value' => $client_search, 'placeholder' => 'Search client or agreement...'],
