@@ -312,11 +312,16 @@ function paginate(int $total, int $perPage, int $current): array {
 function handleUpload(string $field, string $dir = 'uploads'): ?string {
     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) return null;
     $file     = $_FILES[$field];
-    $allowed  = ['image/jpeg','image/png','image/webp','image/gif','application/pdf'];
     $maxBytes = 5 * 1024 * 1024;
-    if (!in_array($file['type'], $allowed, true) || $file['size'] > $maxBytes) return null;
-    $ext  = pathinfo($file['name'], PATHINFO_EXTENSION);
-    $name = bin2hex(random_bytes(12)) . '.' . strtolower($ext);
+    if ($file['size'] > $maxBytes) return null;
+    $finfo    = finfo_open(FILEINFO_MIME_TYPE);
+    $realMime = finfo_file($finfo, $file['tmp_name']);
+    finfo_close($finfo);
+    $allowed  = ['image/jpeg','image/png','image/webp','image/gif','application/pdf'];
+    if (!in_array($realMime, $allowed, true)) return null;
+    $mimeToExt = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif','application/pdf'=>'pdf'];
+    $ext  = $mimeToExt[$realMime] ?? strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    $name = bin2hex(random_bytes(12)) . '.' . $ext;
     $dest = __DIR__ . '/../' . $dir . '/' . $name;
     if (!is_dir(dirname($dest))) mkdir(dirname($dest), 0755, true);
     if (!move_uploaded_file($file['tmp_name'], $dest)) return null;

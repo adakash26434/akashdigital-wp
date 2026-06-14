@@ -41,10 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Screenshot upload
         $screenshotUrl = trim($_POST['screenshot_url'] ?? '');
         if (!empty($_FILES['screenshot_file']['tmp_name'])) {
-            $ext  = strtolower(pathinfo($_FILES['screenshot_file']['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['png','jpg','jpeg','gif','webp']) && $_FILES['screenshot_file']['size'] < 5*1024*1024) {
+            $_sf = $_FILES['screenshot_file'];
+            $allowedImgMime = ['image/jpeg','image/png','image/webp','image/gif'];
+            $_fi = finfo_open(FILEINFO_MIME_TYPE);
+            $_rm = finfo_file($_fi, $_sf['tmp_name']);
+            finfo_close($_fi);
+            $mimeExtMap = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif'];
+            if (in_array($_rm, $allowedImgMime, true) && $_sf['size'] < 5*1024*1024) {
+                $ext   = $mimeExtMap[$_rm];
                 $fname = 'svc_' . ($id ?: time()) . '_' . time() . '.' . $ext;
-                if (move_uploaded_file($_FILES['screenshot_file']['tmp_name'], $uploadDir . $fname)) {
+                if (move_uploaded_file($_sf['tmp_name'], $uploadDir . $fname)) {
                     $screenshotUrl = SITE_URL . '/uploads/services/' . $fname;
                 }
             } else {

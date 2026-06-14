@@ -9,30 +9,24 @@ $currentPage = $_GET['page'] ?? 'home';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
     try {
-        if (isset($_FILES['chairman_photo_upload']) && $_FILES['chairman_photo_upload']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../uploads/leadership/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $fileName = uniqid() . '_' . basename($_FILES['chairman_photo_upload']['name']);
-            $uploadFile = $uploadDir . $fileName;
-            if (move_uploaded_file($_FILES['chairman_photo_upload']['tmp_name'], $uploadFile)) {
-                $_POST['chairman_photo'] = 'uploads/leadership/' . $fileName;
-            } else {
-                throw new Exception('Failed to upload chairman photo.');
-            }
-        }
-        if (isset($_FILES['ceo_photo_upload']) && $_FILES['ceo_photo_upload']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../uploads/leadership/';
-            if (!is_dir($uploadDir)) {
-                mkdir($uploadDir, 0755, true);
-            }
-            $fileName = uniqid() . '_' . basename($_FILES['ceo_photo_upload']['name']);
-            $uploadFile = $uploadDir . $fileName;
-            if (move_uploaded_file($_FILES['ceo_photo_upload']['tmp_name'], $uploadFile)) {
-                $_POST['ceo_photo'] = 'uploads/leadership/' . $fileName;
-            } else {
-                throw new Exception('Failed to upload CEO photo.');
+        $allowedPhotoMime = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif'];
+        foreach (['chairman_photo_upload' => 'chairman_photo', 'ceo_photo_upload' => 'ceo_photo'] as $fileField => $settingKey) {
+            if (isset($_FILES[$fileField]) && $_FILES[$fileField]['error'] === UPLOAD_ERR_OK) {
+                $_pf = $_FILES[$fileField];
+                $_fi = finfo_open(FILEINFO_MIME_TYPE);
+                $_rm = finfo_file($_fi, $_pf['tmp_name']);
+                finfo_close($_fi);
+                if (!isset($allowedPhotoMime[$_rm]) || $_pf['size'] > 3*1024*1024) {
+                    throw new \Exception('Photo must be a JPG/PNG/WebP image under 3 MB.');
+                }
+                $uploadDir = '../uploads/leadership/';
+                if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
+                $fileName  = uniqid() . '.' . $allowedPhotoMime[$_rm];
+                if (move_uploaded_file($_pf['tmp_name'], $uploadDir . $fileName)) {
+                    $_POST[$settingKey] = 'uploads/leadership/' . $fileName;
+                } else {
+                    throw new \Exception('Failed to upload photo.');
+                }
             }
         }
 

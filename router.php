@@ -80,7 +80,15 @@ if (str_starts_with($path, '/admin')) {
     }
 }
 
-// Default: serve index.php
+// Root path → homepage
+if ($path === '/') {
+    chdir(__DIR__);
+    require __DIR__ . '/index.php';
+    return true;
+}
+
+// Unknown path → 404
+http_response_code(404);
 chdir(__DIR__);
-require __DIR__ . '/index.php';
+require __DIR__ . '/404.php';
 return true;

@@ -20,15 +20,18 @@ $stats = [
   ['Subscribers',       safeCount("SELECT COUNT(*) c FROM subscribers WHERE status='active'"),  'mail-check','#f5f3ff','#7c3aed', url('admin/subscribers.php')],
 ];
 
-// ── Ticket trends (last 7 days) ───────────────────────────────────
+// ── Ticket trends (last 7 days) — single GROUP BY query ──────────
 $ticketTrend = [];
 try {
-    for ($i=6; $i>=0; $i--) {
+    $since = date('Y-m-d', strtotime('-6 days'));
+    $rows  = query("SELECT DATE(created_at) AS d, COUNT(*) AS cnt FROM tickets WHERE DATE(created_at) >= ? GROUP BY DATE(created_at)", [$since]);
+    $byDate = [];
+    foreach ($rows as $r) $byDate[$r['d']] = (int)$r['cnt'];
+    for ($i = 6; $i >= 0; $i--) {
         $date = date('Y-m-d', strtotime("-$i days"));
-        $cnt  = safeCount("SELECT COUNT(*) c FROM tickets WHERE DATE(created_at)=?", [$date]);
-        $ticketTrend[] = ['date'=>date('M j', strtotime($date)), 'count'=>$cnt];
+        $ticketTrend[] = ['date' => date('M j', strtotime($date)), 'count' => $byDate[$date] ?? 0];
     }
-} catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+} catch (\Throwable $e) { error_log('[' . basename(__FILE__) . '] ' . $e->getMessage()); }
 
 // ── Recent data ───────────────────────────────────────────────────
 $recentTickets = [];

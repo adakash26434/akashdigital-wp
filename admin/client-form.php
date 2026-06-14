@@ -72,16 +72,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Logo: file upload takes priority over URL field
         $logoUrl = trim($_POST['logo_url'] ?? ($client['logo_url'] ?? ''));
         if (!empty($_FILES['logo_file']['tmp_name'])) {
-            $ext  = strtolower(pathinfo($_FILES['logo_file']['name'], PATHINFO_EXTENSION));
-            $safe = in_array($ext, ['png','jpg','jpeg','gif','svg','webp']);
-            if ($safe && $_FILES['logo_file']['size'] < 2*1024*1024) {
-                $fname    = 'client_' . ($isEdit ? $id : time()) . '.' . $ext;
+            $_lf = $_FILES['logo_file'];
+            $allowedLogoMime = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif'];
+            $_fi = finfo_open(FILEINFO_MIME_TYPE);
+            $_rm = finfo_file($_fi, $_lf['tmp_name']);
+            finfo_close($_fi);
+            if (isset($allowedLogoMime[$_rm]) && $_lf['size'] < 2*1024*1024) {
+                $fname    = 'client_' . ($isEdit ? $id : time()) . '.' . $allowedLogoMime[$_rm];
                 $destPath = $uploadDir . $fname;
-                if (move_uploaded_file($_FILES['logo_file']['tmp_name'], $destPath)) {
+                if (move_uploaded_file($_lf['tmp_name'], $destPath)) {
                     $logoUrl = SITE_URL . '/uploads/clients/' . $fname;
                 }
             } else {
-                $error = 'Logo must be PNG/JPG/SVG/WebP under 2 MB.';
+                $error = 'Logo must be PNG/JPG/WebP under 2 MB.';
             }
         }
 

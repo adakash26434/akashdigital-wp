@@ -30,6 +30,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validToken) {
     $confirm = $_POST['confirm'] ?? '';
     if (strlen($newPass) < 8) {
         $error = isNepali() ? 'पासवर्ड कम्तिमा ८ अक्षरको हुनुपर्छ।' : 'Password must be at least 8 characters.';
+    } elseif (!preg_match('/[A-Za-z]/', $newPass) || !preg_match('/[0-9]/', $newPass)) {
+        $error = isNepali() ? 'पासवर्डमा कम्तिमा एउटा अक्षर र एउटा अंक हुनुपर्छ।' : 'Password must contain at least one letter and one number.';
     } elseif ($newPass !== $confirm) {
         $error = isNepali() ? 'पासवर्डहरू मेल खाएनन्।' : 'Passwords do not match.';
     } else {

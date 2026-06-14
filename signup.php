@@ -29,6 +29,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = 'Please enter a valid email address.';
         } elseif (strlen($password) < 8) {
             $error = 'Password must be at least 8 characters.';
+        } elseif (!preg_match('/[A-Za-z]/', $password) || !preg_match('/[0-9]/', $password)) {
+            $error = 'Password must contain at least one letter and one number.';
         } elseif ($password !== $confirm) {
             $error = 'Passwords do not match.';
         } else {

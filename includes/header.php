@@ -1,5 +1,26 @@
 <?php
 require_once __DIR__ . '/lang.php';
+
+// ── Maintenance mode enforcement ──────────────────────────────────
+if (function_exists('siteSettings') && function_exists('isStaff')) {
+    $_ms = siteSettings();
+    if (!empty($_ms['maintenance_mode']) && (string)$_ms['maintenance_mode'] === '1' && !isStaff()) {
+        http_response_code(503);
+        $__sn  = function_exists('stSiteName') ? stSiteName() : 'Our Website';
+        $__url = defined('SITE_URL') ? SITE_URL : '';
+        echo '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Maintenance — ' . htmlspecialchars($__sn, ENT_QUOTES) . '</title>
+<style>*{box-sizing:border-box;margin:0;padding:0}body{min-height:100vh;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;background:#f8fafc;color:#1e293b;padding:2rem}
+.box{max-width:480px;width:100%;text-align:center}.icon{font-size:3.5rem;margin-bottom:1.25rem}
+h1{font-size:1.75rem;font-weight:700;margin-bottom:.75rem}p{color:#64748b;line-height:1.6;margin-bottom:1.5rem}
+.badge{display:inline-block;padding:.375rem 1rem;background:#fef3c7;color:#92400e;border-radius:9999px;font-size:.8125rem;font-weight:600;border:1px solid #fde68a}
+</style></head><body><div class="box"><div class="icon">🔧</div>
+<h1>Under Maintenance</h1>
+<p>' . htmlspecialchars($__sn, ENT_QUOTES) . ' is currently undergoing scheduled maintenance. We\'ll be back shortly.</p>
+<span class="badge">⏱ Please check back soon</span></div></body></html>';
+        exit;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= currentLang() === 'np' ? 'ne' : 'en' ?>" id="html-root">
