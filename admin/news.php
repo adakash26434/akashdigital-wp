@@ -92,41 +92,47 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
     <a href="?new=1" class="btn btn-primary btn-sm">+ New Post</a>
   </div>
 
-  <div class="st-card ov-hidden">
-    <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
-      <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
+  <div class="tbl-wrap">
+    <table class="st-table">
+      <thead><tr>
         <?php foreach(['Title','Category','Author','Published','Active',''] as $h):?>
-        <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"><?=$h?></th>
+        <th><?=$h?></th>
         <?php endforeach;?>
       </tr></thead>
       <tbody>
         <?php if(empty($posts)):?>
-        <tr><td colspan="6" class="p-empty">No posts yet. Click "+ New Post".</td></tr>
+        <tr><td colspan="6">
+          <div class="af-empty">
+            <i data-lucide="file-text" class="af-empty-icon"></i>
+            <div class="af-empty-title">No posts yet</div>
+            <div class="af-empty-sub">Click &ldquo;+ New Post&rdquo; to publish your first article.</div>
+          </div>
+        </td></tr>
         <?php else: foreach($posts as $p): ?>
-        <tr style="border-bottom:1px solid var(--border);transition:background 0.12s;" onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">
-          <td style="padding:0.75rem 1rem;max-width:250px;">
-            <div style="font-weight:600;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e(truncate($p['title'],45))?></div>
+        <tr>
+          <td style="max-width:250px;">
+            <div class="fw-strong" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e(truncate($p['title'],45))?></div>
             <div class="fs-2xs-mt"><?=e($p['slug'])?> · <?=$p['read_time']?>min read</div>
           </td>
-          <td class="p-row"><span style="padding:0.15rem 0.5rem;border-radius:9999px;background:var(--muted);color:var(--muted-foreground);font-size:0.6875rem;"><?=e($p['category'])?></span></td>
-          <td style="padding:0.75rem 1rem;color:var(--muted-foreground);"><?=e($p['author_name']??'—')?></td>
-          <td class="p-row">
+          <td><span class="badge badge-closed"><?=e($p['category'])?></span></td>
+          <td class="text-muted"><?=e($p['author_name']??'—')?></td>
+          <td>
             <?php if($p['published'] && $p['published_at']):?>
-            <span style="font-size:0.75rem;color:var(--success-fg);font-weight:600;"> <?=date('M j, Y',strtotime($p['published_at']))?></span>
+            <span class="badge badge-active"><?=date('M j, Y',strtotime($p['published_at']))?></span>
             <?php elseif($p['published']):?>
-            <span style="font-size:0.75rem;color:var(--success-fg);">Published</span>
+            <span class="badge badge-active">Published</span>
             <?php else:?>
-            <span class="fs-xs-mt">Draft</span>
+            <span class="badge badge-closed">Draft</span>
             <?php endif;?>
-            <?php if($p['featured']):?><span style="margin-left:0.25rem;font-size:0.6rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:600;">FEATURED</span><?php endif;?>
+            <?php if($p['featured']):?><span class="badge badge-warning" style="margin-left:0.25rem;">Featured</span><?php endif;?>
           </td>
-          <td style="padding:0.75rem 1rem;text-align:center;"><?=$p['active']?'':'⬜'?></td>
-          <td class="p-row">
-            <div style="display:flex;gap:0.375rem;">
-              <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+          <td class="td-center"><?=$p['active']?'<span class="badge badge-active">On</span>':'<span class="badge badge-closed">Off</span>'?></td>
+          <td class="td-actions">
+            <div class="tbl-act-group">
+              <a href="?edit=<?=$p['id']?>" class="tbl-act" title="Edit"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <form method="POST" class="inline" onsubmit="return confirm('Delete this post?')">
                 <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
-                <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+                <button type="submit" class="tbl-act danger" title="Delete"><i data-lucide="trash-2" style="width:13px;height:13px;pointer-events:none;"></i></button>
               </form>
             </div>
           </td>
@@ -150,13 +156,13 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
-      <!-- Tab nav — sticky at top -->
-      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:2px solid var(--border);flex-shrink:0;">
-        <button type="button" class="af-tab-btn active" data-tab="content" style="padding:0.5rem 1rem;border:none;border-bottom:3px solid transparent;cursor:pointer;font-weight:600;transition:all 0.2s;color:var(--muted-foreground);" onclick="switchTab(this,'content')">
-          <i data-lucide="file-text" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Content
+      <!-- Tab nav -->
+      <div class="af-tab-bar">
+        <button type="button" class="af-tab-btn active" data-tab="content" onclick="switchTab(this,'content')">
+          <i data-lucide="file-text" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Content
         </button>
-        <button type="button" class="af-tab-btn" data-tab="publish" style="padding:0.5rem 1rem;border:none;border-bottom:3px solid transparent;cursor:pointer;font-weight:600;transition:all 0.2s;color:var(--muted-foreground);" onclick="switchTab(this,'publish')">
-          <i data-lucide="upload-cloud" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Publish
+        <button type="button" class="af-tab-btn" data-tab="publish" onclick="switchTab(this,'publish')">
+          <i data-lucide="upload-cloud" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Publish
         </button>
       </div>
 

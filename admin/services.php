@@ -165,27 +165,31 @@ $ICONS_JSON = json_encode($ICONS);
     <h2 class="h-eyebrow-flat">Services (<?=count($services)?>)</h2>
     <a href="?new=1" class="btn btn-primary btn-sm">+ Add Service</a>
   </div>
-  <div style="display:flex;flex-direction:column;gap:0.5rem;">
+  <div style="display:flex;flex-direction:column;gap:0.375rem;">
     <?php if(empty($services)):?>
-    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No services yet.</div>
+    <div class="af-empty" style="border:2px dashed var(--border);border-radius:var(--radius-lg);">
+      <i data-lucide="layers" class="af-empty-icon"></i>
+      <div class="af-empty-title">No services yet</div>
+      <div class="af-empty-sub">Add your first service to display on the website.</div>
+    </div>
     <?php else: foreach($services as $s):?>
-    <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:1rem;<?=!$s['active']?'opacity:0.55;':''?>">
+    <div class="af-list-item <?=!$s['active']?'is-inactive':''?>">
       <div style="width:2rem;height:2rem;border-radius:0.5rem;background:var(--primary-light);display:grid;place-items:center;flex-shrink:0;">
         <i data-lucide="<?=e($s['lucide_icon']??$s['icon']??'layers')?>" style="width:14px;height:14px;color:var(--primary);"></i>
       </div>
       <div class="flex-1-min">
         <div class="fw-strong"><?=e($s['title'])?>
           <?php if(!empty($s['badge'])):?>
-          <span style="display:inline-block;margin-left:0.375rem;font-size:0.65rem;font-weight:700;padding:0.1rem 0.4rem;border-radius:9999px;background:var(--primary-light);color:var(--primary);"><?=e($s['badge'])?></span>
+          <span class="badge badge-primary" style="margin-left:0.375rem;font-size:0.6rem;"><?=e($s['badge'])?></span>
           <?php endif;?>
         </div>
         <div class="fs-2xs-mt">slug: <?=e($s['slug'])?> · pos: <?=$s['position']?> · <?=e($s['icon_color']??'')?></div>
       </div>
-      <div style="display:flex;gap:0.375rem;flex-shrink:0;">
-        <a href="?edit=<?=$s['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+      <div class="tbl-act-group">
+        <a href="?edit=<?=$s['id']?>" class="tbl-act" title="Edit"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
         <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
           <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$s['id']?>">
-          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><?=icon('trash-2',13)?></button>
+          <button type="submit" class="tbl-act danger" title="Delete"><i data-lucide="trash-2" style="width:13px;height:13px;pointer-events:none;"></i></button>
         </form>
       </div>
     </div>
@@ -204,22 +208,16 @@ $ICONS_JSON = json_encode($ICONS);
       <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
     </div>
 
-    <!-- Tab bar — standardized -->
-    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:2px solid var(--border);flex-shrink:0;">
-      <button type="button" @click="tab='basic'" class="af-tab-btn" 
-              :style="tab==='basic' ? 'color:var(--primary);border-bottom-color:var(--primary);' : 'color:var(--muted-foreground);border-bottom-color:transparent;'"
-              style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;">
-        <i data-lucide="info" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Basic
+    <!-- Tab bar -->
+    <div class="af-tab-bar">
+      <button type="button" @click="tab='basic'" class="af-tab-btn" :class="tab==='basic'?'active':''">
+        <i data-lucide="info" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Basic
       </button>
-      <button type="button" @click="tab='content'" class="af-tab-btn"
-              :style="tab==='content' ? 'color:var(--primary);border-bottom-color:var(--primary);' : 'color:var(--muted-foreground);border-bottom-color:transparent;'"
-              style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;">
-        <i data-lucide="file-text" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Content
+      <button type="button" @click="tab='content'" class="af-tab-btn" :class="tab==='content'?'active':''">
+        <i data-lucide="file-text" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Content
       </button>
-      <button type="button" @click="tab='appearance'" class="af-tab-btn"
-              :style="tab==='appearance' ? 'color:var(--primary);border-bottom-color:var(--primary);' : 'color:var(--muted-foreground);border-bottom-color:transparent;'"
-              style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;">
-        <i data-lucide="palette" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Appearance
+      <button type="button" @click="tab='appearance'" class="af-tab-btn" :class="tab==='appearance'?'active':''">
+        <i data-lucide="palette" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Appearance
       </button>
     </div>
 

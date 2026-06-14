@@ -79,22 +79,29 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
   </div>
 
   <?php if(empty($faqs)):?>
-  <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No FAQs yet. Add your first FAQ!</div>
+  <div class="af-empty" style="border:2px dashed var(--border);border-radius:var(--radius-lg);">
+    <i data-lucide="help-circle" class="af-empty-icon"></i>
+    <div class="af-empty-title">No FAQs yet</div>
+    <div class="af-empty-sub">Add your first FAQ to help customers find answers.</div>
+  </div>
   <?php else: foreach($byCat as $cat => $items):?>
   <div class="mb-1-25">
-    <div style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:0.5rem;padding:0 0.25rem;"><?=e($cat)?></div>
+    <div class="af-section"><?=e($cat)?></div>
     <div style="display:flex;flex-direction:column;gap:0.25rem;">
       <?php foreach($items as $f):?>
-      <div class="st-card" style="padding:0.75rem 1rem;display:flex;align-items:center;gap:0.875rem;<?=!$f['active']?'opacity:0.55;':''?>">
+      <div class="af-list-item <?=!$f['active']?'is-inactive':''?>">
         <div class="flex-1-min">
-          <div style="font-size:0.875rem;font-weight:500;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e(truncate($f['question'],70))?></div>
-          <div class="fs-2xs-mt">Position: <?=$f['position']?> · <?=$f['active']?'Active':'Inactive'?></div>
+          <div class="fw-strong" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e(truncate($f['question'],70))?></div>
+          <div class="fs-2xs-mt">
+            Pos: <?=$f['position']?> &nbsp;·&nbsp;
+            <?=$f['active']?'<span class="badge badge-active" style="font-size:.6rem;padding:.1rem .4rem;">Active</span>':'<span class="badge badge-inactive" style="font-size:.6rem;padding:.1rem .4rem;">Inactive</span>'?>
+          </div>
         </div>
-        <div style="display:flex;gap:0.375rem;flex-shrink:0;">
-          <a href="?edit=<?=$f['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+        <div class="tbl-act-group">
+          <a href="?edit=<?=$f['id']?>" class="tbl-act" title="Edit"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
           <form method="POST" class="inline" onsubmit="return confirm('Delete this FAQ?')">
             <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$f['id']?>">
-            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+            <button type="submit" class="tbl-act danger" title="Delete"><i data-lucide="trash-2" style="width:13px;height:13px;pointer-events:none;"></i></button>
           </form>
         </div>
       </div>

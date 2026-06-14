@@ -249,60 +249,59 @@ require_once '../includes/admin-layout.php';
 </div>
 
 <!-- ── Search + filter bar ──────────────────────────────────────────────────── -->
-<form method="GET" style="display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.25rem;align-items:flex-end;">
+<form method="GET" class="af-filter-bar">
   <input type="hidden" name="status" value="<?= e($filt) ?>">
-  <div style="flex:1;min-width:12rem;">
+  <div class="af-search-wrap">
+    <i data-lucide="search" class="af-search-icon"></i>
     <input type="text" name="q" class="form-input w-100" placeholder="Search name, Client ID, email, district…" value="<?= e($q) ?>">
   </div>
   <?php if($provinces): ?>
-  <div>
-    <select name="province" class="form-input">
-      <option value="">All Provinces</option>
-      <?php foreach($provinces as $pr): ?>
-      <option value="<?= e($pr['province']) ?>" <?= $fprov===$pr['province']?'selected':'' ?>><?= e($pr['province']) ?></option>
-      <?php endforeach; ?>
-    </select>
-  </div>
+  <select name="province" class="form-input">
+    <option value="">All Provinces</option>
+    <?php foreach($provinces as $pr): ?>
+    <option value="<?= e($pr['province']) ?>" <?= $fprov===$pr['province']?'selected':'' ?>><?= e($pr['province']) ?></option>
+    <?php endforeach; ?>
+  </select>
   <?php endif; ?>
-  <div>
-    <select name="renewal" class="form-input">
-      <option value="">All Renewals</option>
-      <option value="due_soon" <?= $renewFilt==='due_soon'?'selected':'' ?>>Due Soon (30d)</option>
-      <option value="expired" <?= $renewFilt==='expired'?'selected':'' ?>>Expired/Overdue</option>
-      <option value="renewed_recently" <?= $renewFilt==='renewed_recently'?'selected':'' ?>>Recently Renewed</option>
-      <option value="no_subscription" <?= $renewFilt==='no_subscription'?'selected':'' ?>>No Subscription</option>
-    </select>
-  </div>
-  <button class="btn btn-outline btn-sm" type="submit" style="height:2.4rem;">
+  <select name="renewal" class="form-input">
+    <option value="">All Renewals</option>
+    <option value="due_soon" <?= $renewFilt==='due_soon'?'selected':'' ?>>Due Soon (30d)</option>
+    <option value="expired" <?= $renewFilt==='expired'?'selected':'' ?>>Expired/Overdue</option>
+    <option value="renewed_recently" <?= $renewFilt==='renewed_recently'?'selected':'' ?>>Recently Renewed</option>
+    <option value="no_subscription" <?= $renewFilt==='no_subscription'?'selected':'' ?>>No Subscription</option>
+  </select>
+  <button class="btn btn-primary btn-sm" type="submit">
     <i data-lucide="search" class="ic-13"></i> Search
   </button>
   <?php if($q||$filt||$fprov||$renewFilt): ?>
-  <a href="clients.php" class="btn btn-ghost btn-sm" style="height:2.4rem;">Clear</a>
+  <a href="clients.php" class="btn btn-ghost btn-sm">✕ Clear</a>
   <?php endif; ?>
 </form>
 
 <!-- ── Clients table ─────────────────────────────────────────────────────────── -->
-<div class="st-card ov-hidden">
-  <div style="overflow-x:auto;">
-    <table style="width:100%;border-collapse:collapse;font-size:.875rem;">
+<div class="tbl-wrap">
+    <table class="st-table">
       <thead>
-        <tr style="background:var(--muted);text-align:left;">
+        <tr>
           <?php foreach(['Client ID','Organization','Contact / Phones','Province · District','Products','Portal','Status',''] as $th): ?>
-          <th style="padding:.6875rem 1rem;font-size:.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;"><?= $th ?></th>
+          <th><?= $th ?></th>
           <?php endforeach; ?>
         </tr>
       </thead>
       <tbody>
         <?php if(empty($clients)): ?>
-        <tr><td colspan="8" style="text-align:center;padding:3rem;color:var(--muted-foreground);">
-          <i data-lucide="inbox" style="width:28px;height:28px;display:block;margin:0 auto .625rem;opacity:.35;"></i>
-          No clients found.
+        <tr><td colspan="8">
+          <div class="af-empty">
+            <i data-lucide="inbox" class="af-empty-icon"></i>
+            <div class="af-empty-title">No clients found</div>
+            <div class="af-empty-sub">Try adjusting the search or filters above.</div>
+          </div>
         </td></tr>
         <?php endif; ?>
         <?php foreach($clients as $c):
           $claimed = !empty($c['user_id']);
         ?>
-        <tr class="cl-tr" style="border-top:1px solid var(--border);">
+        <tr>
 
           <!-- Client ID -->
           <td style="padding:.8125rem 1rem;">
@@ -364,27 +363,25 @@ require_once '../includes/admin-layout.php';
           </td>
 
           <!-- Status -->
-          <td style="padding:.8125rem 1rem;">
-            <span style="padding:.2rem .625rem;border-radius:9999px;font-size:.6875rem;font-weight:700;
-                   background:<?=$c['status']==='active'?'var(--success-soft)':'var(--danger-soft)'?>;
-                   color:<?=$c['status']==='active'?'var(--success-fg)':'var(--danger-fg)'?>;">
+          <td>
+            <span class="badge <?=$c['status']==='active'?'badge-active':'badge-inactive'?>">
               <?= ucfirst($c['status']) ?>
             </span>
           </td>
 
           <!-- Actions -->
-          <td style="padding:.8125rem 1rem;white-space:nowrap;">
-            <div class="cl-actions">
-              <a href="client-form.php?id=<?= $c['id'] ?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .5rem;">
-                <i data-lucide="pencil" class="ic-14"></i>
+          <td class="td-actions">
+            <div class="tbl-act-group">
+              <a href="client-form.php?id=<?= $c['id'] ?>" class="tbl-act" title="Edit">
+                <i data-lucide="pencil" class="ic-13"></i>
               </a>
               <?php if(!$claimed): ?>
               <form method="POST" onsubmit="return confirm('Permanently delete <?= e(addslashes($c['org_name'])) ?>?');" class="inline">
                 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
                 <input type="hidden" name="action" value="delete">
                 <input type="hidden" name="id" value="<?= $c['id'] ?>">
-                <button type="submit" class="btn btn-ghost btn-sm" title="Delete" style="padding:.25rem .5rem;color:var(--destructive);">
-                  <i data-lucide="trash-2" class="ic-14"></i>
+                <button type="submit" class="tbl-act danger" title="Delete">
+                  <i data-lucide="trash-2" class="ic-13"></i>
                 </button>
               </form>
               <?php endif; ?>
@@ -395,18 +392,14 @@ require_once '../includes/admin-layout.php';
         <?php endforeach; ?>
       </tbody>
     </table>
-  </div>
 
-  <!-- Pagination -->
   <?php if($pages > 1 || $total > 0): ?>
-  <div style="display:flex;align-items:center;justify-content:space-between;padding:.875rem 1rem;border-top:1px solid var(--border);font-size:.8125rem;color:var(--muted-foreground);flex-wrap:wrap;gap:.5rem;">
-    <span>Showing <?= count($clients) ?> of <?= $total ?> clients</span>
+  <div class="tbl-footer">
+    <span class="fs-sm-mt">Showing <?= count($clients) ?> of <?= $total ?> clients</span>
     <?php if($pages>1): ?>
-    <div style="display:flex;gap:.25rem;flex-wrap:wrap;">
+    <div class="pagination">
       <?php for($pg=1;$pg<=$pages;$pg++): ?>
-      <a href="?page=<?=$pg?>&status=<?=e($filt)?>&q=<?=urlencode($q)?>&province=<?=urlencode($fprov)?>"
-         style="padding:.25rem .625rem;border-radius:.375rem;text-decoration:none;font-weight:<?=$pg===$page?700:400?>;
-                background:<?=$pg===$page?'var(--primary)':'var(--muted)'?>;color:<?=$pg===$page?'#fff':'var(--foreground)'?>;">
+      <a href="?page=<?=$pg?>&status=<?=e($filt)?>&q=<?=urlencode($q)?>&province=<?=urlencode($fprov)?>" <?=$pg===$page?'class="current"':''?>>
         <?= $pg ?>
       </a>
       <?php endfor; ?>
