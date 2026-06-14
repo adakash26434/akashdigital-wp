@@ -1,0 +1,145 @@
+Review:
+* Folder structure
+* Naming conventions
+* MVC separation
+* Controller logic
+* Models
+* Helpers
+* Services
+* Middleware
+* Assets
+* Uploads
+* Config files
+Identify:
+* Unused files
+* Duplicate files
+* Dead code
+* Legacy code
+* Experimental code
+* Empty files
+* Backup files
+* Unreachable code
+* Duplicate components
+* Duplicate CSS
+* Duplicate JS
+Create a list:
+REMOVE THESE FILES MERGE THESE FILES RENAME THESE FILES KEEP THESE FILES
+
+PHASE 2: GLOBAL DESIGN SYSTEM AUDIT
+Inspect all:
+* CSS
+* Bootstrap classes
+* Tailwind classes
+* Components
+Find:
+* Duplicate styling
+* Conflicting styling
+* Multiple button systems
+* Multiple form styles
+* Multiple card styles
+* Multiple table styles
+Create one unified design system.
+Required:
+Global Theme
+* colors
+* typography
+* spacing
+* radius
+* shadows
+* buttons
+* forms
+* tables
+* cards
+* badges
+* alerts
+* modals
+* sidebar
+* navbar
+List all files to update.
+
+PHASE 3: ADMIN PANEL AUDIT
+
+For each module:
+* Missing CRUD?
+* Duplicate functionality?
+* Broken navigation?
+* Missing validation?
+* Missing permissions?
+* Missing search?
+* Missing pagination?
+* Missing filters?
+* Missing bulk actions?
+Provide exact findings.
+
+PHASE 4: PUBLIC WEBSITE AUDIT
+
+For every public page verify:
+Can admin update content?
+Can admin update images?
+Can admin update SEO?
+Can admin update menu?
+Can admin update footer?
+Can admin update homepage sections?
+Find anything hardcoded.
+List every hardcoded item.
+
+PHASE 5: CLIENT PORTAL AUDIT
+
+
+PHASE 6: ADMIN ↔ PUBLIC WEBSITE CONNECTION AUDIT
+
+PHASE 7: DATABASE AUDIT
+
+
+PHASE 8: SEARCH & FILTER AUDIT
+For every table/grid/list:
+Verify:
+Search
+Sort
+Pagination
+Date Filter
+Status Filter
+Export
+Bulk Action
+Reset Filter
+Identify missing features.
+
+PHASE 9: SECURITY AUDIT
+
+
+PHASE 10: PERFORMANCE AUDIT
+
+
+PHASE 11: DOCUMENTATION AUDIT
+
+
+PHASE 12: FINAL CLEANUP
+Provide:
+1. Files to Delete
+2. Files to Merge
+3. Files to Rename
+4. Tables to Delete
+5. Tables to Merge
+6. Tables to Optimize
+7. Routes to Remove
+8. Routes to Add
+9. Controllers to Refactor
+10. Models to Refactor
+11. CSS to Consolidate
+12. JS to Consolidate
+
+PHASE 13: FINAL SCORE
+Score each area:
+Architecture /100
+Database /100
+Security /100
+Performance /100
+UI/UX /100
+Admin Panel /100
+Client Portal /100
+CMS /100
+Code Quality /100
+Maintainability /100
+Overall /100
+
+PHASE 14: PRODUCE FINAL VERSION PLAN

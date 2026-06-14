@@ -1,0 +1,27 @@
+<?php
+/**
+ * PRODUCTION CONFIGURATION — DO NOT COMMIT TO GITHUB!
+ *
+ * Copy this file to config-production.php and fill in your credentials.
+ * config-production.php is gitignored and will NOT be pushed to GitHub.
+ *
+ * Generate a strong APP_SECRET_KEY:
+ *   php -r "echo bin2hex(random_bytes(32));"
+ */
+
+// ── Database Credentials ──────────────────────────────
+define('DB_HOST',    'localhost');
+define('DB_NAME',    'your_database_name');
+define('DB_USER',    'your_database_user');
+define('DB_PASS',    'YOUR_PASSWORD_HERE');
+define('DB_CHARSET', 'utf8mb4');
+
+// ── Site URL ───────────────────────────────────────────
+define('SITE_URL', 'https://yourdomain.com');
+
+// ── Secret Key (generate a unique one per deployment) ──
+// php -r "echo bin2hex(random_bytes(32));"
+define('APP_SECRET_KEY', 'PASTE_YOUR_GENERATED_KEY_HERE');
+
+// ── Environment ────────────────────────────────────────
+define('APP_ENV', 'production');

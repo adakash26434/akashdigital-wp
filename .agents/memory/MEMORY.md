@@ -1,0 +1,7 @@
+- [SQLite migration rule](sqlite-migration-rule.md) — never add ALTER TABLE in sqliteMigrate() for columns already in CREATE TABLE; causes silent PDO errors every request
+- [Admin sidebar CSS](admin-sidebar-css.md) — sidebar uses max-width transition on .sb-label, not display:none; mobile uses translateX
+- [Client import/export columns](client-import-export.md) — export template must match exact column names the importer expects; see client-import.php header comment for canonical list
+- [Pricing plans as shared source](pricing-plans-shared-source.md) — pricing_plans table is the single source for plan names; client-form package dropdown and subscription plan_name datalist both pull from it
+- [DB migrations SQLite safety](db-migrations-sqlite.md) — db-migrations.php uses dbTableExists()/dbColumnExists() helpers that branch on DB_DRIVER; SHOW TABLES/SHOW COLUMNS are MySQL-only and must never be used directly
+- [Stat card standard](stat-card-standard.md) — single stat card component is .stat-card (theme.css); accent variants use .is-danger/.is-warning/.is-success/.is-primary modifier classes; crm/charge/clients pages all migrated
+- [Notifications schema canonical](notifications-schema.md) — canonical schema uses seen_at DATETIME (NULL = unread); is_read/read_at columns were old duplicate schema, removed from database.sql; portal/index.php and notify.php all use seen_at IS NULL

@@ -1,0 +1,60 @@
+# ─────────────────────────────────────────────────────────────────────
+# Ankur Infotech CMS — security & routing rules
+# ─────────────────────────────────────────────────────────────────────
+
+# Disable directory listing
+Options -Indexes
+
+# ── Block direct HTTP access to server-side directories ──────────────
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Block direct web access to PHP includes, cache, config, cron, and artifact dirs
+  RewriteRule ^(includes|cron|\.cache|\.agents|\.local|\.replit-artifact)/  - [F,L]
+</IfModule>
+
+# ── Protect individual sensitive files ───────────────────────────────
+<FilesMatch "^(dev-config\.php|\.env|composer\.(json|lock))$">
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+  <IfModule !mod_authz_core.c>
+    Order deny,allow
+    Deny from all
+  </IfModule>
+</FilesMatch>
+
+# ── PHP settings for production ───────────────────────────────────────
+<IfModule mod_php8.c>
+  php_flag  display_errors  Off
+  php_flag  log_errors      On
+  php_value error_log       /dev/null
+</IfModule>
+<IfModule mod_php.c>
+  php_flag  display_errors  Off
+  php_flag  log_errors      On
+</IfModule>
+
+# ── Security headers ─────────────────────────────────────────────────
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  # HSTS — enforced; all assets and fonts are self-hosted so HTTPS is safe to require.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  # CSP — enforce mode. All JS/CSS/fonts are self-hosted (no external CDN needed).
+  # img-src allows data: (inline SVG/base64 thumbs) and https: (user-uploaded images via external URLs).
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'"
+</IfModule>
+
+# ── Static asset caching ─────────────────────────────────────────────
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css             "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/svg+xml        "access plus 1 year"
+  ExpiresByType image/webp           "access plus 1 year"
+  ExpiresByType font/woff2           "access plus 1 year"
+</IfModule>
