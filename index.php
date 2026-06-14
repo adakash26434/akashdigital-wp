@@ -17,10 +17,10 @@ try { $testimonials = query("SELECT * FROM testimonials WHERE active=1 ORDER BY 
 $__logoClients = [];
 
 // Get ALL active clients from CRM (single source of truth) - case insensitive
-try { $__logoClients = query("SELECT org_name, logo_url FROM clients WHERE LOWER(TRIM(status)) = 'active' AND TRIM(org_name) IS NOT NULL AND TRIM(org_name) != '' ORDER BY org_name ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+try { $__logoClients = query("SELECT org_name, logo_url, district, province FROM clients WHERE LOWER(TRIM(status)) = 'active' AND TRIM(org_name) IS NOT NULL AND TRIM(org_name) != '' ORDER BY org_name ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
 // Also include client-type partners
-try { $partnerClients = query("SELECT name AS org_name, logo_url FROM partners ORDER BY position ASC, id ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+try { $partnerClients = query("SELECT name AS org_name, logo_url, district, '' AS province FROM partners ORDER BY position ASC, id ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
 // Count total clients for stat display (use actual count from DB)
 $__clientCount = count($__logoClients) + count($partnerClients);
@@ -439,18 +439,41 @@ include 'includes/stats-bar.php';
       </h2>
     </div>
 
+    <style>
+    .st-marq-card{flex-shrink:0;display:flex;align-items:center;gap:.625rem;background:var(--card);border:1px solid var(--border);border-radius:.875rem;padding:.625rem .875rem;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:border-color .22s,box-shadow .22s,transform .18s;cursor:default;min-width:180px;max-width:240px;}
+    .st-marq-card:hover{border-color:rgba(79,70,229,.3);box-shadow:0 3px 14px rgba(79,70,229,.1);transform:translateY(-2px);}
+    .st-marq-card__logo{width:2.25rem;height:2.25rem;object-fit:contain;border-radius:.375rem;flex-shrink:0;filter:grayscale(.3);opacity:.85;transition:filter .25s,opacity .25s;}
+    .st-marq-card:hover .st-marq-card__logo{filter:grayscale(0);opacity:1;}
+    .st-marq-card__icon{width:2.25rem;height:2.25rem;border-radius:.5rem;background:color-mix(in srgb,var(--primary) 10%,transparent);display:grid;place-items:center;flex-shrink:0;}
+    .st-marq-card__body{display:flex;flex-direction:column;gap:.1rem;min-width:0;}
+    .st-marq-card__name{font-family:var(--font-display);font-weight:600;font-size:.8125rem;color:var(--foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
+    .st-marq-card__loc{font-size:.6875rem;color:var(--muted-foreground);white-space:nowrap;display:flex;align-items:center;gap:.2rem;line-height:1;}
+    </style>
     <div class="marquee-wrap" style="padding-bottom:2.5rem;">
-      <div style="display:flex;gap:1rem;align-items:center;width:max-content;animation:logo-sc 55s linear infinite;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
-      <?php for($r=0;$r<2;$r++): foreach($__logoClients as $lc): ?>
-      <div style="flex-shrink:0;display:flex;align-items:center;padding:0 .375rem;">
+      <div style="display:flex;gap:.75rem;align-items:stretch;width:max-content;animation:logo-sc 65s linear infinite;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
+      <?php for($r=0;$r<2;$r++): foreach($__logoClients as $lc):
+        $_dist = trim($lc['district'] ?? '');
+        $_prov = (int)($lc['province'] ?? 0);
+        $_provLabel = $_prov > 0 ? 'Province ' . $_prov : '';
+        $loc = $_dist ?: $_provLabel;
+        if ($_dist && $_provLabel) $loc = $_dist . ', ' . $_provLabel;
+      ?>
+      <div class="st-marq-card">
         <?php if (!empty($lc['logo_url'])): ?>
-        <img src="<?= e($lc['logo_url']) ?>" alt="<?= e($lc['org_name']) ?>" loading="lazy" decoding="async"
-             class="st-marq-logo">
+        <img src="<?= e($lc['logo_url']) ?>" alt="<?= e($lc['org_name']) ?>" loading="lazy" decoding="async" class="st-marq-card__logo">
         <?php else: ?>
-        <span class="st-marq-label">
-          <i data-lucide="building-2" style="width:13px;height:13px;flex-shrink:0;color:var(--primary);opacity:.8;"></i><?= e($lc['org_name']) ?>
-        </span>
+        <div class="st-marq-card__icon">
+          <i data-lucide="building-2" style="width:1rem;height:1rem;color:var(--primary);"></i>
+        </div>
         <?php endif; ?>
+        <div class="st-marq-card__body">
+          <div class="st-marq-card__name"><?= e($lc['org_name']) ?></div>
+          <?php if ($loc): ?>
+          <div class="st-marq-card__loc">
+            <i data-lucide="map-pin" style="width:.6rem;height:.6rem;flex-shrink:0;"></i><?= e($loc) ?>
+          </div>
+          <?php endif; ?>
+        </div>
       </div>
       <?php endforeach; endfor; ?>
     </div>
