@@ -29,7 +29,7 @@ $todayFollowups = query("
     LEFT JOIN users u ON u.id=l.assigned_to
     WHERE l.next_followup = ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
-", [$today])->fetchAll(PDO::FETCH_ASSOC);
+", [$today]);
 
 // ── Overdue Follow-ups ────────────────────────────────────────
 $overdueFollowups = query("
@@ -42,7 +42,7 @@ $overdueFollowups = query("
     WHERE l.next_followup < ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
     LIMIT 20
-", [$today])->fetchAll(PDO::FETCH_ASSOC);
+", [$today]);
 
 // ── Upcoming Follow-ups (next 7 days) ────────────────────────
 $nextWeek = date('Y-m-d', strtotime('+7 days'));
@@ -54,13 +54,13 @@ $upcomingFollowups = query("
     WHERE l.next_followup > ? AND l.next_followup <= ? AND l.stage NOT IN ('won','lost')
     ORDER BY l.next_followup ASC
     LIMIT 10
-", [$today, $nextWeek])->fetchAll(PDO::FETCH_ASSOC);
+", [$today, $nextWeek]);
 
 // ── New Demo Requests ────────────────────────────────────────
-$newDemos = query("SELECT * FROM demo_requests WHERE status='pending' ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+$newDemos = query("SELECT * FROM demo_requests WHERE status='pending' ORDER BY created_at DESC LIMIT 5");
 
 // ── New Contact Inquiries ─────────────────────────────────────
-$newContacts = query("SELECT * FROM contact_submissions WHERE status='new' ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
+$newContacts = query("SELECT * FROM contact_submissions WHERE status='new' ORDER BY created_at DESC LIMIT 5");
 
 // ── Recent Activity (last 5 follow-ups) ─────────────────────
 $recentActivity = query("
@@ -70,7 +70,7 @@ $recentActivity = query("
     LEFT JOIN users u ON u.id=f.user_id
     ORDER BY f.followup_at DESC
     LIMIT 8
-")->fetchAll(PDO::FETCH_ASSOC);
+");
 
 // ── Deal Pipeline Summary ────────────────────────────────────
 $pipeline = queryOne("
@@ -88,7 +88,7 @@ $stageDist = query("
     FROM crm_leads
     GROUP BY stage
     ORDER BY cnt DESC
-")->fetchAll(PDO::FETCH_ASSOC);
+");
 
 $stageLabels = [
     'prospect' => 'Prospect',

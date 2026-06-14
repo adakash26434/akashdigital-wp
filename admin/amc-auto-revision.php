@@ -145,7 +145,7 @@ $total = (int)queryOne(
 $pg = paginate($total, $perPage, $page);
 
 $clients = query(
-    "SELECT c.*, u.name as client_name, u.email as client_email, 
+    "SELECT c.*, u.display_name as client_name, u.email as client_email, 
             rc.renewal_cycle, rc.increment_type, rc.increment_value, rc.last_revision_date
      FROM clients c 
      LEFT JOIN users u ON u.id=c.user_id 

@@ -14,11 +14,11 @@ if (!$id) {
 }
 
 $invoice = queryOne(
-    "SELECT i.*, c.*, u.name as client_name, u.email as client_email, u.phone as client_phone,
+    "SELECT i.*, c.*, u.display_name as client_name, u.email as client_email, u.phone as client_phone,
             u.address as client_address, c.org_name
      FROM invoices i 
      LEFT JOIN clients c ON c.id=i.client_id 
-     LEFT JOIN users u ON u.id=i.user_id 
+     LEFT JOIN users u ON u.id=c.user_id 
      WHERE i.id=?",
     [$id]
 );

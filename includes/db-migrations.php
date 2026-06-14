@@ -326,4 +326,33 @@ function runDbMigrations() {
             }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M16: ' . $e->getMessage()); }
+
+    try {
+        // Migration 17: Add missing columns to invoices + sla_breached to tickets
+        $m17 = [
+            "ALTER TABLE invoices ADD COLUMN user_id INTEGER",
+            "ALTER TABLE invoices ADD COLUMN terms TEXT",
+            "ALTER TABLE invoices ADD COLUMN tax_rate REAL NOT NULL DEFAULT 0",
+            "ALTER TABLE invoices ADD COLUMN created_by INTEGER",
+            "ALTER TABLE invoices ADD COLUMN billing_period_from TEXT",
+            "ALTER TABLE invoices ADD COLUMN billing_period_to TEXT",
+            "ALTER TABLE tickets ADD COLUMN sla_breached INTEGER NOT NULL DEFAULT 0",
+            "ALTER TABLE client_documents ADD COLUMN status TEXT NOT NULL DEFAULT 'pending'",
+            "ALTER TABLE client_documents ADD COLUMN approved_by INTEGER",
+            "ALTER TABLE client_documents ADD COLUMN approved_at TEXT",
+            "ALTER TABLE client_documents ADD COLUMN notes TEXT",
+            "ALTER TABLE client_documents ADD COLUMN rejection_reason TEXT",
+            "ALTER TABLE clients ADD COLUMN custom_charge_type TEXT",
+            "ALTER TABLE clients ADD COLUMN custom_charge_value REAL DEFAULT 0",
+            "ALTER TABLE amc_renewal_config ADD COLUMN last_revision_date TEXT",
+        ];
+        foreach ($m17 as $sql) {
+            try { execute($sql); } catch (\Throwable $e2) {
+                // Ignore "duplicate column" errors (already applied)
+                if (stripos($e2->getMessage(), 'duplicate column') === false) {
+                    error_log('[db-migrations] M17: ' . $e2->getMessage() . ' | SQL: ' . substr($sql, 0, 80));
+                }
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M17: ' . $e->getMessage()); }
 }

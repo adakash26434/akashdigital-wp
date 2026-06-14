@@ -6,14 +6,6 @@ require_once '../includes/admin-layout.php';
 function safe(string $sql, array $p = []): array {
     try { return query($sql, $p); } catch(\Throwable $e) { return []; }
 }
-// नेपालीमा: safeOne() — yo function le aafno kaam garchha
-function safeOne(string $sql, array $p = []): ?array {
-    try { $r = queryOne($sql, $p); return $r ?: null; } catch(\Throwable $e) { return null; }
-}
-// नेपालीमा: safeInt() — yo function le aafno kaam garchha
-function safeInt(string $sql, array $p = []): int {
-    $r = safeOne($sql, $p); return (int)($r[array_key_first($r ?? [])] ?? 0);
-}
 
 // ── Date range ────────────────────────────────────────────────
 $range  = max(7, min(90, (int)($_GET['range'] ?? 30)));

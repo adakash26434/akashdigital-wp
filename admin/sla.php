@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $policies = query("SELECT * FROM sla_policies ORDER BY FIELD(priority,'urgent','high','normal','low')");
-$breached = (int)(queryOne("SELECT COUNT(*) c FROM tickets WHERE sla_breached=1 AND status NOT IN ('resolved','closed')")['c'] ?? 0);
+$breached = (int)(queryOne("SELECT COUNT(*) c FROM tickets WHERE sla_deadline IS NOT NULL AND sla_deadline < datetime('now') AND status NOT IN ('resolved','closed')")['c'] ?? 0);
 ?>
 <div style="padding:1.5rem;max-width:900px;margin:0 auto;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">

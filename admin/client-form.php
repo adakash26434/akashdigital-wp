@@ -158,7 +158,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Helper: Generate agreement from template
 function generateAgreementFromTemplate($pdo, $clientId, $template, $createdBy) {
     // Get client data
-    $client = queryOne("SELECT c.*, u.name as contact_name, u.email as contact_email, u.phone as contact_phone 
+    $client = queryOne("SELECT c.*, u.display_name as contact_name, u.email as contact_email, u.phone as contact_phone 
                         FROM clients c LEFT JOIN users u ON u.id=c.user_id WHERE c.id=?", [$clientId]);
     if (!$client) return;
     

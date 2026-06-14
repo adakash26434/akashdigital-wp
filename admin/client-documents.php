@@ -28,7 +28,7 @@ if ($type_filter) {
     $params[] = $type_filter;
 }
 if ($client_search) {
-    $where[] = "(c.org_name LIKE ? OR u.name LIKE ?)";
+    $where[] = "(c.org_name LIKE ? OR u.display_name LIKE ?)";
     $params[] = "%$client_search%";
     $params[] = "%$client_search%";
 }
@@ -44,8 +44,8 @@ $total = (int)queryOne(
 $pg = paginate($total, $perPage, $page);
 
 $docs = query(
-    "SELECT d.*, c.org_name, u.name as client_name, u.email as client_email,
-            a.name as approver_name
+    "SELECT d.*, c.org_name, u.display_name as client_name, u.email as client_email,
+            a.display_name as approver_name
      FROM client_documents d 
      LEFT JOIN clients c ON c.id=d.client_id 
      LEFT JOIN users u ON u.id=c.user_id 

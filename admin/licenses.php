@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $rows = query(
-    "SELECT cs.*, u.name AS user_name, u.email AS user_email
+    "SELECT cs.*, u.display_name AS user_name, u.email AS user_email
      FROM client_subscriptions cs
      JOIN users u ON u.id = cs.user_id
      ORDER BY cs.created_at DESC LIMIT 200"

@@ -21,7 +21,7 @@ if ($status_filter) {
     $params[] = $status_filter;
 }
 if ($client_search) {
-    $where[] = "(c.org_name LIKE ? OR u.name LIKE ? OR i.invoice_number LIKE ?)";
+    $where[] = "(c.org_name LIKE ? OR u.display_name LIKE ? OR i.invoice_number LIKE ?)";
     $params[] = "%$client_search%";
     $params[] = "%$client_search%";
     $params[] = "%$client_search%";
@@ -29,15 +29,15 @@ if ($client_search) {
 $whereSQL = 'WHERE ' . implode(' AND ', $where);
 
 // Count
-$total = (int)queryOne("SELECT COUNT(*) c FROM invoices i LEFT JOIN clients c ON c.id=i.client_id LEFT JOIN users u ON u.id=i.user_id $whereSQL", $params)['c'];
+$total = (int)queryOne("SELECT COUNT(*) c FROM invoices i LEFT JOIN clients c ON c.id=i.client_id LEFT JOIN users u ON u.id=c.user_id $whereSQL", $params)['c'];
 $pg = paginate($total, $perPage, $page);
 
 // Fetch invoices
 $invoices = query(
-    "SELECT i.*, c.org_name, u.name as client_name, u.email as client_email
+    "SELECT i.*, c.org_name, u.display_name as client_name, u.email as client_email
      FROM invoices i 
      LEFT JOIN clients c ON c.id=i.client_id 
-     LEFT JOIN users u ON u.id=i.user_id 
+     LEFT JOIN users u ON u.id=c.user_id 
      $whereSQL 
      ORDER BY i.created_at DESC 
      LIMIT {$pg['perPage']} OFFSET {$pg['offset']}",
@@ -240,7 +240,7 @@ $STATUS_COLORS = [
 ];
 
 // Get clients for dropdown
-$clients = query("SELECT c.id, c.org_name, u.name, u.email FROM clients c LEFT JOIN users u ON u.id=c.user_id ORDER BY c.org_name");
+$clients = query("SELECT c.id, c.org_name, u.display_name AS name, u.email FROM clients c LEFT JOIN users u ON u.id=c.user_id ORDER BY c.org_name");
 
 // Header
 adminListHeader('Invoices', "$total invoices", [

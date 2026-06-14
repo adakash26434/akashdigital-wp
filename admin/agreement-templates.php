@@ -107,7 +107,7 @@ if (post('action')) {
 }
 
 // Get all templates
-$templates = query("SELECT t.*, u.name as created_by_name FROM agreement_templates t LEFT JOIN users u ON u.id=t.created_by ORDER BY t.template_type, t.is_default DESC, t.name");
+$templates = query("SELECT t.*, u.display_name as created_by_name FROM agreement_templates t LEFT JOIN users u ON u.id=t.created_by ORDER BY t.template_type, t.is_default DESC, t.name");
 
 // Group by type
 $grouped = [];

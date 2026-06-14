@@ -16,6 +16,31 @@ if (!function_exists('str_contains')) {
     }
 }
 
+function post(string $key, mixed $default = ''): mixed {
+    return $_POST[$key] ?? $default;
+}
+
+function safeOne(string $sql, array $p = []): ?array {
+    try { $r = queryOne($sql, $p); return $r ?: null; } catch (\Throwable $e) { return null; }
+}
+
+function safeInt(string $sql, array $params = []): int {
+    try {
+        $row = queryOne($sql, $params);
+        return (int)(is_array($row) ? (reset($row) ?? 0) : ($row ?? 0));
+    } catch (\Throwable $e) {
+        error_log('[safeInt] ' . $e->getMessage());
+        return 0;
+    }
+}
+
+function redirectSelf(array $extra = []): void {
+    $url = strtok($_SERVER['REQUEST_URI'] ?? '/', '?');
+    $params = array_merge($_GET ?? [], $extra);
+    if ($params) $url .= '?' . http_build_query($params);
+    redirect($url);
+}
+
 function e($v): string {
     return htmlspecialchars((string)($v ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }

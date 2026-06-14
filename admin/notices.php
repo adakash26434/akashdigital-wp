@@ -84,7 +84,7 @@ $csrf = csrfToken();
     <?php endif; ?>
 
     <div class="space-y-4">
-        <?php $rows = $notices->fetchAll(PDO::FETCH_ASSOC); ?>
+        <?php $rows = $notices; ?>
         <?php foreach ($rows as $n): ?>
         <div class="card bg-base-100 shadow-sm <?= !$n['is_active'] ? 'opacity-60' : '' ?>">
             <div class="card-body p-5">

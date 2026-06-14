@@ -35,7 +35,7 @@ if ($source_filter) {
     $params[] = $source_filter;
 }
 if ($client_search) {
-    $where[] = "(c.org_name LIKE ? OR u.name LIKE ?)";
+    $where[] = "(c.org_name LIKE ? OR u.display_name LIKE ?)";
     $params[] = "%$client_search%";
     $params[] = "%$client_search%";
 }
@@ -53,8 +53,8 @@ $pg = paginate($total, $perPage, $page);
 
 // Fetch agreements
 $agreements = query(
-    "SELECT a.*, c.org_name, c.id as client_id, u.name as client_name,
-            u.email as client_email, st.name as staff_name
+    "SELECT a.*, c.org_name, c.id as client_id, u.display_name as client_name,
+            u.email as client_email, st.display_name as staff_name
      FROM client_agreements a 
      LEFT JOIN clients c ON c.id=a.client_id 
      LEFT JOIN users u ON u.id=c.user_id 
@@ -195,7 +195,7 @@ $TYPE_LABELS = [
 ];
 
 // Get all clients for dropdown
-$clients = query("SELECT c.id, c.org_name, u.name FROM clients c LEFT JOIN users u ON u.id=c.user_id ORDER BY c.org_name");
+$clients = query("SELECT c.id, c.org_name, u.display_name AS name FROM clients c LEFT JOIN users u ON u.id=c.user_id ORDER BY c.org_name");
 
 // Stats
 $stats = [
