@@ -137,6 +137,7 @@ $kpis = [
   ['Demo Conv. Rate', $convPct.'%',     icon('trending-up',16),   'var(--success-soft)','var(--success-fg)', null],
   ['Avg Response',    $avgHrs ? $avgHrs.'h' : '—', icon('clock',16), 'var(--success-soft)','var(--success-fg)', null],
 ];
+?>
 <?php foreach ($kpis as [$lbl,$val,$ico,$bg,$col,$href]):?>
 <div style="padding:1rem 1.125rem;border-radius:0.875rem;border:1px solid var(--border);background:var(--card);display:flex;flex-direction:column;gap:0.375rem;">
   <span style="display:flex;color:<?=$col?>"><?=$ico?></span>
@@ -162,6 +163,7 @@ $kpis = [
       ['Expiring (30d)',   $subRevExpiring,                    icon('alert-triangle',14), '#fffbeb','var(--warning-fg)'],
       ['Expired',          $subRevExpired,                     icon('x-circle',14),       'var(--danger-soft)','var(--danger-fg)'],
     ];
+    ?>
     <?php foreach($revKpis as [$lbl,$val,$ico,$bg,$col]):?>
     <div style="padding:0.875rem 1rem;border-radius:0.75rem;background:<?=$bg?>;border:1px solid var(--border);display:flex;flex-direction:column;gap:0.375rem;">
       <span style="display:flex;color:<?=$col?>"><?=$ico?></span>

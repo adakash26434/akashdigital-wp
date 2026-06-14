@@ -169,6 +169,7 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
     ['Won',              $stats['s_won']       ?? 0, 'var(--success-soft)','var(--success-fg)',''],
     ['Accepted Proposals',$prop_stats['accepted']??0,'#dbeafe','var(--primary-dark)',''],
   ];
+  ?>
   <?php foreach ($statsCards as [$lbl,$val,$bg,$col,$ico]):?>
   <div style="padding:1rem;border-radius:0.875rem;background:<?=$bg?>;border:1px solid var(--border);">
     <div style="font-size:1.25rem;margin-bottom:0.25rem;"><?=$ico?></div>

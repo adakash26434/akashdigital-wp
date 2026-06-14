@@ -307,6 +307,7 @@ $__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Application
       [url('admin/settings.php'),              'settings-2',     'Settings'],
       [url('admin/users.php'),                 'user',           'Users'],
     ];
+    ?>
     <?php foreach($quickActions as [$href,$ico,$lbl]):?>
     <a href="<?=$href?>" style="display:flex;align-items:center;gap:0.375rem;padding:0.5rem 0.875rem;border-radius:0.625rem;border:1px solid var(--border);background:var(--background);font-size:0.8125rem;font-weight:500;color:var(--foreground);text-decoration:none;transition:all 0.15s;"
        onmouseover="this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--foreground)'">
@@ -336,6 +337,7 @@ $__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Application
       ['Footer & Tagline',   'align-bottom', url('admin/settings.php').'#footer',         'Footer tagline & copyright'],
       ['Brand Colors',       'palette',      url('admin/settings.php').'#brand_colors',   'Primary, secondary & status colors'],
     ];
+    ?>
     <?php foreach($contentShortcuts as [$label,$ico,$href,$desc]):?>
     <a href="<?=e($href)?>" style="display:flex;align-items:center;gap:0.625rem;padding:0.5rem 0.75rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--background);text-decoration:none;transition:all 0.15s;"
        onmouseover="this.style.background='var(--primary-light)';this.style.borderColor='var(--primary)'" onmouseout="this.style.background='var(--background)';this.style.borderColor='var(--border)'">
