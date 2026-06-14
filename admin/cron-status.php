@@ -28,7 +28,7 @@ try {
         "SELECT rr.*, cs.product_name, u.email
          FROM renewal_reminders rr
          LEFT JOIN client_subscriptions cs ON cs.id = rr.subscription_id
-         LEFT JOIN users u ON u.id = rr.user_id
+         LEFT JOIN users u ON u.id = cs.user_id
          ORDER BY rr.id DESC LIMIT 20"
     );
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }

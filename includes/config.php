@@ -102,7 +102,10 @@ if (getenv('APP_ENV') !== 'development') {
 // (e.g., an embed-allowed page may send its own X-Frame-Options: ALLOWALL).
 if (!headers_sent()) {
     header('X-Content-Type-Options: nosniff');
-    header('X-Frame-Options: SAMEORIGIN');
+    // In development (Replit preview), omit X-Frame-Options so the iframe preview works
+    if (getenv('APP_ENV') !== 'development') {
+        header('X-Frame-Options: SAMEORIGIN');
+    }
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-XSS-Protection: 1; mode=block');
     // Permissions-Policy: disable unused powerful features

@@ -38,20 +38,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Auto-create table on first visit (idempotent)
+// Auto-create table on first visit (idempotent — SQLite + MySQL compatible)
 try {
-    execute("CREATE TABLE IF NOT EXISTS tech_expertise (
-        id          INT AUTO_INCREMENT PRIMARY KEY,
-        name        VARCHAR(255) NOT NULL,
-        category    VARCHAR(100) NOT NULL DEFAULT 'General',
+    getDb()->exec("CREATE TABLE IF NOT EXISTS tech_expertise (
+        id          INTEGER PRIMARY KEY AUTOINCREMENT,
+        name        TEXT NOT NULL,
+        category    TEXT NOT NULL DEFAULT 'General',
         description TEXT,
         icon_url    TEXT,
-        lucide_icon VARCHAR(100) NOT NULL DEFAULT 'cpu',
-        position    INT         NOT NULL DEFAULT 0,
-        active      TINYINT(1)  NOT NULL DEFAULT 1,
-        created_at  DATETIME    NOT NULL DEFAULT NOW(),
-        updated_at  DATETIME    NOT NULL DEFAULT NOW()
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+        lucide_icon TEXT NOT NULL DEFAULT 'cpu',
+        position    INTEGER NOT NULL DEFAULT 0,
+        active      INTEGER NOT NULL DEFAULT 1,
+        created_at  TEXT NOT NULL DEFAULT (datetime('now')),
+        updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
+    )");
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
 $items = [];
