@@ -4,6 +4,17 @@ require_once '../includes/admin-layout.php';
 
 $success = $error = '';
 
+// Load products & services for the feature picker
+$pickerItems = [];
+try {
+    $prods = query("SELECT name AS label, 'Product' AS kind FROM products WHERE active=1 ORDER BY position,id");
+    foreach ($prods as $p) $pickerItems[] = $p;
+} catch (\Throwable $e) {}
+try {
+    $svcs = query("SELECT title AS label, 'Service' AS kind FROM services WHERE active=1 ORDER BY position,id");
+    foreach ($svcs as $s) $pickerItems[] = $s;
+} catch (\Throwable $e) {}
+
 // Fetch all active pricing plans
 $plans = [];
 try {
@@ -99,9 +110,47 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
 
     <!-- LEFT: feature name editor -->
     <div class="st-card p-tile col-1">
+
+      <?php if (!empty($pickerItems)): ?>
+      <!-- Product & Service picker -->
+      <div style="margin-bottom:1rem;">
+        <label class="form-label" style="margin-bottom:0.5rem;">
+          Pick from Products &amp; Services
+          <span style="font-weight:400;color:var(--muted-foreground);">— click to add / remove</span>
+        </label>
+        <div id="pt-chips" style="display:flex;flex-wrap:wrap;gap:0.375rem;">
+          <?php
+          $kinds = [];
+          foreach ($pickerItems as $item) {
+              $kinds[$item['kind']][] = $item['label'];
+          }
+          $kindColors = ['Product' => 'var(--primary)', 'Service' => 'var(--success-fg)'];
+          $kindBg     = ['Product' => 'var(--primary-light)', 'Service' => 'var(--success-soft)'];
+          foreach ($kinds as $kind => $labels):
+              foreach ($labels as $label):
+          ?>
+          <button type="button"
+                  class="pt-chip"
+                  data-label="<?= e($label) ?>"
+                  title="<?= e($kind) ?>"
+                  style="padding:0.25rem 0.625rem;border-radius:999px;border:1px solid <?= $kindColors[$kind] ?? 'var(--border)' ?>;
+                         background:transparent;color:<?= $kindColors[$kind] ?? 'var(--foreground)' ?>;
+                         font-size:0.75rem;font-weight:500;cursor:pointer;transition:background 0.12s,color 0.12s;
+                         font-family:var(--font-body);">
+            <?= e($label) ?>
+          </button>
+          <?php endforeach; endforeach; ?>
+        </div>
+        <p class="form-hint" style="margin-top:0.375rem;">
+          <span style="display:inline-block;width:0.5rem;height:0.5rem;border-radius:50%;background:var(--primary);margin-right:0.25rem;"></span>Product &nbsp;
+          <span style="display:inline-block;width:0.5rem;height:0.5rem;border-radius:50%;background:var(--success-fg);margin-right:0.25rem;"></span>Service
+        </p>
+      </div>
+      <?php endif; ?>
+
       <div>
         <label class="form-label">Feature rows <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
-        <textarea name="features" rows="14" class="form-textarea"
+        <textarea name="features" id="pt-features" rows="14" class="form-textarea"
           placeholder="Core Software Module&#10;Members limit&#10;Branches&#10;…"><?= e($features_str) ?></textarea>
         <p class="form-hint">Each line = one row in the table. Order here = order on the public pricing page.</p>
       </div>
@@ -214,5 +263,62 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
 </form>
 
 <?php endif; ?>
+
+<script>
+(function () {
+  const ta    = document.getElementById('pt-features');
+  const chips = document.querySelectorAll('.pt-chip');
+  if (!ta || !chips.length) return;
+
+  // Returns current lines as a Set
+  function getLines() {
+    return new Set(ta.value.split('\n').map(l => l.trim()).filter(Boolean));
+  }
+
+  // Reflect active state on all chips
+  function syncChips() {
+    const lines = getLines();
+    chips.forEach(chip => {
+      const lbl  = chip.dataset.label;
+      const kind = chip.title; // 'Product' or 'Service'
+      const on   = lines.has(lbl);
+      if (on) {
+        chip.style.background = kind === 'Service' ? 'var(--success-soft)' : 'var(--primary-light)';
+        chip.style.fontWeight  = '700';
+        chip.style.opacity     = '1';
+      } else {
+        chip.style.background = 'transparent';
+        chip.style.fontWeight  = '500';
+        chip.style.opacity     = '0.75';
+      }
+    });
+  }
+
+  // Toggle a label in the textarea
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const lbl   = chip.dataset.label;
+      const lines = getLines();
+      if (lines.has(lbl)) {
+        // Remove it
+        lines.delete(lbl);
+        ta.value = [...lines].join('\n');
+      } else {
+        // Append it
+        const cur = ta.value.trimEnd();
+        ta.value  = cur ? cur + '\n' + lbl : lbl;
+      }
+      syncChips();
+      // Trigger the live table re-render (existing page uses form submit)
+      ta.dispatchEvent(new Event('input'));
+    });
+  });
+
+  // Sync on load
+  syncChips();
+  // Re-sync when user types in textarea
+  ta.addEventListener('input', syncChips);
+})();
+</script>
 
 <?php require_once '../includes/admin-layout-close.php'; ?>
