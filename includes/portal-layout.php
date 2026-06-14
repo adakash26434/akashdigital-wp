@@ -92,6 +92,7 @@ require __DIR__ . '/head.php';
         ['services.php',    'package',        isNepali() ? 'मेरा सेवाहरू'    : 'My Services',     $__expiring],
         ['orders.php',      'shopping-cart',  isNepali() ? 'मेरा अर्डरहरू'  : 'My Orders',        0],
         ['invoices.php',    'receipt',        isNepali() ? 'इनभ्वाइस'       : 'Invoices',         0],
+        ['documents.php',   'file-text',      isNepali() ? 'कागजातहरू'      : 'Documents',        0],
         ['faq.php',         'book-open',      isNepali() ? 'ज्ञान आधार'     : 'Knowledge Base',   0],
         ['contacts.php',    'phone',          isNepali() ? 'समर्थन सम्पर्क' : 'Support Contacts', 0],
         ['profile.php',     'user',           isNepali() ? 'प्रोफाइल'       : 'Profile',          0],

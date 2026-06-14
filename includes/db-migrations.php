@@ -303,4 +303,27 @@ function runDbMigrations() {
             }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M15: ' . $e->getMessage()); }
+
+    try {
+        // Migration 16: Add indexes for high-traffic tables missing coverage
+        $m16 = [
+            "CREATE INDEX IF NOT EXISTS idx_audit_log_user_id      ON audit_log(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_audit_log_action       ON audit_log(action)",
+            "CREATE INDEX IF NOT EXISTS idx_audit_log_created_at   ON audit_log(created_at)",
+            "CREATE INDEX IF NOT EXISTS idx_ticket_replies_ticket   ON ticket_replies(ticket_id)",
+            "CREATE INDEX IF NOT EXISTS idx_support_messages_conv   ON support_messages(conversation_id)",
+            "CREATE INDEX IF NOT EXISTS idx_notifications_user_id   ON notifications(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_notifications_seen_at   ON notifications(seen_at)",
+            "CREATE INDEX IF NOT EXISTS idx_crm_proposals_lead_id   ON crm_proposals(lead_id)",
+            "CREATE INDEX IF NOT EXISTS idx_orders_user_id          ON orders(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_orders_status           ON orders(status)",
+            "CREATE INDEX IF NOT EXISTS idx_activity_log_user_id    ON activity_log(user_id)",
+            "CREATE INDEX IF NOT EXISTS idx_activity_log_created_at ON activity_log(created_at)",
+        ];
+        foreach ($m16 as $idxSql) {
+            try { execute($idxSql); } catch (\Throwable $e2) {
+                error_log('[db-migrations] M16 index: ' . $e2->getMessage() . ' | SQL: ' . substr($idxSql, 0, 80));
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M16: ' . $e->getMessage()); }
 }

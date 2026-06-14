@@ -870,22 +870,6 @@ function sqliteMigrate(PDO $pdo): void {
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
-    CREATE TABLE IF NOT EXISTS branches (
-        id         INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_id  INTEGER NOT NULL,
-        code       TEXT,
-        name       TEXT NOT NULL,
-        address    TEXT,
-        district   TEXT,
-        province   TEXT,
-        phone      TEXT,
-        manager    TEXT,
-        is_head    INTEGER NOT NULL DEFAULT 0,
-        active     INTEGER NOT NULL DEFAULT 1,
-        created_at TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
     CREATE TABLE IF NOT EXISTS tech_expertise (
         id          INTEGER PRIMARY KEY AUTOINCREMENT,
         name        TEXT NOT NULL,
@@ -1026,77 +1010,6 @@ function _sqliteInitSeedData(PDO $pdo): void
     ];
     $stmt = $pdo->prepare("INSERT OR IGNORE INTO site_settings (setting_key, setting_val) VALUES (?, ?)");
     foreach ($settings as [$k, $v]) $stmt->execute([$k, $v]);
-
-    // ── AMC & Subscription Tables ──────────────────────────────────
-    $pdo->exec("
-    CREATE TABLE IF NOT EXISTS amc_renewal_config (
-        id                  INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_id           INTEGER NOT NULL UNIQUE,
-        renewal_cycle       TEXT NOT NULL DEFAULT '2years',
-        cycle_months        INTEGER DEFAULT 24,
-        increment_type      TEXT NOT NULL DEFAULT 'percentage',
-        increment_value     REAL NOT NULL DEFAULT 0,
-        base_amc_ho         REAL DEFAULT NULL,
-        base_ammc_branch    REAL DEFAULT NULL,
-        next_renewal_date   TEXT DEFAULT NULL,
-        last_renewal_date   TEXT DEFAULT NULL,
-        created_at          TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at          TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    ");
-
-    $pdo->exec("
-    CREATE TABLE IF NOT EXISTS client_subscriptions (
-        id               INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id          INTEGER NOT NULL,
-        product_id       INTEGER DEFAULT NULL,
-        product_name     TEXT NOT NULL,
-        plan_name        TEXT NOT NULL,
-        license_key      TEXT DEFAULT NULL,
-        deployment_type  TEXT DEFAULT NULL,
-        branches         INTEGER NOT NULL DEFAULT 1,
-        members_limit    INTEGER DEFAULT NULL,
-        amount           REAL DEFAULT NULL,
-        billing_cycle    TEXT DEFAULT 'monthly',
-        status           TEXT NOT NULL DEFAULT 'active',
-        starts_at        TEXT DEFAULT NULL,
-        expires_at       TEXT DEFAULT NULL,
-        created_at       TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at       TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    ");
-
-    $pdo->exec("
-    CREATE TABLE IF NOT EXISTS client_charge_history (
-        id              INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_id       INTEGER NOT NULL,
-        charge_type     TEXT NOT NULL,
-        old_value       REAL DEFAULT NULL,
-        new_value       REAL NOT NULL,
-        effective_date  TEXT NOT NULL,
-        reason          TEXT DEFAULT NULL,
-        changed_by      INTEGER DEFAULT NULL,
-        created_at      TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    ");
-
-    $pdo->exec("
-    CREATE TABLE IF NOT EXISTS branches (
-        id         INTEGER PRIMARY KEY AUTOINCREMENT,
-        client_id  INTEGER NOT NULL,
-        code       TEXT,
-        name       TEXT NOT NULL,
-        address     TEXT,
-        district    TEXT,
-        province    TEXT,
-        phone       TEXT,
-        manager     TEXT,
-        is_head     INTEGER DEFAULT 0,
-        active      INTEGER DEFAULT 1,
-        created_at  TEXT NOT NULL DEFAULT (datetime('now')),
-        updated_at  TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-    ");
 
     // Seed sample clients
     $clients = [

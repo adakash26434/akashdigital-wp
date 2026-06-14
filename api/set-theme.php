@@ -1,6 +1,6 @@
 <?php
 /**
- * POST /sahakari/api/set-theme.php
+ * POST /api/set-theme.php
  * Saves user's dark/light preference server-side.
  */
 require_once __DIR__ . '/../includes/config.php';

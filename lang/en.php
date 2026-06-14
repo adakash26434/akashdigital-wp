@@ -9,6 +9,7 @@ return [
     'nav_services'    => 'Services',
     'nav_pricing'     => 'Pricing',
     'nav_portfolio'   => 'Portfolio',
+    'nav_gallery'     => 'Gallery',
     'nav_news'        => 'News',
     'nav_faq'         => 'FAQ',
     'nav_kb'          => 'Knowledge Base',

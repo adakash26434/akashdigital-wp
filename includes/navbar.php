@@ -20,6 +20,7 @@ $navLinks = [
 ];
 $moreLinks = [
   ['href' => 'portfolio.php', 'key' => 'nav_portfolio', 'icon' => 'layout-grid'],
+  ['href' => 'gallery.php',   'key' => 'nav_gallery',   'icon' => 'image'],
   ['href' => 'news.php',      'key' => 'nav_news',      'icon' => 'newspaper'],
   ['href' => 'kb.php',        'key' => 'nav_kb',        'icon' => 'book-open', 'label_en' => 'Knowledge Base', 'label_ne' => 'सहयोग केन्द्र'],
   ['href' => 'faq.php',       'key' => 'nav_faq',       'icon' => 'help-circle'],

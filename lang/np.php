@@ -9,6 +9,7 @@ return [
     'nav_services'    => 'सेवाहरू',
     'nav_pricing'     => 'मूल्य निर्धारण',
     'nav_portfolio'   => 'पोर्टफोलियो',
+    'nav_gallery'     => 'ग्यालरी',
     'nav_news'        => 'समाचार',
     'nav_kb'          => 'सहयोग केन्द्र',
     'nav_faq'         => 'सामान्य प्रश्न',

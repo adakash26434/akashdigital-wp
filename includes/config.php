@@ -34,7 +34,7 @@ if (!defined('DB_CHARSET')) define('DB_CHARSET', 'utf8mb4');
 
 // ── Site URL (no trailing slash) ──────────────────────────────
 // Root install:      define('SITE_URL', 'https://yourdomain.com');
-// Subfolder install: define('SITE_URL', 'https://yourdomain.com/sahakari');
+// Subfolder install: define('SITE_URL', 'https://yourdomain.com/myapp');
 if (!defined('SITE_URL')) define('SITE_URL', 'https://example.com');
 
 // ── Site Identity ─────────────────────────────────────────────
