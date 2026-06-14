@@ -36,17 +36,25 @@ if (!isset($__s)) $__s = siteSettings();
        style="display:flex;align-items:center;justify-content:space-between;height:4rem;overflow:visible;">
 
     <!-- Brand -->
-    <a id="st-brand" href="<?= url('index.php') ?>">
-      <?php 
+    <?php
       $headerLogo = !empty($__s['company_logo_url']) ? $__s['company_logo_url'] : ($__s['logo_url'] ?? '');
-      ?>
-      <?php if (!empty($headerLogo)): ?>
-        <img id="st-brand-logo" src="<?= e($headerLogo) ?>" alt="<?= e($__s['company_name'] ?? $__s['site_name'] ?? SITE_NAME) ?>" loading="eager" decoding="async">
-      <?php else: ?>
-        <span id="st-brand-monogram"><?= strtoupper(substr(defined('SITE_NAME') ? SITE_NAME : 'NI', 0, 2)) ?></span>
-        <span><?= e($__s['company_name'] ?? $__s['site_name'] ?? SITE_NAME) ?></span>
+      $isoLogo    = $__s['iso_logo_url'] ?? '';
+    ?>
+    <div id="st-brand-wrap" style="display:flex;align-items:center;gap:0.625rem;text-decoration:none;">
+      <a id="st-brand" href="<?= url('index.php') ?>" style="display:flex;align-items:center;gap:0.5rem;">
+        <?php if (!empty($headerLogo)): ?>
+          <img id="st-brand-logo" src="<?= e($headerLogo) ?>" alt="<?= e($__s['company_name'] ?? $__s['site_name'] ?? SITE_NAME) ?>" loading="eager" decoding="async">
+        <?php else: ?>
+          <span id="st-brand-monogram"><?= strtoupper(substr(defined('SITE_NAME') ? SITE_NAME : 'NI', 0, 2)) ?></span>
+          <span><?= e($__s['company_name'] ?? $__s['site_name'] ?? SITE_NAME) ?></span>
+        <?php endif; ?>
+      </a>
+      <?php if (!empty($isoLogo)): ?>
+        <div class="st-iso-badge" title="ISO Certified">
+          <img src="<?= e($isoLogo) ?>" alt="ISO Certified" loading="eager" decoding="async">
+        </div>
       <?php endif; ?>
-    </a>
+    </div>
 
     <!-- Desktop primary nav -->
     <ul id="st-desktop-nav" style="list-style:none;margin:0;padding:0;">

@@ -992,6 +992,7 @@ function _sqliteInitSeedData(PDO $pdo): void
         ['contact_phone',    ''],
         ['address',          ''],
         ['logo_url',         ''],
+        ['iso_logo_url',     ''],
         ['social_links',     '{"facebook":"","twitter":"","linkedin":"","youtube":""}'],
         ['whatsapp_number',  ''],
         ['whatsapp_enabled', '1'],
