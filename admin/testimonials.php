@@ -124,19 +124,19 @@ catch (\Throwable $e) {
       </div>
       <div>
         <label class="form-label fs-2xs2">Organization / Cooperative</label>
-        <input type="text" name="author_org" class="form-input fs-sm2"
+        <input type="text" name="author_org" id="tst-author-org" class="form-input fs-sm2"
                value="<?=e($editing['author_org']??'')?>"
-               placeholder="Select a client or type manually"
-               list="tst-org-list"
-               autocomplete="off">
+               placeholder="Type organization name">
         <?php if (!empty($clientOrgs)): ?>
-        <datalist id="tst-org-list">
+        <select class="form-input fs-sm2" style="margin-top:0.375rem;"
+                onchange="if(this.value){document.getElementById('tst-author-org').value=this.value;}this.selectedIndex=0;">
+          <option value="">— Select from existing clients —</option>
           <?php foreach ($clientOrgs as $co): ?>
-            <option value="<?=e($co['org_name'])?>">
+            <option value="<?=e($co['org_name'])?>"><?=e($co['org_name'])?></option>
           <?php endforeach; ?>
-        </datalist>
+        </select>
         <?php endif; ?>
-        <span class="form-hint">Select from existing clients or type a custom name.</span>
+        <span class="form-hint">Pick from the list above or type a custom name.</span>
       </div>
       <div>
         <label class="form-label fs-2xs2">Quote / Review <span class="text-danger-token">*</span></label>
