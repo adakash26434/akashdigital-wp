@@ -324,7 +324,7 @@ $ICONS_JSON = json_encode($ICONS);
           </div>
           <label class="row-check" style="margin-top:1.25rem;">
             <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
-            Active
+            <span>Active</span>
           </label>
         </div>
       </div><!-- /basic -->

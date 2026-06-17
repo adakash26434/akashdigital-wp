@@ -412,8 +412,8 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
       <p style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1rem;">Select demo requests to import as CRM leads (already imported ones are hidden).</p>
       <div style="display:flex;flex-direction:column;gap:0.5rem;max-height:320px;overflow-y:auto;margin-bottom:1.25rem;">
         <?php foreach ($demo_unimported as $d): ?>
-        <label style="display:flex;align-items:flex-start;gap:0.75rem;padding:0.75rem;border:1px solid var(--border);border-radius:0.75rem;cursor:pointer;">
-          <input type="checkbox" name="import_ids[]" value="<?= $d['id'] ?>" style="margin-top:0.125rem;">
+        <label class="row-check" style="padding:0.75rem;border:1px solid var(--border);border-radius:0.75rem;">
+          <input type="checkbox" name="import_ids[]" value="<?= $d['id'] ?>">
           <div>
             <div style="font-weight:700;font-size:0.875rem;"><?= e($d['contact_name']) ?> — <?= e($d['org_name']) ?></div>
             <div class="fs-xs-mt"><?= e($d['product'] ?? '') ?> · <?= date('M j, Y', strtotime($d['created_at'])) ?></div>

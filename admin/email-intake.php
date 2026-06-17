@@ -39,7 +39,7 @@ $log = query("SELECT * FROM email_intake_log ORDER BY fetched_at DESC LIMIT 50")
   <div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
   <form method="post">
     <?= csrfField() ?>
-    <label style="display:flex;gap:0.5rem;align-items:center;margin-bottom:1.25rem;font-weight:600;cursor:pointer;">
+    <label class="row-check" style="margin-bottom:1.25rem;font-weight:600;">
       <input type="checkbox" name="imap_enabled" <?= $cfg['imap_enabled']==='1'?'checked':'' ?>>
       <span>Enable IMAP email intake</span>
     </label>

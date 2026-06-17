@@ -217,9 +217,9 @@ echo '</div></div>';
         </div>
         
         <div>
-          <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;">
+          <label class="row-check">
             <input type="checkbox" name="is_default" value="1" id="template-default">
-            <span style="font-size:0.8125rem;">Set as default template for this type</span>
+            <span>Set as default template for this type</span>
           </label>
         </div>
         

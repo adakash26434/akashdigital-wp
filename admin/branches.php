@@ -237,12 +237,12 @@ $selectedClient = $clientId
         </div>
       </div>
 
-      <div style="display:flex;gap:1.5rem;align-items:center;font-size:0.8125rem;">
-        <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;">
+      <div style="display:flex;gap:1.5rem;align-items:center;">
+        <label class="row-check">
           <input type="checkbox" name="is_head" <?=($editing['is_head']??0)?'checked':''?>>
           <span>Head Office</span>
         </label>
-        <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;">
+        <label class="row-check">
           <input type="checkbox" name="active" <?=($editing['active']??1)?'checked':''?>>
           <span>Active</span>
         </label>

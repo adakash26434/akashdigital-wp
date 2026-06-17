@@ -143,7 +143,8 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
         </div>
         <div style="padding-bottom:0.5rem;">
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible
+            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+            <span>Active / Visible</span>
           </label>
         </div>
       </div>

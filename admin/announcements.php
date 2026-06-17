@@ -211,11 +211,13 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
       </div>
 
       <div style="display:flex;gap:1rem;">
-        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.875rem;">
-          <input type="checkbox" name="active" value="1" <?=($edit['active']??1)?'checked':''?>> Active
+        <label class="row-check">
+          <input type="checkbox" name="active" value="1" <?=($edit['active']??1)?'checked':''?>>
+          <span>Active</span>
         </label>
-        <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.875rem;">
-          <input type="checkbox" name="dismissible" value="1" <?=($edit['dismissible']??1)?'checked':''?>> Dismissible (user can close)
+        <label class="row-check">
+          <input type="checkbox" name="dismissible" value="1" <?=($edit['dismissible']??1)?'checked':''?>>
+          <span>Dismissible (user can close)</span>
         </label>
       </div>
 

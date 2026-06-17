@@ -226,13 +226,16 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
         </div>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
           <label class="row-check">
-            <input type="checkbox" name="published" value="1" <?=($editing['published']??0)?'checked':''?>> Published
+            <input type="checkbox" name="published" value="1" <?=($editing['published']??0)?'checked':''?>>
+            <span>Published</span>
           </label>
           <label class="row-check">
-            <input type="checkbox" name="featured" value="1" <?=($editing['featured']??0)?'checked':''?>> Featured
+            <input type="checkbox" name="featured" value="1" <?=($editing['featured']??0)?'checked':''?>>
+            <span>Featured</span>
           </label>
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active
+            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+            <span>Active</span>
           </label>
         </div>
       </div>

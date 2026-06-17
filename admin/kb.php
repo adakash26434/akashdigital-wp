@@ -103,8 +103,9 @@ if (!empty($_GET['edit'])) {
           <input name="position" type="number" value="0" class="form-input">
         </div>
         <div style="display:flex;align-items:flex-end;padding-bottom:0.25rem;">
-          <label style="display:flex;align-items:center;gap:0.4rem;cursor:pointer;font-size:0.8125rem;font-weight:500;">
-            <input type="checkbox" name="active" checked> Active
+          <label class="row-check">
+            <input type="checkbox" name="active" checked>
+            <span>Active</span>
           </label>
         </div>
       </div>

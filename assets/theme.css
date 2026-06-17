@@ -2372,6 +2372,40 @@ html[data-theme="dark"] {
 .row-between { display: flex; justify-content: space-between; }
 .row-between-mb { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
 .row-check { display: flex; align-items: center; gap: 0.375rem; cursor: pointer; font-size: 0.8125rem; }
+.row-check input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.row-check:hover span {
+  color: var(--foreground);
+}
+
+/* ── Global Checkbox Styling ─────────────────────────────────── */
+input[type="checkbox"] {
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--primary);
+  cursor: pointer;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+/* ── Toggle Switch Checkbox ──────────────────────────────────── */
+.toggle-check {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.toggle-check input[type="checkbox"] {
+  width: 2.25rem;
+  height: 1.25rem;
+  accent-color: var(--primary);
+}
 .ic-13    { width: 13px; height: 13px; }
 .ic-16-p  { width: 16px; height: 16px; color: var(--primary); }
 .h-eyebrow-tight { font-family: var(--font-display); font-size: 0.9375rem; font-weight: 700; margin-bottom: 1.25rem; }

@@ -497,44 +497,78 @@ require_once '../includes/admin-layout.php';
       </div>
       <div class="form-row form-row-2">
         <div>
-          <label class="form-label">Product(s) in Use</label>
+          <label class="form-label">Product(s) / Service(s) in Use</label>
           <?php
-            // Support comma-separated stored value as pre-selected items
             $_selProducts = array_filter(array_map('trim', explode(',', $client['product'] ?? ($_POST['product'] ?? ''))));
           ?>
           <select name="product_multi[]" id="cf-product-select" multiple class="form-input"
-            style="min-height:2.75rem;padding:.375rem .75rem;" title="Hold Ctrl/Cmd to select multiple">
+            style="min-height:2.75rem;padding:.375rem .75rem;" title="Select from existing or type below">
             <?php foreach ($_productServiceList as $_pname): ?>
             <option value="<?= e($_pname) ?>" <?= in_array($_pname, $_selProducts) ? 'selected' : '' ?>><?= e($_pname) ?></option>
             <?php endforeach; ?>
           </select>
           <input type="hidden" name="product" id="cf-product-hidden" value="<?= $v('product') ?>">
           <div id="cf-product-tags" class="ps-tag-wrap"></div>
-          <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:.25rem 0 0;">Hold <kbd style="font-size:.7rem;padding:.1em .35em;border:1px solid var(--border);border-radius:.25rem;background:var(--muted);">Ctrl</kbd> / <kbd style="font-size:.7rem;padding:.1em .35em;border:1px solid var(--border);border-radius:.25rem;background:var(--muted);">⌘</kbd> to select multiple</p>
+          
+          <!-- Free text input for custom products -->
+          <div style="margin-top:0.75rem;">
+            <label class="form-label-sub">Add custom product / service</label>
+            <div style="display:flex;gap:0.5rem;">
+              <input type="text" id="cf-custom-product" class="form-input" placeholder="Type to add new..." 
+                     style="flex:1;font-size:0.875rem;">
+              <button type="button" class="btn btn-outline btn-sm" onclick="addCustomProduct()" 
+                      style="white-space:nowrap;">Add</button>
+            </div>
+            <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:.25rem 0 0;">Select from dropdown above or add your own</p>
+          </div>
+          
           <script>
           (function(){
             var sel=document.getElementById('cf-product-select');
             var hid=document.getElementById('cf-product-hidden');
             var tags=document.getElementById('cf-product-tags');
+            var customInput=document.getElementById('cf-custom-product');
+            
             function syncTags(){
               var vals=Array.from(sel.selectedOptions).map(o=>o.value);
               hid.value=vals.join(', ');
               tags.innerHTML=vals.map(v=>'<span class="ps-tag">'+v+'</span>').join('');
             }
+            
             // Pre-select from hidden (comma-separated)
             var pre=(hid.value||'').split(',').map(s=>s.trim()).filter(Boolean);
             Array.from(sel.options).forEach(o=>{ if(pre.includes(o.value)) o.selected=true; });
             syncTags();
             sel.addEventListener('change', syncTags);
+            
+            // Custom product handler
+            window.addCustomProduct=function(){
+              var val=customInput.value.trim();
+              if(!val) return;
+              var exists=Array.from(sel.options).some(o=>o.value===val);
+              if(!exists){
+                var opt=document.createElement('option');
+                opt.value=val; opt.text=val; opt.selected=true;
+                sel.appendChild(opt);
+              } else {
+                Array.from(sel.options).forEach(o=>{ if(o.value===val) o.selected=true; });
+              }
+              customInput.value='';
+              syncTags();
+            };
+            
+            // Enter key to add
+            customInput.addEventListener('keypress',function(e){
+              if(e.key==='Enter'){ e.preventDefault(); addCustomProduct(); }
+            });
           })();
           </script>
         </div>
         <div>
           <label class="form-label">Software In Use?</label>
-          <label style="display:flex;align-items:center;gap:.625rem;margin-top:.625rem;cursor:pointer;">
-            <input type="checkbox" name="cbs_use" value="1" <?= ($v('cbs_use','1')==='1')?'checked':'' ?>
-                   style="width:1.125rem;height:1.125rem;accent-color:var(--primary);">
-            <span style="font-size:.875rem;color:var(--foreground);">Yes, software is active for this client</span>
+          <label class="row-check" style="margin-top:0.625rem;">
+            <input type="checkbox" name="cbs_use" value="1" <?= ($v('cbs_use','1')==='1')?'checked':'' ?>>
+            <span>Yes, software is active for this client</span>
           </label>
         </div>
       </div>
@@ -619,8 +653,8 @@ require_once '../includes/admin-layout.php';
           <input type="number" name="cloud_charge_branch" class="form-input" placeholder="0.00" step="0.01" min="0" value="<?= $v('cloud_charge_branch') ?>">
         </div>
         <div>
-          <label class="form-label">Cloud Storage</label>
-          <input type="text" name="cloud_gb" class="form-input" placeholder="e.g. 10 GB" value="<?= $v('cloud_gb') ?>">
+          <label class="form-label">Cloud Storage (GB)</label>
+          <input type="number" name="cloud_gb" class="form-input" placeholder="0" step="0.1" min="0" value="<?= $v('cloud_gb') ?>">
         </div>
       </div>
     </div>

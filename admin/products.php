@@ -258,7 +258,8 @@ if (!empty($_GET['edit'])) {
           </div>
           <div style="display:flex;align-items:flex-end;padding-bottom:0.25rem;">
             <label class="row-check">
-              <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible
+              <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+              <span>Active / Visible</span>
             </label>
           </div>
         </div>

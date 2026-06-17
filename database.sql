@@ -250,11 +250,17 @@ CREATE TABLE IF NOT EXISTS clients (
   cloud_charge_branch DECIMAL(12,2) DEFAULT NULL,
   custom_charge_type VARCHAR(50) DEFAULT NULL,
   custom_charge_value DECIMAL(12,2) DEFAULT NULL,
+  -- Service tracking
+  agreement_date DATE DEFAULT NULL COMMENT 'Client agreement signing date',
+  installation_date DATE DEFAULT NULL COMMENT 'Software installation date',
+  num_branches INT NOT NULL DEFAULT 1 COMMENT 'Number of branches (HO + branches)',
+  cloud_gb DECIMAL(10,2) DEFAULT NULL COMMENT 'Cloud storage in GB',
   -- Sale tracking
   sale_type       VARCHAR(30) NOT NULL DEFAULT 'office_sale' COMMENT 'office_sale, channel_partner',
   channel_partner_id INT DEFAULT NULL COMMENT 'Referral channel partner',
   sale_date       DATE DEFAULT NULL COMMENT 'When the sale was made',
   sale_by         INT DEFAULT NULL COMMENT 'Staff who made the sale',
+  assigned_by     INT DEFAULT NULL COMMENT 'Admin who created this client',
   created_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at      DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_status (status),

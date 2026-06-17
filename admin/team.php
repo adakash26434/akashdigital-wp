@@ -154,17 +154,19 @@ if (!empty($_GET['edit'])) {
         <input type="url" name="linkedin_url" class="form-input" value="<?=e($editing['linkedin_url']??'')?>" placeholder="https://linkedin.com/in/username">
         <span class="form-hint">Optional. LinkedIn profile link.</span>
       </div>
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
+      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:start;">
         <div>
           <label class="form-label">Position</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
-        <div style="display:flex;flex-direction:column;gap:0.25rem;padding-bottom:0.5rem;">
-          <label class="row-check">
-            <input type="checkbox" name="is_leadership" value="1" <?=($editing['is_leadership']??0)?'checked':''?>> Leadership team
+        <div style="padding-top:0.625rem;">
+          <label class="row-check" style="margin-bottom:0.375rem;">
+            <input type="checkbox" name="is_leadership" value="1" <?=(!empty($editing['is_leadership']))?'checked':''?>>
+            <span>Leadership team</span>
           </label>
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible
+            <input type="checkbox" name="active" value="1" <?=(!empty($editing['active']))?'checked':''?>>
+            <span>Active / Visible</span>
           </label>
         </div>
       </div>
