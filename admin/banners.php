@@ -210,9 +210,11 @@ if (isset($_GET['edit'])) {
           <input type="text" name="btn_text" class="form-input" value="<?= e($edit['btn_text'] ?? '') ?>" placeholder="e.g., Learn More, Get Started" maxlength="30">
           <span class="form-hint">Optional. Short call-to-action text for the button. Max 30 characters.</span>
         </div>
-        <div style="display:flex;align-items:center;gap:0.5rem;">
-          <input type="checkbox" id="active" name="active" value="1" <?= ($edit['active'] ?? 1) ? 'checked' : '' ?>>
-          <label for="active" style="margin:0;font-size:0.875rem;font-weight:500;">Active / Show on site</label>
+        <div>
+          <label class="row-check">
+            <input type="checkbox" name="active" value="1" <?= ($edit['active'] ?? 1) ? 'checked' : '' ?>>
+            <span>Active / Show on site</span>
+          </label>
         </div>
         <div style="display:flex;gap:0.5rem;padding-top:0.5rem;">
           <button type="submit" class="btn btn-primary flex-1"><?= $edit ? 'Update Banner' : 'Create Banner' ?></button>

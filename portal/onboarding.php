@@ -151,13 +151,10 @@ $pct = (int)round(($step / 5) * 100);
         // Use slugified key for value for backward-compat, but show real name
         $_obKey = strtolower(preg_replace('/[^a-z0-9]+/i', '_', $_obpn));
       ?>
-      <label style="display:flex;align-items:center;gap:0.625rem;padding:0.625rem 0.875rem;border:1px solid var(--border);border-radius:0.625rem;margin-bottom:0.5rem;cursor:pointer;background:var(--card);transition:border-color .15s,background .15s;"
-        onmouseover="this.style.borderColor='var(--primary)';this.style.background='var(--primary-light)'"
-        onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--card)'">
+      <label class="ob-check-item">
         <input type="checkbox" name="data[interested][]" value="<?= e($_obKey) ?>"
-          <?= (in_array($_obKey, $interested, true) || in_array($_obpn, $interested, true)) ? 'checked' : '' ?>
-          style="width:1rem;height:1rem;accent-color:var(--primary);">
-        <span style="font-size:var(--text-sm);color:var(--foreground);"><?= e($_obpn) ?></span>
+          <?= (in_array($_obKey, $interested, true) || in_array($_obpn, $interested, true)) ? 'checked' : '' ?>>
+        <span><?= e($_obpn) ?></span>
       </label>
       <?php endforeach; ?>
 

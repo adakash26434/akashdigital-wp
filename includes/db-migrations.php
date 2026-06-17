@@ -355,4 +355,24 @@ function runDbMigrations() {
             }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M17: ' . $e->getMessage()); }
+
+    try {
+        // Migration 18: Add service tracking columns to clients table
+        $m18 = [
+            "ALTER TABLE clients ADD COLUMN agreement_date DATE",
+            "ALTER TABLE clients ADD COLUMN installation_date DATE",
+            "ALTER TABLE clients ADD COLUMN num_branches INTEGER NOT NULL DEFAULT 1",
+            "ALTER TABLE clients ADD COLUMN cloud_gb REAL",
+            "ALTER TABLE clients ADD COLUMN assigned_by INTEGER",
+        ];
+        foreach ($m18 as $sql) {
+            try { execute($sql); } catch (\Throwable $e2) {
+                // Ignore "duplicate column" errors (already applied)
+                if (stripos($e2->getMessage(), 'duplicate column') === false &&
+                    stripos($e2->getMessage(), 'can\'t overwrite') === false) {
+                    error_log('[db-migrations] M18: ' . $e2->getMessage() . ' | SQL: ' . substr($sql, 0, 80));
+                }
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M18: ' . $e->getMessage()); }
 }

@@ -171,7 +171,8 @@ catch (\Throwable $e) {
         </div>
       </div>
       <label class="row-check">
-        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible on site
+        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+        <span>Active / Visible on site</span>
       </label>
       <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update':'Add Testimonial'?></button>
       <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>

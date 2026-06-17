@@ -211,7 +211,8 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         <textarea name="requirements" class="form-input fs-sm-r" rows="3" placeholder="- 2+ years PHP&#10;- MySQL experience"><?=e($editing['requirements']??'')?></textarea>
       </div>
       <label class="row-check">
-        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Open / Accepting Applications
+        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+        <span>Open / Accepting Applications</span>
       </label>
 
       </div><!-- /scrollable-content -->

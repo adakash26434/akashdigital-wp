@@ -181,10 +181,12 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
         </div>
         <div style="display:flex;flex-direction:column;gap:0.25rem;padding-bottom:0.25rem;">
           <label class="row-check">
-            <input type="checkbox" name="featured" value="1" <?=($editing['featured']??0)?'checked':''?>> Featured
+            <input type="checkbox" name="featured" value="1" <?=($editing['featured']??0)?'checked':''?>>
+            <span>Featured</span>
           </label>
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active
+            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+            <span>Active</span>
           </label>
         </div>
       </div>

@@ -178,14 +178,14 @@ $showForm = !empty($_GET['new']) || $editing;
       <input type="number" name="position" class="form-input" min="0" value="<?=e($editing['position']??0)?>">
     </div>
     <div style="display:flex;gap:1.5rem;">
-      <label style="display:flex;align-items:center;gap:0.5rem;font-size:var(--text-sm);cursor:pointer;">
-        <input type="checkbox" name="is_popular" style="width:1rem;height:1rem;accent-color:var(--primary);" <?=($editing['is_popular']??0)?'checked':''?>>
+      <label class="row-check">
+        <input type="checkbox" name="is_popular" <?=($editing['is_popular']??0)?'checked':''?>>
         <span>Mark as Popular (highlighted)</span>
       </label>
     </div>
     <div style="display:flex;gap:1.5rem;">
-      <label style="display:flex;align-items:center;gap:0.5rem;font-size:var(--text-sm);cursor:pointer;">
-        <input type="checkbox" name="active" style="width:1rem;height:1rem;accent-color:var(--primary);" <?=($editing['active']??1)?'checked':''?>>
+      <label class="row-check">
+        <input type="checkbox" name="active" <?=($editing['active']??1)?'checked':''?>>
         <span>Visible on public page</span>
       </label>
     </div>

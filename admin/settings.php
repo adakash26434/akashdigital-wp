@@ -521,9 +521,11 @@ $tabs = [
               echo e(sv($s,'whatsapp_message', $defaultMsg));
             ?></textarea>
           </div>
-          <div style="display:flex;align-items:center;gap:0.5rem;">
-            <input type="checkbox" name="whatsapp_enabled" id="wa_en" <?= sv($s,'whatsapp_enabled','1') !== '0' ? 'checked' : '' ?> style="width:1rem;height:1rem;accent-color:var(--primary);">
-            <label for="wa_en" style="font-size:0.875rem;font-weight:500;">Enable WhatsApp button</label>
+          <div>
+            <label class="row-check">
+              <input type="checkbox" name="whatsapp_enabled" id="wa_en" <?= sv($s,'whatsapp_enabled','1') !== '0' ? 'checked' : '' ?>>
+              <span>Enable WhatsApp button</span>
+            </label>
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save WhatsApp Settings</button>
         </div>
@@ -908,8 +910,8 @@ $tabs = [
               <div style="font-size:0.875rem;font-weight:600;color:var(--foreground);"><?= $label ?></div>
               <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.125rem;"><?= $desc ?></div>
             </div>
-            <label style="position:relative;display:inline-flex;align-items:center;cursor:pointer;flex-shrink:0;">
-              <input type="checkbox" name="<?=$key?>" <?= sv($s,$key,'1') !== '0' ? 'checked' : '' ?> style="width:2.25rem;height:1.25rem;accent-color:var(--primary);">
+            <label class="toggle-check">
+              <input type="checkbox" name="<?=$key?>" <?= sv($s,$key,'1') !== '0' ? 'checked' : '' ?>>
             </label>
           </div>
           <?php endforeach; ?>
@@ -940,9 +942,11 @@ $tabs = [
             <?php $imgField = 'chairman_photo'; $imgValue = sv($s,'chairman_photo'); $imgLabel = 'Chairman Photo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
           </div>
           <?php biTA($s,'chairman_message','Message','Write a message from the Chairman…','अध्यक्षज्यूको सन्देश लेख्नुस…',5,'','Leave blank to hide the Chairman card.') ?>
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
-            <input type="checkbox" id="chairman_active" name="chairman_active" value="1" <?= sv($s,'chairman_active') ? 'checked' : '' ?> style="cursor:pointer;">
-            <label for="chairman_active" style="cursor:pointer;margin:0;">Show on public page</label>
+          <div style="margin-top:1rem;">
+            <label class="row-check">
+              <input type="checkbox" id="chairman_active" name="chairman_active" value="1" <?= sv($s,'chairman_active') ? 'checked' : '' ?>>
+              <span>Show on public page</span>
+            </label>
           </div>
         </div>
 
@@ -959,9 +963,11 @@ $tabs = [
             <?php $imgField = 'ceo_photo'; $imgValue = sv($s,'ceo_photo'); $imgLabel = 'CEO Photo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
           </div>
           <?php biTA($s,'ceo_message','Message','Write a message from the CEO…','CEO को सन्देश लेख्नुस…',5,'','Leave blank to hide the CEO card.') ?>
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:1rem;">
-            <input type="checkbox" id="ceo_active" name="ceo_active" value="1" <?= sv($s,'ceo_active') ? 'checked' : '' ?> style="cursor:pointer;">
-            <label for="ceo_active" style="cursor:pointer;margin:0;">Show on public page</label>
+          <div style="margin-top:1rem;">
+            <label class="row-check">
+              <input type="checkbox" id="ceo_active" name="ceo_active" value="1" <?= sv($s,'ceo_active') ? 'checked' : '' ?>>
+              <span>Show on public page</span>
+            </label>
           </div>
         </div>
 
@@ -1409,7 +1415,7 @@ $tabs = [
       <h2 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1rem;">Security & 2FA</h2>
 
       <div style="margin-bottom:1rem;padding:1rem;background:var(--muted);border-radius:0.5rem;">
-        <label style="display:flex;gap:0.625rem;align-items:flex-start;cursor:pointer;">
+        <label class="row-check" style="gap:0.625rem;align-items:flex-start;">
           <input type="checkbox" name="require_2fa_for_staff" <?= sv($s,'require_2fa_for_staff')==='1'?'checked':'' ?>>
           <span>
             <strong style="display:block;font-size:0.9rem;">Require 2FA for all staff (admin / editor / support)</strong>
@@ -1419,7 +1425,7 @@ $tabs = [
       </div>
 
       <div style="margin-bottom:1rem;padding:1rem;background:var(--muted);border-radius:0.5rem;">
-        <label style="display:flex;gap:0.625rem;align-items:flex-start;cursor:pointer;">
+        <label class="row-check" style="gap:0.625rem;align-items:flex-start;">
           <input type="checkbox" name="require_2fa_for_clients" <?= sv($s,'require_2fa_for_clients')==='1'?'checked':'' ?>>
           <span>
             <strong style="display:block;font-size:0.9rem;">Require 2FA for all client portal users</strong>

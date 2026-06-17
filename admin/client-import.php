@@ -296,11 +296,10 @@ require_once '../includes/admin-layout.php';
         <div id="fn" style="font-size:.75rem;color:var(--muted-foreground);margin-top:.375rem;"></div>
       </div>
 
-      <div style="margin-bottom:1.5rem;display:flex;align-items:center;gap:.625rem;">
-        <input type="checkbox" name="overwrite" id="overwrite" value="1"
-               style="width:1rem;height:1rem;accent-color:var(--primary);">
-        <label for="overwrite" style="font-size:.875rem;color:var(--foreground);cursor:pointer;">
-          <strong>Overwrite</strong> existing records that share the same Office Id / Client Code
+      <div style="margin-bottom:1.5rem;">
+        <label class="row-check">
+          <input type="checkbox" name="overwrite" id="overwrite" value="1">
+          <span><strong>Overwrite</strong> existing records that share the same Office Id / Client Code</span>
         </label>
       </div>
 

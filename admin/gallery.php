@@ -126,7 +126,8 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
         <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
       </div>
       <label class="row-check">
-        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Active / Visible
+        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+        <span>Active / Visible</span>
       </label>
       <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update Image':'Add Image'?></button>
       <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>

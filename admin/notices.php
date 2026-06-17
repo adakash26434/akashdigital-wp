@@ -196,8 +196,8 @@ $csrf = csrfToken();
                 </div>
             </div>
             <div class="form-group mb-6">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="is_active" checked class="checkbox checkbox-primary">
+                <label class="row-check">
+                    <input type="checkbox" name="is_active" checked>
                     <span>Active (show immediately)</span>
                 </label>
             </div>

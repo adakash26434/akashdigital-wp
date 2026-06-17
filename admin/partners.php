@@ -199,7 +199,8 @@ sort($DISTRICTS);
         </div>
         <div style="padding-bottom:0.5rem;">
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>> Show on site
+            <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+            <span>Show on site</span>
           </label>
         </div>
       </div>
