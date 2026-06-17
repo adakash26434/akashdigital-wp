@@ -93,12 +93,13 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
   </div>
   <?php else:?>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
-    <?php foreach($items as $item):
+    <?php $sn=1; foreach($items as $item):
       [$ico,$bg,$col] = $TYPES[$item['type']] ?? ['','#dbeafe','var(--primary-dark)'];
       $now = time();
       $live = $item['active'] && (!$item['starts_at'] || strtotime($item['starts_at'])<=$now) && (!$item['ends_at'] || strtotime($item['ends_at'])>=$now);
     ?>
     <div class="st-card" style="padding:1rem 1.25rem;display:flex;align-items:center;gap:1rem;<?= !$item['active']?'opacity:0.55;':'' ?>">
+      <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
       <div style="width:2rem;height:2rem;border-radius:0.5rem;background:<?=$bg?>;display:grid;place-items:center;font-size:0.875rem;flex-shrink:0;"><?=$ico?></div>
       <div class="flex-1-min">
         <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">

@@ -4253,6 +4253,22 @@ html {
   animation: hero-text-in 1s ease-out 0.2s both;
 }
 
+/* ── Hero Dark Mode Adjustments ─────────────────────────────────── */
+html.dark .hero-subtitle {
+  color: #cbd5e1; /* Lighter gray for dark mode readability */
+}
+
+html.dark .hero-section {
+  background: var(--card);
+}
+
+html.dark .hero-badge,
+html.dark .hero-badge-2 {
+  border-color: rgba(148, 163, 184, 0.3);
+  background: rgba(30, 41, 59, 0.8);
+  color: #e2e8f0;
+}
+
 /* ── Feature Grid Improvements ────────────────────────────────────– */
 .feature-grid {
   display: grid;
@@ -6922,5 +6938,28 @@ html.dark .tbl-act              { background: var(--card); }
   h1 { font-size: clamp(1.5rem, 5vw, 2rem); }
   h2 { font-size: clamp(1.25rem, 4vw, 1.75rem); }
   h3 { font-size: clamp(1.125rem, 3vw, 1.5rem); }
+}
+
+
+
+/* ── Dark Mode Hero Badges Fix ───────────────────────────────────── */
+html.dark .hero-left .hero-badge {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #93c5fd;
+}
+
+html.dark .hero-left .hero-badge i {
+  color: #60a5fa;
+}
+
+html.dark .hero-section .hero-content .hero-subtitle {
+  color: #cbd5e1;
+}
+
+html.dark .hero-left .hero-badge-2 {
+  background: rgba(30, 41, 59, 0.8);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #e2e8f0;
 }
 

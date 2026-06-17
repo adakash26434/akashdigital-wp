@@ -10,6 +10,12 @@ $pageDesc  = 'Join ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NA
 $jobs = [];
 try { $jobs = query("SELECT * FROM job_listings WHERE active=1 ORDER BY created_at DESC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
+// Check if job deadline has passed
+function isJobExpired($job) {
+    if (empty($job['deadline'])) return false;
+    return strtotime($job['deadline']) < time();
+}
+
 $departments = array_values(array_unique(array_filter(array_column($jobs, 'department'))));
 sort($departments);
 
@@ -25,7 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     $cover     = trim($_POST['cover_letter'] ?? '');
     $resume    = trim($_POST['resume_url'] ?? '');
 
-    if (!$full_name || !$email) {
+    // Verify job exists and deadline hasn't passed
+    $job = null;
+    try { $job = queryOne("SELECT * FROM job_listings WHERE id=? AND active=1", [$job_id]); } catch (\Throwable $e) {}
+    
+    if (!$job) {
+        $apply_error = 'This job posting is no longer available.';
+    } elseif (isJobExpired($job)) {
+        $apply_error = 'Application deadline has passed for this position.';
+    } elseif (!$full_name || !$email) {
         $apply_error = 'Name and email are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $apply_error = 'Please enter a valid email address.';
@@ -108,9 +122,16 @@ ob_start(); ?>
       <h3 style="font-weight:600;margin-bottom:0.5rem;">No open positions right now</h3>
       <p>We're always looking for great talent. Send your CV to <a href="mailto:<?= e(stContactEmail()) ?>" class="text-primary"><?= e(stContactEmail()) ?></a></p>
     </div>
+    <?php else: $openJobs = array_filter($jobs, fn($j) => !isJobExpired($j)); ?>
+    <?php if(empty($openJobs)): ?>
+    <div style="border:2px dashed var(--border);border-radius:1.25rem;padding:4rem 2rem;text-align:center;color:var(--muted-foreground);">
+      <div class="fs-3rem"></div>
+      <h3 style="font-weight:600;margin-bottom:0.5rem;">No open positions right now</h3>
+      <p>We're always looking for great talent. Send your CV to <a href="mailto:<?= e(stContactEmail()) ?>" class="text-primary"><?= e(stContactEmail()) ?></a></p>
+    </div>
     <?php else: ?>
     <div class="col-1" id="job-list">
-      <?php foreach ($jobs as $job): ?>
+      <?php foreach ($openJobs as $job): ?>
       <div class="st-card" x-show="dept==='' || dept==='<?= e($job['department']??'') ?>'" style="padding:0;">
         <div class="p-tile" x-data="{open:false}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
@@ -120,6 +141,12 @@ ob_start(); ?>
                 <?php if(!empty($job['type'])): ?><span class="badge badge-secondary"><?= e(ucfirst(str_replace('_',' ',$job['type']))) ?></span><?php endif;?>
                 <?php if(!empty($job['location'])): ?><span class="badge" style="background:var(--background);border:1px solid var(--border);color:var(--muted-foreground);"> <?= e($job['location']) ?></span><?php endif;?>
                 <?php if(!empty($job['salary_range'])): ?><span class="badge" style="background:var(--success-soft);border:1px solid var(--success-border);color:var(--success-fg);"> <?= e($job['salary_range']) ?></span><?php endif;?>
+                <?php if(!empty($job['deadline'])): ?>
+                <?php $daysLeft = ceil((strtotime($job['deadline']) - time()) / 86400); ?>
+                <span class="badge <?=$daysLeft <= 3 ? 'badge-error' : 'badge-warning'?>" style="background:<?=$daysLeft <= 3 ? 'var(--danger-soft)' : 'var(--warning-soft)'?>;border:1px solid <?=$daysLeft <= 3 ? 'var(--danger-border)' : 'var(--warning-border)'?>;color:<?=$daysLeft <= 3 ? 'var(--danger-fg)' : 'var(--warning-fg)'?>;">
+                  ⏳ <?=date('M j', strtotime($job['deadline']))?> (<?=$daysLeft?>d left)
+                </span>
+                <?php endif;?>
               </div>
               <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;color:var(--foreground);"><?= e($job['title']) ?></h3>
               <?php if(!empty($job['short_desc'])): ?>

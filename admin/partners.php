@@ -111,10 +111,10 @@ sort($DISTRICTS);
           <?php endif;?>
         </div>
         <div style="display:flex;gap:0.25rem;flex-shrink:0;">
-          <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm"></a>
+          <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
           <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
             <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
-            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;padding:0.25rem 0.5rem;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
           </form>
         </div>
       </div>
