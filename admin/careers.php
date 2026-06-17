@@ -239,25 +239,23 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
   <div class="st-card ov-hidden">
     <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
-        <?php foreach(['Applicant','Position','Contact','Status','Applied',''] as $h):?>
+        <?php foreach(['#','Applicant','Position','Deadline','Status','Applied',''] as $h):?>
         <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"><?=$h?></th>
         <?php endforeach;?>
       </tr></thead>
       <tbody>
         <?php if(empty($apps)):?>
-        <tr><td colspan="6" class="p-empty">No applications yet.</td></tr>
-        <?php else: foreach($apps as $a):
+        <tr><td colspan="7" class="p-empty">No applications yet.</td></tr>
+        <?php else: $sn=1; foreach($apps as $a):
           $status = $a['status'] ?? 'new';
           $scls = ['new'=>['var(--warning-soft)','var(--warning-fg)'],'reviewing'=>['#dbeafe','var(--primary-dark)'],'shortlisted'=>['#e0e7ff','#4338ca'],'interview'=>['#f3e8ff','#7e22ce'],'hired'=>['var(--success-soft)','var(--success-fg)'],'rejected'=>['var(--danger-soft)','var(--danger-fg)']];
           [$sbg,$scol] = $scls[$status] ?? ['var(--muted)','var(--muted-foreground)'];
         ?>
         <tr style="border-bottom:1px solid var(--border);">
+          <td style="padding:0.75rem 1rem;font-weight:700;color:var(--muted-foreground);font-size:0.75rem;"><?=$sn++?></td>
           <td style="padding:0.75rem 1rem;font-weight:600;color:var(--foreground);"><?=e($a['full_name']??$a['name']??'—')?></td>
           <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><?=e($a['job_title']??'—')?></td>
-          <td class="p-row">
-            <div class="fs-xs"><a href="mailto:<?=e($a['email']??'')?>" style="color:var(--primary);text-decoration:none;"><?=e($a['email']??'—')?></a></div>
-            <?php if(!empty($a['phone'])):?><div class="fs-2xs-mt"><?=e($a['phone'])?></div><?php endif;?>
-          </td>
+          <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><?=!empty($a['deadline'])?date('M j, Y',strtotime($a['deadline'])):'—'?></td>
           <td class="p-row">
             <form method="POST" class="inline">
               <?=csrfField()?><input type="hidden" name="action" value="update_app_status"><input type="hidden" name="id" value="<?=$a['id']?>">
@@ -272,11 +270,11 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
           <td class="p-row">
             <div style="display:flex;gap:0.25rem;">
               <?php if(!empty($a['resume_url'])):?>
-              <a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-ghost btn-sm" title="Resume"></a>
+              <a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-ghost btn-sm" title="Resume"><i data-lucide="file-text" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <?php endif;?>
               <form method="POST" class="inline" onsubmit="return confirm('Remove?')">
                 <?=csrfField()?><input type="hidden" name="action" value="delete_app"><input type="hidden" name="id" value="<?=$a['id']?>">
-                <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"></button>
+                <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
               </form>
             </div>
           </td>
