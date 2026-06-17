@@ -77,8 +77,9 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.625rem;">
     <?php if(empty($items)):?>
     <div style="grid-column:1/-1;border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No gallery images yet.</div>
-    <?php else: foreach($items as $img):?>
+    <?php else: $sn=1; foreach($items as $img):?>
     <div style="position:relative;border-radius:0.75rem;overflow:hidden;border:1px solid var(--border);<?=!$img['active']?'opacity:0.5;':''?>" class="group">
+      <span style="position:absolute;top:0.375rem;left:0.375rem;z-index:2;width:1.5rem;height:1.5rem;border-radius:0.375rem;background:rgba(0,0,0,0.55);color:#fff;font-size:0.625rem;font-weight:700;display:flex;align-items:center;justify-content:center;"><?=$sn++?></span>
       <div style="height:120px;background:var(--muted);">
         <img src="<?=e($img['image_url'])?>" loading="lazy" alt="<?=e($img['title']??'')?>" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
