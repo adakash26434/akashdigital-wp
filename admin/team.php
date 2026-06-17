@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $team = [];
-try { $team = query("SELECT id,name,role,photo_url,is_leadership,category,active,position FROM team_members ORDER BY is_leadership DESC,position,name"); }
+try { $team = query("SELECT id,name,role,photo_url,is_leadership,category,active,position FROM team_members ORDER BY is_leadership DESC, category, position ASC, name ASC"); }
 catch(\Throwable $e) { 
     try { $team = query("SELECT id,name,role,photo_url,is_leadership,active,position FROM team_members ORDER BY position,name"); }
     catch(\Throwable $e2) { $error = 'team_members table not found. Run database.sql.'; }
@@ -78,41 +78,109 @@ if (!empty($_GET['edit'])) {
     <a href="?new=1" class="btn btn-primary btn-sm">+ Add Member</a>
   </div>
 
-  <!-- Leadership -->
-  <?php $leads = array_filter($team, fn($m)=>$m['is_leadership']); if(!empty($leads)):?>
-  <div style="margin-bottom:0.75rem;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);">Leadership</div>
-  <?php endif;?>
+  <?php
+  // Group by is_leadership + category for better display
+  $leads_board = array_filter($team, fn($m)=>!empty($m['is_leadership']) && ($m['category'] ?? '') === 'board');
+  $leads_mgmt = array_filter($team, fn($m)=>!empty($m['is_leadership']) && ($m['category'] ?? 'management') === 'management');
+  $members = array_filter($team, fn($m)=>empty($m['is_leadership']));
+  ?>
 
-  <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.25rem;">
-    <?php foreach($team as $m): ?>
-    <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:1rem;<?=!$m['active']?'opacity:0.55;':''?>">
-      <!-- Avatar -->
-      <div style="width:2.5rem;height:2.5rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
-        <?php if(!empty($m['photo_url'])):?>
-        <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
-        <?php else:?>
-        <span style="font-weight:700;color:var(--muted-foreground);"><?=strtoupper(substr($m['name'],0,1))?></span>
-        <?php endif;?>
-      </div>
-      <div class="flex-1-min">
-        <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
-          <span class="fw-strong"><?=e($m['name'])?></span>
-          <?php if($m['is_leadership']):?><span style="font-size:0.625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;">LEADERSHIP</span><?php endif;?>
-          <?php if(!$m['active']):?><span style="font-size:0.625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
-        </div>
-        <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
-      </div>
-      <div style="display:flex;gap:0.375rem;flex-shrink:0;">
-        <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
-        <form method="POST" class="inline" onsubmit="return confirm('Delete this team member?')">
-          <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$m['id']?>">
-          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
-        </form>
-      </div>
-    </div>
-    <?php endforeach;?>
-    <?php if(empty($team)):?><div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No team members yet.</div><?php endif;?>
+  <?php if(!empty($leads_board)):?>
+  <div style="margin-bottom:0.5rem;margin-top:1rem;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);">
+    <span style="display:inline-flex;align-items:center;gap:0.375rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Board of Directors
+    </span>
   </div>
+  <?php $sn = 1; foreach($leads_board as $m): ?>
+  <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
+    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <div style="width:2.25rem;height:2.25rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
+      <?php if(!empty($m['photo_url'])):?>
+      <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
+      <?php else:?>
+      <span style="font-weight:700;color:var(--muted-foreground);font-size:0.75rem;"><?=strtoupper(substr($m['name'],0,1))?></span>
+      <?php endif;?>
+    </div>
+    <div class="flex-1-min">
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="fw-strong"><?=e($m['name'])?></span>
+        <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--primary-soft);color:var(--primary-fg);font-weight:700;">BOARD</span>
+        <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
+      </div>
+      <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+    </div>
+    <div style="display:flex;gap:0.25rem;flex-shrink:0;">
+      <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+      <form method="POST" class="inline" onsubmit="return confirm('Delete?')"><?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$m['id']?>"><button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button></form>
+    </div>
+  </div>
+  <?php endforeach; endif;?>
+
+  <?php if(!empty($leads_mgmt)):?>
+  <div style="margin-bottom:0.5rem;margin-top:1rem;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);">
+    <span style="display:inline-flex;align-items:center;gap:0.375rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Management Team
+    </span>
+  </div>
+  <?php $sn = 1; foreach($leads_mgmt as $m): ?>
+  <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
+    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--warning-soft);color:var(--warning-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <div style="width:2.25rem;height:2.25rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
+      <?php if(!empty($m['photo_url'])):?>
+      <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
+      <?php else:?>
+      <span style="font-weight:700;color:var(--muted-foreground);font-size:0.75rem;"><?=strtoupper(substr($m['name'],0,1))?></span>
+      <?php endif;?>
+    </div>
+    <div class="flex-1-min">
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="fw-strong"><?=e($m['name'])?></span>
+        <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;">MANAGEMENT</span>
+        <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
+      </div>
+      <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+    </div>
+    <div style="display:flex;gap:0.25rem;flex-shrink:0;">
+      <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+      <form method="POST" class="inline" onsubmit="return confirm('Delete?')"><?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$m['id']?>"><button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button></form>
+    </div>
+  </div>
+  <?php endforeach; endif;?>
+
+  <?php if(!empty($members)):?>
+  <div style="margin-bottom:0.5rem;margin-top:1rem;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);">
+    <span style="display:inline-flex;align-items:center;gap:0.375rem;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+      Team Members
+    </span>
+  </div>
+  <?php $sn = 1; foreach($members as $m): ?>
+  <div class="st-card" style="padding:0.75rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
+    <span style="min-width:1.5rem;height:1.5rem;border-radius:0.375rem;background:var(--muted);color:var(--muted-foreground);font-size:0.625rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <div style="width:2rem;height:2rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
+      <?php if(!empty($m['photo_url'])):?>
+      <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
+      <?php else:?>
+      <span style="font-weight:700;color:var(--muted-foreground);font-size:0.6875rem;"><?=strtoupper(substr($m['name'],0,1))?></span>
+      <?php endif;?>
+    </div>
+    <div class="flex-1-min">
+      <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+        <span class="fw-strong" style="font-size:0.875rem;"><?=e($m['name'])?></span>
+        <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
+      </div>
+      <div class="fs-sm-mt" style="font-size:0.75rem;"><?=e($m['role']??'—')?></div>
+    </div>
+    <div style="display:flex;gap:0.25rem;flex-shrink:0;">
+      <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .375rem;"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
+      <form method="POST" class="inline" onsubmit="return confirm('Delete?')"><?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$m['id']?>"><button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;padding:.25rem .375rem;"><i data-lucide="trash-2" style="width:13px;height:13px;pointer-events:none;"></i></button></form>
+    </div>
+  </div>
+  <?php endforeach; endif;?>
+
+  <?php if(empty($team)):?><div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No team members yet.</div><?php endif;?>
 </div>
 </div><!-- /aft-list -->
 
