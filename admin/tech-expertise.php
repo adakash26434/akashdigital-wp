@@ -12,25 +12,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try { execute("DELETE FROM tech_expertise WHERE id=?", [(int)$_POST['id']]); $success = 'Deleted.'; }
         catch(\Throwable $e) { $error = 'Delete failed.'; }
     } elseif (in_array($action, ['create','update'])) {
-        $id          = (int)($_POST['id'] ?? 0);
-        $name        = trim($_POST['name'] ?? '');
-        $category    = trim($_POST['category'] ?? 'General');
-        $description = trim($_POST['description'] ?? '');
-        $lucide_icon = trim($_POST['lucide_icon'] ?? 'cpu');
-        $icon_url    = trim($_POST['icon_url'] ?? '');
-        $position    = (int)($_POST['position'] ?? 0);
-        $active      = isset($_POST['active']) ? 1 : 0;
+        $id       = (int)($_POST['id'] ?? 0);
+        $name     = trim($_POST['name'] ?? '');
+        $category = trim($_POST['category'] ?? 'General');
+        $icon_url = trim($_POST['icon_url'] ?? '');
+        $position = (int)($_POST['position'] ?? 0);
+        $active   = isset($_POST['active']) ? 1 : 0;
 
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
                 if ($id) {
-                    execute("UPDATE tech_expertise SET name=?,category=?,description=?,lucide_icon=?,icon_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
-                        [$name,$category,$description,$lucide_icon,$icon_url?:null,$position,$active,$id]);
+                    execute("UPDATE tech_expertise SET name=?,category=?,icon_url=?,position=?,active=? WHERE id=?",
+                        [$name,$category,$icon_url?:null,$position,$active,$id]);
                     $success = 'Tech entry updated.';
                 } else {
-                    execute("INSERT INTO tech_expertise (name,category,description,lucide_icon,icon_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$name,$category,$description,$lucide_icon,$icon_url?:null,$position,$active]);
+                    execute("INSERT INTO tech_expertise (name,category,icon_url,position,active,created_at) VALUES (?,?,?,?,?,NOW())",
+                        [$name,$category,$icon_url?:null,$position,$active]);
                     $success = 'Tech entry added.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
