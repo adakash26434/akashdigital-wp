@@ -48,6 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $contactEmail  = strtolower(trim($_POST['contact_email'] ?? ''));
         $contactPhone  = trim($_POST['contact_phone']  ?? '');
 
+        // Referral / Channel Partner
+        $channelPartnerId = $_POST['channel_partner_id'] !== '' ? (int)$_POST['channel_partner_id'] : null;
+        $saleType = $channelPartnerId ? 'channel_partner' : 'office_sale';
+
         // Services
         // Support hidden (synced from multi-select) or product_multi[] fallback
         $product = trim($_POST['product'] ?? '');
@@ -110,6 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'num_branches','head_office_amc','branch_office_amc',
                     'cloud_charge_ho','cloud_charge_branch','cloud_gb',
                     'notes','logo_url',
+                    'channel_partner_id','sale_type',
                 ];
                 $vals = [
                     $org,$code,$status,
@@ -120,6 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $branches,$hoAmc,$brAmc,
                     $cloudHo,$cloudBr,$cloudGb,
                     $notes,$logoUrl ?: null,
+                    $channelPartnerId,$saleType,
                 ];
 
                 if ($isEdit) {
@@ -255,6 +261,8 @@ $_allProducts = [];
 try { $_allProducts = query("SELECT id, name FROM products WHERE active=1 ORDER BY position, name"); } catch (\Throwable $e) { error_log('[client-form] products: '.$e->getMessage()); }
 $_allServices = [];
 try { $_allServices = query("SELECT id, title AS name FROM services WHERE active=1 ORDER BY position, title"); } catch (\Throwable $e) { error_log('[client-form] services: '.$e->getMessage()); }
+$_channelPartners = [];
+try { $_channelPartners = query("SELECT id, name FROM partners WHERE type='channel' AND active=1 ORDER BY name"); } catch (\Throwable $e) { error_log('[client-form] channel partners: '.$e->getMessage()); }
 // Merge into one unified list for the "Product(s) in Use" multi-select
 $_productServiceList = array_merge(
     array_map(fn($p) => $p['name'], $_allProducts),
@@ -385,6 +393,16 @@ require_once '../includes/admin-layout.php';
             <option value="inactive"     <?= ($v('status','active')==='inactive')?'selected':'' ?>>Inactive</option>
             <option value="terminated"   <?= ($v('status','active')==='terminated')?'selected':'' ?>>Terminated</option>
           </select>
+        </div>
+        <div>
+          <label class="form-label">Referral Source</label>
+          <select name="channel_partner_id" class="form-input">
+            <option value="">— Head Office (Direct) —</option>
+            <?php foreach($_channelPartners as $cp): ?>
+            <option value="<?= $cp['id'] ?>" <?= ($v('channel_partner_id') == $cp['id'])?'selected':'' ?>><?= e($cp['name']) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.25rem;">Select channel partner who referred this client, or leave blank for direct sale.</p>
         </div>
       </div>
       <?php if ($isEdit && $client['status'] !== 'terminated'): ?>
