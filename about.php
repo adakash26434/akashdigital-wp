@@ -206,7 +206,6 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
     <div class="animate-fade-up section-head">
       <div class="section-eyebrow section-eyebrow-primary mb-3q"><?= e(__('about_team_eyebrow')) ?></div>
       <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(__('about_team_title', stCompanyName())) ?></h2>
-      <p class="section-lede"><?= e(__('about_team_sub')) ?></p>
     </div>
 
     <?php if ($__leaders): ?>
@@ -244,6 +243,8 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       <?php endforeach; ?>
     </div>
     <?php endif; ?>
+
+    <p class="section-lede" style="text-align:center;max-width:700px;margin:2rem auto 2.5rem;"><?= e(__('about_team_sub')) ?></p>
 
     <?php if ($__members): ?>
     <div class="team-grid stagger-children">
