@@ -100,11 +100,14 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
     <?php if(empty($jobs)):?>
     <div class="af-empty">No jobs posted yet!</div>
-    <?php else: foreach($jobs as $j): $isActive=(bool)$j['active']; ?>
+    <?php else: $sn=1; foreach($jobs as $j): $isActive=(bool)$j['active']; ?>
     <div class="st-card" style="padding:1rem 1.25rem;<?=!$isActive?'opacity:0.6;':''?>">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-        <div class="flex-1">
-          <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
+      <div style="display:flex;align-items:flex-start;gap:0.75rem;<?=!$isActive?'opacity:0.6;':''?>">
+        <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+        <div class="flex-1" style="flex:1;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+            <div class="flex-1">
+              <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
             <span style="font-weight:700;color:var(--foreground);"><?=e($j['title'])?></span>
             <?php if($isActive):?>
             <span style="font-size:0.625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--success-soft);color:var(--success-fg);font-weight:700;">OPEN</span>
@@ -120,11 +123,13 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
           <div style="font-size:0.75rem;color:<?=strtotime($j['deadline'])<time()?'var(--danger-fg)':'var(--warning-fg)'?>;margin-top:0.25rem;">⏳ Deadline: <?=date('M j, Y',strtotime($j['deadline']))?></div>
           <?php endif;?>
         </div>
+          </div>
+        </div>
         <div style="display:flex;gap:0.375rem;flex-shrink:0;">
           <a href="?edit=<?=$j['id']?>&tab=jobs" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
           <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
             <?=csrfField()?><input type="hidden" name="action" value="delete_job"><input type="hidden" name="id" value="<?=$j['id']?>">
-            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"></button>
+            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
           </form>
         </div>
       </div>
