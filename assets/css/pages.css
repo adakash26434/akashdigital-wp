@@ -1152,6 +1152,7 @@
   justify-content: center;
   gap: 1.25rem;
   margin-bottom: 2.5rem;
+  text-align: center;
 }
 .team-grid {
   display: grid;
@@ -1166,6 +1167,7 @@
   width: min(100%, 13.5rem);
   position: relative;
   overflow: hidden;
+  margin: 0 auto;
 }
 .team-card--lead::before {
   content: "";
@@ -1224,8 +1226,9 @@
   font-weight: 800;
   font-size: var(--text-md);
   color: var(--foreground);
-  margin: 0 0 0.2rem;
+  margin: 0 auto 0.2rem;
   line-height: 1.3;
+  text-align: center;
 }
 .team-card__name--sm { font-size: var(--text-base); font-weight: 700; }
 .team-card__role {
