@@ -2391,6 +2391,33 @@ input[type="checkbox"] {
   cursor: pointer;
   vertical-align: middle;
   flex-shrink: 0;
+  border-radius: 0.25rem;
+  -webkit-appearance: none;
+  appearance: none;
+  background-color: var(--background);
+  border: 1.5px solid var(--border);
+  display: inline-grid;
+  place-content: center;
+  transition: all 0.15s ease;
+}
+input[type="checkbox"]::before {
+  content: "";
+  width: 0.65em;
+  height: 0.65em;
+  transform: scale(0);
+  transition: 0.12s transform ease-in-out;
+  box-shadow: inset 1em 1em var(--primary);
+  clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+}
+input[type="checkbox"]:checked {
+  background-color: var(--primary);
+  border-color: var(--primary);
+}
+input[type="checkbox"]:checked::before {
+  transform: scale(1);
+}
+input[type="checkbox"]:hover {
+  border-color: var(--primary);
 }
 
 /* ── Toggle Switch Checkbox ──────────────────────────────────── */
@@ -2714,9 +2741,9 @@ html.dark #st-navbar.is-scrolled {
   text-decoration: none;
 }
 #st-brand-logo {
-  height: 2.25rem;   /* slightly larger than before */
+  height: 2.75rem;
   width: auto;
-  max-width: 9rem;
+  max-width: 11rem;
   object-fit: contain;
   display: block;
 }
@@ -2743,9 +2770,9 @@ html.dark #st-navbar.is-scrolled {
   margin-left: 0.125rem;
 }
 .st-iso-badge img {
-  height: 1.875rem;
+  height: 2.25rem;
   width: auto;
-  max-width: 5rem;
+  max-width: 6rem;
   object-fit: contain;
   display: block;
   opacity: 0.9;
