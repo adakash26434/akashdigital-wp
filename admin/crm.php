@@ -351,12 +351,15 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
           <label class="form-label">Source</label>
           <select name="source" class="form-input">
             <option value="other">Other</option>
-            <option value="demo_request">Demo Request</option>
-            <option value="contact_form">Contact Form</option>
-            <option value="referral">Referral</option>
-            <option value="cold_call">Cold Call</option>
-            <option value="website">Website</option>
-            <option value="exhibition">Exhibition</option>
+            <option value="demo_request">🎯 Demo Request</option>
+            <option value="contact_form">📩 Contact Form</option>
+            <option value="referral">🤝 Referral</option>
+            <option value="cold_call">📱 Cold Call</option>
+            <option value="website">🌐 Website</option>
+            <option value="exhibition">🏛️ Exhibition</option>
+            <option value="partner">🤝 Partner</option>
+            <option value="social_media">📱 Social Media</option>
+            <option value="walk_in">🚶 Walk-in</option>
           </select>
         </div>
         <div class="form-group grid-full">

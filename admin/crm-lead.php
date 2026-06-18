@@ -1,6 +1,7 @@
 <?php
 $pageTitle = 'Lead Detail';
 require_once '../includes/admin-layout.php';
+require_once '../includes/nepal-geo.php';
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) { header('Location: ' . url('admin/crm.php')); exit; }
@@ -56,7 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif ($action === 'update_stage') {
         $stage = trim($_POST['stage'] ?? '');
-        $reason = trim($_POST['lost_reason'] ?? '') ?: null;
+        $reason = trim($_POST['lost_reason'] ?? '');
+        if (!$reason && !empty($_POST['lost_reason_custom'])) {
+            $reason = trim($_POST['lost_reason_custom']);
+        }
+        $reason = $reason ?: null;
         try {
             $won_at = $stage === 'won' ? date('Y-m-d H:i:s') : null;
             execute(
@@ -189,20 +194,32 @@ $staff = [];
 try { $staff = query("SELECT id, display_name FROM users WHERE role IN ('admin','staff','editor') ORDER BY display_name"); }
 catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
+// Get all districts from Nepal geo data for dropdown
+$geo = nepalGeo();
+$districts = [];
+foreach ($geo as $province => $districts_list) {
+    foreach (array_keys($districts_list) as $d) {
+        $districts[] = $d;
+    }
+}
+sort($districts);
+
 // ── Config ────────────────────────────────────────────────────
 $STAGES = [
-    'prospect'     => ['','#dbeafe','var(--primary-dark)','Prospect'],
-    'contacted'    => ['','#f3e8ff','#7e22ce','Contacted'],
-    'proposal_sent'=> ['','var(--warning-soft)','var(--warning-fg)','Proposal Sent'],
-    'negotiation'  => ['','#ffedd5','#c2410c','Negotiation'],
-    'won'          => ['','var(--success-soft)','var(--success-fg)','Won'],
-    'lost'         => ['','var(--danger-soft)','var(--danger-fg)','Lost'],
-    'on_hold'      => ['','var(--muted)','var(--muted-foreground)','On Hold'],
+    'prospect'     => ['👋','#dbeafe','var(--primary-dark)','Prospect'],
+    'contacted'    => ['📞','#f3e8ff','#7e22ce','Contacted'],
+    'proposal_sent'=> ['📋','var(--warning-soft)','var(--warning-fg)','Proposal Sent'],
+    'negotiation'  => ['🤝','#ffedd5','#c2410c','Negotiation'],
+    'won'          => ['✅','var(--success-soft)','var(--success-fg)','Won'],
+    'lost'         => ['❌','var(--danger-soft)','var(--danger-fg)','Lost'],
+    'on_hold'      => ['⏸️','var(--muted)','var(--muted-foreground)','On Hold'],
 ];
-$TYPE_ICONS  = ['call'=>'','email'=>'','meeting'=>'','demo'=>'','whatsapp'=>'','other'=>''];
+$TYPE_ICONS  = ['call'=>'📞','email'=>'📧','meeting'=>'👥','demo'=>'💻','whatsapp'=>'💬','other'=>'📝'];
 $OUT_COLORS  = ['positive'=>['var(--success-soft)','var(--success-fg)',' Positive'],'neutral'=>['#dbeafe','var(--primary-dark)',' Neutral'],'negative'=>['var(--danger-soft)','var(--danger-fg)',' Negative'],'no_answer'=>['var(--muted)','var(--muted-foreground)',' No Answer']];
 $PROP_STATUS = ['draft'=>['var(--muted)','var(--muted-foreground)','Draft'],'sent'=>['#dbeafe','var(--primary-dark)','Sent'],'viewed'=>['#f3e8ff','#7e22ce','Viewed'],'accepted'=>['var(--success-soft)','var(--success-fg)','Accepted'],'rejected'=>['var(--danger-soft)','var(--danger-fg)','Rejected'],'expired'=>['var(--warning-soft)','var(--warning-fg)','Expired']];
-$SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'=>'','website'=>'','exhibition'=>'','other'=>''];
+$SOURCE_ICONS= ['demo_request'=>'🎯','contact_form'=>'📩','referral'=>'🤝','cold_call'=>'📱','website'=>'🌐','exhibition'=>'🏛️','partner'=>'🤝','other'=>'📋'];
+$SOURCE_LABELS = ['demo_request'=>'Demo Request','contact_form'=>'Contact Form','referral'=>'Referral','cold_call'=>'Cold Call','website'=>'Website','exhibition'=>'Exhibition','partner'=>'Partner','other'=>'Other'];
+$LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competitor'=>'Went with competitor','No response'=>'No response','Project postponed'=>'Project postponed','Not a fit'=>'Not a fit','Pricing too high'=>'Pricing too high','Found alternative solution'=>'Found alternative solution'];
 [$ico,$sbg,$scol,$slbl] = $STAGES[$lead['stage']] ?? ['','var(--muted)','var(--muted-foreground)','Unknown'];
 ?>
 
@@ -217,6 +234,7 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
       <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
         <span style="font-size:1.75rem;"><?= $SOURCE_ICONS[$lead['source']] ?? '' ?></span>
         <div>
+          <div style="font-size:0.6875rem;color:var(--muted-foreground);"><?= $SOURCE_LABELS[$lead['source']] ?? 'Other' ?></div>
           <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:800;"><?= e($lead['name']) ?></h2>
           <p style="font-size:0.875rem;color:var(--muted-foreground);"><?= e($lead['org_name']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?></p>
         </div>
@@ -479,7 +497,13 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
         </div>
         <div x-show="stage==='lost'">
           <label class="form-label fs-xs">Lost Reason</label>
-          <textarea name="lost_reason" class="form-input" rows="2" placeholder="Went with competitor, budget…"><?= e($lead['lost_reason'] ?? '') ?></textarea>
+          <select name="lost_reason" class="form-input" style="font-size:0.8125rem;">
+            <option value="">— Select Reason —</option>
+            <?php foreach ($LOST_REASONS as $r): ?>
+            <option value="<?= e($r) ?>" <?= ($lead['lost_reason'] ?? '') === $r ? 'selected' : '' ?>><?= e($r) ?></option>
+            <?php endforeach; ?>
+          </select>
+          <input type="text" name="lost_reason_custom" class="form-input" placeholder="Or type custom reason…" style="font-size:0.8125rem;margin-top:0.5rem;">
         </div>
         <button type="submit" class="btn btn-primary btn-sm w-100">Update Stage</button>
       </form>
@@ -528,7 +552,6 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
           ['org_name','Organisation *','text',$lead['org_name']],
           ['email','Email','email',$lead['email']??''],
           ['phone','Phone','text',$lead['phone']??''],
-          ['district','District','text',$lead['district']??''],
           ['deal_value','Deal Value (NPR)','number',$lead['deal_value']??''],
           ['next_followup','Next Follow-up','date',$lead['next_followup']??''],
         ];
@@ -538,6 +561,16 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
           <input type="<?=$ft?>" name="<?=$fn?>" value="<?= e((string)$fv) ?>" class="form-input" style="font-size:0.8125rem;padding:0.5rem 0.625rem;">
         </div>
         <?php endforeach; ?>
+        <!-- District - dropdown -->
+        <div>
+          <label class="form-label">District</label>
+          <select name="district" class="form-input" style="font-size:0.8125rem;padding:0.5rem 0.625rem;">
+            <option value="">— Select District —</option>
+            <?php foreach ($districts as $d): ?>
+            <option value="<?= e($d) ?>" <?= ($lead['district'] ?? '') === $d ? 'selected' : '' ?>><?= e($d) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
         <!-- Products / Services Interest — dropdown from DB -->
         <div>
           <label class="form-label">Products Interest</label>
