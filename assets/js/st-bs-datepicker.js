@@ -239,7 +239,7 @@
     // Wrapper
     var wrap = document.createElement('div');
     wrap.className = 'st-bsp-wrap';
-    wrap.style.cssText = 'position:relative;display:inline-block;width:100%;';
+    wrap.style.cssText = 'position:relative;display:flex;width:100%;align-items:center;gap:0.5rem;';
     hidden.parentNode.insertBefore(wrap, hidden);
     wrap.appendChild(hidden);
 
@@ -258,18 +258,19 @@
     if (isDateTime) {
       timeInput = document.createElement('input');
       timeInput.type = 'time';
-      timeInput.className = 'form-input';
-      timeInput.style.cssText = 'margin-left:0.5rem;width:120px;';
+      timeInput.className = 'form-input st-bsp-time';
+      timeInput.style.cssText = 'width:100px;flex-shrink:0;margin-left:0.5rem;';
       timeInput.value = savedTime || (function() {
         var now = new Date();
         var h = String(now.getHours()).padStart(2,'0');
         var m = String(now.getMinutes()).padStart(2,'0');
         return h + ':' + m;
       })();
-      wrap.appendChild(timeInput);
+      // Insert BEFORE hidden, AFTER display
+      wrap.insertBefore(timeInput, hidden.nextSibling);
     }
 
-    // Calendar icon
+    // Calendar icon (after time input for datetime)
     var icon = document.createElement('span');
     icon.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>';
     icon.style.cssText = 'position:absolute;right:.625rem;top:50%;transform:translateY(-50%);color:var(--muted-foreground);pointer-events:none;display:flex;align-items:center;';
@@ -284,7 +285,7 @@
     clearBtn.style.display = initBs ? '' : 'none';
     wrap.appendChild(clearBtn);
 
-    // Popup - append to body for proper overflow handling
+    // Popup - append to wrapper for proper containment
     var popup = document.createElement('div');
     popup.className = 'st-bsp-popup';
     popup.style.display = 'none';
@@ -299,7 +300,7 @@
         '<span class="st-bsp-ad-label"></span>' +
         '<button type="button" class="st-bsp-today">Today</button>' +
       '</div>';
-    document.body.appendChild(popup);
+    wrap.appendChild(popup);
 
     var titleEl  = popup.querySelector('.st-bsp-title');
     var bodyEl   = popup.querySelector('.st-bsp-body');
@@ -336,26 +337,32 @@
       // Show offscreen first to measure real height
       popup.style.visibility = 'hidden';
       popup.style.display = 'block';
+      popup.style.position = 'absolute';
+      popup.style.zIndex = '9999';
 
-      var rect   = disp.getBoundingClientRect();
       var popH   = popup.offsetHeight;
       var popW   = popup.offsetWidth || 272;
+      var wrapW  = wrap.offsetWidth;
       var vw     = window.innerWidth;
       var vh     = window.innerHeight;
       var GAP    = 6;
 
-      // Vertical: prefer below; flip above if not enough space below
+      // Vertical: prefer below; flip above if not enough space
+      var rect = disp.getBoundingClientRect();
+      var wrapRect = wrap.getBoundingClientRect();
+      
+      // Position relative to wrapper
       var top;
       if (rect.bottom + GAP + popH <= vh) {
-        top = rect.bottom + GAP;           // below
+        top = rect.bottom - wrapRect.top + GAP;           // below
       } else if (rect.top - GAP - popH >= 0) {
-        top = rect.top - GAP - popH;       // above
+        top = -(popH + GAP);       // above
       } else {
-        top = Math.max(GAP, vh - popH - GAP); // best fit within viewport
+        top = -(popH + GAP); // above by default
       }
 
-      // Horizontal: align to left edge of input, clamp within viewport
-      var left = Math.max(GAP, Math.min(rect.left, vw - popW - GAP));
+      // Horizontal: align to left edge, clamp within viewport
+      var left = Math.max(-GAP, Math.min(rect.left - wrapRect.left, vw - wrapRect.left - popW - GAP));
 
       popup.style.top        = top + 'px';
       popup.style.left       = left + 'px';
