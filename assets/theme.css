@@ -6963,3 +6963,8 @@ html.dark .hero-left .hero-badge-2 {
   color: #e2e8f0;
 }
 
+
+/* ── News List Improvements ─────────────────────────────── */
+.row-inactive { opacity: 0.5; }
+.tbl-act.success { color: #22c55e; background: rgba(34,197,94,0.1); }
+.tbl-act.success:hover { background: rgba(34,197,94,0.2); }

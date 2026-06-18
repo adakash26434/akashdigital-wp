@@ -90,11 +90,12 @@ if (!empty($_GET['edit'])) {
     <span style="display:inline-flex;align-items:center;gap:0.375rem;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Board of Directors
+      <span style="background:var(--primary-soft);color:var(--primary-fg);padding:0.1rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($leads_board)?></span>
     </span>
   </div>
-  <?php $sn = 1; foreach($leads_board as $m): ?>
+  <?php foreach($leads_board as $m): ?>
   <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
-    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Position"><?=(int)$m['position']?></span>
     <div style="width:2.25rem;height:2.25rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
       <?php if(!empty($m['photo_url'])):?>
       <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
@@ -109,6 +110,9 @@ if (!empty($_GET['edit'])) {
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
       <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+      <?php if(!empty($m['bio'])):?>
+      <div class="fs-2xs-mt" style="color:var(--muted-foreground);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?=e($m['bio'])?>"><?=e(truncate($m['bio'],60))?></div>
+      <?php endif;?>
     </div>
     <div style="display:flex;gap:0.25rem;flex-shrink:0;">
       <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
@@ -122,11 +126,12 @@ if (!empty($_GET['edit'])) {
     <span style="display:inline-flex;align-items:center;gap:0.375rem;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Management Team
+      <span style="background:var(--warning-soft);color:var(--warning-fg);padding:0.1rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($leads_mgmt)?></span>
     </span>
   </div>
-  <?php $sn = 1; foreach($leads_mgmt as $m): ?>
+  <?php foreach($leads_mgmt as $m): ?>
   <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
-    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--warning-soft);color:var(--warning-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--warning-soft);color:var(--warning-fg);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Position"><?=(int)$m['position']?></span>
     <div style="width:2.25rem;height:2.25rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
       <?php if(!empty($m['photo_url'])):?>
       <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
@@ -141,6 +146,9 @@ if (!empty($_GET['edit'])) {
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
       <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+      <?php if(!empty($m['bio'])):?>
+      <div class="fs-2xs-mt" style="color:var(--muted-foreground);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?=e($m['bio'])?>"><?=e(truncate($m['bio'],60))?></div>
+      <?php endif;?>
     </div>
     <div style="display:flex;gap:0.25rem;flex-shrink:0;">
       <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
@@ -154,11 +162,12 @@ if (!empty($_GET['edit'])) {
     <span style="display:inline-flex;align-items:center;gap:0.375rem;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
       Team Members
+      <span style="background:var(--muted);color:var(--muted-foreground);padding:0.1rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($members)?></span>
     </span>
   </div>
-  <?php $sn = 1; foreach($members as $m): ?>
+  <?php foreach($members as $m): ?>
   <div class="st-card" style="padding:0.75rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$m['active']?'opacity:0.55;':''?>">
-    <span style="min-width:1.5rem;height:1.5rem;border-radius:0.375rem;background:var(--muted);color:var(--muted-foreground);font-size:0.625rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
+    <span style="min-width:1.5rem;height:1.5rem;border-radius:0.375rem;background:var(--muted);color:var(--muted-foreground);font-size:0.625rem;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;" title="Position"><?=(int)$m['position']?></span>
     <div style="width:2rem;height:2rem;border-radius:9999px;overflow:hidden;flex-shrink:0;background:var(--muted);display:grid;place-items:center;">
       <?php if(!empty($m['photo_url'])):?>
       <img src="<?=e($m['photo_url'])?>" loading="lazy" alt="<?=e($m['name'])?>" style="width:100%;height:100%;object-fit:cover;">
@@ -172,6 +181,9 @@ if (!empty($_GET['edit'])) {
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
       <div class="fs-sm-mt" style="font-size:0.75rem;"><?=e($m['role']??'—')?></div>
+      <?php if(!empty($m['bio'])):?>
+      <div class="fs-2xs-mt" style="color:var(--muted-foreground);font-size:0.6875rem;max-width:250px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?=e($m['bio'])?>"><?=e(truncate($m['bio'],50))?></div>
+      <?php endif;?>
     </div>
     <div style="display:flex;gap:0.25rem;flex-shrink:0;">
       <a href="?edit=<?=$m['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .375rem;"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
