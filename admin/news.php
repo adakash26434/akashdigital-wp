@@ -44,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $tags        = json_encode(array_values(array_filter(array_map('trim', explode(',', $_POST['tags'] ?? '')))));
         $active      = isset($_POST['active']) ? 1 : 0;
+        $source_url  = filter_var(trim($_POST['source_url'] ?? ''), FILTER_VALIDATE_URL) ?: null;
 
         if (!$title) { $error = 'Title is required.'; }
         else {
@@ -52,12 +53,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             try {
                 if ($id) {
-                    execute("UPDATE news SET title=?,slug=?,excerpt=?,content=?,cover_url=?,author_name=?,category=?,tags=?,read_time=?,featured=?,published=?,published_at=?,active=?,updated_at=NOW() WHERE id=?",
-                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$id]);
+                    execute("UPDATE news SET title=?,slug=?,excerpt=?,content=?,cover_url=?,author_name=?,category=?,tags=?,read_time=?,featured=?,published=?,published_at=?,active=?,source_url=?,updated_at=NOW() WHERE id=?",
+                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url,$id]);
                     $success = 'Post updated.';
                 } else {
-                    execute("INSERT INTO news (title,slug,excerpt,content,cover_url,author_name,category,tags,read_time,featured,published,published_at,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active]);
+                    execute("INSERT INTO news (title,slug,excerpt,content,cover_url,author_name,category,tags,read_time,featured,published,published_at,active,source_url,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url]);
                     $success = 'Post created.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: ' . $e->getMessage(); }
@@ -243,6 +244,11 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
         <div>
           <label class="form-label">Tags <span style="color:var(--muted-foreground);font-weight:400;">(comma-separated)</span></label>
           <input type="text" name="tags" class="form-input" value="<?=e($editing['tags_text']??'')?>" placeholder="Software, IT, Nepal">
+        </div>
+        <div>
+          <label class="form-label">External Source URL <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
+          <input type="url" name="source_url" class="form-input" value="<?=e($editing['source_url']??'')?>" placeholder="https://onlinekhabar.com/news/...">
+          <small style="color:var(--muted-foreground);font-size:0.6875rem;">Link to original article (onlinekhabar, nagariknews, etc.)</small>
         </div>
         <div>
           <label class="form-label">Publish Date / Time</label>
