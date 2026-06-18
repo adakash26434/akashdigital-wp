@@ -283,13 +283,27 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
               </span>
               <?php endif; ?>
             </div>
-            <div style="font-size:0.75rem;color:var(--foreground);margin-top:0.125rem;"><?= e($l['org_name']) ?></div>
-            <?php if($l['district'] || $firstProduct): ?>
-            <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.125rem;">
-              <?= $firstProduct ? '<span style="background:var(--muted);padding:0.05rem 0.35rem;border-radius:0.25rem;margin-right:0.25rem;">'.e(trim($firstProduct)).'</span>' : '' ?>
-              <?= $l['district'] ? e($l['district']) : '' ?>
+            <div style="font-size:0.75rem;color:<?= $l['org_name'] ? 'var(--foreground)' : 'var(--muted-foreground)' ?>;margin-top:0.125rem;">
+              <?= $l['org_name'] ? e($l['org_name']) : '<span style="font-style:italic;">No organisation</span>' ?>
             </div>
-            <?php endif; ?>
+            <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.125rem;display:flex;gap:0.25rem;flex-wrap:wrap;">
+              <?php if($firstProduct): ?>
+              <span style="background:var(--muted);padding:0.05rem 0.35rem;border-radius:0.25rem;"><?= e(trim($firstProduct)) ?></span>
+              <?php else: ?>
+              <span style="background:rgba(0,0,0,0.05);padding:0.05rem 0.35rem;border-radius:0.25rem;color:var(--muted-foreground);">—</span>
+              <?php endif; ?>
+              <?php if($l['district']): ?>
+              <span style="display:flex;align-items:center;gap:0.15rem;">
+                <i data-lucide="map-pin" style="width:0.625rem;height:0.625rem;"></i>
+                <?= e($l['district']) ?>
+              </span>
+              <?php else: ?>
+              <span style="display:flex;align-items:center;gap:0.15rem;color:var(--muted-foreground);">
+                <i data-lucide="map-pin" style="width:0.625rem;height:0.625rem;"></i>
+                —
+              </span>
+              <?php endif; ?>
+            </div>
           </div>
         </div>
       </td>
