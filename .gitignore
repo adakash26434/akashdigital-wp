@@ -1,5 +1,4 @@
 
-
 # Production config with credentials
 config-production.php
 includes/dev-config.php
@@ -11,3 +10,8 @@ data/*.db
 data/*.sqlite
 *.sqlite
 *.sqlite3
+
+# Environment files
+.env
+.env.*
+*.env
