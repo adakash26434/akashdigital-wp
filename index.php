@@ -206,7 +206,7 @@ $_heroSubVal   = cms($__s, 'homepage_hero_subtitle') ?: (isNepali() ? 'सहक
 <style>
 .st-hero{position:relative;overflow:hidden;min-height:clamp(480px,70vh,640px);display:flex;align-items:center;background:var(--hero-bg,#0a1023);--h-text:#fff;--h-sub:rgba(255,255,255,.8);--h-badge-bg:rgba(255,255,255,.08);--h-badge-border:rgba(255,255,255,.15);--h-badge-color:#93c5fd;--h-trust:rgba(255,255,255,.6);--h-grid:rgba(255,255,255,.03);--h-shadow:0 4px 24px rgba(0,0,0,.5);}
 /* Light mode overrides — hero shell only (mockup stays dark) */
-html:not(.dark) .st-hero{--h-text:#0f172a;--h-sub:rgba(15,23,42,.75);--h-badge-bg:rgba(37,99,235,.08);--h-badge-border:rgba(37,99,235,.2);--h-badge-color:#2563eb;--h-trust:rgba(15,23,42,.6);--h-grid:rgba(15,23,42,.04);--h-shadow:0 4px 24px rgba(0,0,0,.08);}
+html:not(.dark) .st-hero{background:#eef2ff !important;--h-text:#0f172a;--h-sub:rgba(15,23,42,.75);--h-badge-bg:rgba(37,99,235,.08);--h-badge-border:rgba(37,99,235,.2);--h-badge-color:#2563eb;--h-trust:rgba(15,23,42,.6);--h-grid:rgba(15,23,42,.04);--h-shadow:0 4px 24px rgba(0,0,0,.08);}
 .st-hero-mesh{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
 .st-hero-mesh span{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;will-change:transform;animation:mesh-float 18s ease-in-out infinite alternate;}
 .st-hero-mesh .m1{width:45vw;height:45vw;top:-15%;left:-10%;background:var(--hero-mesh-1,#2563eb);animation-delay:0s;}

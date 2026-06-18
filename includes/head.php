@@ -141,7 +141,8 @@ endif; ?>
   var loc = localStorage.getItem('st-theme');
   var pref = srv || loc || '';
   var mode = pref === 'system' ? '' : pref;
-  var isDark = mode !== 'light';
+  // Fix: properly check dark mode with system preference fallback
+  var isDark = mode === 'dark' || (mode === '' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   if (isDark) document.documentElement.classList.add('dark');
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
   if (srv) localStorage.setItem('st-theme', srv);

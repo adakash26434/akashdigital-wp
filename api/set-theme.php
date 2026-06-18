@@ -24,7 +24,7 @@ if (!in_array($theme, ['light', 'dark'])) {
 
 try {
     $user = currentUser();
-    if ((int)($user['id'] ?? -1) === 0 && ($user['role'] ?? '') === 'superadmin') {
+    if (($user['role'] ?? '') === 'superadmin') {
         $_SESSION['sa_theme'] = $theme;
     } else {
         execute("UPDATE users SET theme_pref=? WHERE id=?", [$theme, $user['id']]);
