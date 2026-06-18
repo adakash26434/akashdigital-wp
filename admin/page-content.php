@@ -150,7 +150,7 @@ $pages = [
         <label for="chairman_photo_upload">Chairman Photo</label>
         <input type="file" id="chairman_photo_upload" name="chairman_photo_upload" accept="image/*">
         <?php if (!empty($allSettings['chairman_photo'])): ?>
-            <img src="../<?=$allSettings['chairman_photo']?>" style="max-width:200px;margin-top:1rem;display:block;">
+            <img src="../<?=$allSettings['chairman_photo']?>" alt="Chairman photo" style="max-width:200px;margin-top:1rem;display:block;">
             <input type="hidden" name="chairman_photo" value="<?=$allSettings['chairman_photo']?>">
         <?php endif; ?>
     </div>
@@ -163,7 +163,7 @@ $pages = [
         <label for="ceo_photo_upload">CEO Photo</label>
         <input type="file" id="ceo_photo_upload" name="ceo_photo_upload" accept="image/*">
         <?php if (!empty($allSettings['ceo_photo'])): ?>
-            <img src="../<?=$allSettings['ceo_photo']?>" style="max-width:200px;margin-top:1rem;display:block;">
+            <img src="../<?=$allSettings['ceo_photo']?>" alt="CEO photo" style="max-width:200px;margin-top:1rem;display:block;">
             <input type="hidden" name="ceo_photo" value="<?=$allSettings['ceo_photo']?>">
         <?php endif; ?>
     </div>

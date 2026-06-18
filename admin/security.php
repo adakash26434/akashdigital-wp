@@ -95,7 +95,7 @@ $enforced    = !empty($__user['require_2fa']) || mustEnable2fa($__user);
       <h2 style="font-size:1rem;font-weight:600;margin-bottom:0.75rem;">Step 1 · Scan QR with your authenticator</h2>
       <div style="display:flex;gap:1.5rem;align-items:center;flex-wrap:wrap;margin-bottom:1.5rem;">
         <img src="<?= e(totp_qr_image_url(totp_otpauth_uri($setupSecret, $__user['email'], SITE_NAME))) ?>"
-             alt="QR" width="200" height="200"
+             alt="Scan this QR code with your authenticator app" width="200" height="200"
              style="border:1px solid var(--border);border-radius:0.75rem;padding:0.5rem;background:#fff;">
         <div>
           <p style="font-size:0.8125rem;color:var(--muted-foreground);margin-bottom:0.5rem;">Or enter manually:</p>
