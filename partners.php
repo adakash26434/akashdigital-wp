@@ -55,6 +55,8 @@ $labels = ['client'=>'Clients','partner'=>'Technology Partners','channel'=>'Chan
 $__s = siteSettings();
 $clientCount = count($grouped['client'] ?? []);
 $partnerCount = count($grouped['partner'] ?? []);
+// Add 300 to client count for display (DB count + 300)
+$displayClientCount = $clientCount + 300;
 
 require_once 'includes/header.php';
 ?>
@@ -71,7 +73,7 @@ include 'includes/page-hero.php';
   <div class="container">
     <div class="partner-stats__grid">
       <?php foreach ([
-        ['204+', 'Cooperative clients'],
+        [$displayClientCount . '+', 'Cooperative clients'],
         ['15+', 'Technology partners'],
         ['7', 'Provinces covered'],
       ] as [$n, $l]): ?>
