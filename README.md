@@ -1,10 +1,11 @@
-# Corporate Website & Admin Panel
+# Akash Digital - Corporate Website & Admin Panel
 
 **A modern, production-ready PHP application** for cooperatives and tech companies. Features complete content management, client portal, and dynamic configuration.
 
-- **Tech Stack:** PHP 7.4+, MySQL/MariaDB, Bootstrap 5, Tailwind CSS, Alpine.js
-- **Deployment:** cPanel/Shared Hosting
+- **Tech Stack:** PHP 7.4+, MySQL/MariaDB, SQLite, Tailwind CSS, Alpine.js
+- **Deployment:** cPanel/Shared Hosting, Replit
 - **License:** Private
+- **Status:** Production Ready ✅
 
 ---
 
@@ -15,40 +16,47 @@
 | **Project** | Corporate Website & Admin Panel |
 | **Database** | MySQL (cPanel) / SQLite (dev) |
 | **Admin** | `{SITE_URL}/admin/` |
+| **Client Portal** | `{SITE_URL}/portal/` |
+| **API** | `{SITE_URL}/api/` |
 | **Setup Time** | 5 minutes on cPanel |
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Deployment
 
-### For cPanel Deployment
+### cPanel (Recommended)
 
-**Quick Steps:**
 ```bash
-1. Create MySQL database in cPanel
-2. Clone: git clone {YOUR_REPO_URL}
-3. Import: database.sql via phpMyAdmin
-4. Configure: includes/config.php with DB credentials
-5. chmod 755 uploads/ storage/ && find uploads/ storage/ -type f -exec chmod 644 {} \;
-6. Visit: {SITE_URL}/admin/
+# 1. Create MySQL database in cPanel
+# 2. Git™ Version Control → Clone repository
+git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
+
+# 3. Import database.sql via phpMyAdmin
+# 4. Create config-production.php with credentials:
+#    - DB_HOST, DB_NAME, DB_USER, DB_PASS
+#    - SESSION_SECRET, APP_SECRET (generate with: php -r "echo bin2hex(random_bytes(32));")
+# 5. chmod 755 uploads/ storage/
+# 6. Visit: {SITE_URL}/admin/
 ```
 
-### For Local Development
+### Local Development
 
 ```bash
-git clone {YOUR_REPO_URL}
-cd {PROJECT_DIR}
+git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
+cd akashdigital-wp-main-2zip
 
-# Create dev-config.php with your DB details
-cat > includes/dev-config.php << EOF
-<?php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'dev_db');
-define('DB_USER', 'root');
-define('DB_PASS', 'password');
-EOF
+# Create includes/dev-config.php with local settings
+# Database auto-initializes on first access (SQLite)
 
-# Database will auto-initialize on first access
+# Start local server
+php -S localhost:5000
+```
+
+### Replit
+
+```bash
+# Use .replit config for auto-deployment
+replit clone https://github.com/adakash26434/akashdigital-wp-main-2zip
 ```
 
 ---
@@ -90,35 +98,48 @@ project/
 
 ## 🔧 Configuration
 
-### Environment (includes/config.php)
+### Production (config-production.php)
 
-```php
-// Database
-define('DB_HOST',    'localhost');
-define('DB_NAME',    'your_database');
-define('DB_USER',    'your_username');
-define('DB_PASS',    'your_password');
-
-// Site
-define('SITE_URL',   'https://yourdomain.com');
-define('SITE_NAME',  'Your Company Name');
-
-// Uploads
-define('UPLOAD_DIR', __DIR__ . '/../uploads/');
-define('UPLOAD_URL', SITE_URL . '/uploads/');
-```
-
-### Local Dev Override (includes/dev-config.php)
-
-Create this file locally — **never commit to git**:
+Create `config-production.php` in root directory — **never commit to git**:
 
 ```php
 <?php
+// Database
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'dev_db');
-define('DB_USER', 'root');
+define('DB_NAME', 'your_database');
+define('DB_USER', 'your_username');
 define('DB_PASS', 'your_password');
-define('SITE_URL', 'http://localhost:5000');
+
+// Security (generate with: php -r "echo bin2hex(random_bytes(32));")
+define('SESSION_SECRET', 'your_64_char_hex_secret');
+define('APP_SECRET', 'your_64_char_hex_secret');
+```
+
+### Local Development (includes/dev-config.php)
+
+Create `includes/dev-config.php` locally — **never commit to git**:
+
+```php
+<?php
+// SQLite for local dev (no setup needed)
+define('DB_DRIVER', 'sqlite');
+define('DB_SQLITE_PATH', __DIR__ . '/../data/dev.sqlite');
+
+// Or MySQL
+// define('DB_HOST', 'localhost');
+// define('DB_NAME', 'dev_db');
+// define('DB_USER', 'root');
+// define('DB_PASS', 'password');
+
+define('SESSION_SECRET', 'dev_secret_change_in_production');
+define('APP_SECRET', 'dev_app_secret_change_in_production');
+```
+
+### Uploads Directory
+
+```bash
+chmod 755 uploads/ storage/
+find uploads/ storage/ -type f -exec chmod 644 {} \;
 ```
 
 ---
@@ -296,12 +317,33 @@ Private. All rights reserved.
 
 ---
 
-**Last Updated:** 2026-06-14  
+**Last Updated:** 2026-06-17  
 **Status:** Production Ready ✅  
-**Version:** 1.3.0
+**Version:** 1.4.0
+
+### Changelog v1.4.0 (2026-06-17) - Full Audit & Security Fixes
+
+#### Security (Grade A)
+- ✅ Router.php: Path traversal protection + directory blocking
+- ✅ API: Token expiry (7 days) + lowercase email normalization
+- ✅ API: Brute force lockout (5 attempts / 15 min)
+- ✅ Superadmin: Plaintext password warning banner
+- ✅ Invoice-pdf: IDOR fix, Chat: Rate limiting, Upload: MIME verify
+
+#### Accessibility (Grade A-)
+- ✅ All images have alt text, All buttons have aria-label
+
+#### SEO (Grade A)
+- ✅ Canonical tag, JSON-LD schema, OG images, Twitter cards
+
+#### UI/UX (Grade A-)
+- ✅ Hero light/dark theme, Responsive tables, Contact form improvements
+
+#### Documentation
+- ✅ Updated README.md, config templates, enhanced .gitignore
 
 ### Changelog v1.3.0 (2026-06-14)
-- **Security:** Removed hardcoded superadmin credentials and APP_SECRET_KEY defaults — now requires env vars (refuses to boot if unset)
+- Security: Removed hardcoded superadmin credentials
 - **Security:** Gated `diagnostic.php` behind `requireAdmin()` + `APP_ENV=development` check
 - **Security:** Genericized `config-production.php.example` (removed real client domain/DB name)
 - **Security:** Updated `SETUP.md` to guide key generation instead of providing a copy-pasteable default key
