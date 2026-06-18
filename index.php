@@ -60,6 +60,7 @@ try {
 $__s = siteSettings();
 
 // Stats bar — admin-editable, fallback to defaults
+// Stat #2 (Happy Clients) uses actual count from clients + partners DB
 $_def = [
   ['10+',  'Years of Experience',   'calendar'],
   ['650+', 'Happy Clients', 'users'],
@@ -70,6 +71,11 @@ $stats = [];
 for ($__i=1;$__i<=4;$__i++) {
   $v = trim($__s["stat_{$__i}_value"] ?? '');
   $l = cms($__s, "stat_{$__i}_label");
+  // Override stat #2 (index 1) with actual client count
+  if ($__i === 2) {
+    $actualCount = $__clientCount > 0 ? ($__clientCount >= 200 ? ($__clientCount.'+') : $__clientCount) : '100+';
+    $v = $actualCount;
+  }
   $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2]];
 }
 unset($__i,$v,$l,$_def);
