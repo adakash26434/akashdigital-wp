@@ -1,81 +1,75 @@
 # 🛠️ Site Setup Guide
 
-## Step 1 — Copy the production config template
+## Step 1 — Clone from GitHub
 
 ```bash
-cp includes/config-production.php.example includes/config-production.php
+git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
+cd akashdigital-wp-main-2zip
 ```
 
-Then open `includes/config-production.php` and fill in your values.
+## Step 2 — Create Production Config
 
----
+Create `config-production.php` in project root:
 
-## Step 2 — Generate a unique APP_SECRET_KEY
+```bash
+cp config-production.php.example config-production.php
+```
 
-Run this command to generate a strong, unique key for your deployment:
+Edit `config-production.php` and fill in:
+- DB credentials
+- SESSION_SECRET
+- APP_SECRET
+
+## Step 3 — Generate Security Keys
 
 ```bash
 php -r "echo bin2hex(random_bytes(32));"
 ```
 
-Paste the output into `config-production.php`:
+Run twice for two keys:
+- First output → `SESSION_SECRET`
+- Second output → `APP_SECRET`
+
+## Step 4 — Database Setup
+
+### cPanel MySQL:
+1. Create MySQL Database
+2. Create Database User
+3. Import `database.sql` via phpMyAdmin
 
 ```php
-define('APP_SECRET_KEY', 'paste_your_generated_key_here');
+define('DB_DRIVER', 'mysql');
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'your_db_name');
+define('DB_USER', 'your_db_user');
+define('DB_PASS', 'your_password');
 ```
 
-> **Important:** Generate a fresh key for each deployment. Never copy a key from another site or from documentation.
+### Local Dev (SQLite):
+No setup needed - auto-creates on first run.
 
----
-
-## Step 3 — Set superadmin credentials
-
-Set these as **cPanel PHP Environment Variables** (never hardcode them in a file):
-
-| Variable | Example value |
-|---|---|
-| `SUPERADMIN_EMAIL` | `admin@yourdomain.com` |
-| `SUPERADMIN_PASS_HASH` | *(bcrypt hash — see below)* |
-
-Generate a bcrypt hash:
+## Step 5 — Set Permissions
 
 ```bash
-php -r "echo password_hash('YourStrongPassword', PASSWORD_BCRYPT, ['cost'=>12]).PHP_EOL;"
+chmod 755 uploads/ storage/
+find uploads/ storage/ -type f -exec chmod 644 {} \;
 ```
 
-Set `SUPERADMIN_PASS_HASH` to the output.  
-For local development only, you may use `SUPERADMIN_PASS_PLAIN` instead.
+## Step 6 — Superadmin (Optional)
 
----
+Set as cPanel PHP Environment Variables:
 
-## Step 4 — Database Settings
+| Variable | Value |
+|---|---|
+| `SUPERADMIN_EMAIL` | admin@yourdomain.com |
+| `SUPERADMIN_PASS_HASH` | bcrypt hash |
 
-In `includes/config-production.php`, update:
-
-```php
-define('DB_NAME', 'your_cpanel_db_name');
-define('DB_USER', 'your_cpanel_db_user');
-define('DB_PASS', 'your_database_password');
+Generate hash:
+```bash
+php -r "echo password_hash('YourPassword', PASSWORD_BCRYPT, ['cost'=>12]).PHP_EOL;"
 ```
-
----
-
-## Step 5 — Site URL
-
-```php
-define('SITE_URL', 'https://yourdomain.com');   // no trailing slash
-```
-
----
-
-## Step 6 — Upload the Files
-
-Upload everything via **cPanel File Manager** or FTP to your `public_html` folder.
-
-Import `database.sql` via phpMyAdmin.
-
----
 
 ## Done! ✅
 
-Visit your site. If you see errors, check cPanel → Error Logs.
+- Website: `https://yourdomain.com`
+- Admin: `https://yourdomain.com/admin/`
