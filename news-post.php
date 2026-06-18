@@ -117,8 +117,16 @@ require_once 'includes/header.php';
 <!-- Article Body -->
 <article style="padding:2.5rem 1.5rem 4rem;">
   <div class="container" style="max-width:52rem;">
-    <div class="prose">
-      <?= nl2br(e($post['content'] ?? '')) ?>
+    <div class="prose" style="text-align:justify;line-height:1.8;">
+      <?php 
+      $rawContent = $post['content'] ?? '';
+      // If content has HTML tags, render as HTML; otherwise escape and add line breaks
+      if (preg_match('/<[a-z][\s\S]*>/i', $rawContent)) {
+        echo $rawContent;
+      } else {
+        echo nl2br(e($rawContent));
+      }
+      ?>
     </div>
 
     <!-- Tags footer -->
