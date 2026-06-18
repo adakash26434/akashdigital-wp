@@ -307,7 +307,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
             </div>
             <div>
               <label class="form-label fs-xs">Next Follow-up Date</label>
-              <input type="date" name="next_followup" class="form-input" data-bs-picker>
+              <input type="date" data-bs-picker name="next_followup" class="form-input" data-bs-picker>
             </div>
             <div class="grid-full">
               <label class="form-label fs-xs">Notes / Summary <span style="color:var(--danger-fg);">*</span></label>
@@ -399,7 +399,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
             </div>
             <div>
               <label class="form-label fs-xs">Valid Until</label>
-              <input type="date" name="valid_until" class="form-input">
+              <input type="date" data-bs-picker name="valid_until" class="form-input" data-bs-picker>
             </div>
             <div>
               <label class="form-label fs-xs">Status</label>

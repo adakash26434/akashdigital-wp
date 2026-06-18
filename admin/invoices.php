@@ -324,18 +324,18 @@ adminListHeader('Invoices', "$total invoices", [
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
           <div>
             <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Billing Period From</label>
-            <input type="date" name="billing_period_from" value="<?= date('Y-m-d') ?>" class="form-input">
+            <input type="date" data-bs-picker name="billing_period_from" value="<?= date('Y-m-d') ?>" class="form-input">
           </div>
           <div>
             <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Billing Period To</label>
-            <input type="date" name="billing_period_to" value="<?= date('Y-m-d', strtotime('+1 year')) ?>" class="form-input">
+            <input type="date" data-bs-picker name="billing_period_to" value="<?= date('Y-m-d', strtotime('+1 year')) ?>" class="form-input">
           </div>
         </div>
         
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
           <div>
             <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Due Date</label>
-            <input type="date" name="due_date" value="<?= date('Y-m-d', strtotime('+15 days')) ?>" class="form-input">
+            <input type="date" data-bs-picker name="due_date" value="<?= date('Y-m-d', strtotime('+15 days')) ?>" class="form-input">
           </div>
           <div>
             <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Tax Rate (%)</label>
@@ -371,7 +371,7 @@ adminListHeader('Invoices', "$total invoices", [
         
         <div>
           <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.375rem;">Due Date</label>
-          <input type="date" name="due_date" value="<?= date('Y-m-d', strtotime('+15 days')) ?>" class="form-input">
+          <input type="date" data-bs-picker name="due_date" value="<?= date('Y-m-d', strtotime('+15 days')) ?>" class="form-input">
         </div>
         
         <div>

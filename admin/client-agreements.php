@@ -297,11 +297,11 @@ adminListFilters([
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.875rem;">
           <div>
             <label class="form-label">Effective Date <span class="text-danger-token">*</span></label>
-            <input type="date" name="effective_date" required value="<?= date('Y-m-d') ?>" class="form-input">
+            <input type="date" data-bs-picker name="effective_date" required value="<?= date('Y-m-d') ?>" class="form-input">
           </div>
           <div>
             <label class="form-label">Expiry Date</label>
-            <input type="date" name="expiry_date" class="form-input">
+            <input type="date" data-bs-picker name="expiry_date" class="form-input">
           </div>
         </div>
         <div>

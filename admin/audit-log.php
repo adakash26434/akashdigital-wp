@@ -94,11 +94,11 @@ function auditActionColor(string $action): array {
 
   <div>
     <label style="font-size:0.75rem;color:var(--muted-foreground);display:block;margin-bottom:0.25rem;">From</label>
-    <input type="date" name="from" value="<?=e($dateFrom)?>" class="form-input">
+    <input type="date" data-bs-picker name="from" value="<?=e($dateFrom)?>" class="form-input">
   </div>
   <div>
     <label style="font-size:0.75rem;color:var(--muted-foreground);display:block;margin-bottom:0.25rem;">To</label>
-    <input type="date" name="to" value="<?=e($dateTo)?>" class="form-input">
+    <input type="date" data-bs-picker name="to" value="<?=e($dateTo)?>" class="form-input">
   </div>
 
   <button type="submit" class="btn btn-primary btn-sm">Filter</button>

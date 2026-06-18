@@ -204,7 +204,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         </div>
         <div>
           <label class="form-label">Application Deadline</label>
-          <input type="date" name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
+          <input type="date" data-bs-picker name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
         </div>
       </div>
       <div>

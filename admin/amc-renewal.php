@@ -284,11 +284,11 @@ require_once '../includes/admin-layout.php';
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
               <div>
                 <label style="font-size:.75rem;color:var(--muted-foreground);display:block;margin-bottom:.25rem;">Last Renewal Date</label>
-                <input type="date" name="last_renewal_date" class="form-input" value="<?= $amcConfig['last_renewal_date'] ?? '' ?>">
+                <input type="date" data-bs-picker name="last_renewal_date" class="form-input" value="<?= $amcConfig['last_renewal_date'] ?? '' ?>">
               </div>
               <div>
                 <label style="font-size:.75rem;color:var(--muted-foreground);display:block;margin-bottom:.25rem;">Next Renewal Date</label>
-                <input type="date" name="next_renewal_date" class="form-input" value="<?= $amcConfig['next_renewal_date'] ?? '' ?>">
+                <input type="date" data-bs-picker name="next_renewal_date" class="form-input" value="<?= $amcConfig['next_renewal_date'] ?? '' ?>">
               </div>
             </div>
           </div>

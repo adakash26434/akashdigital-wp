@@ -81,7 +81,7 @@ require_once '../includes/admin-layout.php';
       </div>
       <div>
         <label class="form-label">Expires</label>
-        <input type="date" name="expires_at" class="form-input">
+        <input type="date" data-bs-picker name="expires_at" class="form-input">
       </div>
     </div>
     <button class="btn btn-primary btn-sm">Create Token</button>

@@ -611,11 +611,11 @@ require_once '../includes/admin-layout.php';
       <div class="form-row form-row-3">
         <div>
           <label class="form-label">Agreement Date</label>
-          <input type="date" name="agreement_date" class="form-input" data-bs-picker value="<?= $v('agreement_date') ?>">
+          <input type="date" data-bs-picker name="agreement_date" class="form-input" data-bs-picker value="<?= $v('agreement_date') ?>">
         </div>
         <div>
           <label class="form-label">Installation Date</label>
-          <input type="date" name="installation_date" class="form-input" data-bs-picker value="<?= $v('installation_date') ?>">
+          <input type="date" data-bs-picker name="installation_date" class="form-input" data-bs-picker value="<?= $v('installation_date') ?>">
         </div>
       </div>
     </div>
