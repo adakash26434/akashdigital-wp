@@ -22,9 +22,8 @@ try { $__logoClients = query("SELECT org_name, logo_url, district, province FROM
 // Also include client-type partners
 try { $partnerClients = query("SELECT name AS org_name, logo_url, district, '' AS province FROM partners ORDER BY position ASC, id ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-// Count total clients for stat display (use actual count from DB, fallback to 565)
-$__clientCount = count($__logoClients) + count($partnerClients);
-if ($__clientCount < 100) { $__clientCount = 565; } // Use hardcoded 565 until more clients in DB
+// Count total clients for stat display (actual DB count + 300)
+$__clientCount = count($__logoClients) + count($partnerClients) + 300;
 // Merge and deduplicate by org_name
 $seen = [];
 foreach ($partnerClients as $pc) {
@@ -74,8 +73,7 @@ for ($__i=1;$__i<=4;$__i++) {
   $l = cms($__s, "stat_{$__i}_label");
   // Override stat #2 (index 1) with actual client count
   if ($__i === 2) {
-    $actualCount = $__clientCount >= 200 ? ($__clientCount.'+') : $__clientCount;
-    $v = $actualCount;
+    $v = $__clientCount . '+';
   }
   $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2]];
 }
@@ -405,7 +403,7 @@ include 'includes/stats-bar.php';
     <div class="container">
       <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
         <?php foreach ([
-          [$__clientCount >= 200 ? ($__clientCount.'+') : $__clientCount, 'Cooperative Clients',  'building-2'],
+          [$__clientCount . '+', 'Cooperative Clients',  'building-2'],
           ['15+',  'Technology Partners',  'layers'],
           ['7',    'Provinces Covered',    'map-pin'],
         ] as [$n, $l, $ic]):
