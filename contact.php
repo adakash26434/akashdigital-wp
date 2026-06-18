@@ -250,33 +250,43 @@ ob_start(); ?>
           </a>
         </div>
 
-        <!-- What happens next -->
-        <div class="st-card" style="padding:1.75rem;">
-          <h3 style="font-family:var(--font-display);font-weight:700;font-size:var(--text-md);color:var(--foreground);margin-bottom:1.25rem;">What happens next?</h3>
-          <?php foreach ([
-            ['message-square','We review your message','Usually within 2 business hours.'],
-            ['phone','Discovery call','We set up a short call to understand your business needs.'],
-            ['monitor','Live demo','We show you the software with your workflow in mind.'],
-            ['file-check','Custom quote','You receive a detailed, transparent proposal.'],
-          ] as $i => [$icon,$title,$desc]): ?>
-          <div style="display:flex;gap:0.875rem;<?= $i < 3 ? 'margin-bottom:1rem;' : '' ?>">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:0.25rem;flex-shrink:0;">
-              <div style="display:grid;place-items:center;width:2rem;height:2rem;border-radius:9999px;background:var(--primary-light);border:1.5px solid rgba(37,99,235,0.2);">
-                <i data-lucide="<?= $icon ?>" style="width:13px;height:13px;color:var(--primary);"></i>
-              </div>
-              <?php if ($i < 3): ?>
-              <div style="width:1.5px;flex:1;min-height:1.25rem;background:var(--border);"></div>
-              <?php endif; ?>
-            </div>
-            <div style="padding-top:0.25rem;">
-              <div style="font-weight:600;font-size:var(--text-sm);color:var(--foreground);margin-bottom:0.125rem;"><?= e($title) ?></div>
-              <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:0;line-height:1.5;"><?= e($desc) ?></p>
-            </div>
-          </div>
-          <?php endforeach; ?>
-        </div>
-
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════ WHAT HAPPENS NEXT ═══════ -->
+<section class="st-section" style="background:var(--card);border-top:1px solid var(--border);padding-top:3rem;padding-bottom:3rem;">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:2.5rem;">
+      <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.375rem;color:var(--foreground);margin-bottom:0.375rem;">
+        <?= e(isNepali() ? 'अब के हुन्छ?' : 'What happens next?') ?>
+      </h2>
+      <p style="font-size:var(--text-sm);color:var(--muted-foreground);">
+        <?= e(isNepali() ? 'फारम पठाएपछि हाम्रो प्रक्रिया यस्तो हुन्छ' : 'Here\'s our process after you reach out') ?>
+      </p>
+    </div>
+
+    <div id="contact-next-steps" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;">
+      <?php foreach ([
+        ['message-square', '1', isNepali() ? 'सन्देश समीक्षा' : 'We review your message', isNepali() ? '२ व्यापार घन्टाभित्र।' : 'Usually within 2 business hours.'],
+        ['phone',          '2', isNepali() ? 'डिस्कभरी कल'   : 'Discovery call',         isNepali() ? 'तपाईंको व्यापारिक आवश्यकता बुझ्न छोटो कुराकानी।' : 'A short call to understand your business needs.'],
+        ['monitor',        '3', isNepali() ? 'लाइभ डेमो'      : 'Live demo',              isNepali() ? 'तपाईंको कार्यप्रवाहलाई ध्यानमा राखेर सफ्टवेयर देखाउँछौं।' : 'We show you the software with your workflow in mind.'],
+        ['file-check',     '4', isNepali() ? 'कस्टम उद्धरण'   : 'Custom quote',           isNepali() ? 'विस्तृत, पारदर्शी प्रस्ताव पाउनुहुन्छ।' : 'You receive a detailed, transparent proposal.'],
+      ] as [$icon, $num, $title, $desc]): ?>
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:0.875rem;">
+        <div style="position:relative;">
+          <div style="display:grid;place-items:center;width:3rem;height:3rem;border-radius:9999px;background:var(--primary-light);border:2px solid rgba(37,99,235,0.2);">
+            <i data-lucide="<?= $icon ?>" style="width:18px;height:18px;color:var(--primary);"></i>
+          </div>
+          <span style="position:absolute;top:-0.375rem;right:-0.375rem;width:1.125rem;height:1.125rem;border-radius:9999px;background:var(--primary);color:#fff;font-size:0.625rem;font-weight:800;display:grid;place-items:center;"><?= $num ?></span>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:var(--text-sm);color:var(--foreground);margin-bottom:0.375rem;"><?= e($title) ?></div>
+          <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:0;line-height:1.6;"><?= e($desc) ?></p>
+        </div>
+      </div>
+      <?php endforeach; ?>
     </div>
   </div>
 </section>
