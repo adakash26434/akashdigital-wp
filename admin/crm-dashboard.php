@@ -132,11 +132,15 @@ $stageLabels = [
 <!-- Header -->
 <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;">
   <div>
-    <h1 style="font-family:var(--font-display);font-size:1.375rem;font-weight:700;">📊 CRM Dashboard</h1>
+    <h1 style="font-family:var(--font-display);font-size:1.375rem;font-weight:700;">
+      <i data-lucide="layout-dashboard" style="width:1.25rem;height:1.25rem;vertical-align:middle;margin-right:0.5rem;"></i> CRM Dashboard
+    </h1>
     <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:0.25rem;">Follow-ups, leads & sales pipeline overview</p>
   </div>
   <div style="display:flex;gap:0.625rem;flex-wrap:wrap;">
-    <a href="<?= url('admin/crm.php') ?>" class="btn btn-outline btn-sm">📋 All Leads</a>
+    <a href="<?= url('admin/crm.php') ?>" class="btn btn-outline btn-sm">
+      <i data-lucide="list" style="width:0.875rem;height:0.875rem;margin-right:0.375rem;"></i> All Leads
+    </a>
   </div>
 </div>
 
@@ -144,38 +148,40 @@ $stageLabels = [
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.875rem;margin-bottom:1.75rem;">
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:var(--card);border:1px solid var(--border);">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:var(--foreground);"><?= number_format($stats['total_leads']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">Total Leads</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="users" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>Total Leads</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:var(--card);border:1px solid var(--border);">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:var(--primary);"><?= number_format($stats['active_leads']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">Active</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="user-check" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>Active</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:<?= $stats['overdue']>0?'var(--danger-soft)':'var(--card)' ?>;border:1px solid <?= $stats['overdue']>0?'var(--danger-fg)':'var(--border)' ?>;">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:<?= $stats['overdue']>0?'var(--danger-fg)':'var(--muted-foreground)' ?>;"><?= number_format($stats['overdue']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">⚠️ Overdue</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="alert-triangle" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>Overdue</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:<?= $stats['due_today']>0?'var(--warning-soft)':'var(--card)' ?>;border:1px solid <?= $stats['due_today']>0?'var(--warning-fg)':'var(--border)' ?>;">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:<?= $stats['due_today']>0?'var(--warning-fg)':'var(--muted-foreground)' ?>;"><?= number_format($stats['due_today']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">⏰ Due Today</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="clock" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>Due Today</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:var(--success-soft);border:1px solid var(--success-fg);">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:var(--success-fg);"><?= number_format($stats['won']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">✅ Won</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="check-circle" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>Won</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:#dbeafe;border:1px solid #93c5fd;">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:var(--primary);"><?= number_format($stats['new_demos']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">🎯 New Demos</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="target" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>New Demos</div>
   </div>
   <div style="padding:1rem 1.125rem;border-radius:0.875rem;background:#f3e8ff;border:1px solid #c084fc;">
     <div style="font-size:1.625rem;font-weight:800;font-family:var(--font-display);color:#7e22ce;"><?= number_format($stats['new_contacts']) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;">📩 New Inquiries</div>
+    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;"><i data-lucide="inbox" style="width:0.75rem;height:0.75rem;vertical-align:middle;margin-right:0.25rem;"></i>New Inquiries</div>
   </div>
 </div>
 
 <!-- Pipeline card -->
 <div class="st-card p-card-lg" style="margin-bottom:1.5rem;">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
-    <h3 style="font-family:var(--font-display);font-weight:700;font-size:0.9375rem;">💰 Sales Pipeline</h3>
+    <h3 style="font-family:var(--font-display);font-weight:700;font-size:0.9375rem;">
+      <i data-lucide="trending-up" style="width:1rem;height:1rem;vertical-align:middle;margin-right:0.375rem;"></i> Sales Pipeline
+    </h3>
     <a href="<?= url('admin/crm.php') ?>" style="font-size:0.75rem;color:var(--primary);text-decoration:none;">View leads →</a>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1.25rem;margin-bottom:1.25rem;">
@@ -228,7 +234,7 @@ $stageLabels = [
       <ul class="fu-list">
         <?php foreach ($overdueFollowups as $l): ?>
         <li class="fu-item">
-          <div class="fu-icon" style="background:var(--danger-soft);color:var(--danger-fg);">📞</div>
+          <div class="fu-icon" style="background:var(--danger-soft);color:var(--danger-fg);"><i data-lucide="phone" style="width:1.25rem;height:1.25rem;"></i></div>
           <div class="fu-body">
             <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" class="fu-name"><?= e($l['name']) ?></a>
             <div class="fu-meta"><?= e($l['org_name']) ?><?= $l['district'] ? ' · '.e($l['district']) : '' ?><?= $l['products_interest'] ? ' · '.e($l['products_interest']) : '' ?></div>
@@ -243,13 +249,13 @@ $stageLabels = [
     <?php if (!empty($todayFollowups)): ?>
     <div class="st-card" style="border-left:3px solid var(--warning-fg);overflow:hidden;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.125rem 0.75rem;border-bottom:1px solid var(--border);">
-        <h3 style="font-weight:700;font-size:0.875rem;color:var(--warning-fg);">⏰ Today's Follow-ups <span style="opacity:.6;">(<?= count($todayFollowups) ?>)</span></h3>
+        <h3 style="font-weight:700;font-size:0.875rem;color:var(--warning-fg);"><i data-lucide="clock" style="width:1.25rem;height:1.25rem;"></i> Today's Follow-ups <span style="opacity:.6;">(<?= count($todayFollowups) ?>)</span></h3>
         <a href="<?= url('admin/crm.php?filter=today') ?>" class="btn btn-ghost btn-sm">View All</a>
       </div>
       <ul class="fu-list">
         <?php foreach ($todayFollowups as $l): ?>
         <li class="fu-item">
-          <div class="fu-icon" style="background:var(--warning-soft);color:var(--warning-fg);">📞</div>
+          <div class="fu-icon" style="background:var(--warning-soft);color:var(--warning-fg);"><i data-lucide="phone" style="width:1.25rem;height:1.25rem;"></i></div>
           <div class="fu-body">
             <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" class="fu-name"><?= e($l['name']) ?></a>
             <div class="fu-meta"><?= e($l['org_name']) ?><?= $l['phone'] ? ' · '.e($l['phone']) : '' ?><?= $l['products_interest'] ? ' · '.e($l['products_interest']) : '' ?></div>
@@ -297,7 +303,7 @@ $stageLabels = [
     <!-- New Demo Requests -->
     <div class="st-card" style="overflow:hidden;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1rem 0.75rem;border-bottom:1px solid var(--border);">
-        <h3 style="font-weight:700;font-size:0.875rem;">🎯 New Demo Requests</h3>
+        <h3 style="font-weight:700;font-size:0.875rem;"><i data-lucide="target" style="width:1.25rem;height:1.25rem;"></i> New Demo Requests</h3>
         <a href="<?= url('admin/demo-requests.php') ?>" class="btn btn-ghost btn-sm">All</a>
       </div>
       <?php if ($newDemos): ?>
@@ -320,7 +326,7 @@ $stageLabels = [
     <!-- New Contact Inquiries -->
     <div class="st-card" style="overflow:hidden;">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:0.875rem 1rem 0.75rem;border-bottom:1px solid var(--border);">
-        <h3 style="font-weight:700;font-size:0.875rem;">📩 New Inquiries</h3>
+        <h3 style="font-weight:700;font-size:0.875rem;"><i data-lucide="mail" style="width:1.25rem;height:1.25rem;"></i> New Inquiries</h3>
         <a href="<?= url('admin/contact-submissions.php') ?>" class="btn btn-ghost btn-sm">All</a>
       </div>
       <?php if ($newContacts): ?>
@@ -340,15 +346,24 @@ $stageLabels = [
     <!-- Recent Activity -->
     <div class="st-card" style="overflow:hidden;">
       <div style="padding:0.875rem 1rem 0.75rem;border-bottom:1px solid var(--border);">
-        <h3 style="font-weight:700;font-size:0.875rem;">📝 Recent Activity</h3>
+        <h3 style="font-weight:700;font-size:0.875rem;"><i data-lucide="edit" style="width:1.25rem;height:1.25rem;"></i> Recent Activity</h3>
       </div>
       <?php if ($recentActivity): ?>
       <div style="padding:0.375rem 0;">
         <?php foreach ($recentActivity as $a):
-          $aIco = match($a['type']??'') { 'call'=>'📞','meeting'=>'🤝','email'=>'📧','demo'=>'🎯','proposal'=>'📄',default=>'💬' };
+          $aIco = match($a['type']??'') { 
+            'call'=>'phone',
+            'meeting'=>'handshake',
+            'email'=>'mail',
+            'demo'=>'target',
+            'proposal'=>'file-text',
+            default=>'message-circle'
+          };
         ?>
         <div style="display:flex;align-items:flex-start;gap:0.625rem;padding:0.625rem 1rem;border-bottom:1px solid var(--border);" class="fu-item">
-          <span style="font-size:0.9rem;flex-shrink:0;margin-top:0.05rem;"><?= $aIco ?></span>
+          <span style="display:grid;place-items:center;width:2rem;height:2rem;border-radius:50%;background:var(--muted);flex-shrink:0;margin-top:0.05rem;">
+            <i data-lucide="<?= $aIco ?>" style="width:1rem;height:1rem;color:var(--muted-foreground);"></i>
+          </span>
           <div style="min-width:0;">
             <a href="<?= url('admin/crm-lead.php?id='.$a['lead_id']) ?>" style="font-weight:600;font-size:0.8125rem;color:var(--foreground);text-decoration:none;"><?= e($a['lead_name']) ?></a>
             <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.1rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= e($a['notes'] ? substr($a['notes'],0,55) : 'No notes') ?><?= strlen($a['notes']??'')>55?'…':'' ?></div>
