@@ -740,3 +740,25 @@ html.dark .tsd-item-icon { background: rgba(241,245,249,0.07); }
 .cl-actions .btn-ghost[style*="destructive"]:hover i {
   color: var(--destructive);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   ACCESSIBILITY — Skip Links
+   ═══════════════════════════════════════════════════════════════ */
+.st-skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0 0 0.5rem 0.5rem;
+  transition: top 0.2s;
+}
+.st-skip-link:focus {
+  top: 0;
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}

@@ -25,6 +25,9 @@ require __DIR__ . '/head.php';
 </head>
 <body style="min-height:100vh;background:var(--background);color:var(--foreground);">
 
+<!-- Skip to content link for keyboard users -->
+<a href="#main-content" class="st-skip-link">Skip to content</a>
+
 <!-- Mobile overlay -->
 <div id="admin-sidebar-overlay" onclick="closeAdminSidebar()"></div>
 
