@@ -118,7 +118,7 @@ ob_start(); ?>
                 </label>
                 <div class="pos-rel">
                   <i data-lucide="user" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="text" id="name" name="name" class="form-input" style="padding-left:2.25rem;" placeholder="Aarav Shrestha" required value="<?= e($_POST['name']??'') ?>">
+                  <input type="text" id="name" name="name" class="form-input" style="padding-left:2.25rem;" placeholder="Aarav Shrestha" required value="<?= e($_POST['name']??'') ?>" autocomplete="name">
                 </div>
               </div>
               <div>
@@ -127,7 +127,7 @@ ob_start(); ?>
                 </label>
                 <div class="pos-rel">
                   <i data-lucide="mail" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="email" id="email" name="email" class="form-input" style="padding-left:2.25rem;" placeholder="you@business.com.np" required value="<?= e($_POST['email']??'') ?>">
+                  <input type="email" id="email" name="email" class="form-input" style="padding-left:2.25rem;" placeholder="you@business.com.np" required value="<?= e($_POST['email']??'') ?>" autocomplete="email">
                 </div>
               </div>
             </div>
@@ -137,7 +137,7 @@ ob_start(); ?>
                 <label class="form-label" for="phone"><?= e(__('contact_phone')) ?></label>
                 <div class="pos-rel">
                   <i data-lucide="phone" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="tel" id="phone" name="phone" class="form-input" style="padding-left:2.25rem;" placeholder="+977 98X-XXX-XXXX" value="<?= e($_POST['phone']??'') ?>">
+                  <input type="tel" id="phone" name="phone" class="form-input" style="padding-left:2.25rem;" placeholder="+977 98X-XXX-XXXX" value="<?= e($_POST['phone']??'') ?>" autocomplete="tel" inputmode="tel">
                 </div>
               </div>
               <div>
