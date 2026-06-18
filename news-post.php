@@ -93,6 +93,13 @@ require_once 'includes/header.php';
       <?php if (!empty($post['views'])): ?>
       <div style="font-size:var(--text-sm);color:var(--muted-foreground);"> <?= number_format((int)$post['views']) ?> views</div>
       <?php endif; ?>
+      <?php if (!empty($post['source_url'])): ?>
+      <a href="<?= e($post['source_url']) ?>" target="_blank" rel="noopener noreferrer" 
+         style="display:inline-flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);font-weight:600;color:var(--primary);text-decoration:none;padding:0.25rem 0.625rem;border:1px solid var(--primary);border-radius:9999px;transition:all 0.2s;">
+        <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+        Read Full Article
+      </a>
+      <?php endif; ?>
     </div>
   </div>
 </section>

@@ -1,13 +1,16 @@
 -- ══════════════════════════════════════════════════════════════════════════════
 -- Butwal Project — Complete MySQL/MariaDB Database Schema
 -- Compatible with: MySQL 5.7+ / MariaDB 10.3+
--- Last Updated: 2026-06-05
+-- Last Updated: 2026-06-17
 -- ══════════════════════════════════════════════════════════════════════════════
 -- HOW TO IMPORT IN cPanel:
 --   1. cPanel → MySQL Databases → Create Database & User → Grant ALL Privileges
 --   2. phpMyAdmin → Select your database → Import → Choose this file → Go
 --   OR via terminal: mysql -u username -p database_name < database.sql
 -- ══════════════════════════════════════════════════════════════════════════════
+
+-- ⚠️ MIGRATION: Run this for existing news table (add source_url column):
+-- ALTER TABLE news ADD COLUMN source_url VARCHAR(500) DEFAULT NULL AFTER views;
 
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
@@ -948,6 +951,7 @@ CREATE TABLE IF NOT EXISTS news (
   published    TINYINT NOT NULL DEFAULT 0,
   published_at DATETIME,
   views        INT NOT NULL DEFAULT 0,
+  source_url   VARCHAR(500) DEFAULT NULL COMMENT 'External news link (e.g. onlinekhabar, nagariknews)',
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_slug      (slug),
