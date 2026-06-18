@@ -1206,9 +1206,10 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   border: 2px solid var(--border);
 }
 .team-card__photo--lg {
-  width: 4.75rem;
-  height: 4.75rem;
+  width: 6rem;
+  height: 6rem;
   border-color: var(--primary);
+  border-width: 3px;
 }
 .team-card__avatar {
   width: 4rem;
@@ -1224,11 +1225,11 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   color: var(--muted-foreground);
 }
 .team-card__avatar--lg {
-  width: 4.75rem;
-  height: 4.75rem;
+  width: 6rem;
+  height: 6rem;
   background: var(--gradient-primary);
   color: #fff;
-  font-size: 1.375rem;
+  font-size: 1.5rem;
 }
 .team-card__badge {
   display: inline-block;
