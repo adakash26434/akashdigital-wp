@@ -8,6 +8,7 @@ require_once '../includes/db.php';
 require_once '../includes/auth.php';
 require_once '../includes/helpers.php';
 require_once '../includes/nepal-geo.php';
+require_once '../includes/db-migrations.php';
 requireAdmin();
 
 $id   = (int)($_GET['id'] ?? 0);
