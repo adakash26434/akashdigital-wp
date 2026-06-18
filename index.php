@@ -204,28 +204,31 @@ $_heroSubVal   = cms($__s, 'homepage_hero_subtitle') ?: (isNepali() ? 'सहक
      external pages.css is stale/cached/out-of-sync on the deployed host.
      Mirrors the .st-hero rules in assets/css/pages.css. -->
 <style>
-.st-hero{position:relative;overflow:hidden;min-height:clamp(480px,70vh,640px);display:flex;align-items:center;background:var(--hero-bg,#0a1023);}
+.st-hero{position:relative;overflow:hidden;min-height:clamp(480px,70vh,640px);display:flex;align-items:center;background:var(--hero-bg,#0a1023);--h-text:#fff;--h-sub:rgba(255,255,255,.8);--h-badge-bg:rgba(255,255,255,.08);--h-badge-border:rgba(255,255,255,.15);--h-badge-color:#93c5fd;--h-trust:rgba(255,255,255,.6);--h-grid:rgba(255,255,255,.03);--h-shadow:0 4px 24px rgba(0,0,0,.5);}
+/* Light mode overrides — hero shell only (mockup stays dark) */
+html:not(.dark) .st-hero{--h-text:#0f172a;--h-sub:rgba(15,23,42,.75);--h-badge-bg:rgba(37,99,235,.08);--h-badge-border:rgba(37,99,235,.2);--h-badge-color:#2563eb;--h-trust:rgba(15,23,42,.6);--h-grid:rgba(15,23,42,.04);--h-shadow:0 4px 24px rgba(0,0,0,.08);}
 .st-hero-mesh{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
 .st-hero-mesh span{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;will-change:transform;animation:mesh-float 18s ease-in-out infinite alternate;}
 .st-hero-mesh .m1{width:45vw;height:45vw;top:-15%;left:-10%;background:var(--hero-mesh-1,#2563eb);animation-delay:0s;}
 .st-hero-mesh .m2{width:35vw;height:35vw;bottom:-10%;right:-5%;background:var(--hero-mesh-2,#7c3aed);animation-delay:-6s;}
 .st-hero-mesh .m3{width:25vw;height:25vw;top:40%;right:30%;background:var(--hero-mesh-3,#06b6d4);animation-delay:-12s;opacity:.2;}
 @keyframes mesh-float{0%{transform:translate(0,0) scale(1);}33%{transform:translate(3%,-4%) scale(1.08);}66%{transform:translate(-2%,3%) scale(.95);}100%{transform:translate(4%,2%) scale(1.05);}}
-.st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
+.st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--h-grid) 1px,transparent 1px),linear-gradient(90deg,var(--h-grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
 .st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;}
 .hero-left{display:flex;flex-direction:column;gap:.75rem;}
-.hero-left .hero-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;padding:.3rem .875rem .3rem .625rem;border-radius:9999px;font-size:var(--text-xs);font-weight:700;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#93c5fd;backdrop-filter:blur(4px);}
+.hero-left .hero-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;padding:.3rem .875rem .3rem .625rem;border-radius:9999px;font-size:var(--text-xs);font-weight:700;background:var(--h-badge-bg);border:1px solid var(--h-badge-border);color:var(--h-badge-color);backdrop-filter:blur(4px);}
 .hero-left .hero-badge i{width:13px;height:13px;}
-.hero-left .hero-title{font-family:var(--font-display);font-size:clamp(1.75rem,4.5vw,2.75rem);font-weight:800;line-height:1.1;color:#fff;letter-spacing:-.025em;text-shadow:0 4px 24px rgba(0,0,0,.5);margin:0;}
+.hero-left .hero-title{font-family:var(--font-display);font-size:clamp(1.75rem,4.5vw,2.75rem);font-weight:800;line-height:1.1;color:var(--h-text);letter-spacing:-.025em;text-shadow:var(--h-shadow);margin:0;}
 .hero-left .hero-title .tg{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hero-left .hero-bar{width:3rem;height:3px;background:var(--primary);border-radius:2px;}
-.hero-left .hero-sub{font-size:clamp(.9375rem,1.6vw,1.0625rem);color:rgba(255,255,255,.8);line-height:1.72;max-width:32rem;margin:0;font-weight:500;}
+.hero-left .hero-sub{font-size:clamp(.9375rem,1.6vw,1.0625rem);color:var(--h-sub);line-height:1.72;max-width:32rem;margin:0;font-weight:500;}
 .hero-left .hero-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem;}
 .hero-left .hero-actions .btn{font-size:var(--text-sm);padding:.6875rem 1.5rem;gap:.5rem;border-radius:var(--radius-md);}
-.hero-left .hero-actions .btn-outline-light{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;}
-.hero-left .hero-actions .btn-outline-light:hover{background:rgba(255,255,255,.15);border-color:rgba(255,255,255,.35);}
+.hero-left .hero-actions .btn-outline-light{background:var(--h-badge-bg);border:1px solid var(--h-badge-border);color:var(--h-text);}
+.hero-left .hero-actions .btn-outline-light:hover{background:var(--h-badge-bg);border-color:var(--h-badge-border);}
 .hero-trust{display:flex;flex-wrap:wrap;gap:.5rem 1.25rem;margin-top:.5rem;}
-.hero-trust span{display:flex;align-items:center;gap:.35rem;font-size:var(--text-xs);color:rgba(255,255,255,.6);font-weight:500;}
+.hero-trust span{display:flex;align-items:center;gap:.35rem;font-size:var(--text-xs);color:var(--h-trust);font-weight:500;}
 .hero-trust span i{width:13px;height:13px;color:var(--primary);}
 .hero-right{position:relative;display:flex;align-items:center;justify-content:center;}
 .hero-right .hero-mockup{width:100%;max-width:520px;border-radius:var(--radius-2xl);overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.06);background:#0f172a;transform:perspective(1000px) rotateY(-3deg) rotateX(2deg);transition:transform .4s ease;}
