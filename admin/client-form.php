@@ -700,29 +700,10 @@ require_once '../includes/admin-layout.php';
         <i data-lucide="image" class="ic-16-p"></i>
         Client Logo
       </div>
-      <div style="display:flex;align-items:flex-start;gap:1.5rem;flex-wrap:wrap;margin-bottom:1rem;">
-        <?php $lg=$v('logo_url'); if($lg): ?>
-        <img src="<?= $lg ?>" alt="logo" class="logo-preview" id="logo-preview">
-        <?php else: ?>
-        <div class="logo-preview" id="logo-preview" style="display:flex;align-items:center;justify-content:center;">
-          <i data-lucide="image" style="width:24px;height:24px;color:var(--muted-foreground);"></i>
-        </div>
-        <?php endif; ?>
-        <div style="flex:1;min-width:16rem;">
-          <label class="form-label" style="margin-bottom:.5rem;">Upload logo file</label>
-          <input type="file" name="logo_file" accept="image/png,image/jpeg,image/gif,image/svg+xml,image/webp"
-                 style="display:block;width:100%;padding:.5rem .75rem;border:1.5px dashed var(--border);border-radius:var(--radius-md);background:var(--muted);font-size:.875rem;cursor:pointer;"
-                 onchange="previewLogo(this)">
-          <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.375rem;">PNG, JPG, SVG or WebP — max 2 MB</p>
-
-          <div style="margin-top:1rem;">
-            <?php $imgField = 'logo_url'; $imgValue = $v('logo_url'); $imgLabel = 'Client Logo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
-          </div>
-          <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.25rem;">
-            This logo appears in the homepage client scroll strip. Leave blank to hide from homepage.
-          </p>
-        </div>
-      </div>
+      <?php $imgField = 'logo_url'; $imgValue = $v('logo_url'); $imgLabel = 'Client Logo'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
+      <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.5rem;">
+        This logo appears in the homepage client scroll strip. Leave blank to hide from homepage.
+      </p>
     </div>
 
     <div class="form-section">
