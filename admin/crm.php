@@ -350,9 +350,9 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
 </div>
 
 <!-- ──────────── ADD LEAD MODAL ──────────── -->
-<div x-data="{open:false}" @open-add-lead.window="open=true" x-show="open" x-cloak
+<div x-data="{open:false,preventClose:false}" @open-add-lead.window="open=true; $nextTick(() => { if (typeof initBsPickers === 'function') initBsPickers(); })" x-show="open" x-cloak
      style="position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.45);padding:1rem;">
-  <div @click.outside="open=false" style="background:var(--card);border-radius:1.25rem;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:1.75rem;box-shadow:var(--shadow-elevated);">
+  <div @click.outside="if (!preventClose) open=false" @click="preventClose=false" style="background:var(--card);border-radius:1.25rem;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;padding:1.75rem;box-shadow:var(--shadow-elevated);">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
       <h3 style="font-family:var(--font-display);font-weight:700;font-size:1rem;">+ Add New Lead</h3>
       <button @click="open=false" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:var(--muted-foreground);"></button>

@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Lead Detail';
+$pageTitle = 'Lead Detail'; // Will be updated after fetch
 require_once '../includes/admin-layout.php';
 require_once '../includes/nepal-geo.php';
 
@@ -7,6 +7,18 @@ $id = (int)($_GET['id'] ?? 0);
 if (!$id) { header('Location: ' . url('admin/crm.php')); exit; }
 
 $success = $error = '';
+
+// ── Fetch lead first (needed for POST handlers) ──────────────────
+$lead = null;
+try { $lead = queryOne("SELECT l.*, u.display_name as assigned_name FROM crm_leads l LEFT JOIN users u ON u.id=l.assigned_to WHERE l.id=?", [$id]); }
+catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+if (!$lead) {
+    echo '<div class="alert alert-error">Lead not found.</div>';
+    exit;
+}
+
+// Update page title with lead name
+$pageTitle = e($lead['name']) . ' – CRM Lead';
 
 // ── Products + Services for dropdowns ─────────────────────────────────────────
 $_lead_products = [];
@@ -171,16 +183,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         catch(\Throwable $e) { $error = 'Delete failed.'; }
     }
 }
-
-// ── Fetch lead ────────────────────────────────────────────────
-$lead = null;
-try { $lead = queryOne("SELECT l.*, u.display_name as assigned_name FROM crm_leads l LEFT JOIN users u ON u.id=l.assigned_to WHERE l.id=?", [$id]); }
-catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
-if (!$lead) {
-    echo '<div class="alert alert-error">Lead not found.</div>';
-    require_once '../includes/admin-layout-close.php'; exit;
-}
-$pageTitle = e($lead['name']) . ' — CRM Lead';
 
 $followups = [];
 try { $followups = query("SELECT f.*, u.display_name FROM crm_followups f LEFT JOIN users u ON u.id=f.user_id WHERE f.lead_id=? ORDER BY f.followup_at DESC", [$id]); }
