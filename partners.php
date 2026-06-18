@@ -19,33 +19,38 @@ try {
     } 
 }
 
-// Get active clients and convert to partner format
-$clientsAsPartners = [];
+// Get clients from clients table for Clients section
+$dbClients = [];
 try {
-    $activeClients = query(
+    $dbClients = query(
         "SELECT id, org_name, logo_url, district, status FROM clients 
          WHERE TRIM(org_name) != '' AND TRIM(org_name) IS NOT NULL
          ORDER BY org_name ASC"
     );
-    foreach ($activeClients as $c) {
-        $clientsAsPartners[] = [
-            'type'      => 'client',
-            'name'      => $c['org_name'],
-            'logo_url'  => $c['logo_url'] ?? '',
-            'district'  => $c['district'] ?? '',
-            'url'       => '',
-        ];
-    }
 } catch (\Throwable $e) { 
     error_log('[' . basename(__FILE__) . '] clients query: ' . $e->getMessage()); 
 }
 
-// Merge clients into partners list
-$all = array_merge($clientsAsPartners, $all);
+// Build clients array with type='client'
+$clientsAsPartners = [];
+foreach ($dbClients as $c) {
+    $clientsAsPartners[] = [
+        'type'      => 'client',
+        'name'      => $c['org_name'],
+        'logo_url'  => $c['logo_url'] ?? '',
+        'district'  => $c['district'] ?? '',
+        'url'       => '',
+    ];
+}
 
 $groups = ['client','partner','channel','solution','investor'];
 $grouped = [];
-foreach ($groups as $g) {
+
+// Clients section: only from DB (clients table)
+$grouped['client'] = $clientsAsPartners;
+
+// Other groups: from partners table
+foreach (['partner','channel','solution','investor'] as $g) {
     $filtered = array_filter($all, fn($p) => ($p['type'] ?? '') === $g);
     if (!empty($filtered)) $grouped[$g] = array_values($filtered);
 }
@@ -53,7 +58,7 @@ foreach ($groups as $g) {
 $labels = ['client'=>'Clients','partner'=>'Technology Partners','channel'=>'Channel Partners','solution'=>'Solution Partners','investor'=>'Investors'];
 
 $__s = siteSettings();
-$clientCount = count($grouped['client'] ?? []);
+$clientCount = count($clientsAsPartners);
 $partnerCount = count($grouped['partner'] ?? []);
 // Add 300 to client count for display (DB count + 300)
 $displayClientCount = $clientCount + 300;
