@@ -56,6 +56,18 @@ $upcomingFollowups = query("
     LIMIT 10
 ", [$today, $nextWeek]);
 
+// ── Near Follow-ups (2-3 days from today) ────────────────────
+$dayAfterTomorrow = date('Y-m-d', strtotime('+3 days'));
+$nearFollowups = query("
+    SELECT l.id, l.name, l.org_name, l.stage, l.products_interest, l.district, l.next_followup,
+           u.display_name as assigned_name
+    FROM crm_leads l
+    LEFT JOIN users u ON u.id=l.assigned_to
+    WHERE l.next_followup > ? AND l.next_followup <= ? AND l.stage NOT IN ('won','lost')
+    ORDER BY l.next_followup ASC
+    LIMIT 10
+", [$today, $dayAfterTomorrow]);
+
 // ── New Demo Requests ────────────────────────────────────────
 $newDemos = query("SELECT * FROM demo_requests WHERE status='pending' ORDER BY created_at DESC LIMIT 5");
 
@@ -267,15 +279,37 @@ $stageLabels = [
     </div>
     <?php endif; ?>
 
+    <?php if (!empty($nearFollowups)): ?>
+    <div class="st-card" style="border-left:3px solid var(--primary);overflow:hidden;">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:1rem 1.125rem 0.75rem;border-bottom:1px solid var(--border);">
+        <h3 style="font-weight:700;font-size:0.875rem;color:var(--primary);"><i data-lucide="calendar-check" style="width:1rem;height:1rem;vertical-align:middle;margin-right:0.375rem;"></i> Near Follow-ups (2-3 Days)</h3>
+        <a href="<?= url('admin/crm.php?filter=near') ?>" class="btn btn-ghost btn-sm">View All</a>
+      </div>
+      <ul class="fu-list">
+        <?php foreach (array_slice($nearFollowups, 0, 5) as $l): ?>
+        <?php $daysUntil = (strtotime($l['next_followup']) - strtotime('today')) / 86400; ?>
+        <li class="fu-item">
+          <div class="fu-icon" style="background:rgba(99,102,241,0.1);color:var(--primary);"><i data-lucide="calendar" style="width:1.25rem;height:1.25rem;"></i></div>
+          <div class="fu-body">
+            <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" class="fu-name"><?= e($l['name']) ?></a>
+            <div class="fu-meta"><?= e($l['org_name']) ?><?= $l['district'] ? ' · '.e($l['district']) : '' ?></div>
+          </div>
+          <div class="fu-date"><?= (int)$daysUntil ?>d</div>
+        </li>
+        <?php endforeach; ?>
+      </ul>
+    </div>
+    <?php endif; ?>
+
     <?php if (!empty($upcomingFollowups)): ?>
     <div class="st-card" style="overflow:hidden;">
       <div style="padding:1rem 1.125rem 0.75rem;border-bottom:1px solid var(--border);">
-        <h3 style="font-weight:700;font-size:0.875rem;">📅 Upcoming — Next 7 Days</h3>
+        <h3 style="font-weight:700;font-size:0.875rem;"><i data-lucide="calendar-range" style="width:1rem;height:1rem;vertical-align:middle;margin-right:0.375rem;"></i> Upcoming — Next 7 Days</h3>
       </div>
       <ul class="fu-list">
         <?php foreach ($upcomingFollowups as $l): ?>
         <li class="fu-item">
-          <div class="fu-icon" style="background:var(--muted);color:var(--muted-foreground);">📆</div>
+          <div class="fu-icon" style="background:var(--muted);color:var(--muted-foreground);"><i data-lucide="calendar" style="width:1.25rem;height:1.25rem;"></i></div>
           <div class="fu-body">
             <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" class="fu-name"><?= e($l['name']) ?></a>
             <div class="fu-meta"><?= e($l['org_name']) ?><?= $l['products_interest'] ? ' · '.e($l['products_interest']) : '' ?></div>

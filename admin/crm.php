@@ -87,6 +87,7 @@ if ($stage_f)          { $where[] = 'l.stage=?';              $params[] = $stage
 if ($filter_f === 'today')   { $where[] = 'l.next_followup = CURDATE()'; }
 if ($filter_f === 'overdue') { $where[] = 'l.next_followup < CURDATE() AND l.stage NOT IN ("won","lost")'; }
 if ($filter_f === 'nofollowup') { $where[] = 'l.next_followup IS NULL AND l.stage NOT IN ("won","lost","on_hold")'; }
+if ($filter_f === 'near') { $where[] = 'l.next_followup > CURDATE() AND l.next_followup <= DATE_ADD(CURDATE(), INTERVAL 3 DAY) AND l.stage NOT IN ("won","lost")'; }
 if ($asgn_f === 'me')  { $where[] = 'l.assigned_to=?';        $params[] = $__user['id']; }
 if ($q) { $where[] = '(l.name LIKE ? OR l.org_name LIKE ? OR l.email LIKE ?)'; $params[] = "%$q%"; $params[] = "%$q%"; $params[] = "%$q%"; }
 
@@ -219,6 +220,7 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
       <option value="today"      <?= $filter_f==='today'?'selected':'' ?>>Clock — Follow-up today</option>
       <option value="overdue"    <?= $filter_f==='overdue'?'selected':'' ?>> Overdue</option>
       <option value="nofollowup" <?= $filter_f==='nofollowup'?'selected':'' ?>> No follow-up set</option>
+      <option value="near" <?= $filter_f==='near'?'selected':'' ?>> Near (2-3 days)</option>
     </select>
     <select name="assigned" class="form-input" style="width:auto;" onchange="this.form.submit()">
       <option value="">All staff</option>
@@ -261,16 +263,33 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
       $nfOverdue = $nfTs && $nfTs < $today && !in_array($l['stage'],['won','lost']);
       $nfToday   = $nfTs && $nfTs === $today;
       $srcIcon = $SOURCE_ICONS[$l['source']] ?? 'list';
+      // Get first product interest
+      $firstProduct = $l['products_interest'] ? explode(',', $l['products_interest'])[0] : '';
+      // Deal value styling
+      $dealClass = !$l['deal_value'] ? 'var(--muted-foreground)' : ((float)$l['deal_value'] > 500000 ? 'var(--success-fg)' : 'var(--foreground)');
     ?>
-    <tr>
+    <tr class="<?= $nfOverdue ? 'row-overdue' : ($nfToday ? 'row-today' : '') ?>" style="<?= $nfOverdue ? 'background:rgba(239,68,68,0.05)' : ($nfToday ? 'background:rgba(251,191,36,0.05)' : '') ?>">
       <td>
-        <div style="display:flex;align-items:center;gap:0.625rem;">
-          <i data-lucide="<?= $srcIcon ?>" style="width:1rem;height:1rem;color:var(--muted-foreground);"></i>
-          <div>
-            <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" style="font-weight:700;font-size:0.875rem;color:var(--primary);text-decoration:none;"><?= e($l['name']) ?></a>
-            <div class="fs-xs-mt"><?= e($l['org_name']) ?>
-              <?php if($l['district']): ?> · <?= e($l['district']) ?><?php endif; ?>
+        <div style="display:flex;align-items:flex-start;gap:0.625rem;">
+          <div style="display:grid;place-items:center;width:2rem;height:2rem;border-radius:0.5rem;background:var(--muted);flex-shrink:0;margin-top:0.125rem;">
+            <i data-lucide="<?= $srcIcon ?>" style="width:0.875rem;height:0.875rem;color:var(--muted-foreground);"></i>
+          </div>
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+              <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" style="font-weight:700;font-size:0.875rem;color:var(--primary);text-decoration:none;"><?= e($l['name']) ?></a>
+              <?php if($l['deal_value']): ?>
+              <span style="font-size:0.6875rem;font-weight:700;padding:0.1rem 0.4rem;border-radius:9999px;background:var(--success-soft);color:var(--success-fg);">
+                NPR <?= number_format((float)$l['deal_value'],0,'.',',') ?>
+              </span>
+              <?php endif; ?>
             </div>
+            <div style="font-size:0.75rem;color:var(--foreground);margin-top:0.125rem;"><?= e($l['org_name']) ?></div>
+            <?php if($l['district'] || $firstProduct): ?>
+            <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.125rem;">
+              <?= $firstProduct ? '<span style="background:var(--muted);padding:0.05rem 0.35rem;border-radius:0.25rem;margin-right:0.25rem;">'.e(trim($firstProduct)).'</span>' : '' ?>
+              <?= $l['district'] ? e($l['district']) : '' ?>
+            </div>
+            <?php endif; ?>
           </div>
         </div>
       </td>
@@ -279,12 +298,16 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
       </td>
       <td>
         <?php if ($nf): ?>
-        <span style="font-size:0.8125rem;font-weight:600;color:<?= $nfOverdue?'var(--danger-fg)':($nfToday?'var(--warning-fg)':'var(--foreground)') ?>;">
-          <?= $nfOverdue ? ' ' : ($nfToday ? '⏰ ' : '') ?>
+        <span style="display:inline-flex;align-items:center;gap:0.25rem;font-size:0.8125rem;font-weight:600;color:<?= $nfOverdue?'var(--danger-fg)':($nfToday?'var(--warning-fg)':'var(--foreground)') ?>;">
+          <?php if ($nfOverdue): ?>
+          <i data-lucide="alert-circle" style="width:0.75rem;height:0.75rem;"></i>
+          <?php elseif ($nfToday): ?>
+          <i data-lucide="clock" style="width:0.75rem;height:0.75rem;"></i>
+          <?php endif; ?>
           <?= date('M j, Y', $nfTs) ?>
         </span>
         <?php else: ?>
-        <span class="fs-xs-mt">Not set</span>
+        <span class="fs-xs-mt" style="color:var(--muted-foreground);">—</span>
         <?php endif; ?>
       </td>
       <td class="text-center"><span style="font-size:0.875rem;font-weight:700;"><?= (int)$l['followup_count'] ?></span></td>
