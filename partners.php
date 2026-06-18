@@ -118,12 +118,14 @@ include 'includes/page-hero.php';
         $label   = $labels[$g];
         $scroll  = count($items) > 5;   // marquee when >5 items
         $speed   = max(20, count($items) * 3); // speed scales with count
+        // Clients section: show DB count + 300
+        $badgeCount = ($g === 'client') ? (count($items) + 300) : count($items);
       ?>
       <div class="partner-group" style="margin-bottom:2.5rem;">
         <div class="partner-group__head">
           <h2 class="partner-group__title"><?= e($label) ?></h2>
           <div class="partner-group__line"></div>
-          <span class="badge badge-primary"><?= count($items) ?></span>
+          <span class="badge badge-primary"><?= $badgeCount ?></span>
         </div>
 
         <?php if ($scroll): ?>
