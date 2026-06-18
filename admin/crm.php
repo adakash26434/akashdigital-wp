@@ -1,6 +1,7 @@
 <?php
 $pageTitle = 'CRM & Follow-ups';
 require_once '../includes/admin-layout.php';
+require_once '../includes/nepal-geo.php';
 
 $success = $error = '';
 
@@ -108,6 +109,16 @@ try {
 
 $staff = [];
 try { $staff = query("SELECT id, display_name FROM users WHERE role IN ('admin','staff','editor') ORDER BY display_name"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+
+// Get all districts from Nepal geo data for dropdown
+$geo = nepalGeo();
+$districts = [];
+foreach ($geo as $province => $districts_list) {
+    foreach (array_keys($districts_list) as $d) {
+        $districts[] = $d;
+    }
+}
+sort($districts);
 
 $prod_list = [];
 try { $prod_list = query("SELECT id, name FROM products WHERE active=1 ORDER BY position"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -329,7 +340,12 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
         </div>
         <div class="form-group">
           <label class="form-label">District</label>
-          <input type="text" name="district" class="form-input" placeholder="Kathmandu">
+          <select name="district" class="form-input">
+            <option value="">— Select District —</option>
+            <?php foreach ($districts as $d): ?>
+            <option value="<?= e($d) ?>"><?= e($d) ?></option>
+            <?php endforeach; ?>
+          </select>
         </div>
         <div class="form-group">
           <label class="form-label">Source</label>
