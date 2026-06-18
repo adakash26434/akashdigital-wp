@@ -149,7 +149,7 @@ $STAGES = [
     'lost'         => ['','var(--danger-soft)','var(--danger-fg)','Lost'],
     'on_hold'      => ['','var(--muted)','var(--muted-foreground)','On Hold'],
 ];
-$SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'=>'','website'=>'','exhibition'=>'','other'=>''];
+$SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'user-plus','cold_call'=>'phone-call','website'=>'globe','exhibition'=>'building','partner'=>'handshake','social_media'=>'smartphone','walk_in'=>'footprints','other'=>'list'];
 ?>
 
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
@@ -173,17 +173,17 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.875rem;margin-bottom:1.75rem;">
   <?php
   $statsCards = [
-    ['Total Leads',      $stats['total']      ?? 0, '#f8fafc','#0f172a',''],
-    ['Today\'s F/U',     $stats['due_today']  ?? 0, ($stats['due_today']>0?'var(--warning-soft)':'#f8fafc'),($stats['due_today']>0?'var(--warning-fg)':'#0f172a'),'⏰'],
-    ['Overdue',          $stats['overdue']    ?? 0, ($stats['overdue']>0?'var(--danger-soft)':'#f8fafc'),   ($stats['overdue']>0?'var(--danger-fg)':'#0f172a'),  ''],
-    ['Proposal Sent',    $stats['s_proposal'] ?? 0, '#f3e8ff','#7e22ce',''],
-    ['Won',              $stats['s_won']       ?? 0, 'var(--success-soft)','var(--success-fg)',''],
-    ['Accepted Proposals',$prop_stats['accepted']??0,'#dbeafe','var(--primary-dark)',''],
+    ['Total Leads',      $stats['total']      ?? 0, '#f8fafc','#0f172a','users'],
+    ['Today\'s F/U',     $stats['due_today']  ?? 0, ($stats['due_today']>0?'var(--warning-soft)':'#f8fafc'),($stats['due_today']>0?'var(--warning-fg)':'#0f172a'),'clock'],
+    ['Overdue',          $stats['overdue']    ?? 0, ($stats['overdue']>0?'var(--danger-soft)':'#f8fafc'),   ($stats['overdue']>0?'var(--danger-fg)':'#0f172a'),  'alert-circle'],
+    ['Proposal Sent',    $stats['s_proposal'] ?? 0, '#f3e8ff','#7e22ce','file-text'],
+    ['Won',              $stats['s_won']       ?? 0, 'var(--success-soft)','var(--success-fg)','check-circle'],
+    ['Accepted Proposals',$prop_stats['accepted']??0,'#dbeafe','var(--primary-dark)','inbox'],
   ];
   ?>
   <?php foreach ($statsCards as [$lbl,$val,$bg,$col,$ico]):?>
   <div style="padding:1rem;border-radius:0.875rem;background:<?=$bg?>;border:1px solid var(--border);">
-    <div style="font-size:1.25rem;margin-bottom:0.25rem;"><?=$ico?></div>
+    <div style="margin-bottom:0.25rem;"><i data-lucide="<?=$ico?>" style="width:1.25rem;height:1.25rem;color:<?=$col?>;"></i></div>
     <div style="font-size:1.5rem;font-weight:800;color:<?=$col?>;font-family:var(--font-display);"><?= number_format((int)$val) ?></div>
     <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.125rem;"><?= e($lbl) ?></div>
   </div>
@@ -216,7 +216,7 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
     <input type="search" name="q" value="<?= e($q) ?>" placeholder="Search name, org, email…" class="form-input" style="flex:1;min-width:180px;max-width:280px;">
     <select name="filter" class="form-input" style="width:auto;" onchange="this.form.submit()">
       <option value="">All leads</option>
-      <option value="today"      <?= $filter_f==='today'?'selected':'' ?>>⏰ Follow-up today</option>
+      <option value="today"      <?= $filter_f==='today'?'selected':'' ?>>Clock — Follow-up today</option>
       <option value="overdue"    <?= $filter_f==='overdue'?'selected':'' ?>> Overdue</option>
       <option value="nofollowup" <?= $filter_f==='nofollowup'?'selected':'' ?>> No follow-up set</option>
     </select>
@@ -260,11 +260,12 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
       $today = strtotime('today');
       $nfOverdue = $nfTs && $nfTs < $today && !in_array($l['stage'],['won','lost']);
       $nfToday   = $nfTs && $nfTs === $today;
+      $srcIcon = $SOURCE_ICONS[$l['source']] ?? 'list';
     ?>
     <tr>
       <td>
         <div style="display:flex;align-items:center;gap:0.625rem;">
-          <span style="font-size:1.125rem;"><?= $SOURCE_ICONS[$l['source']] ?? '' ?></span>
+          <i data-lucide="<?= $srcIcon ?>" style="width:1rem;height:1rem;color:var(--muted-foreground);"></i>
           <div>
             <a href="<?= url('admin/crm-lead.php?id='.$l['id']) ?>" style="font-weight:700;font-size:0.875rem;color:var(--primary);text-decoration:none;"><?= e($l['name']) ?></a>
             <div class="fs-xs-mt"><?= e($l['org_name']) ?>
@@ -350,16 +351,16 @@ $SOURCE_ICONS = ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call
         <div class="form-group">
           <label class="form-label">Source</label>
           <select name="source" class="form-input">
-            <option value="other">Other</option>
-            <option value="demo_request">🎯 Demo Request</option>
-            <option value="contact_form">📩 Contact Form</option>
-            <option value="referral">🤝 Referral</option>
-            <option value="cold_call">📱 Cold Call</option>
-            <option value="website">🌐 Website</option>
-            <option value="exhibition">🏛️ Exhibition</option>
-            <option value="partner">🤝 Partner</option>
-            <option value="social_media">📱 Social Media</option>
-            <option value="walk_in">🚶 Walk-in</option>
+            <option value="other">— Other —</option>
+            <option value="demo_request">Target — Demo Request</option>
+            <option value="contact_form">Mail — Contact Form</option>
+            <option value="referral">User Plus — Referral</option>
+            <option value="cold_call">Phone Call — Cold Call</option>
+            <option value="website">Globe — Website</option>
+            <option value="exhibition">Building — Exhibition</option>
+            <option value="partner">Handshake — Partner</option>
+            <option value="social_media">Smartphone — Social Media</option>
+            <option value="walk_in">Footprints — Walk-in</option>
           </select>
         </div>
         <div class="form-group grid-full">

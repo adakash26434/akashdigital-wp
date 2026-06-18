@@ -206,19 +206,19 @@ sort($districts);
 
 // ── Config ────────────────────────────────────────────────────
 $STAGES = [
-    'prospect'     => ['👋','#dbeafe','var(--primary-dark)','Prospect'],
-    'contacted'    => ['📞','#f3e8ff','#7e22ce','Contacted'],
-    'proposal_sent'=> ['📋','var(--warning-soft)','var(--warning-fg)','Proposal Sent'],
-    'negotiation'  => ['🤝','#ffedd5','#c2410c','Negotiation'],
-    'won'          => ['✅','var(--success-soft)','var(--success-fg)','Won'],
-    'lost'         => ['❌','var(--danger-soft)','var(--danger-fg)','Lost'],
-    'on_hold'      => ['⏸️','var(--muted)','var(--muted-foreground)','On Hold'],
+    'prospect'     => ['hand-wave','#dbeafe','var(--primary-dark)','Prospect'],
+    'contacted'    => ['phone','#f3e8ff','#7e22ce','Contacted'],
+    'proposal_sent'=> ['file-text','var(--warning-soft)','var(--warning-fg)','Proposal Sent'],
+    'negotiation'  => ['handshake','#ffedd5','#c2410c','Negotiation'],
+    'won'          => ['check-circle','var(--success-soft)','var(--success-fg)','Won'],
+    'lost'         => ['x-circle','var(--danger-soft)','var(--danger-fg)','Lost'],
+    'on_hold'      => ['pause-circle','var(--muted)','var(--muted-foreground)','On Hold'],
 ];
-$TYPE_ICONS  = ['call'=>'📞','email'=>'📧','meeting'=>'👥','demo'=>'💻','whatsapp'=>'💬','other'=>'📝'];
+$TYPE_ICONS  = ['call'=>'phone','email'=>'mail','meeting'=>'users','demo'=>'monitor','whatsapp'=>'message-circle','other'=>'file-text'];
 $OUT_COLORS  = ['positive'=>['var(--success-soft)','var(--success-fg)',' Positive'],'neutral'=>['#dbeafe','var(--primary-dark)',' Neutral'],'negative'=>['var(--danger-soft)','var(--danger-fg)',' Negative'],'no_answer'=>['var(--muted)','var(--muted-foreground)',' No Answer']];
 $PROP_STATUS = ['draft'=>['var(--muted)','var(--muted-foreground)','Draft'],'sent'=>['#dbeafe','var(--primary-dark)','Sent'],'viewed'=>['#f3e8ff','#7e22ce','Viewed'],'accepted'=>['var(--success-soft)','var(--success-fg)','Accepted'],'rejected'=>['var(--danger-soft)','var(--danger-fg)','Rejected'],'expired'=>['var(--warning-soft)','var(--warning-fg)','Expired']];
-$SOURCE_ICONS= ['demo_request'=>'🎯','contact_form'=>'📩','referral'=>'🤝','cold_call'=>'📱','website'=>'🌐','exhibition'=>'🏛️','partner'=>'🤝','other'=>'📋'];
-$SOURCE_LABELS = ['demo_request'=>'Demo Request','contact_form'=>'Contact Form','referral'=>'Referral','cold_call'=>'Cold Call','website'=>'Website','exhibition'=>'Exhibition','partner'=>'Partner','other'=>'Other'];
+$SOURCE_ICONS= ['demo_request'=>'target','contact_form'=>'mail','referral'=>'user-plus','cold_call'=>'phone-call','website'=>'globe','exhibition'=>'building','partner'=>'handshake','social_media'=>'smartphone','walk_in'=>'footprints','other'=>'list'];
+$SOURCE_LABELS = ['demo_request'=>'Demo Request','contact_form'=>'Contact Form','referral'=>'Referral','cold_call'=>'Cold Call','website'=>'Website','exhibition'=>'Exhibition','partner'=>'Partner','social_media'=>'Social Media','walk_in'=>'Walk-in','other'=>'Other'];
 $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competitor'=>'Went with competitor','No response'=>'No response','Project postponed'=>'Project postponed','Not a fit'=>'Not a fit','Pricing too high'=>'Pricing too high','Found alternative solution'=>'Found alternative solution'];
 [$ico,$sbg,$scol,$slbl] = $STAGES[$lead['stage']] ?? ['','var(--muted)','var(--muted-foreground)','Unknown'];
 ?>
@@ -232,13 +232,17 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-top:0.5rem;">
     <div>
       <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-        <span style="font-size:1.75rem;"><?= $SOURCE_ICONS[$lead['source']] ?? '' ?></span>
+        <span style="display:grid;place-items:center;width:2.5rem;height:2.5rem;border-radius:0.625rem;background:<?=$sbg?>;">
+          <i data-lucide="<?= $SOURCE_ICONS[$lead['source']] ?? 'list' ?>" style="width:1.25rem;height:1.25rem;color:<?=$scol?>;"></i>
+        </span>
         <div>
           <div style="font-size:0.6875rem;color:var(--muted-foreground);"><?= $SOURCE_LABELS[$lead['source']] ?? 'Other' ?></div>
           <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:800;"><?= e($lead['name']) ?></h2>
           <p style="font-size:0.875rem;color:var(--muted-foreground);"><?= e($lead['org_name']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?></p>
         </div>
-        <span style="padding:0.3rem 0.875rem;border-radius:9999px;font-size:0.8125rem;font-weight:700;background:<?=$sbg?>;color:<?=$scol?>;"><?=$ico?> <?=$slbl?></span>
+        <span style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.875rem;border-radius:9999px;font-size:0.8125rem;font-weight:700;background:<?=$sbg?>;color:<?=$scol?>;">
+          <i data-lucide="<?=$ico?>" style="width:0.875rem;height:0.875rem;"></i> <?=$slbl?>
+        </span>
         <?php if ($lead['deal_value']): ?>
         <span style="padding:0.3rem 0.875rem;border-radius:9999px;font-size:0.8125rem;font-weight:700;background:var(--success-soft);color:var(--success-fg);"> NPR <?= number_format((float)$lead['deal_value']) ?></span>
         <?php endif; ?>
@@ -252,7 +256,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
   <?php foreach ($STAGES as $sk => [$sico,$sbg2,$scol2,$slbl2]): ?>
   <?php $isCurrent = $lead['stage'] === $sk; ?>
   <div style="flex:1;min-width:80px;padding:0.5rem 0.375rem;border-radius:0.5rem;text-align:center;background:<?=$isCurrent?$sbg2:'var(--muted)'?>;border:2px solid <?=$isCurrent?$scol2:'transparent'?>;font-size:0.6875rem;font-weight:<?=$isCurrent?'700':'500'?>;color:<?=$isCurrent?$scol2:'var(--muted-foreground)'?>;">
-    <?=$sico?> <?=$slbl2?>
+    <i data-lucide="<?=$sico?>" style="width:0.875rem;height:0.875rem;display:block;margin:0 auto 0.25rem;"></i><?=$slbl2?>
   </div>
   <?php endforeach; ?>
 </div>
@@ -327,11 +331,13 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
         <div class="col-1">
           <?php foreach ($followups as $f):
             [$obg,$ocol,$olbl] = $OUT_COLORS[$f['outcome']] ?? ['var(--muted)','var(--muted-foreground)','—'];
-            $tIco = $TYPE_ICONS[$f['type']] ?? '';
+            $tIco = $TYPE_ICONS[$f['type']] ?? 'file-text';
           ?>
           <div style="display:flex;gap:0.875rem;align-items:flex-start;">
             <!-- Icon dot -->
-            <div style="width:2.625rem;height:2.625rem;border-radius:50%;background:<?=$obg?>;border:3px solid <?=$ocol?>;display:grid;place-items:center;font-size:1rem;flex-shrink:0;z-index:1;"><?=$tIco?></div>
+            <div style="width:2.625rem;height:2.625rem;border-radius:50%;background:<?=$obg?>;border:3px solid <?=$ocol?>;display:grid;place-items:center;flex-shrink:0;z-index:1;">
+              <i data-lucide="<?=$tIco?>" style="width:1.125rem;height:1.125rem;color:<?=$ocol?>;"></i>
+            </div>
             <!-- Content -->
             <div class="st-card" style="flex:1;padding:1rem;">
               <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.5rem;">
@@ -489,8 +495,8 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
           <label style="cursor:pointer;">
             <input type="radio" name="stage" value="<?=$sk?>" <?=$lead['stage']===$sk?'checked':''?> @change="stage='<?=$sk?>'" style="display:none;">
             <span :style="stage==='<?=$sk?>' ? 'background:<?=$sbg2?>;color:<?=$scol2?>;border:2px solid <?=$scol2?>;' : 'background:var(--muted);color:var(--muted-foreground);border:2px solid transparent;'"
-                  style="display:block;padding:0.3rem 0.5rem;border-radius:0.5rem;font-size:0.6875rem;font-weight:600;text-align:center;transition:all 0.15s;">
-              <?=$sico?> <?=$slbl2?>
+                  style="display:flex;align-items:center;justify-content:center;gap:0.25rem;padding:0.3rem 0.5rem;border-radius:0.5rem;font-size:0.6875rem;font-weight:600;text-align:center;transition:all 0.15s;">
+              <i data-lucide="<?=$sico?>" style="width:0.75rem;height:0.75rem;"></i> <?=$slbl2?>
             </span>
           </label>
           <?php endforeach; ?>
@@ -514,7 +520,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
         <?= csrfField() ?>
         <input type="hidden" name="action" value="convert_to_client">
         <button type="submit" class="btn btn-success btn-sm w-100">
-          ✅ Convert to Client
+          <i data-lucide="user-plus" style="width:14px;height:14px;margin-right:4px;"></i> Convert to Client
         </button>
       </form>
       <?php elseif ($lead['stage'] === 'won' && preg_match('/Converted to Client #(\d+)/', $lead['stage_notes'] ?? '', $m)): ?>
@@ -533,7 +539,19 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
     $nfToday = $nfTs === strtotime('today');
     ?>
     <div style="padding:1rem;border-radius:0.875rem;background:<?=$nfOverdue?'var(--danger-soft)':($nfToday?'var(--warning-soft)':'var(--success-soft)')?>;border:1px solid <?=$nfOverdue?'var(--danger-border)':($nfToday?'var(--warning-border)':'var(--success-border)')?>;display:flex;align-items:center;gap:0.75rem;">
-      <span style="font-size:1.5rem;"><?=$nfOverdue?'':($nfToday?'⏰':'')?></span>
+      <?php if ($nfOverdue): ?>
+      <span style="display:grid;place-items:center;width:2rem;height:2rem;background:var(--danger-soft);border-radius:50%;">
+        <i data-lucide="alert-circle" style="width:1.125rem;height:1.125rem;color:var(--danger-fg);"></i>
+      </span>
+      <?php elseif ($nfToday): ?>
+      <span style="display:grid;place-items:center;width:2rem;height:2rem;background:var(--warning-soft);border-radius:50%;">
+        <i data-lucide="clock" style="width:1.125rem;height:1.125rem;color:var(--warning-fg);"></i>
+      </span>
+      <?php else: ?>
+      <span style="display:grid;place-items:center;width:2rem;height:2rem;background:var(--success-soft);border-radius:50%;">
+        <i data-lucide="calendar" style="width:1.125rem;height:1.125rem;color:var(--success-fg);"></i>
+      </span>
+      <?php endif; ?>
       <div>
         <div style="font-size:0.8125rem;font-weight:700;color:<?=$nfOverdue?'var(--danger-fg)':($nfToday?'var(--warning-fg)':'var(--success-fg)')?>"><?=$nfOverdue?'Overdue follow-up!':($nfToday?'Follow-up today!':'Next follow-up')?></div>
         <div style="font-size:0.875rem;font-weight:800;"><?= date('M j, Y', $nfTs) ?></div>
