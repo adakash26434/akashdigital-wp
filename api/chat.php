@@ -9,7 +9,15 @@ header('X-Content-Type-Options: nosniff');
 
 require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
+
+// Rate limiting - prevent spam
+if (!ipThrottle('chat', 20)) {
+    http_response_code(429);
+    echo json_encode(['error' => 'Too many requests. Please wait a moment.']);
+    exit;
+}
 
 // नेपालीमा: jsonOut() — yo function le aafno kaam garchha
 function jsonOut(array $data, int $status = 200): void {

@@ -4,7 +4,10 @@
  * Uses inline CSS for print-ready output
  */
 require_once __DIR__ . '/../includes/db.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
+
+requireAdmin();
 
 $pdo = getDb();
 $id = (int)($_GET['id'] ?? 0);

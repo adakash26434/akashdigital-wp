@@ -56,6 +56,19 @@ if (post('action')) {
                 }
             }
         }
+
+        // SECURE: Verify uploaded file MIME type after save
+        if (!empty($wordFilePath)) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $realMime = finfo_file($finfo, $uploadDir . $wordFilePath);
+            finfo_close($finfo);
+            $allowedMimes = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword'];
+            if (!in_array($realMime, $allowedMimes, true)) {
+                @unlink($uploadDir . $wordFilePath);
+                $wordFilePath = null;
+                setFlash('error', 'Invalid file type. Only DOC/DOCX allowed.');
+            }
+        }
         
         if ($id > 0) {
             // If new file uploaded, update path
