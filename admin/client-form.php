@@ -142,16 +142,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     execute("UPDATE clients SET $set WHERE id=?", array_merge($vals, [$id]));
                     $success = 'Client updated successfully.';
                 } else {
-                    $ph  = implode(',', array_fill(0, count($fields)+1, '?'));
-                    $fld = implode(',', $fields) . ',assigned_by';
-                    // Validate counts match before executing
-                    $allVals = array_merge($vals, [currentUser()['id']]);
-                    if (count($allVals) !== substr_count($ph, '?')) {
-                        error_log("[client-form] INSERT mismatch: " . count($allVals) . " values, " . substr_count($ph, '?') . " placeholders");
-                        error_log("[client-form] Fields: $fld");
-                        throw new Exception("Data mismatch error");
+                    // Build INSERT query - include assigned_by in fields directly
+                    $insertFields = $fields;
+                    $insertVals = $vals;
+                    if (dbColumnExists('clients', 'assigned_by')) {
+                        $insertFields[] = 'assigned_by';
+                        $insertVals[] = currentUser()['id'];
                     }
-                    execute("INSERT INTO clients ($fld) VALUES ($ph)", $allVals);
+                    $ph  = implode(',', array_fill(0, count($insertFields), '?'));
+                    $fld = implode(',', $insertFields);
+                    execute("INSERT INTO clients ($fld) VALUES ($ph)", $insertVals);
                     
                     // Get inserted client ID
                     $pdo = getDb();
