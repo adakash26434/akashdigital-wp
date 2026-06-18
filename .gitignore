@@ -15,3 +15,7 @@ data/*.sqlite
 .env
 .env.*
 *.env
+
+# Agent/OpenHands development files
+.agents/
+AGENTS.md
