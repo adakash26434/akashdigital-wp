@@ -272,8 +272,21 @@ if ($route === 'auth/login' && $method === 'POST') {
     $email    = strtolower(trim($d['email'] ?? '')); // Force lowercase for consistency
     $password = $d['password'] ?? '';
     if (!$email || !$password) err('validation','email and password required.');
+    
+    // Check brute force lockout (5 attempts / 15 min)
+    $lockKey = 'api:' . hash('sha256', $email . clientIp());
+    if (isLoginLocked($lockKey)) {
+        $mins = getLockoutMinutesRemaining($lockKey);
+        err('locked', "Too many failed attempts. Try again in {$mins} minute(s).", 429);
+    }
+    
     $user = queryOne("SELECT * FROM users WHERE email=? AND active=1",[$email]);
-    if (!$user || !password_verify($password,$user['password_hash'])) err('unauthorized','Invalid email or password.',401);
+    if (!$user || !password_verify($password,$user['password_hash'])) {
+        recordLoginFailure($lockKey);
+        err('unauthorized','Invalid email or password.',401);
+    }
+    
+    clearLoginAttempts($lockKey);
     execute("UPDATE users SET last_login_at=NOW() WHERE id=?",[$user['id']]);
     // Set session too
     if (session_status()===PHP_SESSION_NONE) session_start();
