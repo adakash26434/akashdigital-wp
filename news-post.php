@@ -52,6 +52,7 @@ try {
 
 $pageTitle = $post['title'] . ' — ' . stSiteName() . ' Blog';
 $pageDesc  = $post['excerpt'] ?? '';
+$ogImage    = !empty($post['image_url']) ? url($post['image_url']) : null;
 require_once 'includes/header.php';
 ?>
 

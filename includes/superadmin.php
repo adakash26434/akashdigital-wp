@@ -51,6 +51,10 @@ $__sa_password = \'YourStrongPassword123\';</pre>
 // Auto-hash the plain password (safe to call every request — fast)
 if (empty($__sa_hash) && !empty($__sa_password)) {
     $__sa_hash = password_hash($__sa_password, PASSWORD_BCRYPT, ['cost' => 11]);
+    // SECURITY WARNING: Plaintext password was used — consider setting SUPERADMIN_PASS_HASH in production
+    error_log('[SECURITY] SUPERADMIN: Using plaintext password fallback. Set SUPERADMIN_PASS_HASH env var for production.');
+    // Clear plaintext after hashing
+    $__sa_password = '';
 }
 
 define('SUPERADMIN_EMAIL',      $__sa_email);

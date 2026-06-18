@@ -75,6 +75,7 @@ try {
 
 $pageTitle = $product['name'] . ' — ' . ($product['tagline'] ?? '') . ' | ' . stSiteName();
 $pageDesc  = $product['summary'] ?? $product['tagline'] ?? '';
+$ogImage   = !empty($product['icon']) ? url($product['icon']) : (!empty($screenshots[0]) ? url($screenshots[0]) : null);
 require_once 'includes/header.php';
 ?>
 
