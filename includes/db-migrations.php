@@ -375,4 +375,11 @@ function runDbMigrations() {
             }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M18: ' . $e->getMessage()); }
+
+    try {
+        // Migration 19: Add installation_cost column
+        if (!dbColumnExists('clients', 'installation_cost')) {
+            execute("ALTER TABLE clients ADD COLUMN installation_cost REAL DEFAULT NULL AFTER integration_charge");
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M19: ' . $e->getMessage()); }
 }

@@ -61,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $cbsUse    = isset($_POST['cbs_use'])  ? 1 : 0;
         $integ     = trim($_POST['integration'] ?? '');
         $integChg  = ($_POST['integration_charge'] ?? '') !== '' ? (float)$_POST['integration_charge'] : null;
+        $installCost = ($_POST['installation_cost'] ?? '') !== '' ? (float)$_POST['installation_cost'] : null;
         $agreeDate = ($_POST['agreement_date']    ?? '') ?: null;
         $instDate  = ($_POST['installation_date'] ?? '') ?: null;
 
@@ -109,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'org_name','client_code','status',
                     'province','district','local_govt','ward_no','address',
                     'contact_name','contact_email','contact_phone',
-                    'product','cbs_use','integration','integration_charge',
+                    'product','cbs_use','integration','integration_charge','installation_cost',
                     'agreement_date','installation_date',
                     'num_branches','head_office_amc','branch_office_amc',
                     'cloud_charge_ho','cloud_charge_branch','cloud_gb',
@@ -120,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $org,$code,$status,
                     $province,$district,$localGovt,$wardNo,$address,
                     $contact,$contactEmail,$contactPhone,
-                    $product,$cbsUse,$integ,$integChg,
+                    $product,$cbsUse,$integ,$integChg,$installCost,
                     $agreeDate,$instDate,
                     $branches,$hoAmc,$brAmc,
                     $cloudHo,$cloudBr,$cloudGb,
@@ -626,6 +627,25 @@ require_once '../includes/admin-layout.php';
 ══════════════════════════════════════════ -->
 <div class="cf-pane" x-show="tab==='billing'" x-cloak>
   <div class="st-card" style="padding:1.875rem;">
+    <!-- Installation / Setup Cost — one-time -->
+    <div class="form-section">
+      <div class="form-section-title">
+        <i data-lucide="package" class="ic-16-p"></i>
+        One-Time Setup
+      </div>
+      <div class="form-row" style="max-width:18rem;">
+        <div>
+          <label class="form-label">First Installation Cost (NPR)</label>
+          <input type="number" name="installation_cost" class="form-input"
+                 placeholder="0.00" step="0.01" min="0"
+                 value="<?= $v('installation_cost') ?>">
+          <p style="font-size:.72rem;color:var(--muted-foreground);margin-top:.25rem;">
+            One-time charge — does not affect monthly revenue
+          </p>
+        </div>
+      </div>
+    </div>
+
     <div class="form-section">
       <div class="form-section-title">
         <i data-lucide="receipt" class="ic-16-p"></i>
