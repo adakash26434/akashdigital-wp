@@ -280,4 +280,68 @@ ob_start(); ?>
     </div>
   </div>
 </section>
+
+<?php 
+// Fetch channel partners marked to show on contact page
+$channelPartners = [];
+try { 
+    $channelPartners = query(
+        "SELECT name, email, phone, address, district 
+         FROM partners 
+         WHERE type='channel' AND active=1 AND show_on_contact=1 
+         ORDER BY position, name"
+    ); 
+} catch (\Throwable $e) {}
+
+if (!empty($channelPartners)): ?>
+<!-- ═══════ CHANNEL PARTNERS SECTION ═══════ -->
+<section class="st-section" style="background:var(--card);border-top:1px solid var(--border);">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:2rem;">
+      <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.375rem 0.875rem;background:var(--primary-soft);border-radius:9999px;font-size:var(--text-xs);font-weight:700;color:var(--primary);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.75rem;">
+        <i data-lucide="handshake" style="width:13px;height:13px;"></i>
+        Our Channel Partners
+      </div>
+      <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--foreground);margin-bottom:0.5rem;">Connect with Our Partners</h2>
+      <p style="font-size:var(--text-sm);color:var(--muted-foreground);max-width:36rem;margin:0 auto;">Our trusted channel partners across Nepal can help you get started with our software solutions.</p>
+    </div>
+    
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+      <?php foreach ($channelPartners as $partner): ?>
+      <div class="st-card" style="padding:1.25rem;">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;">
+          <div style="width:2.5rem;height:2.5rem;border-radius:0.625rem;background:var(--primary-soft);display:grid;place-items:center;flex-shrink:0;">
+            <i data-lucide="user" style="width:1.125rem;height:1.125rem;color:var(--primary);"></i>
+          </div>
+          <div style="flex:1;min-width:0;">
+            <h3 style="font-family:var(--font-display);font-size:var(--text-base);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;"><?= e($partner['name']) ?></h3>
+            <?php if (!empty($partner['district'])): ?>
+            <div style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-xs);color:var(--muted-foreground);margin-bottom:0.5rem;">
+              <i data-lucide="map-pin" style="width:11px;height:11px;"></i>
+              <?= e($partner['district']) ?>
+            </div>
+            <?php endif; ?>
+            <div style="display:flex;flex-direction:column;gap:0.375rem;">
+              <?php if (!empty($partner['phone'])): ?>
+              <a href="tel:<?= e($partner['phone']) ?>" style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);color:var(--foreground);text-decoration:none;font-weight:500;">
+                <i data-lucide="phone" style="width:13px;height:13px;color:var(--primary);"></i>
+                <?= e($partner['phone']) ?>
+              </a>
+              <?php endif; ?>
+              <?php if (!empty($partner['email'])): ?>
+              <a href="mailto:<?= e($partner['email']) ?>" style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);color:var(--primary);text-decoration:none;">
+                <i data-lucide="mail" style="width:13px;height:13px;"></i>
+                <?= e($partner['email']) ?>
+              </a>
+              <?php endif; ?>
+            </div>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
+
 <?php include 'includes/footer.php'; ?>
