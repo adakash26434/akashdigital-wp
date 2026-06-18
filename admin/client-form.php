@@ -139,7 +139,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if ($isEdit) {
                     $set = implode('=?,', $fields) . '=?,updated_at=NOW()';
-                    execute("UPDATE clients SET $set WHERE id=?", array_merge($vals, [$id]));
+                    $allVals = array_merge($vals, [$id]);
+                    // Debug: log the query info
+                    error_log("[client-form] UPDATE: " . count($allVals) . " values, " . (substr_count($set, '?') + 1) . " placeholders in set");
+                    if (count($allVals) !== (substr_count($set, '?') + 1)) {
+                        error_log("[client-form] UPDATE Fields: " . $set);
+                        error_log("[client-form] UPDATE Values count: " . count($allVals));
+                    }
+                    execute("UPDATE clients SET $set WHERE id=?", $allVals);
                     $success = 'Client updated successfully.';
                 } else {
                     // Build INSERT query - include assigned_by in fields directly

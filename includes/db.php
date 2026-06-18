@@ -63,7 +63,15 @@ function queryOne(string $sql, array $params = []): ?array {
 
 // नेपालीमा: INSERT/UPDATE/DELETE chalauney ra last insert ID return garne
 function execute(string $sql, array $params = []): int {
-    $stmt = getDB()->prepare(sqliteCompat($sql));
+    $prepared = sqliteCompat($sql);
+    // Debug: log on UPDATE/INSERT
+    if (stripos($sql, 'UPDATE clients') !== false || stripos($sql, 'INSERT INTO clients') !== false) {
+        error_log("[execute] Original: " . substr($sql, 0, 100));
+        error_log("[execute] Prepared: " . substr($prepared, 0, 100));
+        error_log("[execute] Params: " . count($params));
+        error_log("[execute] Placeholders in prepared: " . substr_count($prepared, '?'));
+    }
+    $stmt = getDB()->prepare($prepared);
     $stmt->execute($params);
     return (int) getDB()->lastInsertId();
 }
