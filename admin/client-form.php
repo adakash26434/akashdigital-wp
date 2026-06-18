@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'org_name','client_code','status',
                     'province','district','local_govt','ward_no','address',
                     'contact_name','contact_email','contact_phone',
-                    'product','cbs_use','integration','integration_charge','installation_cost',
+                    'product','cbs_use','integration','integration_charge',
                     'agreement_date','installation_date',
                     'num_branches','head_office_amc','branch_office_amc',
                     'cloud_charge_ho','cloud_charge_branch','cloud_gb',
@@ -121,13 +121,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $org,$code,$status,
                     $province,$district,$localGovt,$wardNo,$address,
                     $contact,$contactEmail,$contactPhone,
-                    $product,$cbsUse,$integ,$integChg,$installCost,
+                    $product,$cbsUse,$integ,$integChg,
                     $agreeDate,$instDate,
                     $branches,$hoAmc,$brAmc,
                     $cloudHo,$cloudBr,$cloudGb,
                     $notes,$logoUrl ?: null,
                     $channelPartnerId,$saleType,
                 ];
+
+                // Add installation_cost only if column exists
+                $hasInstallCost = dbColumnExists('clients', 'installation_cost');
+                if ($hasInstallCost) {
+                    array_splice($fields, 14, 0, ['installation_cost']);
+                    array_splice($vals, 14, 0, [$installCost]);
+                }
 
                 if ($isEdit) {
                     $set = implode('=?,', $fields) . '=?,updated_at=NOW()';
