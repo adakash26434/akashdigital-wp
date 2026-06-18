@@ -5,3 +5,9 @@ config-production.php
 includes/dev-config.php
 diagnostic.php
 DEPLOYMENT_READY.md
+
+# Database files (dev SQLite)
+data/*.db
+data/*.sqlite
+*.sqlite
+*.sqlite3

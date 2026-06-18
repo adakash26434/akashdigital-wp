@@ -181,7 +181,7 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
       <?= csrfField() ?>
       <input type="hidden" name="action" value="delete">
       <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-      <button type="submit" class="btn btn-sm" style="border:1px solid var(--danger-border);color:var(--danger);background:transparent;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+      <button type="submit" class="btn btn-sm" style="border:1px solid var(--danger-border);color:var(--danger);background:transparent;" aria-label="Delete" onclick="return confirm('Delete?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
     </form>
   </div>
   <?php if ($c['notes']): ?>

@@ -110,7 +110,7 @@ if (isset($_GET['edit'])) {
         <div style="width:4px;height:4rem;border-radius:9999px;flex-shrink:0;background:<?= $b['banner_style']==='success'?'var(--secondary)':($b['banner_style']==='warning'?'#f59e0b':($b['banner_style']==='danger'?'#ef4444':'#3b82f6')) ?>"></div>
 
         <?php if (!empty($b['image_url'])): ?>
-        <img src="<?= e($b['image_url']) ?>" style="width:3.5rem;height:3.5rem;object-fit:cover;border-radius:0.5rem;flex-shrink:0;">
+        <img alt="Image" src="<?= e($b['image_url']) ?>" style="width:3.5rem;height:3.5rem;object-fit:cover;border-radius:0.5rem;flex-shrink:0;">
         <?php endif; ?>
 
         <div class="flex-1-min">

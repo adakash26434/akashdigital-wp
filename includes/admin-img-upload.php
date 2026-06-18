@@ -37,7 +37,7 @@ $_iu_uid      = 'imgup_' . bin2hex(random_bytes(4)); // unique per widget
   <!-- Preview -->
   <div id="<?= $_iu_uid ?>_preview"
        style="<?= $_iu_val ? '' : 'display:none;' ?>width:100%;max-height:140px;overflow:hidden;border-radius:0.625rem;border:1px solid var(--border);background:var(--muted);">
-    <img id="<?= $_iu_uid ?>_img"
+    <img alt="Image" id="<?= $_iu_uid ?>_img"
          src="<?= e($_iu_val) ?>"
          alt="Preview"
          style="width:100%;max-height:140px;object-fit:cover;display:block;">

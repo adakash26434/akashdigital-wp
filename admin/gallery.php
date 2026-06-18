@@ -87,7 +87,7 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
         <a href="?edit=<?=$img['id']?>" style="padding:.25rem .4375rem;border-radius:0.375rem;background:#fff;color:#1e293b;text-decoration:none;" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;display:block;"></i></a>
         <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
           <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$img['id']?>">
-          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);" aria-label="Delete" onclick="return confirm('Delete this image?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
         </form>
       </div>
       <?php if($img['title']):?><div style="padding:0.375rem 0.5rem;font-size:0.6875rem;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e($img['title'])?></div><?php endif;?>

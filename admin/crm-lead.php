@@ -448,7 +448,7 @@ $SOURCE_ICONS= ['demo_request'=>'','contact_form'=>'','referral'=>'','cold_call'
               <?= csrfField() ?>
               <input type="hidden" name="action" value="delete_proposal">
               <input type="hidden" name="proposal_id" value="<?=$p['id']?>">
-              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger-fg);font-size:0.8125rem;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+              <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--danger-fg);font-size:0.8125rem;" aria-label="Delete" onclick="return confirm('Delete?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
             </form>
           </form>
         </div>

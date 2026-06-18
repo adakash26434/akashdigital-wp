@@ -63,8 +63,20 @@ $__asset = function (string $path) use ($__siteUrl, $__assetRoot): string {
 <meta property="og:description" content="<?= e($__desc) ?>">
 <meta property="og:image"       content="<?= e($__ogImage) ?>">
 <meta property="og:url"         content="<?= e($__ogUrl) ?>">
+<link rel="canonical"           href="<?= e($__ogUrl) ?>">
 <meta property="og:type"        content="website">
 <meta name="twitter:card"       content="summary_large_image">
+<?php if ($__indexable && !empty($__s['site_name'])): ?>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "<?= e($__s['site_name'] ?? '') ?>",
+  "url": "<?= e($__siteUrl) ?>",
+  "logo": "<?= e($__siteUrl) ?>/assets/img/logo.png"
+}
+</script>
+<?php endif; ?>
 <?php endif; ?>
 
 <!-- Self-hosted fonts (no Google Fonts network calls) -->

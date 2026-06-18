@@ -404,7 +404,7 @@ $ICONS_JSON = json_encode($ICONS);
             </template>
             <template x-if="imgPreview">
               <div>
-                <img :src="imgPreview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
+                <img alt="Image" :src="imgPreview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
                 <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
               </div>
             </template>
