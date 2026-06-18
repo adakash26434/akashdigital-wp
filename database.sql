@@ -9,8 +9,9 @@
 --   OR via terminal: mysql -u username -p database_name < database.sql
 -- ══════════════════════════════════════════════════════════════════════════════
 
--- ⚠️ MIGRATION: Run this for existing news table (add source_url column):
+-- ⚠️ MIGRATION: Run this for existing tables:
 -- ALTER TABLE news ADD COLUMN source_url VARCHAR(500) DEFAULT NULL AFTER views;
+-- ALTER TABLE partners ADD COLUMN show_on_contact TINYINT NOT NULL DEFAULT 0 AFTER position;
 
 SET NAMES utf8mb4;
 SET CHARACTER SET utf8mb4;
@@ -918,7 +919,7 @@ CREATE TABLE IF NOT EXISTS gallery (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS partners (
-id         INT AUTO_INCREMENT PRIMARY KEY,
+  id         INT AUTO_INCREMENT PRIMARY KEY,
   name       VARCHAR(255) NOT NULL,
   logo_url   VARCHAR(500),
   url        VARCHAR(500),
@@ -929,6 +930,7 @@ id         INT AUTO_INCREMENT PRIMARY KEY,
   district   VARCHAR(100),
   active     TINYINT NOT NULL DEFAULT 1,
   position   INT NOT NULL DEFAULT 0,
+  show_on_contact TINYINT NOT NULL DEFAULT 0 COMMENT 'Show on contact page',
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
