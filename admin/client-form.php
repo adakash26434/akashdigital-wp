@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'num_branches=?,','head_office_amc=?,','branch_office_amc=?,',
                         'cloud_charge_ho=?,','cloud_charge_branch=?,','cloud_gb=?,',
                         'notes=?,','logo_url=?,',
-                        'channel_partner_id=?,','sale_type=?',
+                        'channel_partner_id=?,','sale_type=?,',
                     ];
                     $setVals = [
                         $org,$code,$status,
