@@ -23,11 +23,13 @@ function currentUser(): ?array {
     return $cache;
 }
 
-// नेपालीमा: isSuperAdmin() — yo function le aafno kaam garchha
-function isSuperAdmin(): bool {
+// नेपालीमा: isAdminOrAbove() — superadmin ra admin lai both check garchha
+function isAdminOrAbove(): bool {
     $user = currentUser();
     return $user !== null && in_array($user['role'], ['superadmin', 'admin']);
 }
+// Alias for backward compatibility
+function isSuperAdmin(): bool { return isAdminOrAbove(); }
 
 // नेपालीमा: isLoggedIn() — yo function le aafno kaam garchha
 function isLoggedIn(): bool { return isset($_SESSION['user_id']); }
