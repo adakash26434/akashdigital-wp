@@ -103,6 +103,7 @@ function pageUrl(int $p, string $q, string $role): string {
 </div>
 
 <div class="st-card ov-hidden">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
     <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
       <?php foreach(['User','Organization','Role','Status','Last Login','Joined','Actions'] as $h):?>

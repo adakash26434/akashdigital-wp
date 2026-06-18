@@ -237,7 +237,8 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
 <div>
   <div style="margin-bottom:1rem;font-size:0.875rem;color:var(--muted-foreground);"><?=count($apps)?> total · <?=$pending_apps?> pending review</div>
   <div class="st-card ov-hidden">
-    <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
         <?php foreach(['#','Applicant','Position','Deadline','Status','Applied',''] as $h):?>
         <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"><?=$h?></th>
@@ -282,7 +283,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         <?php endforeach;endif;?>
       </tbody>
     </table>
-  </div>
+  </div><!-- /.tbl-wrap --></div>
 </div>
 <?php endif;?>
 

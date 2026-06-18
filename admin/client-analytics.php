@@ -320,7 +320,7 @@ $csrf = generateCsrf();
       <?php endforeach; ?>
     </tbody>
   </table>
-</div>
+  </div><!-- /.tbl-wrap --></div>
 <?php endif; ?>
 
 <?php require_once '../includes/admin-layout-close.php'; ?>

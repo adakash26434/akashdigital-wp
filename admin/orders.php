@@ -42,6 +42,7 @@ $STATUS_STYLES = [
 </div>
 
 <div class="st-card ov-hidden">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
     <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
       <?php foreach(['#','Client','Product / Plan','Amount','Status','Date',''] as $h):?>
@@ -87,6 +88,6 @@ $STATUS_STYLES = [
       <?php endforeach;endif;?>
     </tbody>
   </table>
-</div>
+  </div><!-- /.tbl-wrap --></div>
 
 <?php require_once '../includes/admin-layout-close.php'; ?>

@@ -105,7 +105,8 @@ if (!empty($_GET['edit'])) {
   </div>
 
   <div class="st-card ov-hidden">
-    <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
         <?php foreach(['Product','Category','Price','Active',''] as $h):?>
         <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"><?=$h?></th>
@@ -155,7 +156,7 @@ if (!empty($_GET['edit'])) {
         <?php endforeach;endif;?>
       </tbody>
     </table>
-  </div>
+  </div><!-- /.tbl-wrap --></div>
 </div>
 </div><!-- /aft-list -->
 

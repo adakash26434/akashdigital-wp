@@ -146,6 +146,7 @@ require_once '../includes/admin-layout.php';
 
 <!-- History Table -->
 <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;">
     <thead>
       <tr style="background:var(--muted);">

@@ -317,6 +317,7 @@ adminListFilters([
 
 <!-- Agreements Table -->
 <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;">
     <thead>
       <tr style="background:var(--muted);">
@@ -446,7 +447,7 @@ adminListFilters([
       <?php endif; ?>
     </tbody>
   </table>
-</div>
+  </div><!-- /.tbl-wrap --></div>
 
 <!-- Reject Modal -->
 <dialog id="reject-modal" style="border:none;border-radius:var(--radius-xl);padding:0;max-width:400px;width:90%;">

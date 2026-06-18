@@ -98,5 +98,5 @@ $rows = query(
       <?php endforeach; ?>
     </tbody>
   </table>
-</div>
+  </div><!-- /.tbl-wrap --></div>
 <?php require_once '../includes/admin-layout-close.php'; ?>

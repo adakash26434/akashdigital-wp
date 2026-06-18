@@ -96,5 +96,5 @@ $log = query("SELECT * FROM email_intake_log ORDER BY fetched_at DESC LIMIT 50")
       <?php endforeach; ?>
     </tbody>
   </table>
-</div>
+  </div><!-- /.tbl-wrap --></div>
 <?php require_once '../includes/admin-layout-close.php'; ?>

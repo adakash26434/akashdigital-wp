@@ -90,6 +90,7 @@ require_once '../includes/admin-layout.php';
 
 <div class="st-card p-card-lg">
   <h3 class="h-eyebrow" style="margin-bottom:1rem;">Existing Tokens</h3>
+    <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table class="table" style="width:100%;">
     <thead><tr><th>Name</th><th>Prefix</th><th>Client</th><th>Scopes</th><th>Rate</th><th>Last used</th><th>Expires</th><th>Status</th><th></th></tr></thead>
     <tbody>

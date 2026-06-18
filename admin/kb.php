@@ -118,6 +118,7 @@ if (!empty($_GET['edit'])) {
     </div>
     <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
       <thead><tr><th>Name</th><th>Slug</th><th>Articles</th><th>Active</th><th></th></tr></thead>
+      </div><!-- /.tbl-wrap -->
       <tbody>
         <?php foreach ($cats as $c):
           $cnt = (int)(queryOne("SELECT COUNT(*) c FROM kb_articles WHERE category_id=?", [$c['id']])['c'] ?? 0); ?>
@@ -198,6 +199,7 @@ if (!empty($_GET['edit'])) {
     </div>
     <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
       <thead><tr><th>Title</th><th>Category</th><th>Status</th><th>Views</th><th>Updated</th><th></th></tr></thead>
+      </div><!-- /.tbl-wrap -->
       <tbody>
         <?php foreach ($articles as $a): ?>
           <tr>

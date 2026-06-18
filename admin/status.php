@@ -140,6 +140,7 @@ function stTab(id) {
       No components yet. <button onclick="stTab('comp-form')" class="btn btn-ghost btn-sm">Add your first →</button>
     </div>
     <?php else:?>
+      <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
         <?php foreach(['Name','Description','Status','Order','Active',''] as $h):?>
@@ -274,6 +275,7 @@ function stTab(id) {
     <?php if(empty($incidents)):?>
     <div style="padding:2.5rem;text-align:center;color:var(--muted-foreground);">No incidents. System is all-green! ✓</div>
     <?php else:?>
+      <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table style="width:100%;border-collapse:collapse;font-size:.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
         <?php foreach(['Title','Component','Severity','Impact','Started','Resolved'] as $h):?>

@@ -28,6 +28,7 @@ $breached = (int)(queryOne("SELECT COUNT(*) c FROM tickets WHERE sla_deadline IS
 
   <form method="post">
     <?= csrfField() ?>
+      <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
     <table class="table" style="width:100%;background:var(--card);border:1px solid var(--border);border-radius:0.5rem;">
       <thead><tr><th>Priority</th><th>Response (min)</th><th>Resolution (min)</th><th>Active</th></tr></thead>
       <tbody>

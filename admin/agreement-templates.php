@@ -272,7 +272,8 @@ echo '</div></div>';
   </div>
   
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;">
-    <table style="width:100%;border-collapse:collapse;">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table style="width:100%;border-collapse:collapse;">
       <thead>
         <tr style="background:var(--muted);">
           <th style="padding:0.75rem 1rem;text-align:left;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">Template</th>
@@ -322,7 +323,7 @@ echo '</div></div>';
         <?php endforeach; ?>
       </tbody>
     </table>
-  </div>
+  </div><!-- /.tbl-wrap --></div>
 </div>
 <?php endforeach; ?>
 
