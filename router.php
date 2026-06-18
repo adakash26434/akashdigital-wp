@@ -15,10 +15,30 @@ if ($uri === '' || $uri === false) $uri = '/';
 // Remove query string
 $path = explode('?', $uri, 2)[0];
 
+// Reject path traversal attempts
+if (str_contains($path, '..')) {
+    http_response_code(403);
+    exit('Forbidden');
+}
+
+// Block sensitive directories (matches .htaccess rules)
+$blocked = ['includes', 'cron', '.cache', '.agents', '.local', '.replit-artifact'];
+foreach ($blocked as $dir) {
+    if (str_starts_with($path, '/' . $dir . '/') || $path === '/' . $dir) {
+        http_response_code(403);
+        exit('Forbidden');
+    }
+}
+
 // Serve static files directly (css, js, images, fonts, etc.) — never serve .php as raw
 $staticFile = __DIR__ . $path;
+// Path traversal containment: verify resolved path stays within project root
+$realPath = realpath($staticFile);
+if ($realPath === false || !str_starts_with($realPath, realpath(__DIR__))) {
+    $realPath = null;
+}
 $ext = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-if ($path !== '/' && $ext !== 'php' && is_file($staticFile)) {
+if ($path !== '/' && $ext !== 'php' && $realPath !== null && is_file($realPath)) {
     $mime = [
         'css'  => 'text/css',
         'js'   => 'application/javascript',
@@ -38,7 +58,7 @@ if ($path !== '/' && $ext !== 'php' && is_file($staticFile)) {
     if (isset($mime[$ext])) {
         header('Content-Type: ' . $mime[$ext]);
     }
-    readfile($staticFile);
+    readfile($realPath);
     return true;
 }
 

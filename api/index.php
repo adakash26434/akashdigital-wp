@@ -55,7 +55,8 @@ function checkApiRateLimit(): void {
     // Skip rate limiting for already-authenticated sessions
     if (session_status() === PHP_SESSION_NONE) session_start();
     if (!empty($_SESSION['user_id'])) return;
-    $ip   = $_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    // Use clientIp() helper for proper proxy handling
+    $ip   = clientIp();
     $hash = hash('sha256', $ip);
     try {
         $row = queryOne("SELECT hits, window_start FROM api_rate_limits WHERE ip_hash=?", [$hash]);
@@ -94,15 +95,19 @@ function requireAuth(): array {
         $u = queryOne("SELECT id,display_name,email,role,org_name,phone FROM users WHERE id=? AND active=1", [$_SESSION['user_id']]);
         if ($u) return $u;
     }
-    // Try Bearer token (simple API key style stored in users.api_token — stub)
+    // Try Bearer token (base64-encoded with expiry timestamp)
     $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     if (str_starts_with($auth, 'Bearer ')) {
         $token = substr($auth, 7);
-        // Simple approach: token = base64(userId:email:hash)
+        // Token format: base64(userId:email:hmac:expiry)
         $decoded = base64_decode($token);
-        $parts   = explode(':', $decoded, 3);
-        if (count($parts) === 3) {
-            [$uid,$email,$sig] = $parts;
+        $parts   = explode(':', $decoded, 4);
+        if (count($parts) >= 3) {
+            [$uid,$email,$sig,$expiry] = array_pad($parts, 4, '');
+            // Validate expiry if present
+            if ($expiry !== '' && (int)$expiry < time()) {
+                err('token_expired','Access token has expired. Please login again.',401);
+            }
             $u = queryOne("SELECT id,display_name,email,role,org_name,phone FROM users WHERE id=? AND email=? AND active=1", [(int)$uid,$email]);
             if ($u && hash_equals(hash_hmac('sha256', $uid.':'.$email, SESSION_SECRET), $sig)) return $u;
         }
@@ -245,7 +250,7 @@ if ($route === 'demo-request' && $method === 'POST') {
 
 if ($route === 'auth/signup' && $method === 'POST') {
     $d            = inputJSON();
-    $email        = trim($d['email'] ?? '');
+    $email        = strtolower(trim($d['email'] ?? '')); // Force lowercase to prevent case-sensitivity issues
     $password     = $d['password'] ?? '';
     $display_name = trim($d['display_name'] ?? '');
     if (!$email || !$password) err('validation','email and password required.');
@@ -256,14 +261,15 @@ if ($route === 'auth/signup' && $method === 'POST') {
     $hash = password_hash($password, PASSWORD_BCRYPT, ['cost'=>12]);
     $id   = execute("INSERT INTO users (email,password_hash,display_name,role) VALUES (?,?,?,'client')",[$email,$hash,$display_name?:explode('@',$email)[0]]);
     $user = queryOne("SELECT id,email,display_name,role FROM users WHERE id=?",[$id]);
-    // Issue simple token
-    $token = base64_encode($id.':'.$email.':'.hash_hmac('sha256',$id.':'.$email,SESSION_SECRET));
-    ok(['user'=>$user,'access_token'=>$token],201);
+    // Issue token with 7-day expiry
+    $expiry = time() + (7 * 24 * 60 * 60);
+    $token = base64_encode($id.':'.$email.':'.hash_hmac('sha256',$id.':'.$email,SESSION_SECRET).':'.$expiry);
+    ok(['user'=>$user,'access_token'=>$token,'expires_in'=>$expiry],201);
 }
 
 if ($route === 'auth/login' && $method === 'POST') {
     $d        = inputJSON();
-    $email    = trim($d['email'] ?? '');
+    $email    = strtolower(trim($d['email'] ?? '')); // Force lowercase for consistency
     $password = $d['password'] ?? '';
     if (!$email || !$password) err('validation','email and password required.');
     $user = queryOne("SELECT * FROM users WHERE email=? AND active=1",[$email]);
@@ -272,9 +278,11 @@ if ($route === 'auth/login' && $method === 'POST') {
     // Set session too
     if (session_status()===PHP_SESSION_NONE) session_start();
     $_SESSION['user_id'] = $user['id'];
-    $token = base64_encode($user['id'].':'.$user['email'].':'.hash_hmac('sha256',$user['id'].':'.$user['email'],SESSION_SECRET));
+    // Issue token with 7-day expiry
+    $expiry = time() + (7 * 24 * 60 * 60);
+    $token = base64_encode($user['id'].':'.$user['email'].':'.hash_hmac('sha256',$user['id'].':'.$user['email'],SESSION_SECRET).':'.$expiry);
     $out   = array_diff_key($user,array_flip(['password_hash']));
-    ok(['user'=>$out,'access_token'=>$token]);
+    ok(['user'=>$out,'access_token'=>$token,'expires_in'=>$expiry]);
 }
 
 if ($route === 'auth/logout' && $method === 'POST') {
