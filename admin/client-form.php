@@ -765,10 +765,11 @@ require_once '../includes/admin-layout.php';
 
 <!-- Sticky footer bar -->
 <div style="position:sticky;bottom:0;z-index:50;margin-top:1.5rem;background:var(--background);border-top:1px solid var(--border);padding:1rem 0;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;">
-  <button type="submit" id="saveBtn" class="btn btn-primary btn-md" style="min-width:10rem;" onclick="this.disabled=true;this.innerHTML='<i data-lucide=\'loader-2\' class=\'ic-15\' style=\'animation:spin;\'></i> Saving...';">
+  <button type="submit" id="saveBtn" class="btn btn-primary btn-md" style="min-width:10rem;">
     <i data-lucide="save" class="ic-15"></i>
     <?= $isEdit ? 'Save Changes' : 'Add Client + Generate ID' ?>
   </button>
+  <script>document.getElementById('saveBtn')?.addEventListener('click',function(){this.disabled=true;this.innerHTML='<i data-lucide="loader-2" class="ic-15" style="animation:spin 1s linear infinite;"></i> Saving...';});</script>
   <a href="clients.php" class="btn btn-outline btn-md">Cancel</a>
   <?php if ($isEdit): ?>
   <span style="margin-left:auto;font-size:.8125rem;color:var(--muted-foreground);">
