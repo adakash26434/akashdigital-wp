@@ -284,7 +284,13 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
               <?php endif; ?>
             </div>
             <div style="font-size:0.75rem;color:<?= $l['org_name'] ? 'var(--foreground)' : 'var(--muted-foreground)' ?>;margin-top:0.125rem;">
-              <?= $l['org_name'] ? e($l['org_name']) : '<span style="font-style:italic;">No organisation</span>' ?>
+              <?php if ($l['org_name']): ?>
+                <?= e($l['org_name']) ?>
+              <?php elseif ($l['email']): ?>
+                <span style="font-style:italic;"><?= e($l['email']) ?></span>
+              <?php else: ?>
+                <span style="font-style:italic;color:var(--muted-foreground);">—</span>
+              <?php endif; ?>
             </div>
             <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.125rem;display:flex;gap:0.25rem;flex-wrap:wrap;">
               <?php if($firstProduct): ?>

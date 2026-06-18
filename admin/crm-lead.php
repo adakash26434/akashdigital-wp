@@ -240,7 +240,17 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
         <div>
           <div style="font-size:0.6875rem;color:var(--muted-foreground);"><?= $SOURCE_LABELS[$lead['source']] ?? 'Other' ?></div>
           <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:800;"><?= e($lead['name']) ?></h2>
-          <p style="font-size:0.875rem;color:var(--muted-foreground);"><?= e($lead['org_name']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?></p>
+          <p style="font-size:0.875rem;color:var(--muted-foreground);">
+            <?php if ($lead['org_name']): ?>
+              <?= e($lead['org_name']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?>
+            <?php elseif ($lead['email']): ?>
+              <?= e($lead['email']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?>
+            <?php elseif ($lead['phone']): ?>
+              <?= e($lead['phone']) ?><?= $lead['district'] ? ' · '.e($lead['district']) : '' ?>
+            <?php else: ?>
+              <?= $lead['district'] ? e($lead['district']) : '' ?>
+            <?php endif; ?>
+          </p>
         </div>
         <span style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.875rem;border-radius:9999px;font-size:0.8125rem;font-weight:700;background:<?=$sbg?>;color:<?=$scol?>;">
           <i data-lucide="<?=$ico?>" style="width:0.875rem;height:0.875rem;"></i> <?=$slbl?>
