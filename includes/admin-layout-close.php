@@ -121,5 +121,11 @@ if ($e2) echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json
 if ($w)  echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json_encode($w).",'warning'));";
 ?>
 </script>
+<script src="<?= asset('js/st-bs-datepicker.js') ?>" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.initBsPickers) window.initBsPickers();
+});
+</script>
 </body>
 </html>
