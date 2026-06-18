@@ -144,7 +144,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     $ph  = implode(',', array_fill(0, count($fields)+1, '?'));
                     $fld = implode(',', $fields) . ',assigned_by';
-                    execute("INSERT INTO clients ($fld) VALUES ($ph)", array_merge($vals, [currentUser()['id']]));
+                    // Validate counts match before executing
+                    $allVals = array_merge($vals, [currentUser()['id']]);
+                    if (count($allVals) !== substr_count($ph, '?')) {
+                        error_log("[client-form] INSERT mismatch: " . count($allVals) . " values, " . substr_count($ph, '?') . " placeholders");
+                        error_log("[client-form] Fields: $fld");
+                        throw new Exception("Data mismatch error");
+                    }
+                    execute("INSERT INTO clients ($fld) VALUES ($ph)", $allVals);
                     
                     // Get inserted client ID
                     $pdo = getDb();
