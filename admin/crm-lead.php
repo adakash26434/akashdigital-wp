@@ -303,11 +303,11 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
             </div>
             <div>
               <label class="form-label fs-xs">Date & Time</label>
-              <input type="datetime-local" name="followup_at" class="form-input" value="<?= date('Y-m-d\TH:i') ?>">
+              <input type="datetime-local" name="followup_at" class="form-input" data-bs-picker value="<?= date('Y-m-d\TH:i') ?>">
             </div>
             <div>
               <label class="form-label fs-xs">Next Follow-up Date</label>
-              <input type="date" name="next_followup" class="form-input">
+              <input type="date" name="next_followup" class="form-input" data-bs-picker>
             </div>
             <div class="grid-full">
               <label class="form-label fs-xs">Notes / Summary <span style="color:var(--danger-fg);">*</span></label>

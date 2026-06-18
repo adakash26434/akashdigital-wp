@@ -421,7 +421,7 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
         </div>
         <div class="form-group">
           <label class="form-label">Next Follow-up Date</label>
-          <input type="date" name="next_followup" class="form-input">
+          <input type="date" name="next_followup" class="form-input" data-bs-picker>
         </div>
         <div class="form-group">
           <label class="form-label">Assign To</label>

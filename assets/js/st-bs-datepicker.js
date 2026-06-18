@@ -17,7 +17,9 @@
   /* ── Month / Day labels ───────────────────────────────────────── */
   var BS_M_EN = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
   var BS_M_NE = ['बैशाख','जेठ','असार','श्रावण','भाद्र','आश्विन','कार्तिक','मंसिर','पुष','माघ','फाल्गुण','चैत्र'];
-  var DAY_EN  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  var BS_M_NE_NUM = ['१', '२', '३', '४', '५', '६', '७', '८', '९', '१०', '११', '१२'];
+  var BS_M    = BS_M_NE; // Default to Nepali
+  var DAY_LABELS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
   /* ── BS Month-day lookup table  (year → 12 month lengths) ────────
      Reference epoch: BS 2000/1/1 = AD 1943/4/14 (Thursday)
@@ -171,14 +173,20 @@
   /* ── Zero-pad ────────────────────────────────────────────────── */
   function z2(n) { return n < 10 ? '0' + n : '' + n; }
 
-  /* ── Format BS date for display ──────────────────────────────── */
+  /* ── Format BS date for display (Nepali) ──────────────────────── */
   function formatBs(y, m, d) {
-    return y + ' ' + BS_M_EN[m - 1] + ' ' + z2(d);
+    return toNepaliNum(d) + ' ' + BS_M[m - 1] + ', ' + toNepaliNum(y);
   }
 
   /* ── AD date string (for hidden input) ───────────────────────── */
   function toAdStr(d) {
     return d.getFullYear() + '-' + z2(d.getMonth() + 1) + '-' + z2(d.getDate());
+  }
+
+  /* ── Convert number to Nepali numeral ───────────────────────── */
+  function toNepaliNum(n) {
+    var nepaliDigits = ['०','१','२','३','४','५','६','७','८','९'];
+    return String(n).replace(/[0-9]/g, function(d) { return nepaliDigits[d]; });
   }
 
   /* ── Build calendar grid HTML ────────────────────────────────── */
@@ -190,13 +198,13 @@
     var startDow = firstAd.getDay(); // 0=Sun
 
     var html = '<div class="st-bsp-days-header">';
-    DAY_EN.forEach(function(d) { html += '<div>' + d + '</div>'; });
+    DAY_LABELS.forEach(function(d) { html += '<div>' + d + '</div>'; });
     html += '</div><div class="st-bsp-grid">';
 
     for (var i = 0; i < startDow; i++) html += '<div></div>';
     for (var d = 1; d <= daysInMonth; d++) {
       var sel = selectedBs && selectedBs.y === year && selectedBs.m === month && selectedBs.d === d;
-      html += '<button type="button" class="st-bsp-day' + (sel ? ' selected' : '') + '" data-d="' + d + '">' + d + '</button>';
+      html += '<button type="button" class="st-bsp-day' + (sel ? ' selected' : '') + '" data-d="' + d + '">' + toNepaliNum(d) + '</button>';
     }
     html += '</div>';
     return html;
@@ -208,11 +216,21 @@
     hidden.dataset.bsPickerInit = '1';
     hidden.style.display = 'none';
 
+    // Check if datetime-local
+    var isDateTime = hidden.type === 'datetime-local';
+    var savedTime = '';
+    
     // Determine initial BS date
     var initBs = null;
     if (hidden.value) {
-      var p = hidden.value.split('-');
-      initBs = adToBs(+p[0], +p[1], +p[2]);
+      var p = hidden.value.split(isDateTime ? 'T' : '-');
+      if (p[0]) {
+        var dateParts = p[0].split('-');
+        initBs = adToBs(+dateParts[0], +dateParts[1], +dateParts[2]);
+        if (isDateTime && p[1]) {
+          savedTime = p[1].substring(0, 5); // HH:MM
+        }
+      }
     }
     var today = new Date();
     var curBs = initBs || adToBs(today.getFullYear(), today.getMonth() + 1, today.getDate());
@@ -230,10 +248,26 @@
     disp.type = 'text';
     disp.readOnly = true;
     disp.className = (hidden.className || 'form-input') + ' st-bsp-display';
-    disp.placeholder = 'Select BS date';
+    disp.placeholder = 'BS मिति छान्नुहोस्';
     disp.style.cssText = 'cursor:pointer;padding-right:2.25rem;';
     if (initBs) disp.value = formatBs(initBs.y, initBs.m, initBs.d);
     wrap.insertBefore(disp, hidden);
+    
+    // Time input for datetime-local
+    var timeInput = null;
+    if (isDateTime) {
+      timeInput = document.createElement('input');
+      timeInput.type = 'time';
+      timeInput.className = 'form-input';
+      timeInput.style.cssText = 'margin-left:0.5rem;width:120px;';
+      timeInput.value = savedTime || (function() {
+        var now = new Date();
+        var h = String(now.getHours()).padStart(2,'0');
+        var m = String(now.getMinutes()).padStart(2,'0');
+        return h + ':' + m;
+      })();
+      wrap.appendChild(timeInput);
+    }
 
     // Calendar icon
     var icon = document.createElement('span');
@@ -275,7 +309,7 @@
     var btnToday = popup.querySelector('.st-bsp-today');
 
     function renderPopup() {
-      titleEl.textContent = viewY + ' ' + BS_M_EN[viewM - 1];
+      titleEl.textContent = toNepaliNum(viewY) + ' ' + BS_M[viewM - 1];
       bodyEl.innerHTML = buildGrid(viewY, viewM, initBs);
       // day click handlers
       bodyEl.querySelectorAll('.st-bsp-day').forEach(function(btn) {
@@ -283,9 +317,10 @@
           var d = +this.dataset.d;
           initBs = { y: viewY, m: viewM, d: d };
           var ad = bsToAd(viewY, viewM, d);
-          hidden.value = toAdStr(ad);
+          var timeVal = timeInput ? timeInput.value : '';
+          hidden.value = toAdStr(ad) + (isDateTime && timeVal ? 'T' + timeVal + ':00' : '');
           disp.value   = formatBs(viewY, viewM, d);
-          adLabel.textContent = ad.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'});
+          adLabel.textContent = ad.toLocaleDateString('ne-NP', {year:'numeric',month:'short',day:'numeric'});
           clearBtn.style.display = '';
           closePopup();
           hidden.dispatchEvent(new Event('change', {bubbles:true}));
@@ -293,7 +328,7 @@
       });
       // Update AD label for current view (first day of month)
       var firstAd = bsToAd(viewY, viewM, 1);
-      adLabel.textContent = firstAd.toLocaleDateString('en-US', {year:'numeric',month:'short',day:'numeric'}) + ' (AD)';
+      adLabel.textContent = firstAd.toLocaleDateString('ne-NP', {year:'numeric',month:'short',day:'numeric'}) + ' (AD)';
     }
 
     function openPopup() {
@@ -349,7 +384,8 @@
       var t = adToBs(today.getFullYear(), today.getMonth()+1, today.getDate());
       viewY = t.y; viewM = t.m;
       initBs = t;
-      hidden.value = toAdStr(today);
+      var timeVal = timeInput ? timeInput.value : '';
+      hidden.value = toAdStr(today) + (isDateTime && timeVal ? 'T' + timeVal + ':00' : '');
       disp.value   = formatBs(t.y, t.m, t.d);
       clearBtn.style.display = '';
       renderPopup();
@@ -363,6 +399,16 @@
       disp.value   = '';
       clearBtn.style.display = 'none';
     });
+    
+    // Sync time with hidden field on time change
+    if (timeInput) {
+      timeInput.addEventListener('change', function() {
+        if (initBs) {
+          var ad = bsToAd(initBs.y, initBs.m, initBs.d);
+          hidden.value = toAdStr(ad) + 'T' + timeInput.value + ':00';
+        }
+      });
+    }
     document.addEventListener('click', function(e) {
       if (!wrap.contains(e.target)) closePopup();
     });
