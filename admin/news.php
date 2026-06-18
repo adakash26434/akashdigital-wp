@@ -12,6 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = (int)$_POST['id'];
         try { execute("DELETE FROM news WHERE id=?", [$id]); $success = 'Post deleted.'; }
         catch(\Throwable $e) { $error = 'Delete failed.'; }
+    } elseif ($action === 'quick_publish') {
+        $id = (int)$_POST['id'];
+        try { 
+            execute("UPDATE news SET published=1, published_at=NOW() WHERE id=?", [$id]); 
+            $success = 'Post published!'; 
+        }
+        catch(\Throwable $e) { $error = 'Publish failed.'; }
     } elseif (in_array($action, ['create','update'])) {
         $id          = (int)($_POST['id'] ?? 0);
         $title       = trim($_POST['title'] ?? '');
@@ -25,7 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $read_time   = (int)($_POST['read_time'] ?? 5);
         $featured    = isset($_POST['featured']) ? 1 : 0;
         $published   = isset($_POST['published']) ? 1 : 0;
-        $published_at= $_POST['published_at'] ?: ($published ? date('Y-m-d H:i:s') : null);
+        
+        // Fix: Handle datetime-local format (YYYY-MM-DDTHH:MM) and convert to MySQL format
+        $rawDateTime = $_POST['published_at'] ?? '';
+        if (!empty($rawDateTime)) {
+            // Replace T with space for MySQL datetime format
+            $published_at = str_replace('T', ' ', $rawDateTime) . ':00';
+        } else {
+            $published_at = $published ? date('Y-m-d H:i:s') : null;
+        }
+        
         $tags        = json_encode(array_values(array_filter(array_map('trim', explode(',', $_POST['tags'] ?? '')))));
         $active      = isset($_POST['active']) ? 1 : 0;
 
@@ -95,7 +111,7 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
   <div class="tbl-wrap">
     <table class="st-table">
       <thead><tr>
-        <?php foreach(['Title','Category','Author','Published','Active',''] as $h):?>
+        <?php foreach(['S.N.','Title','Category','Status','Active',''] as $h):?>
         <th><?=$h?></th>
         <?php endforeach;?>
       </tr></thead>
@@ -108,27 +124,35 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
             <div class="af-empty-sub">Click &ldquo;+ New Post&rdquo; to publish your first article.</div>
           </div>
         </td></tr>
-        <?php else: foreach($posts as $p): ?>
-        <tr>
-          <td style="max-width:250px;">
+        <?php else: foreach($posts as $i => $p): ?>
+        <tr class="<?=!$p['active']?'row-inactive':''?>">
+          <td class="text-muted" style="width:3rem;"><?=$i+1?></td>
+          <td style="max-width:260px;">
             <div class="fw-strong" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e(truncate($p['title'],45))?></div>
-            <div class="fs-2xs-mt"><?=e($p['slug'])?> · <?=$p['read_time']?>min read</div>
+            <div class="fs-2xs-mt" style="color:var(--muted-foreground);"><?=e($p['author_name']??'—')?> · <?=$p['read_time']?>min read</div>
           </td>
           <td><span class="badge badge-closed"><?=e($p['category'])?></span></td>
-          <td class="text-muted"><?=e($p['author_name']??'—')?></td>
           <td>
             <?php if($p['published'] && $p['published_at']):?>
-            <span class="badge badge-active"><?=date('M j, Y',strtotime($p['published_at']))?></span>
+            <span class="badge badge-active"><i data-lucide="globe" style="width:11px;height:11px;display:inline;"></i> <?=date('M j',strtotime($p['published_at']))?></span>
             <?php elseif($p['published']):?>
             <span class="badge badge-active">Published</span>
             <?php else:?>
-            <span class="badge badge-closed">Draft</span>
+            <span class="badge badge-closed"><i data-lucide="file-text" style="width:11px;height:11px;display:inline;"></i> Draft</span>
             <?php endif;?>
-            <?php if($p['featured']):?><span class="badge badge-warning" style="margin-left:0.25rem;">Featured</span><?php endif;?>
+            <?php if($p['featured']):?><span class="badge badge-warning" style="margin-left:0.25rem;">★</span><?php endif;?>
           </td>
           <td class="td-center"><?=$p['active']?'<span class="badge badge-active">On</span>':'<span class="badge badge-closed">Off</span>'?></td>
           <td class="td-actions">
             <div class="tbl-act-group">
+              <?php if(!$p['published']):?>
+              <form method="POST" class="inline" title="Publish">
+                <?=csrfField()?>
+                <input type="hidden" name="action" value="quick_publish">
+                <input type="hidden" name="id" value="<?=$p['id']?>">
+                <button type="submit" class="tbl-act success" title="Publish now"><i data-lucide="globe" style="width:13px;height:13px;pointer-events:none;"></i></button>
+              </form>
+              <?php endif;?>
               <a href="?edit=<?=$p['id']?>" class="tbl-act" title="Edit"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <form method="POST" class="inline" onsubmit="return confirm('Delete this post?')">
                 <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
