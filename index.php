@@ -398,7 +398,7 @@ include 'includes/stats-bar.php';
     <div class="container">
       <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
         <?php foreach ([
-          ['204+', 'Cooperative Clients',  'building-2'],
+          [$__clientCount > 0 ? ($__clientCount >= 200 ? ($__clientCount.'+') : $__clientCount) : '100+', 'Cooperative Clients',  'building-2'],
           ['15+',  'Technology Partners',  'layers'],
           ['7',    'Provinces Covered',    'map-pin'],
         ] as [$n, $l, $ic]):
