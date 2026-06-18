@@ -30,6 +30,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
+                // First ensure the show_on_contact column exists
+                try {
+                    execute("ALTER TABLE partners ADD COLUMN IF NOT EXISTS show_on_contact TINYINT NOT NULL DEFAULT 0 AFTER position");
+                } catch(\Throwable $e) { /* Column might already exist */ }
+                
                 if ($id) {
                     execute("UPDATE partners SET name=?,logo_url=?,url=?,email=?,phone=?,address=?,type=?,district=?,position=?,active=?,show_on_contact=?,updated_at=NOW() WHERE id=?",
                         [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$show_on_contact,$id]);
@@ -183,7 +188,7 @@ sort($DISTRICTS);
           </div>
           <div>
             <label class="row-check" style="cursor:pointer;">
-              <input type="checkbox" name="show_on_contact" value="1" <?=!empty($editing['show_on_contact'])?'checked':''?>>
+              <input type="checkbox" name="show_on_contact" value="1" <?=(isset($editing['show_on_contact']) && $editing['show_on_contact'])?'checked':''?>>
               <span>Show on Contact Page</span>
             </label>
             <small style="color:var(--muted-foreground);font-size:0.6875rem;display:block;margin-top:0.25rem;">If enabled, this partner will appear on the contact page below the contact form.</small>

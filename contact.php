@@ -285,13 +285,24 @@ ob_start(); ?>
 // Fetch channel partners marked to show on contact page
 $channelPartners = [];
 try { 
+    // Try with show_on_contact filter first
     $channelPartners = query(
         "SELECT name, email, phone, address, district 
          FROM partners 
          WHERE type='channel' AND active=1 AND show_on_contact=1 
          ORDER BY position, name"
     ); 
-} catch (\Throwable $e) {}
+} catch (\Throwable $e) {
+    // Fallback if column doesn't exist yet
+    try {
+        $channelPartners = query(
+            "SELECT name, email, phone, address, district 
+             FROM partners 
+             WHERE type='channel' AND active=1 
+             ORDER BY position, name"
+        );
+    } catch (\Throwable $e2) {}
+}
 
 if (!empty($channelPartners)): ?>
 <!-- ═══════ CHANNEL PARTNERS SECTION ═══════ -->
