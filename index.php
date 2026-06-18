@@ -188,7 +188,8 @@ $_heroBg    = trim($__s['hero_bg'] ?? '') ?: '#0a1023';
 
 // Badge text
 $_badge1 = cms($__s, 'hero_badge1_text') ?: (isNepali() ? '🇳🇵 नेपालमा बनेको' : '🇳🇵 Built for Nepal');
-$_badge2 = cms($__s, 'hero_badge2_text') ?: (isNepali() ? '१२०+ सहकारीहरूको विश्वास' : 'Trusted by 120+ Cooperatives');
+// Badge 2: Dynamic client count (DB count + 300)
+$_badge2 = $__clientCount . '+ ' . (isNepali() ? 'सहकारीहरूको विश्वास' : 'Cooperatives Trust');
 
 // CTA
 $_ctaHref  = trim($__s['homepage_cta_url'] ?? '') ?: url('contact.php');
