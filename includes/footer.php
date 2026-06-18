@@ -1,4 +1,13 @@
-<?php $__s = siteSettings(); ?>
+<?php 
+$__s = siteSettings();
+// Fetch products from DB for dynamic footer (single source of truth)
+$_footerProducts = [];
+try { 
+    $_footerProducts = query("SELECT name, slug FROM products WHERE active=1 ORDER BY position, id LIMIT 8"); 
+} catch (\Throwable $e) { 
+    error_log('[footer] products: '.$e->getMessage()); 
+}
+?>
 </main><!-- /#main-content -->
 <footer style="background:var(--footer-bg,var(--primary-dark,#0f172a));color:#f1f5f9;margin-top:3rem;">
 
@@ -94,13 +103,17 @@
       <div>
         <h5 class="footer-heading"><?= e(__('footer_products')) ?></h5>
         <ul class="footer-list">
-          <?php foreach (['IT Solutions','Software Development','Document Management','HR & Payroll','Website Development','IT Support'] as $p): ?>
-          <li>
-            <a href="<?= url('products.php') ?>" class="footer-link-strong">
-              <?= e($p) ?>
-            </a>
-          </li>
-          <?php endforeach; ?>
+          <?php if (!empty($_footerProducts)): ?>
+            <?php foreach ($_footerProducts as $_fp): ?>
+            <li>
+              <a href="<?= url('products.php') . (!empty($_fp['slug']) ? '#'.e($_fp['slug']) : '') ?>" class="footer-link-strong">
+                <?= e($_fp['name']) ?>
+              </a>
+            </li>
+            <?php endforeach; ?>
+          <?php else: ?>
+            <li><a href="<?= url('products.php') ?>" class="footer-link-strong">Our Products</a></li>
+          <?php endif; ?>
         </ul>
       </div>
 
