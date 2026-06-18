@@ -130,11 +130,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $channelPartnerId,$saleType,
                 ];
 
-                // Add installation_cost only if column exists
+                // Add installation_cost only if column exists AND not already added
                 $hasInstallCost = dbColumnExists('clients', 'installation_cost');
-                if ($hasInstallCost) {
+                if ($hasInstallCost && !in_array('installation_cost', $fields)) {
                     array_splice($fields, 14, 0, ['installation_cost']);
                     array_splice($vals, 14, 0, [$installCost]);
+                } elseif ($hasInstallCost && in_array('installation_cost', $fields)) {
+                    error_log("[client-form] WARNING: installation_cost already in fields, skipping");
                 }
 
                 if ($isEdit) {
@@ -146,6 +148,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         error_log("[client-form] UPDATE Fields: " . $set);
                         error_log("[client-form] UPDATE Values count: " . count($allVals));
                     }
+                    error_log("[client-form] Full SQL SET: " . $set); error_log("[client-form] Vals count: " . count($allVals));
                     execute("UPDATE clients SET $set WHERE id=?", $allVals);
                     $success = 'Client updated successfully.';
                 } else {
@@ -762,7 +765,7 @@ require_once '../includes/admin-layout.php';
 
 <!-- Sticky footer bar -->
 <div style="position:sticky;bottom:0;z-index:50;margin-top:1.5rem;background:var(--background);border-top:1px solid var(--border);padding:1rem 0;display:flex;align-items:center;gap:.875rem;flex-wrap:wrap;">
-  <button type="submit" class="btn btn-primary btn-md" style="min-width:10rem;">
+  <button type="submit" id="saveBtn" class="btn btn-primary btn-md" style="min-width:10rem;" onclick="this.disabled=true;this.innerHTML='<i data-lucide=\'loader-2\' class=\'ic-15\' style=\'animation:spin;\'></i> Saving...';">
     <i data-lucide="save" class="ic-15"></i>
     <?= $isEdit ? 'Save Changes' : 'Add Client + Generate ID' ?>
   </button>
