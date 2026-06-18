@@ -107,61 +107,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             try {
-                $fields = [
-                    'org_name','client_code','status',
-                    'province','district','local_govt','ward_no','address',
-                    'contact_name','contact_email','contact_phone',
-                    'product','cbs_use','integration','integration_charge',
-                    'agreement_date','installation_date',
-                    'num_branches','head_office_amc','branch_office_amc',
-                    'cloud_charge_ho','cloud_charge_branch','cloud_gb',
-                    'notes','logo_url',
-                    'channel_partner_id','sale_type',
-                ];
-                $vals = [
-                    $org,$code,$status,
-                    $province,$district,$localGovt,$wardNo,$address,
-                    $contact,$contactEmail,$contactPhone,
-                    $product,$cbsUse,$integ,$integChg,
-                    $agreeDate,$instDate,
-                    $branches,$hoAmc,$brAmc,
-                    $cloudHo,$cloudBr,$cloudGb,
-                    $notes,$logoUrl ?: null,
-                    $channelPartnerId,$saleType,
-                ];
-
-                // Add installation_cost only if column exists AND not already added
-                $hasInstallCost = dbColumnExists('clients', 'installation_cost');
-                if ($hasInstallCost && !in_array('installation_cost', $fields)) {
-                    array_splice($fields, 14, 0, ['installation_cost']);
-                    array_splice($vals, 14, 0, [$installCost]);
-                } elseif ($hasInstallCost && in_array('installation_cost', $fields)) {
-                    error_log("[client-form] WARNING: installation_cost already in fields, skipping");
-                }
-
+                // Build UPDATE query
                 if ($isEdit) {
-                    $set = implode('=?,', $fields) . '=?,updated_at=NOW()';
-                    $allVals = array_merge($vals, [$id]);
-                    // Debug: log the query info
-                    error_log("[client-form] UPDATE: " . count($allVals) . " values, " . (substr_count($set, '?') + 1) . " placeholders in set");
-                    if (count($allVals) !== (substr_count($set, '?') + 1)) {
-                        error_log("[client-form] UPDATE Fields: " . $set);
-                        error_log("[client-form] UPDATE Values count: " . count($allVals));
-                    }
-                    error_log("[client-form] Full SQL SET: " . $set); error_log("[client-form] Vals count: " . count($allVals));
-                    execute("UPDATE clients SET $set WHERE id=?", $allVals);
+                    $setParts = [
+                        'org_name=?,','client_code=?,','status=?',
+                        'province=?,','district=?,','local_govt=?,','ward_no=?,','address=?',
+                        'contact_name=?,','contact_email=?,','contact_phone=?',
+                        'product=?,','cbs_use=?,','integration=?,','integration_charge=?',
+                        'agreement_date=?,','installation_date=?',
+                        'num_branches=?,','head_office_amc=?,','branch_office_amc=?',
+                        'cloud_charge_ho=?,','cloud_charge_branch=?,','cloud_gb=?',
+                        'notes=?,','logo_url=?',
+                        'channel_partner_id=?,','sale_type=?',
+                    ];
+                    $setVals = [
+                        $org,$code,$status,
+                        $province,$district,$localGovt,$wardNo,$address,
+                        $contact,$contactEmail,$contactPhone,
+                        $product,$cbsUse,$integ,$integChg,
+                        $agreeDate,$instDate,
+                        $branches,$hoAmc,$brAmc,
+                        $cloudHo,$cloudBr,$cloudGb,
+                        $notes,$logoUrl ?: null,
+                        $channelPartnerId,$saleType,
+                    ];
+                    $set = implode('', $setParts) . 'updated_at=NOW()';
+                    execute("UPDATE clients SET $set WHERE id=?", array_merge($setVals, [$id]));
                     $success = 'Client updated successfully.';
                 } else {
-                    // Build INSERT query - include assigned_by in fields directly
-                    $insertFields = $fields;
-                    $insertVals = $vals;
+                    // INSERT
+                    $fields = [
+                        'org_name','client_code','status',
+                        'province','district','local_govt','ward_no','address',
+                        'contact_name','contact_email','contact_phone',
+                        'product','cbs_use','integration','integration_charge',
+                        'agreement_date','installation_date',
+                        'num_branches','head_office_amc','branch_office_amc',
+                        'cloud_charge_ho','cloud_charge_branch','cloud_gb',
+                        'notes','logo_url',
+                        'channel_partner_id','sale_type',
+                    ];
+                    $vals = [
+                        $org,$code,$status,
+                        $province,$district,$localGovt,$wardNo,$address,
+                        $contact,$contactEmail,$contactPhone,
+                        $product,$cbsUse,$integ,$integChg,
+                        $agreeDate,$instDate,
+                        $branches,$hoAmc,$brAmc,
+                        $cloudHo,$cloudBr,$cloudGb,
+                        $notes,$logoUrl ?: null,
+                        $channelPartnerId,$saleType,
+                    ];
+                    // Add assigned_by if column exists
                     if (dbColumnExists('clients', 'assigned_by')) {
-                        $insertFields[] = 'assigned_by';
-                        $insertVals[] = currentUser()['id'];
+                        $fields[] = 'assigned_by';
+                        $vals[] = currentUser()['id'];
                     }
-                    $ph  = implode(',', array_fill(0, count($insertFields), '?'));
-                    $fld = implode(',', $insertFields);
-                    execute("INSERT INTO clients ($fld) VALUES ($ph)", $insertVals);
+                    $ph = implode(',', array_fill(0, count($fields), '?'));
+                    execute("INSERT INTO clients (" . implode(',', $fields) . ") VALUES ($ph)", $vals);
                     
                     // Get inserted client ID
                     $pdo = getDb();
