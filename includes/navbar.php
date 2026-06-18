@@ -37,7 +37,8 @@ if (!isset($__s)) $__s = siteSettings();
 
     <!-- Brand -->
     <?php
-      $headerLogo = !empty($__s['company_logo_url']) ? $__s['company_logo_url'] : ($__s['logo_url'] ?? '');
+      // Use site logo (single source of truth)
+      $headerLogo = $__s['logo_url'] ?? '';
       $isoLogo    = $__s['iso_logo_url'] ?? '';
     ?>
     <div id="st-brand-wrap" style="display:flex;align-items:center;gap:0.625rem;text-decoration:none;">

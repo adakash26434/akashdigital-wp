@@ -27,10 +27,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($section === 'company') {
             saveSetting('company_name',     trim($_POST['company_name'] ?? ''));
             saveSetting('company_website',  trim($_POST['company_website'] ?? ''));
-            $compLogoIn = trim((string)($_POST['company_logo_url'] ?? ''));
-            $compLogo = normalizeImageUrl($compLogoIn);
-            if ($compLogo === false) throw new \RuntimeException('Company Logo URL is invalid. Use an absolute URL or a site-root path like /uploads/..');
-            saveSetting('company_logo_url', $compLogo);
             $isoLogoIn = trim((string)($_POST['iso_logo_url'] ?? ''));
             $isoLogo = normalizeImageUrl($isoLogoIn);
             if ($isoLogo === false) throw new \RuntimeException('ISO Logo URL is invalid. Use an absolute URL or a site-root path like /uploads/..');
@@ -380,14 +376,17 @@ $tabs = [
           </div>
           <?php
             $imgField = 'logo_url'; $imgValue = sv($s,'logo_url');
-            $imgLabel = 'Logo';
+            $imgLabel = 'Site Logo';
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
-          <p class="caption-meta" style="margin-top:-0.25rem;">Leave blank to use text logo.</p>
-          <div>
-            <label class="form-label">Favicon URL</label>
-            <input type="url" name="favicon_url" class="form-input" value="<?= e(sv($s,'favicon_url')) ?>" placeholder="https://.../favicon.ico">
-          </div>
+          <p class="caption-meta" style="margin-top:-0.25rem;">Used in navbar, login page, and admin sidebar. Leave blank to use text logo.</p>
+          
+          <?php
+            $imgField = 'favicon_url'; $imgValue = sv($s,'favicon_url');
+            $imgLabel = 'Favicon (Site Icon)';
+            require __DIR__ . '/../includes/admin-img-upload.php';
+          ?>
+          <p class="caption-meta" style="margin-top:-0.25rem;">Small icon shown in browser tab. Recommended: 32x32px PNG or ICO.</p>
           <button type="submit" class="btn btn-primary w-fit">Save General Settings</button>
         </div>
       </div>
@@ -412,17 +411,11 @@ $tabs = [
             <input type="url" name="company_website" class="form-input" value="<?= e(sv($s,'company_website')) ?>" placeholder="https://example.com">
           </div>
           <?php
-            $imgField = 'company_logo_url'; $imgValue = sv($s,'company_logo_url');
-            $imgLabel = 'Company Logo';
-            require __DIR__ . '/../includes/admin-img-upload.php';
-          ?>
-          <p class="caption-meta" style="margin-top:-0.25rem;">Used in header and other places where company branding is shown.</p>
-          <?php
             $imgField = 'iso_logo_url'; $imgValue = sv($s,'iso_logo_url');
             $imgLabel = 'ISO Certification Logo';
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
-          <p class="caption-meta" style="margin-top:-0.25rem;">Displayed beside the company logo in the header (e.g. ISO 9001 / ISO 27001 badge). Leave blank to hide.</p>
+          <p class="caption-meta" style="margin-top:-0.25rem;">Displayed beside the site logo in the header (e.g. ISO 9001 / ISO 27001 badge). Leave blank to hide.</p>
           <hr style="border:none;border-top:1px solid var(--border);margin:0.5rem 0;">
           <h4 style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.5rem;">Developer Attribution</h4>
           <div>
