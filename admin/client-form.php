@@ -111,10 +111,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($isEdit) {
                     $setParts = [
                         'org_name=?,','client_code=?,','status=?',
-                        'province=?,','district=?,','local_govt=?,','ward_no=?,','address=?',
+                        'province=?,','district=?,','local_govt=?,','ward_no=?,','address=?,',
                         'contact_name=?,','contact_email=?,','contact_phone=?',
                         'product=?,','cbs_use=?,','integration=?,','integration_charge=?',
-                        'agreement_date=?,','installation_date=?',
+                        'agreement_date=?,','installation_date=?,',
                         'num_branches=?,','head_office_amc=?,','branch_office_amc=?',
                         'cloud_charge_ho=?,','cloud_charge_branch=?,','cloud_gb=?',
                         'notes=?,','logo_url=?',
