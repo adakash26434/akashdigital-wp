@@ -506,8 +506,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
           <?php foreach ($STAGES as $sk => [$sico,$sbg2,$scol2,$slbl2]): ?>
           <label style="cursor:pointer;">
             <input type="radio" name="stage" value="<?=$sk?>" <?=$lead['stage']===$sk?'checked':''?> @change="stage='<?=$sk?>'" style="display:none;">
-            <span :style="stage==='<?=$sk?>' ? 'background:<?=$sbg2?>;color:<?=$scol2?>;border:2px solid <?=$scol2?>;' : 'background:var(--muted);color:var(--muted-foreground);border:2px solid transparent;'"
-                  style="display:flex;align-items:center;justify-content:center;gap:0.25rem;padding:0.3rem 0.5rem;border-radius:0.5rem;font-size:0.6875rem;font-weight:600;text-align:center;transition:all 0.15s;">
+            <span :style="(stage==='<?=$sk?>' ? 'background:<?=$sbg2?>;color:<?=$scol2?>;border:2px solid <?=$scol2?>;' : 'background:var(--muted);color:var(--muted-foreground);border:2px solid transparent;') + ';display:flex;align-items:center;justify-content:center;gap:0.25rem;padding:0.3rem 0.5rem;border-radius:0.5rem;font-size:0.6875rem;font-weight:600;text-align:center;transition:all 0.15s;cursor:pointer;'">
               <i data-lucide="<?=$sico?>" style="width:0.75rem;height:0.75rem;"></i> <?=$slbl2?>
             </span>
           </label>
