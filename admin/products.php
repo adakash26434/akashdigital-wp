@@ -69,6 +69,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $products = [];
 try { $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id"); } catch(\Throwable $e) { $error = 'products table not found. Run database.sql first.'; }
 
+// Lucide icons list for visual picker (same as services.php)
+$ICONS = [
+    'monitor','smartphone','tablet','laptop','cpu','server','database','hard-drive','wifi',
+    'cloud','network','globe','map-pin','building','building-2','home','briefcase','package',
+    'file-text','file','file-check','folder','folder-open','clipboard','clipboard-check','inbox','mail',
+    'code','terminal','git-branch','layers','box','workflow','settings','settings-2','sliders',
+    'shield','shield-check','lock','key','fingerprint','eye','scan','qr-code','printer',
+    'phone','phone-call','headphones','message-square','message-circle','video','bell','share-2','link',
+    'bar-chart','bar-chart-2','pie-chart','trending-up','trending-down','activity','zap','star','award',
+    'users','user','user-check','contact','credit-card','wallet','receipt','calculator','dollar-sign',
+    'check-circle','check','alert-triangle','info','help-circle','refresh-cw','download','upload','image',
+];
+$ICONS_JSON = json_encode($ICONS);
+
 $editing = null;
 if (!empty($_GET['edit'])) {
     try { $editing = queryOne("SELECT * FROM products WHERE id=?", [(int)$_GET['edit']]); }
@@ -161,8 +175,8 @@ if (!empty($_GET['edit'])) {
 </div><!-- /aft-list -->
 
 <div id="aft-form" style="<?=$afActive==='form'?'display:block':'display:none'?>">
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);">
+  <div class="st-card p-tile" style="display:flex;flex-direction:column;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?= $editing ? '✏ Edit Product' : '➕ New Product' ?></h3>
       <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
     </div>
@@ -189,11 +203,17 @@ if (!empty($_GET['edit'])) {
       <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
 
       <!-- Tab: Basic -->
-      <div class="af-tab-pane active" data-tab-pane="basic" style="padding-bottom:2rem;">
-        <div style="display:grid;grid-template-columns:54px 1fr;gap:0.5rem;">
+      <div class="af-tab-pane active" data-tab-pane="basic" style="padding-bottom:2rem;" x-data="prodForm('<?= htmlspecialchars($editing['lucide_icon'] ?? 'layers', ENT_QUOTES) ?>', '<?= htmlspecialchars($editing['icon_color'] ?? 'blue', ENT_QUOTES) ?>')">
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:0.625rem;align-items:end;">
           <div>
-            <label class="form-label">Emoji</label>
-            <input type="text" name="icon" class="form-input" style="font-size:1.125rem;text-align:center;padding:0.5rem;" value="<?=e($editing['icon']??'')?>">
+            <div style="font-size:0.75rem;font-weight:500;color:var(--muted-foreground);margin-bottom:0.25rem;">Icon</div>
+            <button type="button" @click="pickerOpen=!pickerOpen"
+                    style="width:3rem;height:2.5rem;border-radius:0.625rem;border:1.5px solid var(--border);background:var(--card);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.15rem;cursor:pointer;">
+              <span style="width:18px;height:18px;display:flex;align-items:center;justify-content:center;">
+                <i :data-lucide="icon" style="width:16px;height:16px;color:var(--primary);"></i>
+              </span>
+              <span style="font-size:0.5rem;color:var(--muted-foreground);line-height:1;">pick</span>
+            </button>
           </div>
           <div>
             <label class="form-label">Product Name <span class="text-danger-token">*</span></label>
@@ -201,20 +221,42 @@ if (!empty($_GET['edit'])) {
             <span class="form-hint">3-100 characters. Main product name displayed everywhere.</span>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-          <div>
-            <label class="form-label">Lucide Icon <a href="https://lucide.dev/icons" target="_blank" style="color:var(--primary);font-size:0.6rem;">browse ↗</a></label>
-            <input type="text" name="lucide_icon" class="form-input" value="<?=e($editing['lucide_icon']??'')?>" placeholder="monitor">
+
+        <!-- Icon picker panel -->
+        <div x-show="pickerOpen" x-transition
+             style="border:1.5px solid var(--border);border-radius:0.875rem;background:var(--card);padding:0.75rem;box-shadow:0 6px 20px rgba(0,0,0,0.1);margin-bottom:0.75rem;">
+          <div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.625rem;">
+            <div style="position:relative;flex:1;">
+              <i data-lucide="search" style="position:absolute;left:0.5rem;top:50%;transform:translateY(-50%);width:12px;height:12px;color:var(--muted-foreground);pointer-events:none;"></i>
+              <input type="text" x-model="iconSearch" @input="filterIcons()"
+                     placeholder="Search icons…" autocomplete="off"
+                     style="width:100%;padding:0.3rem 0.5rem 0.3rem 1.75rem;border-radius:0.4rem;border:1px solid var(--border);font-size:0.8rem;background:var(--background);">
+            </div>
+            <span style="font-size:0.7rem;color:var(--muted-foreground);white-space:nowrap;" x-text="iconsFiltered.length+' icons'"></span>
+            <button type="button" @click="pickerOpen=false"
+                    style="padding:0.2rem 0.4rem;border-radius:0.375rem;border:1px solid var(--border);font-size:0.7rem;cursor:pointer;background:none;color:var(--muted-foreground);">✕</button>
           </div>
-          <div>
-            <label class="form-label">Icon Color</label>
-            <select name="icon_color" class="form-input">
-              <?php foreach(['blue','teal','purple','green','amber','rose','indigo','cyan'] as $col): ?>
-              <option value="<?=$col?>" <?=($editing['icon_color']??'blue')===$col?'selected':''?>><?=ucfirst($col)?></option>
-              <?php endforeach; ?>
-            </select>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(3.25rem,1fr));gap:0.2rem;max-height:200px;overflow-y:auto;">
+            <template x-for="ico in iconsFiltered" :key="ico">
+              <button type="button" @click="selectIcon(ico)"
+                      :style="icon===ico ? 'background:var(--primary-light);border-color:var(--primary);color:var(--primary);' : 'background:transparent;border-color:transparent;color:var(--foreground);'"
+                      style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.2rem;padding:0.35rem 0.15rem;border-radius:0.4rem;border:1.5px solid;cursor:pointer;transition:all 0.1s;">
+                <i :data-lucide="ico" style="width:15px;height:15px;flex-shrink:0;"></i>
+                <span style="font-size:0.48rem;line-height:1.2;text-align:center;word-break:break-all;max-width:2.8rem;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;" x-text="ico"></span>
+              </button>
+            </template>
+          </div>
+          <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;align-items:center;">
+            <span style="font-size:0.7rem;color:var(--muted-foreground);white-space:nowrap;">Type:</span>
+            <input type="text" :value="icon" @input="icon=$event.target.value.trim()||'layers';$nextTick(()=>{if(window.lucide)lucide.createIcons();})"
+                   style="flex:1;padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);font-size:0.8rem;">
+            <a href="https://lucide.dev/icons/" target="_blank" style="font-size:0.7rem;color:var(--primary);white-space:nowrap;">All icons →</a>
           </div>
         </div>
+
+        <input type="hidden" name="lucide_icon" x-model="icon">
+        <input type="hidden" name="icon_color" x-model="iconColor">
+
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
           <div>
             <label class="form-label">Slug</label>
@@ -231,6 +273,28 @@ if (!empty($_GET['edit'])) {
             <input type="text" name="badge" id="badge-input" class="form-input" value="<?=e($editing['badge']??'')?>" placeholder="or type custom…" oninput="updatePreview()">
           </div>
         </div>
+
+        <!-- Icon Color swatches -->
+        <div style="margin-bottom:0.75rem;">
+          <label class="form-label">Icon Color Theme</label>
+          <div style="display:flex;gap:0.4rem;flex-wrap:wrap;margin-top:0.25rem;">
+            <?php
+            $colorDots = ['blue'=>'#3b82f6','green'=>'#22c55e','purple'=>'#a855f7','amber'=>'#f59e0b','teal'=>'#14b8a6','rose'=>'#f43f5e','orange'=>'#f97316','indigo'=>'#6366f1','gray'=>'#9ca3af'];
+            $COLORS = ['blue','green','purple','amber','teal','rose','orange','indigo','gray'];
+            foreach($COLORS as $c):
+              $checked = ($editing['icon_color']??'blue')===$c;
+            ?>
+            <label style="cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:0.2rem;" title="<?=ucfirst($c)?>">
+              <input type="radio" name="icon_color_radio" value="<?=$c?>" <?=$checked?'checked':''?>
+                     style="position:absolute;opacity:0;width:0;height:0;"
+                     @change="iconColor='<?=$c?>';updatePreview();document.querySelectorAll('.clr-dot').forEach(d=>{d.style.outline='none'});$el.nextElementSibling.style.outline='2.5px solid #0f172a'">
+              <span class="clr-dot" style="width:1.5rem;height:1.5rem;border-radius:50%;background:<?=$colorDots[$c]?>;display:block;<?=$checked?'outline:2.5px solid #0f172a;outline-offset:2px;':''?>"></span>
+              <span style="font-size:0.55rem;color:var(--muted-foreground);"><?=ucfirst($c)?></span>
+            </label>
+            <?php endforeach;?>
+          </div>
+        </div>
+
         <div>
           <label class="form-label">Tagline</label>
           <input type="text" name="tagline" class="form-input" value="<?=e($editing['tagline']??'')?>" placeholder="e.g., Fast & Secure Banking" maxlength="80">
@@ -377,6 +441,38 @@ if (!empty($_GET['edit'])) {
 </div>
 
 <script>
+var _prodIcons = <?= $ICONS_JSON ?>;
+
+/* ── Alpine component for icon picker ── */
+function prodForm(initIcon, initColor) {
+  return {
+    icon: initIcon || 'layers',
+    pickerOpen: false,
+    iconSearch: '',
+    iconsAll: _prodIcons,
+    iconsFiltered: _prodIcons,
+    iconColor: initColor || 'blue',
+
+    filterIcons() {
+      const q = this.iconSearch.toLowerCase().trim();
+      this.iconsFiltered = q ? this.iconsAll.filter(i => i.includes(q)) : this.iconsAll;
+    },
+    selectIcon(ico) {
+      this.icon = ico;
+      this.pickerOpen = false;
+      this.iconSearch = '';
+      this.iconsFiltered = this.iconsAll;
+      this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+      updatePreview();
+    },
+
+    init() {
+      this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
+      this.$watch('pickerOpen', v => { if (v) this.$nextTick(() => { if (window.lucide) lucide.createIcons(); }); });
+    },
+  };
+}
+
 /* ── Tab switching — uses .active class; display controlled by admin-forms.css ── */
 function switchTab(btn, tabName) {
   // Deactivate all tab buttons
@@ -420,7 +516,7 @@ function updatePreview() {
   var price   = parseFloat(f.querySelector('[name=price_from]')?.value||0) || 0;
   var summary = (f.querySelector('[name=summary]')?.value||'').trim();
   var icon    = (f.querySelector('[name=lucide_icon]')?.value||'layers').trim();
-  var color   = f.querySelector('[name=icon_color]')?.value||'blue';
+  var color   = (f.querySelector('[name=icon_color]')?.value||'blue').trim();
 
   document.getElementById('prv-name').textContent    = name || 'Product Name';
   document.getElementById('prv-tagline').textContent = tagline;
