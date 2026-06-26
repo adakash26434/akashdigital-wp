@@ -95,29 +95,38 @@ if (!empty($_GET['edit'])) {
         }
     }
 } elseif ($isNew) {
-    // Demo product data for new products - shows sample data that user can edit and save as new
-    $editing = [
-        'name' => 'Sahakari Banking Software',
-        'slug' => 'sahakari-banking',
-        'tagline' => 'Complete Core Banking Solution',
-        'summary' => 'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
-        'description' => '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
-        'lucide_icon' => 'landmark',
-        'icon_color' => 'blue',
-        'badge' => 'Popular',
-        'price_from' => 14999,
-        'category' => 'Banking Software',
-        'features' => '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
-        'features_text' => "Member Management\nSavings Accounts\nLoan Processing\nFD & RD\nShare Management\nNRB Reports\nBranches\nAudit Trail",
-        'highlights' => '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
-        'highlights_text' => "Member & KYC\nSavings & FD\nLoan Lifecycle\nNRB Compliance\nBS Calendar\nMulti-Branch",
-        'position' => 1,
-        'active' => 1,
-        'show_on_home' => 1,
-        'home_position' => 1,
-        'home_card_wide' => 1,
-        'home_card_dark' => 0,
-    ];
+    // Check if demo product already exists
+    try {
+        $demoCheck = queryOne("SELECT id FROM products WHERE slug='sahakari-banking' LIMIT 1");
+        if (!empty($demoCheck)) {
+            // Demo exists - just show the list (don't redirect to edit)
+            // User can click on it in the list to edit if they want
+        } else {
+            // Demo doesn't exist - create it automatically
+            execute(
+                "INSERT INTO products (name,slug,tagline,summary,description,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                [
+                    'Sahakari Banking Software',
+                    'sahakari-banking',
+                    'Complete Core Banking Solution',
+                    'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
+                    '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
+                    'landmark',
+                    'blue',
+                    'Popular',
+                    14999,
+                    'Banking Software',
+                    '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
+                    '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
+                    1, 1, 1, 1, 1, 0
+                ]
+            );
+        }
+    } catch (\Throwable $e) { 
+        error_log('[products.php] Demo product check/creation failed: ' . $e->getMessage()); 
+    }
+    // Refresh products list after potential insert
+    try { $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id"); } catch(\Throwable $e) {}
 }
 ?>
 
