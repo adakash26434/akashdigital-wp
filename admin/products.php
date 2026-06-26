@@ -84,6 +84,8 @@ $ICONS = [
 $ICONS_JSON = json_encode($ICONS);
 
 $editing = null;
+$isNew = isset($_GET['new']); // Track if creating new product
+
 if (!empty($_GET['edit'])) {
     try { $editing = queryOne("SELECT * FROM products WHERE id=?", [(int)$_GET['edit']]); }
     catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -92,6 +94,30 @@ if (!empty($_GET['edit'])) {
             if (!empty($editing[$f])) $editing[$f.'_text'] = implode("\n", json_decode($editing[$f],true) ?? []);
         }
     }
+} elseif ($isNew) {
+    // Demo product data for new products - shows sample data that user can edit and save as new
+    $editing = [
+        'name' => 'Sahakari Banking Software',
+        'slug' => 'sahakari-banking',
+        'tagline' => 'Complete Core Banking Solution',
+        'summary' => 'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
+        'description' => '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
+        'lucide_icon' => 'landmark',
+        'icon_color' => 'blue',
+        'badge' => 'Popular',
+        'price_from' => 14999,
+        'category' => 'Banking Software',
+        'features' => '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
+        'features_text' => "Member Management\nSavings Accounts\nLoan Processing\nFD & RD\nShare Management\nNRB Reports\nBranches\nAudit Trail",
+        'highlights' => '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
+        'highlights_text' => "Member & KYC\nSavings & FD\nLoan Lifecycle\nNRB Compliance\nBS Calendar\nMulti-Branch",
+        'position' => 1,
+        'active' => 1,
+        'show_on_home' => 1,
+        'home_position' => 1,
+        'home_card_wide' => 1,
+        'home_card_dark' => 0,
+    ];
 }
 ?>
 
@@ -183,7 +209,7 @@ if (!empty($_GET['edit'])) {
 
     <form method="POST">
       <?=csrfField()?>
-      <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
+      <input type="hidden" name="action" value="<?=$isNew ? 'create' : 'update'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <!-- Tab nav — sticky at top -->
@@ -433,7 +459,7 @@ if (!empty($_GET['edit'])) {
 
       <!-- Footer: always visible & sticky -->
       <div class="af-form-footer" style="margin-top:1rem;padding:1rem 0;border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-shrink:0;">
-        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Product':'Create Product'?></button>
+        <button type="submit" class="btn btn-primary flex-1"><?=$isNew ? 'Create Product' : 'Update Product'?></button>
         <?php if($editing):?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif;?>
       </div>
     </form>
