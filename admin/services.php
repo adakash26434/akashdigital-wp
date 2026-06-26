@@ -200,7 +200,7 @@ $ICONS_JSON = json_encode($ICONS);
 
 <script>var _svcIcons=<?= $ICONS_JSON ?>;</script>
 <div id="aft-form" style="<?=$afActive==='list'?'display:none':'display:block'?>">
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;"
+  <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;"
        x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($editing['screenshot_url'] ?? ''), ENT_QUOTES) ?>)">
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
@@ -221,16 +221,13 @@ $ICONS_JSON = json_encode($ICONS);
       </button>
     </div>
 
-    <form method="POST" enctype="multipart/form-data" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
+    <form method="POST" enctype="multipart/form-data">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
       <input type="hidden" name="lucide_icon" x-model="icon">
       <input type="hidden" name="features"    x-model="chipsJoined">
       <input type="hidden" name="screenshot_url" x-model="imgUrl">
-
-      <!-- Tab content container — scrollable -->
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
 
       <!-- ══ TAB: BASIC ══ -->
       <div x-show="tab==='basic'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
@@ -420,8 +417,6 @@ $ICONS_JSON = json_encode($ICONS);
           </div>
         </div>
       </div><!-- /appearance -->
-
-      </div><!-- /scrollable tab content -->
 
       <!-- Save -->
       <div class="af-form-footer" style="margin-top:1rem;padding-top:0.875rem;border-top:1px solid var(--border);flex-shrink:0;">

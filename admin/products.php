@@ -84,6 +84,8 @@ $ICONS = [
 $ICONS_JSON = json_encode($ICONS);
 
 $editing = null;
+$isNew = isset($_GET['new']); // Track if creating new product
+
 if (!empty($_GET['edit'])) {
     try { $editing = queryOne("SELECT * FROM products WHERE id=?", [(int)$_GET['edit']]); }
     catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -92,6 +94,39 @@ if (!empty($_GET['edit'])) {
             if (!empty($editing[$f])) $editing[$f.'_text'] = implode("\n", json_decode($editing[$f],true) ?? []);
         }
     }
+} elseif ($isNew) {
+    // Check if demo product already exists
+    try {
+        $demoCheck = queryOne("SELECT id FROM products WHERE slug='sahakari-banking' LIMIT 1");
+        if (!empty($demoCheck)) {
+            // Demo exists - just show the list (don't redirect to edit)
+            // User can click on it in the list to edit if they want
+        } else {
+            // Demo doesn't exist - create it automatically
+            execute(
+                "INSERT INTO products (name,slug,tagline,summary,description,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                [
+                    'Sahakari Banking Software',
+                    'sahakari-banking',
+                    'Complete Core Banking Solution',
+                    'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
+                    '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
+                    'landmark',
+                    'blue',
+                    'Popular',
+                    14999,
+                    'Banking Software',
+                    '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
+                    '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
+                    1, 1, 1, 1, 1, 0
+                ]
+            );
+        }
+    } catch (\Throwable $e) { 
+        error_log('[products.php] Demo product check/creation failed: ' . $e->getMessage()); 
+    }
+    // Refresh products list after potential insert
+    try { $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id"); } catch(\Throwable $e) {}
 }
 ?>
 
@@ -183,7 +218,7 @@ if (!empty($_GET['edit'])) {
 
     <form method="POST">
       <?=csrfField()?>
-      <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
+      <input type="hidden" name="action" value="<?=$isNew ? 'create' : 'update'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <!-- Tab nav — sticky at top -->
@@ -199,8 +234,8 @@ if (!empty($_GET['edit'])) {
         </button>
       </div>
 
-      <!-- Tab content container — scrollable -->
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
+      <!-- Tab content container -->
+      <div>
 
       <!-- Tab: Basic -->
       <div class="af-tab-pane active" data-tab-pane="basic" style="padding-bottom:2rem;" x-data="prodForm('<?= htmlspecialchars($editing['lucide_icon'] ?? 'layers', ENT_QUOTES) ?>', '<?= htmlspecialchars($editing['icon_color'] ?? 'blue', ENT_QUOTES) ?>')">
@@ -433,7 +468,7 @@ if (!empty($_GET['edit'])) {
 
       <!-- Footer: always visible & sticky -->
       <div class="af-form-footer" style="margin-top:1rem;padding:1rem 0;border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-shrink:0;">
-        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Product':'Create Product'?></button>
+        <button type="submit" class="btn btn-primary flex-1"><?=$isNew ? 'Create Product' : 'Update Product'?></button>
         <?php if($editing):?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif;?>
       </div>
     </form>
