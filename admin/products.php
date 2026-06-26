@@ -67,33 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $products = [];
-try { 
-    // Auto-create demo product if it doesn't exist (on every page load when list is shown)
-    if (!isset($_GET['edit']) && !isset($_GET['new'])) {
-        $demoCheck = queryOne("SELECT id FROM products WHERE slug='sahakari-banking' LIMIT 1");
-        if (empty($demoCheck)) {
-            execute(
-                "INSERT INTO products (name,slug,tagline,summary,description,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                [
-                    'Sahakari Banking Software',
-                    'sahakari-banking',
-                    'Complete Core Banking Solution',
-                    'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
-                    '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
-                    'landmark',
-                    'blue',
-                    'Popular',
-                    14999,
-                    'Banking Software',
-                    '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
-                    '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
-                    1, 1, 1, 1, 1, 0
-                ]
-            );
-        }
-    }
-    $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id"); 
-} catch(\Throwable $e) { $error = 'products table not found. Run database.sql first.'; }
+try { $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id"); } catch(\Throwable $e) { $error = 'products table not found. Run database.sql first.'; }
 
 // Lucide icons list for visual picker (same as services.php)
 $ICONS = [
@@ -118,33 +92,6 @@ if (!empty($_GET['edit'])) {
             if (!empty($editing[$f])) $editing[$f.'_text'] = implode("\n", json_decode($editing[$f],true) ?? []);
         }
     }
-} elseif (isset($_GET['new'])) {
-    // Auto-create demo product if doesn't exist, then show in list
-    try {
-        $demoCheck = queryOne("SELECT id FROM products WHERE slug='sahakari-banking' LIMIT 1");
-        if (empty($demoCheck)) {
-            execute(
-                "INSERT INTO products (name,slug,tagline,summary,description,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                [
-                    'Sahakari Banking Software',
-                    'sahakari-banking',
-                    'Complete Core Banking Solution',
-                    'All-in-one cooperative banking software with member management, savings, loans, and NRB reporting built in.',
-                    '<p>Our flagship banking software designed specifically for Nepal\'s cooperatives and financial institutions.</p>',
-                    'landmark',
-                    'blue',
-                    'Popular',
-                    14999,
-                    'Banking Software',
-                    '["Member Management","Savings Accounts","Loan Processing","FD & RD","Share Management","NRB Reports","Branches","Audit Trail"]',
-                    '["Member & KYC","Savings & FD","Loan Lifecycle","NRB Compliance","BS Calendar","Multi-Branch"]',
-                    1, 1, 1, 1, 1, 0
-                ]
-            );
-            // Refresh products list
-            $products = query("SELECT id,name,slug,tagline,icon,badge,price_from,category,active,position FROM products ORDER BY position,id");
-        }
-    } catch (\Throwable $e) { error_log('[products.php] Demo product: ' . $e->getMessage()); }
 }
 ?>
 
