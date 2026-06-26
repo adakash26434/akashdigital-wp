@@ -132,30 +132,50 @@ $PRI_COLORS = [
   <span style="margin-left:auto;font-size:0.8125rem;color:var(--muted-foreground);"><?=$total?> ticket<?=$total!==1?'s':''?></span>
 </form>
 
-<!-- Quick status pills -->
-<div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;">
+<!-- Stats cards -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.875rem;margin-bottom:1.25rem;">
   <?php
   // Get all counts in single query to avoid N+1
   $statusCounts = [];
+  $priorityCounts = [];
   try {
       $counts = query("SELECT status, COUNT(*) c FROM tickets GROUP BY status");
       foreach ($counts as $row) {
           $statusCounts[$row['status']] = (int)$row['c'];
       }
-      $statusCounts[''] = array_sum($statusCounts);
-  } catch(\Throwable $e) { $statusCounts = [''=>0]; }
+      $totalTickets = array_sum($statusCounts);
+      
+      $pCounts = query("SELECT priority, COUNT(*) c FROM tickets WHERE status NOT IN ('resolved','closed') GROUP BY priority");
+      foreach ($pCounts as $row) {
+          $priorityCounts[$row['priority']] = (int)$row['c'];
+      }
+  } catch(\Throwable $e) { $totalTickets = 0; }
   
-  foreach(['','open','in_progress','replied','resolved','closed'] as $s):
-    $cnt = $statusCounts[$s] ?? 0;
-    $lbl = $s?ucwords(str_replace('_',' ',$s)):'All';
-    [$bg,$col] = $STATUS_COLORS[$s] ?? ['var(--muted)','var(--muted-foreground)'];
-    if(!$s){$bg='var(--muted)';$col='var(--muted-foreground)';}
+  $allCount = $totalTickets;
+  $openCount = $statusCounts['open'] ?? 0;
+  $inProgressCount = $statusCounts['in_progress'] ?? 0;
+  $repliedCount = $statusCounts['replied'] ?? 0;
+  $resolvedCount = $statusCounts['resolved'] ?? 0;
+  $closedCount = $statusCounts['closed'] ?? 0;
+  
+  $statCards = [
+    ['All', $allCount, '?status=&priority=', '#f8fafc', '#0f172a', 'layers'],
+    ['Open', $openCount, '?status=open&priority=', ($openCount>0?'var(--warning-soft)':'#f8fafc'), ($openCount>0?'var(--warning-fg)':'#0f172a'), 'folder-open'],
+    ['In Progress', $inProgressCount, '?status=in_progress&priority=', ($inProgressCount>0?'var(--info-soft)':'#f8fafc'), ($inProgressCount>0?'var(--info-fg)':'#0f172a'), 'loader'],
+    ['Replied', $repliedCount, '?status=replied&priority=', '#f3e8ff', '#7e22ce', 'message-circle'],
+    ['Resolved', $resolvedCount, '?status=resolved&priority=', 'var(--success-soft)', 'var(--success-fg)', 'check-circle'],
+    ['Closed', $closedCount, '?status=closed&priority=', 'var(--muted)', 'var(--muted-foreground)', 'archive'],
+  ];
   ?>
-  <a href="?status=<?=$s?>&priority=<?=$priority_filter?>&q=<?=urlencode($q)?>"
-     style="padding:0.3rem 0.75rem;border-radius:9999px;font-size:0.75rem;font-weight:600;background:<?=$status_filter===$s?$bg:'var(--muted)'?>;color:<?=$status_filter===$s?$col:'var(--muted-foreground)'?>;text-decoration:none;border:1px solid <?=$status_filter===$s?'transparent':'var(--border)'?>;">
-    <?=$lbl?> (<?=$cnt?>)
+  <?php foreach ($statCards as [$lbl,$cnt,$href,$bg,$col,$ico]): ?>
+  <a href="<?= e($href) ?>q=<?=urlencode($q)?>" style="display:block;padding:0.875rem;border-radius:0.75rem;background:<?=$bg?>;border:1px solid var(--border);text-decoration:none;transition:all 0.15s;">
+    <div style="display:flex;align-items:center;gap:0.375rem;margin-bottom:0.25rem;">
+      <i data-lucide="<?=$ico?>" style="width:0.875rem;height:0.875rem;color:<?=$col?>;"></i>
+      <span style="font-size:0.6875rem;font-weight:600;color:var(--muted-foreground);"><?= e($lbl) ?></span>
+    </div>
+    <div style="font-size:1.5rem;font-weight:800;color:<?=$col?>;font-family:var(--font-display);"><?= number_format($cnt) ?></div>
   </a>
-  <?php endforeach;?>
+  <?php endforeach; ?>
 </div>
 
 <form method="POST" id="bulk-form">
