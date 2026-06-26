@@ -200,16 +200,16 @@ $ICONS_JSON = json_encode($ICONS);
 
 <script>var _svcIcons=<?= $ICONS_JSON ?>;</script>
 <div id="aft-form" style="<?=$afActive==='list'?'display:none':'display:block'?>">
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);"
+  <div class="st-card p-tile" style="display:flex;flex-direction:column;"
        x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($editing['screenshot_url'] ?? ''), ENT_QUOTES) ?>)">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'✏ Edit Service':'➕ New Service'?></h3>
       <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
     </div>
 
     <!-- Tab bar -->
-    <div class="af-tab-bar">
+    <div class="af-tab-bar" style="flex-shrink:0;">
       <button type="button" @click="tab='basic'" class="af-tab-btn" :class="tab==='basic'?'active':''">
         <i data-lucide="info" style="width:13px;height:13px;display:inline;vertical-align:middle;"></i> Basic
       </button>

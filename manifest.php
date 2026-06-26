@@ -4,6 +4,12 @@ require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/helpers.php';
 
+// Detect current language for manifest
+$__langCode = 'en';
+if (function_exists('isNepali')) {
+    $__langCode = isNepali() ? 'np' : 'en';
+}
+
 header('Content-Type: application/manifest+json; charset=utf-8');
 header('Cache-Control: public, max-age=3600');
 
@@ -22,7 +28,7 @@ $manifest = [
     'orientation'      => 'portrait-primary',
     'background_color' => '#fafbfc',
     'theme_color'      => '#2563eb',
-    'lang'             => 'en',
+    'lang'             => $__langCode,
     'categories'       => ['business', 'productivity'],
     'icons'            => [
         ['src' => '/public/favicon.svg', 'sizes' => 'any', 'type' => 'image/svg+xml', 'purpose' => 'any maskable'],
