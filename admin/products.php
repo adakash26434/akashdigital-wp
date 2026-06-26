@@ -202,13 +202,13 @@ if (!empty($_GET['edit'])) {
 </div><!-- /aft-list -->
 
 <div id="aft-form" style="<?=$afActive==='form'?'display:block':'display:none'?>">
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;">
+  <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?= $editing ? '✏ Edit Product' : '➕ New Product' ?></h3>
       <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
     </div>
 
-    <form method="POST" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
+    <form method="POST">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
