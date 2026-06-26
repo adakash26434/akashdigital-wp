@@ -174,20 +174,20 @@ $SOURCE_ICONS = ['demo_request'=>'target','contact_form'=>'mail','referral'=>'us
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:0.875rem;margin-bottom:1.75rem;">
   <?php
   $statsCards = [
-    ['Total Leads',      $stats['total']      ?? 0, '#f8fafc','#0f172a','users'],
-    ['Today\'s F/U',     $stats['due_today']  ?? 0, ($stats['due_today']>0?'var(--warning-soft)':'#f8fafc'),($stats['due_today']>0?'var(--warning-fg)':'#0f172a'),'clock'],
-    ['Overdue',          $stats['overdue']    ?? 0, ($stats['overdue']>0?'var(--danger-soft)':'#f8fafc'),   ($stats['overdue']>0?'var(--danger-fg)':'#0f172a'),  'alert-circle'],
-    ['Proposal Sent',    $stats['s_proposal'] ?? 0, '#f3e8ff','#7e22ce','file-text'],
-    ['Won',              $stats['s_won']       ?? 0, 'var(--success-soft)','var(--success-fg)','check-circle'],
-    ['Accepted Proposals',$prop_stats['accepted']??0,'#dbeafe','var(--primary-dark)','inbox'],
+    ['Total Leads',        $stats['total']      ?? 0, '#f8fafc','#0f172a','users',   '?stage='],
+    ['Today\'s F/U',       $stats['due_today']  ?? 0, ($stats['due_today']>0?'var(--warning-soft)':'#f8fafc'),($stats['due_today']>0?'var(--warning-fg)':'#0f172a'),'clock',       '?filter_f=today'],
+    ['Overdue',            $stats['overdue']    ?? 0, ($stats['overdue']>0?'var(--danger-soft)':'#f8fafc'),   ($stats['overdue']>0?'var(--danger-fg)':'#0f172a'),  'alert-circle','?filter_f=overdue'],
+    ['Proposal Sent',      $stats['s_proposal'] ?? 0, '#f3e8ff','#7e22ce','file-text', '?stage=proposal_sent'],
+    ['Won',                $stats['s_won']       ?? 0, 'var(--success-soft)','var(--success-fg)','check-circle','?stage=won'],
+    ['Accepted Proposals', $prop_stats['accepted']??0,'#dbeafe','var(--primary-dark)','inbox',    '?stage=won&has_accepted=1'],
   ];
   ?>
-  <?php foreach ($statsCards as [$lbl,$val,$bg,$col,$ico]):?>
-  <div style="padding:1rem;border-radius:0.875rem;background:<?=$bg?>;border:1px solid var(--border);">
+  <?php foreach ($statsCards as [$lbl,$val,$bg,$col,$ico,$href]):?>
+  <a href="<?= e($href) ?>" style="display:block;padding:1rem;border-radius:0.875rem;background:<?=$bg?>;border:1px solid var(--border);text-decoration:none;transition:all 0.15s;">
     <div style="margin-bottom:0.25rem;"><i data-lucide="<?=$ico?>" style="width:1.25rem;height:1.25rem;color:<?=$col?>;"></i></div>
     <div style="font-size:1.5rem;font-weight:800;color:<?=$col?>;font-family:var(--font-display);"><?= number_format((int)$val) ?></div>
     <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.125rem;"><?= e($lbl) ?></div>
-  </div>
+  </a>
   <?php endforeach; ?>
 </div>
 
