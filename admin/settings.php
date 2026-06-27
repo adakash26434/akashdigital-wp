@@ -118,6 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('hero_mock_deposits', trim($_POST['hero_mock_deposits'] ?? ''));
             saveSetting('hero_mock_loans',    trim($_POST['hero_mock_loans']    ?? ''));
             saveSetting('hero_mock_growth',   trim($_POST['hero_mock_growth']   ?? ''));
+            saveSetting('hero_dashboard_image', trim($_POST['hero_dashboard_image'] ?? ''));
             // Products section
             saveSetting('home_products_eyebrow', trim($_POST['home_products_eyebrow'] ?? ''));
             // Process / How-it-works section
@@ -758,6 +759,9 @@ $tabs = [
                 <label class="form-label fs-xs">Growth % (floating chip)</label>
                 <input type="text" name="hero_mock_growth" class="form-input" value="<?= e(sv($s,'hero_mock_growth')) ?>" placeholder="+14.2%">
               </div>
+            </div>
+            <div style="margin-top:1rem;">
+              <?php $imgField = 'hero_dashboard_image'; $imgValue = sv($s,$imgField); $imgLabel = 'Dashboard Screenshot (optional)'; $imgHelp = 'Replace the mockup with a real screenshot. Recommended size: 800×500px'; require __DIR__ . '/../includes/admin-img-upload.php'; ?>
             </div>
           </div>
         </details>
