@@ -122,7 +122,10 @@ ob_start(); ?>
       <h3 style="font-weight:600;margin-bottom:0.5rem;">No open positions right now</h3>
       <p>We're always looking for great talent. Send your CV to <a href="mailto:<?= e(stContactEmail()) ?>" class="text-primary"><?= e(stContactEmail()) ?></a></p>
     </div>
-    <?php else: $openJobs = array_filter($jobs, fn($j) => !isJobExpired($j)); ?>
+    <?php else: 
+      $openJobs = [];
+      foreach ($jobs as $j) { if (!isJobExpired($j)) $openJobs[] = $j; }
+    ?>
     <?php if(empty($openJobs)): ?>
     <div style="border:2px dashed var(--border);border-radius:1.25rem;padding:4rem 2rem;text-align:center;color:var(--muted-foreground);">
       <div class="fs-3rem"></div>
