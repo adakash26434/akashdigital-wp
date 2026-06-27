@@ -498,15 +498,16 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
 
     <!-- Quick actions -->
     <div class="st-card" style="padding:1.125rem;">
-      <div style="font-size:0.8125rem;font-weight:700;margin-bottom:0.875rem;"> Update Stage</div>
+      <div style="font-size:0.8125rem;font-weight:700;margin-bottom:0.875rem;">Update Stage</div>
       <form method="POST" x-data="{stage:'<?= $lead['stage'] ?>'}" style="display:flex;flex-direction:column;gap:0.75rem;">
         <?= csrfField() ?><input type="hidden" name="action" value="update_stage">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.375rem;">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
           <?php foreach ($STAGES as $sk => [$sico,$sbg2,$scol2,$slbl2]): ?>
           <label style="cursor:pointer;">
             <input type="radio" name="stage" value="<?=$sk?>" <?=$lead['stage']===$sk?'checked':''?> @change="stage='<?=$sk?>'" style="display:none;">
-            <span :style="(stage==='<?=$sk?>' ? 'background:<?=$sbg2?>;color:<?=$scol2?>;border:2px solid <?=$scol2?>;' : 'background:var(--muted);color:var(--muted-foreground);border:2px solid transparent;') + ';display:flex;align-items:center;justify-content:center;gap:0.25rem;padding:0.3rem 0.5rem;border-radius:0.5rem;font-size:0.6875rem;font-weight:600;text-align:center;transition:all 0.15s;cursor:pointer;'">
-              <i data-lucide="<?=$sico?>" style="width:0.75rem;height:0.75rem;"></i> <?=$slbl2?>
+            <span :style="(stage==='<?=$sk?>' ? 'background:<?=$sbg2?>;color:<?=$scol2?>;border-color:<?=$scol2?>;box-shadow:0 0 0 2px <?=$scol2?>33;' : 'background:var(--card);color:var(--muted-foreground);border-color:var(--border);') + ';display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.25rem;padding:0.625rem 0.375rem;border-radius:0.625rem;font-size:0.75rem;font-weight:600;text-align:center;transition:all 0.2s;cursor:pointer;border:2px solid transparent;'" 
+                  x-effect="if(stage==='<?=$sk?>') $el.scrollIntoView({behavior:'smooth',block:'nearest'});">
+              <i data-lucide="<?=$sico?>" style="width:1rem;height:1rem;"></i> <?=$slbl2?>
             </span>
           </label>
           <?php endforeach; ?>
