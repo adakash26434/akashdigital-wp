@@ -92,44 +92,70 @@ sort($DISTRICTS);
     <a href="?new=1" class="btn btn-primary btn-sm">+ Add Partner</a>
   </div>
 
-  <?php foreach(['client'=>' Clients','partner'=>' Technology Partners','channel'=>' Channel Partners','solution'=>' Solution Partners','investor'=>' Investors'] as $type => $label):
-    $grp = $byType[$type] ?? [];
-  ?>
-  <?php if(!empty($grp)):?>
-  <div style="margin-bottom:1.5rem;">
-    <div style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:0.625rem;"><?=$label?> (<?=count($grp)?>)</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.625rem;">
-      <?php foreach($grp as $p):?>
-      <div class="st-card" style="padding:0.875rem;display:flex;align-items:center;gap:0.75rem;<?=!$p['active']?'opacity:0.55;':''?>">
-        <?php if(!empty($p['logo_url'])):?>
-        <img src="<?=e($p['logo_url'])?>" alt="" style="width:2.5rem;height:2rem;object-fit:contain;flex-shrink:0;">
-        <?php else:?>
-        <div style="width:2.5rem;height:2rem;background:var(--muted);border-radius:0.5rem;display:grid;place-items:center;font-size:0.75rem;font-weight:700;color:var(--muted-foreground);flex-shrink:0;"><?=strtoupper(substr($p['name'],0,2))?></div>
-        <?php endif;?>
-        <div class="flex-1-min">
-          <div style="font-weight:600;font-size:0.8125rem;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e($p['name'])?></div>
-          <?php if(!empty($p['district'])):?><div class="fs-2xs-mt"><?=e($p['district'])?></div><?php endif;?>
-          <?php if($type==='channel' && (!empty($p['email'])||!empty($p['phone']))):?>
-          <div style="font-size:0.65rem;color:var(--primary);margin-top:0.2rem;">
-            <?php if(!empty($p['email'])):?>✉ <?=e($p['email'])?><?php endif;?>
-            <?php if(!empty($p['phone'])):?>  ☎ <?=e($p['phone'])?><?php endif;?>
-          </div>
-          <?php endif;?>
-        </div>
-        <div style="display:flex;gap:0.25rem;flex-shrink:0;">
-          <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
-          <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
-            <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
-            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
-          </form>
-        </div>
-      </div>
-      <?php endforeach;?>
-    </div>
-  </div>
+  <?php if(empty($items)):?>
+    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No partners yet. Click "+ Add Partner" to get started.</div>
+  <?php else:?>
+  <div class="st-card ov-hidden">
+  <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
+  <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
+      <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
+        <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);">Partner</th>
+        <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);">Type</th>
+        <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);">Location</th>
+        <th style="padding:0.625rem 1rem;text-align:center;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);">Status</th>
+        <th style="padding:0.625rem 1rem;text-align:right;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"></th>
+      </tr></thead>
+      <tbody>
+        <?php foreach($items as $p): $active=(bool)$p['active']; $typeLabel=['client'=>'Client','partner'=>'Tech Partner','channel'=>'Channel Partner','solution'=>'Solution Partner','investor'=>'Investor'][$p['type']] ?? $p['type']; ?>
+        <tr style="border-bottom:1px solid var(--border);transition:background 0.12s;" onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">
+          <td class="p-row">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+              <?php if(!empty($p['logo_url']) && filter_var($p['logo_url'], FILTER_VALIDATE_URL)):?>
+              <div style="width:2.5rem;height:2rem;background:#fff;border:1px solid var(--border);border-radius:0.375rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                <img src="<?=e($p['logo_url'])?>" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">
+              </div>
+              <?php else:?>
+              <div style="width:2.5rem;height:2rem;background:var(--muted);border-radius:0.375rem;display:grid;place-items:center;font-size:0.75rem;font-weight:700;color:var(--muted-foreground);flex-shrink:0;"><?=strtoupper(substr($p['name'],0,2))?></div>
+              <?php endif;?>
+              <div>
+                <div class="fw-strong"><?=e($p['name'])?></div>
+                <?php if(!empty($p['url'])):?><div class="fs-xs-mt" style="font-size:0.7rem;"><a href="<?=e($p['url'])?>" target="_blank" class="text-primary"><?=e(parse_url($p['url'], PHP_URL_HOST) ?? $p['url'])?></a></div><?php endif;?>
+              </div>
+            </div>
+          </td>
+          <td style="padding:0.75rem 1rem;">
+            <span class="badge badge-secondary"><?=e($typeLabel)?></span>
+          </td>
+          <td style="padding:0.75rem 1rem;color:var(--muted-foreground);"><?=!empty($p['district'])?e($p['district']):'—'?></td>
+          <td style="padding:0.75rem 1rem;text-align:center;">
+            <form method="POST" class="inline">
+              <?=csrfField()?>
+              <input type="hidden" name="action" value="toggle_active">
+              <input type="hidden" name="id" value="<?=$p['id']?>">
+              <input type="hidden" name="active" value="<?=$active?0:1?>">
+              <button type="submit" title="<?=$active?'Click to hide':'Click to show'?>"
+                style="background:none;border:none;cursor:pointer;font-size:0.75rem;padding:0.2rem 0.5rem;border-radius:9999px;font-weight:600;
+                       color:<?=$active?'var(--secondary)':'var(--muted-foreground)'?>;
+                       background:<?=$active?'rgba(34,197,94,0.1)':'var(--muted)'?>">
+                <?=$active?'● Live':'○ Hidden'?>
+              </button>
+            </form>
+          </td>
+          <td class="p-row">
+            <div style="display:flex;gap:0.375rem;justify-content:flex-end;">
+              <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
+              <form method="POST" class="inline" onsubmit="return confirm('Delete partner \'<?=addslashes(e($p['name']))?>\'? This cannot be undone.')">
+                <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
+                <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        <?php endforeach;?>
+      </tbody>
+    </table>
+  </div><!-- /.tbl-wrap --></div>
   <?php endif;?>
-  <?php endforeach;?>
-  <?php if(empty($items)):?><div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No partners yet. Add your first client or technology partner.</div><?php endif;?>
 </div>
 </div><!-- /aft-list -->
 
