@@ -96,32 +96,52 @@ sort($DISTRICTS);
     $grp = $byType[$type] ?? [];
   ?>
   <?php if(!empty($grp)):?>
-  <div style="margin-bottom:1.5rem;">
-    <div style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);margin-bottom:0.625rem;"><?=$label?> (<?=count($grp)?>)</div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.625rem;">
+  <div style="margin-bottom:2rem;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;">
+      <span style="font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);"><?=$label?></span>
+      <span style="background:var(--muted);color:var(--muted-foreground);font-size:0.6875rem;font-weight:600;padding:0.125rem 0.5rem;border-radius:9999px;"><?=count($grp)?></span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:0.75rem;">
       <?php foreach($grp as $p):?>
-      <div class="st-card" style="padding:0.875rem;display:flex;align-items:center;gap:0.75rem;<?=!$p['active']?'opacity:0.55;':''?>">
-        <?php if(!empty($p['logo_url'])):?>
-        <img src="<?=e($p['logo_url'])?>" alt="" style="width:2.5rem;height:2rem;object-fit:contain;flex-shrink:0;">
-        <?php else:?>
-        <div style="width:2.5rem;height:2rem;background:var(--muted);border-radius:0.5rem;display:grid;place-items:center;font-size:0.75rem;font-weight:700;color:var(--muted-foreground);flex-shrink:0;"><?=strtoupper(substr($p['name'],0,2))?></div>
-        <?php endif;?>
-        <div class="flex-1-min">
-          <div style="font-weight:600;font-size:0.8125rem;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e($p['name'])?></div>
-          <?php if(!empty($p['district'])):?><div class="fs-2xs-mt"><?=e($p['district'])?></div><?php endif;?>
-          <?php if($type==='channel' && (!empty($p['email'])||!empty($p['phone']))):?>
-          <div style="font-size:0.65rem;color:var(--primary);margin-top:0.2rem;">
-            <?php if(!empty($p['email'])):?>✉ <?=e($p['email'])?><?php endif;?>
-            <?php if(!empty($p['phone'])):?>  ☎ <?=e($p['phone'])?><?php endif;?>
+      <div class="st-card" style="padding:1rem;<?=!$p['active']?'opacity:0.5;border-style:dashed;':''?>">
+        <div style="display:flex;align-items:flex-start;gap:0.875rem;">
+          <?php if(!empty($p['logo_url']) && filter_var($p['logo_url'], FILTER_VALIDATE_URL)):?>
+          <div style="width:3.5rem;height:3rem;background:#fff;border:1px solid var(--border);border-radius:0.5rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+            <img src="<?=e($p['logo_url'])?>" alt="" style="max-width:100%;max-height:100%;object-fit:contain;">
           </div>
+          <?php else:?>
+          <div style="width:3.5rem;height:3rem;background:var(--muted);border-radius:0.5rem;display:grid;place-items:center;font-size:1rem;font-weight:800;color:var(--muted-foreground);flex-shrink:0;"><?=strtoupper(substr($p['name'],0,2))?></div>
           <?php endif;?>
+          <div class="flex-1-min" style="min-width:0;">
+            <div style="font-weight:700;font-size:0.875rem;color:var(--foreground);margin-bottom:0.25rem;"><?=e($p['name'])?></div>
+            <?php if(!empty($p['district'])):?>
+            <div style="font-size:0.75rem;color:var(--muted-foreground);display:flex;align-items:center;gap:0.25rem;">
+              <i data-lucide="map-pin" style="width:0.75rem;height:0.75rem;"></i> <?=e($p['district'])?>
+            </div>
+            <?php endif;?>
+            <?php if($type==='channel' && (!empty($p['email'])||!empty($p['phone']))):?>
+            <div style="font-size:0.7rem;color:var(--primary);margin-top:0.25rem;">
+              <?php if(!empty($p['email'])):?><?=e($p['email'])?><?php endif;?>
+              <?php if(!empty($p['phone'])):?> · <?=e($p['phone'])?><?php endif;?>
+            </div>
+            <?php endif;?>
+          </div>
         </div>
-        <div style="display:flex;gap:0.25rem;flex-shrink:0;">
-          <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
-          <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
-            <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
-            <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
-          </form>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--border);">
+          <span style="font-size:0.6875rem;color:var(--muted-foreground);<?=!$p['active']?'color:var(--danger-fg);':''?>">
+            <?php if($p['active']):?><i data-lucide="check-circle" style="width:0.6875rem;height:0.6875rem;display:inline;vertical-align:middle;margin-right:0.125rem;color:var(--success-fg);"></i> Active<?php else:?><i data-lucide="x-circle" style="width:0.6875rem;height:0.6875rem;display:inline;vertical-align:middle;margin-right:0.125rem;color:var(--danger-fg);"></i> Inactive<?php endif;?>
+          </span>
+          <div style="display:flex;gap:0.375rem;">
+            <a href="?edit=<?=$p['id']?>" class="btn btn-outline btn-sm" style="padding:0.25rem 0.625rem;font-size:0.75rem;">
+              <i data-lucide="pencil" style="width:0.875rem;height:0.875rem;display:inline;vertical-align:middle;margin-right:0.25rem;"></i>Edit
+            </a>
+            <form method="POST" class="inline" onsubmit="return confirm('Delete this partner?')">
+              <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
+              <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);border:none;padding:0.25rem 0.625rem;font-size:0.75rem;">
+                <i data-lucide="trash-2" style="width:0.875rem;height:0.875rem;display:inline;vertical-align:middle;margin-right:0.25rem;"></i>Delete
+              </button>
+            </form>
+          </div>
         </div>
       </div>
       <?php endforeach;?>
