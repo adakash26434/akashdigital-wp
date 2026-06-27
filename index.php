@@ -201,6 +201,7 @@ $_mockMembers  = trim($__s['hero_mock_members'] ?? '') ?: '2,847';
 $_mockDeposits = trim($__s['hero_mock_deposits'] ?? '') ?: 'NPR 8.4 Cr';
 $_mockLoans    = trim($__s['hero_mock_loans'] ?? '') ?: '142';
 $_mockGrowth   = trim($__s['hero_mock_growth'] ?? '') ?: '+14.2%';
+$_heroDashboardImage = trim($__s['hero_dashboard_image'] ?? '');
 
 // Hero title & subtitle
 $_heroTitleVal = cms($__s, 'homepage_hero_title') ?: (isNepali() ? 'डिजिटाइजेसन र <span class="tg">अटोमेसन</span>' : 'IT Solutions & <span class="tg">Automation</span>');
@@ -331,6 +332,15 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 
       <!-- ── RIGHT: Dashboard mockup ── -->
       <div class="hero-right">
+        <?php if($_heroDashboardImage): ?>
+        <!-- Real screenshot mode -->
+        <div class="hero-mockup" style="padding:0;">
+          <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+            <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
+          </div>
+        </div>
+        <?php else: ?>
+        <!-- Mockup mode (default) -->
         <div class="hero-mockup">
           <!-- Chrome bar -->
           <div class="mockup-bar">
@@ -365,6 +375,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
             </div>
           </div>
         </div>
+        <?php endif; ?>
 
         <!-- Floating stat chips -->
         <div class="float-chip f1 green">
