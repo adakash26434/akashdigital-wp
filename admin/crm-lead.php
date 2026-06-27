@@ -92,12 +92,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($existing) {
                 $error = 'A client with this organisation and email already exists.';
             } else {
-                // Create new client
-                execute(
+                // Create new client - execute() returns lastInsertId()
+                $clientId = execute(
                     "INSERT INTO clients (org_name, contact_email, contact_phone, district, user_id) VALUES (?,?,?,?,?)",
                     [$lead['org_name'], $lead['email'], $lead['phone'], $lead['district'], $lead['user_id'] ?? null]
                 );
-                $clientId = $pdo->lastInsertId();
                 
                 // Update lead stage to won and mark as converted
                 execute(
@@ -527,7 +526,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
       
       <!-- Convert to Client -->
       <?php if (!in_array($lead['stage'], ['won', 'lost'])): ?>
-      <form method="POST" class="mt-3" onsubmit="return confirm('Convert this lead to a client? This will mark the lead as won.');">
+      <form method="POST" style="margin-top:1rem;" onsubmit="return confirm('Convert this lead to a client? This will mark the lead as won.');">
         <?= csrfField() ?>
         <input type="hidden" name="action" value="convert_to_client">
         <button type="submit" class="btn btn-success btn-sm w-100">
