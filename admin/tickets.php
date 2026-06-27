@@ -168,7 +168,7 @@ $PRI_COLORS = [
   ];
   ?>
   <?php foreach ($statCards as [$lbl,$cnt,$href,$bg,$col,$ico]): ?>
-  <a href="<?= e($href) ?>q=<?=urlencode($q)?>" style="display:block;padding:0.875rem;border-radius:0.75rem;background:<?=$bg?>;border:1px solid var(--border);text-decoration:none;transition:all 0.15s;">
+  <a href="<?= e($href) ?>&q=<?=urlencode($q)?>" style="display:block;padding:0.875rem;border-radius:0.75rem;background:<?=$bg?>;border:1px solid var(--border);text-decoration:none;transition:all 0.15s;">
     <div style="display:flex;align-items:center;gap:0.375rem;margin-bottom:0.25rem;">
       <i data-lucide="<?=$ico?>" style="width:0.875rem;height:0.875rem;color:<?=$col?>;"></i>
       <span style="font-size:0.6875rem;font-weight:600;color:var(--muted-foreground);"><?= e($lbl) ?></span>
