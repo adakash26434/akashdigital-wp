@@ -139,12 +139,9 @@ try {
     <div class="container" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
       <p style="font-size:var(--text-xs);color:rgba(241,245,249,0.35);margin:0;">
         <?= sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME)) ?>
-        <?php 
-          $devName = $__s['developed_by_name'] ?? '';
-          $devUrl = $__s['developed_by_url'] ?? '';
-          if (!empty($devName)): 
-        ?>
-          | Developed by <a href="<?= e($devUrl ?: '#') ?>" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;"><?= e($devName) ?></a>
+        | Developed by <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>
+        <?php if(!empty($__s['custom_footer_text'])): ?>
+          | <?= e($__s['custom_footer_text']) ?>
         <?php endif; ?>
       </p>
       <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
