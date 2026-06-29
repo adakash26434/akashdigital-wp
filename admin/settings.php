@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('iso_logo_url', $isoLogo);
             saveSetting('developed_by_name', trim($_POST['developed_by_name'] ?? ''));
             saveSetting('developed_by_url',  trim($_POST['developed_by_url'] ?? ''));
+            saveSetting('custom_footer_text', trim($_POST['custom_footer_text'] ?? ''));
             $success = 'Company settings saved.';
         } elseif ($section === 'contact') {
             saveSetting('contact_email', trim($_POST['contact_email'] ?? ''));
@@ -422,12 +423,12 @@ $tabs = [
           <div>
             <label class="form-label">Developed By Name</label>
             <input type="text" name="developed_by_name" class="form-input" value="<?= e(sv($s,'developed_by_name',stSiteName())) ?>" placeholder="Company name">
-            <span class="form-hint">Displayed in footer: "Developed by [Name]".</span>
+            <span class="form-hint">Developed by Aakash Adhikari (hardcoded).</span>
           </div>
           <div>
-            <label class="form-label">Developer URL</label>
-            <input type="url" name="developed_by_url" class="form-input" value="<?= e(sv($s,'developed_by_url')) ?>" placeholder="https://example.com">
-            <span class="form-hint">Linked in footer attribution.</span>
+            <label class="form-label">Custom Footer Text (optional)</label>
+            <input type="text" name="custom_footer_text" class="form-input" value="<?= e(sv($s,'custom_footer_text')) ?>" placeholder="| Developed & Design By: Your Name">
+            <span class="form-hint">Add extra text after "Developed by Aakash Adhikari".</span>
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save Company Settings</button>
         </div>
