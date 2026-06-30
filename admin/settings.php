@@ -115,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('home_bento_title',       trim($_POST['home_bento_title']       ?? ''));
             saveSetting('home_bento_subtitle',    trim($_POST['home_bento_subtitle']    ?? ''));
             // Hero dashboard mockup demo numbers
+            saveSetting('hero_show_dashboard', trim($_POST['hero_show_dashboard'] ?? '1'));
             saveSetting('hero_mock_members',  trim($_POST['hero_mock_members']  ?? ''));
             saveSetting('hero_mock_deposits', trim($_POST['hero_mock_deposits'] ?? ''));
             saveSetting('hero_mock_loans',    trim($_POST['hero_mock_loans']    ?? ''));
@@ -742,7 +743,18 @@ $tabs = [
         <details class="st-accordion">
           <summary><?= icon('bar-chart-2',14,'color:var(--primary);flex-shrink:0;') ?> Hero Dashboard Demo Numbers</summary>
           <div class="st-accordion__body">
-            <p class="caption-meta" style="margin-top:0;">Figures shown in the dashboard visual on the homepage hero. Leave blank to use defaults.</p>
+            <p class="caption-meta" style="margin-top:0;">Figures shown in the dashboard visual on the homepage hero.</p>
+            <div style="margin-bottom:1rem;">
+              <label class="form-label fs-xs">Show on homepage</label>
+              <div style="display:flex;gap:1.5rem;margin-top:0.375rem;">
+                <label style="display:flex;align-items:center;gap:0.375rem;cursor:pointer;font-size:0.8125rem;">
+                  <input type="radio" name="hero_show_dashboard" value="1" <?=(sv($s,'hero_show_dashboard')!=='0')?'checked':''?>> Visible
+                </label>
+                <label style="display:flex;align-items:center;gap:0.375rem;cursor:pointer;font-size:0.8125rem;">
+                  <input type="radio" name="hero_show_dashboard" value="0" <?=(sv($s,'hero_show_dashboard')==='0')?'checked':''?>> Hidden
+                </label>
+              </div>
+            </div>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.625rem;">
               <div>
                 <label class="form-label fs-xs">Members count</label>

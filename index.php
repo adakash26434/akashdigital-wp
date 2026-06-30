@@ -197,6 +197,7 @@ $_ctaLabel = cms($__s,'homepage_cta_text') ?: __('home_hero_book_demo');
 $_ctaSec   = cms($__s,'hero_cta_secondary') ?: (isNepali() ? 'डेमो हेर्नुस' : 'Watch Demo');
 
 // Dashboard mockup numbers — editable from admin
+$_showDashboard = ($__s['hero_show_dashboard'] ?? '1') === '1';
 $_mockMembers  = trim($__s['hero_mock_members'] ?? '') ?: '2,847';
 $_mockDeposits = trim($__s['hero_mock_deposits'] ?? '') ?: 'NPR 8.4 Cr';
 $_mockLoans    = trim($__s['hero_mock_loans'] ?? '') ?: '142';
@@ -222,6 +223,7 @@ html:not(.dark) .st-hero{background:#eef2ff !important;--h-text:#0f172a;--h-sub:
 @keyframes mesh-float{0%{transform:translate(0,0) scale(1);}33%{transform:translate(3%,-4%) scale(1.08);}66%{transform:translate(-2%,3%) scale(.95);}100%{transform:translate(4%,2%) scale(1.05);}}
 .st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--h-grid) 1px,transparent 1px),linear-gradient(90deg,var(--h-grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
 .st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;}
+.st-hero-split.hero-no-right{grid-template-columns:1fr;}.st-hero-split.hero-no-right .hero-right{display:none;}
 .hero-left{display:flex;flex-direction:column;gap:.75rem;}
 .hero-left .hero-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;padding:.3rem .875rem .3rem .625rem;border-radius:9999px;font-size:var(--text-xs);font-weight:700;background:var(--h-badge-bg);border:1px solid var(--h-badge-border);color:var(--h-badge-color);backdrop-filter:blur(4px);}
 .hero-left .hero-badge i{width:13px;height:13px;}
@@ -292,7 +294,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
   <div class="st-hero-grid"></div>
 
   <div class="container">
-    <div class="st-hero-split">
+    <div class="st-hero-split<?= !$_showDashboard ? ' hero-no-right' : '' ?>">
 
       <!-- ── LEFT: Text content ── -->
       <div class="hero-left">
@@ -331,6 +333,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
       </div>
 
       <!-- ── RIGHT: Dashboard mockup ── -->
+      <?php if($_showDashboard): ?>
       <div class="hero-right">
         <?php if($_heroDashboardImage): ?>
         <!-- Real screenshot mode -->
@@ -391,6 +394,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
           <?= isNepali() ? '२४/७ सहयोग' : '24/7 Support' ?>
         </div>
       </div>
+      <?php endif; ?>
 
     </div>
   </div>
