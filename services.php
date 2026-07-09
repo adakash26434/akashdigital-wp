@@ -189,7 +189,7 @@ ob_start(); ?>
       ['map-pin',    'Nepal-first',       'Offices across all provinces — on-site support when you need it.'],
       ['shield',     'Secure by design',  'End-to-end encryption, role-based access and audit trails built in.'],
       ['zap',        'Fast deployment',   'Website live in 2 weeks, mobile app in 3 — fast and reliable.'],
-      ['headphones', 'Always on',         '24×7 support via WhatsApp, phone and a dedicated client portal.'],
+      ['life-buoy',  'Always on',         '24×7 support via WhatsApp, phone and a dedicated client portal.'],
       ['calendar',   'BS Calendar',       'Nepali calendar native in every module — no conversion needed.'],
       ['file-check', 'NRB Aligned',       'Fully aligned with Nepal Rastra Bank and government compliance requirements.'],
     ];
