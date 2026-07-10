@@ -139,9 +139,7 @@ try {
     <div class="container" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
       <p style="font-size:var(--text-xs);color:rgba(241,245,249,0.35);margin:0;">
         <?= sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME)) ?>
-        <?php if(!empty($__s['developer_credit'])): ?>
-          | <?= e($__s['developer_credit']) ?>
-        <?php endif; ?>
+        | Developed by <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>
         <?php if(!empty($__s['custom_footer_text'])): ?>
           | <?= e($__s['custom_footer_text']) ?>
         <?php endif; ?>
