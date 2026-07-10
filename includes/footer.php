@@ -140,9 +140,6 @@ try {
       <p style="font-size:var(--text-xs);color:rgba(241,245,249,0.35);margin:0;">
         <?= sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME)) ?>
         | Developed by <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>
-        <?php if(!empty($__s['custom_footer_text'])): ?>
-          | <?= e($__s['custom_footer_text']) ?>
-        <?php endif; ?>
       </p>
       <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
         <a href="<?= url('privacy.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">गोपनीयता</a>
