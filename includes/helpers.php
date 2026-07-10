@@ -97,6 +97,7 @@ function siteSettings(): array {
         'whatsapp_enabled' => true,
         'whatsapp_message' => "Hello! I'm interested in your software.",
         'maintenance_mode' => false,
+        'developer_credit' => 'Developed & Design By Ankur Infotech Pvt. Ltd.',
     ];
     // Try to get site settings, but gracefully fall back to defaults if DB is unavailable
     try {
