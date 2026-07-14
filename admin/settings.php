@@ -88,6 +88,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 saveSetting("stat_{$i}_value", trim($_POST["stat_{$i}_value"] ?? ''));
                 saveSetting("stat_{$i}_label", trim($_POST["stat_{$i}_label"] ?? ''));
             }
+            // Secondary stats (Clients section — Cooperative Clients, Partners, Provinces)
+            saveSetting('client_count_offset',    (string)(int)($_POST['client_count_offset'] ?? 300));
+            saveSetting('stat_coop_clients_label', trim($_POST['stat_coop_clients_label'] ?? ''));
+            saveSetting('stat_partners_value',     trim($_POST['stat_partners_value']     ?? ''));
+            saveSetting('stat_partners_label',     trim($_POST['stat_partners_label']     ?? ''));
+            saveSetting('stat_provinces_value',    trim($_POST['stat_provinces_value']    ?? ''));
+            saveSetting('stat_provinces_label',    trim($_POST['stat_provinces_label']    ?? ''));
             // Hero badges & trust bar
             saveSetting('hero_badge1_text',       trim($_POST['hero_badge1_text']       ?? ''));
             saveSetting('hero_badge2_text',       trim($_POST['hero_badge2_text']       ?? ''));
@@ -133,6 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 saveSetting("home_step{$__si}_desc",  trim($_POST["home_step{$__si}_desc"]  ?? ''));
             }
             // Pricing teaser section
+            saveSetting('pricing_cards_visible', isset($_POST['pricing_cards_visible']) ? '1' : '0');
             saveSetting('home_pricing_eyebrow', trim($_POST['home_pricing_eyebrow'] ?? ''));
             saveSetting('home_pricing_title',   trim($_POST['home_pricing_title']   ?? ''));
             saveSetting('home_pricing_sub',     trim($_POST['home_pricing_sub']     ?? ''));
@@ -621,6 +629,45 @@ $tabs = [
               </div>
               <?php endfor; ?>
             </div>
+            <hr style="border:none;border-top:1px solid var(--border);margin:.75rem 0;">
+            <!-- Secondary stats (Cooperative Clients row) -->
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Cooperative Clients Section Stats</div>
+            <p class="caption-meta" style="margin-top:0;">These appear in the clients/partners section below the hero. "Cooperative Clients" count = DB count + offset.</p>
+            <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
+              <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Cooperative Clients</div>
+                <div>
+                  <label class="form-label">Count Offset (added to DB count)</label>
+                  <input type="number" name="client_count_offset" class="form-input" value="<?= e(sv($s,'client_count_offset') ?: '300') ?>" placeholder="300" min="0" style="max-width:120px;">
+                </div>
+                <div>
+                  <label class="form-label">Label (default: Cooperative Clients)</label>
+                  <input type="text" name="stat_coop_clients_label" class="form-input" value="<?= e(sv($s,'stat_coop_clients_label')) ?>" placeholder="Cooperative Clients">
+                </div>
+              </div>
+              <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Technology Partners</div>
+                <div>
+                  <label class="form-label">Value (default: 15+)</label>
+                  <input type="text" name="stat_partners_value" class="form-input" value="<?= e(sv($s,'stat_partners_value')) ?>" placeholder="15+">
+                </div>
+                <div>
+                  <label class="form-label">Label (default: Technology Partners)</label>
+                  <input type="text" name="stat_partners_label" class="form-input" value="<?= e(sv($s,'stat_partners_label')) ?>" placeholder="Technology Partners">
+                </div>
+              </div>
+              <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
+                <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Provinces Covered</div>
+                <div>
+                  <label class="form-label">Value (default: 7)</label>
+                  <input type="text" name="stat_provinces_value" class="form-input" value="<?= e(sv($s,'stat_provinces_value')) ?>" placeholder="7">
+                </div>
+                <div>
+                  <label class="form-label">Label (default: Provinces Covered)</label>
+                  <input type="text" name="stat_provinces_label" class="form-input" value="<?= e(sv($s,'stat_provinces_label')) ?>" placeholder="Provinces Covered">
+                </div>
+              </div>
+            </div>
           </div>
         </details>
 
@@ -846,6 +893,10 @@ $tabs = [
           <div class="st-accordion__body">
             <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:0.375rem;">Pricing Teaser</div>
             <p class="caption-meta" style="margin-top:0;">Individual plans → <a href="pricing.php" class="text-primary">Admin → Pricing</a>.</p>
+            <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;margin-bottom:0.75rem;">
+              <input type="checkbox" name="pricing_cards_visible" value="1" <?= (($s['pricing_cards_visible'] ?? '1') !== '0') ? 'checked' : '' ?>>
+              <span style="font-size:0.875rem;font-weight:500;">Show pricing plan cards (Starter / Growth / Enterprise)</span>
+            </label>
             <?php biI($s,'home_pricing_eyebrow','Eyebrow label','Simple pricing','सरल मूल्य निर्धारण') ?>
             <?php biI($s,'home_pricing_title','Section title','Plans for every business','हरेक व्यवसायका लागि योजनाहरू') ?>
             <?php biI($s,'home_pricing_sub','Section subtitle','No hidden fees. Upgrade any time.','कुनै लुकेको शुल्क छैन।') ?>

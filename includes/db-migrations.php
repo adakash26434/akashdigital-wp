@@ -64,8 +64,9 @@ function runDbMigrations() {
 
     try {
         // Migration 1: Add team category field
+        // Note: TEXT DEFAULT is invalid in MySQL 5.7+; use VARCHAR(50) so DEFAULT works on both MySQL and SQLite.
         if (!dbColumnExists('team_members', 'category')) {
-            execute("ALTER TABLE team_members ADD COLUMN category TEXT DEFAULT 'management'");
+            execute("ALTER TABLE team_members ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'management'");
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M1: ' . $e->getMessage()); }
 

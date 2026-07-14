@@ -32,7 +32,10 @@ ob_start(); ?>
     $pricingTeaserFeatureLimit = null;
     $pricingTeaserWide = true;
     $pricingTeaserGridId = 'pricing-grid';
-    include 'includes/pricing-teaser.php';
+    $__pricingS = siteSettings();
+    if (($__pricingS['pricing_cards_visible'] ?? '1') !== '0'):
+        include 'includes/pricing-teaser.php';
+    endif;
     ?>
     <p class="text-center text-muted" style="margin-top:1.75rem;font-size:var(--text-sm);">
       <?= e(__('pricing_note')) ?>
