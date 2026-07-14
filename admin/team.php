@@ -2,6 +2,18 @@
 $pageTitle = 'Team Members';
 require_once '../includes/admin-layout.php';
 
+// ── Self-healing: ensure the category column exists ───────────────
+// MySQL 5.7 doesn't allow TEXT DEFAULT, so the original migration may have
+// silently failed. Try to add the column here if it's still missing.
+$__tmHasCategory = false;
+try {
+    $__tmHasCategory = dbColumnExists('team_members', 'category');
+    if (!$__tmHasCategory) {
+        execute("ALTER TABLE team_members ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'management'");
+        $__tmHasCategory = true;
+    }
+} catch (\Throwable $__e) { error_log('[team.php] category column: ' . $__e->getMessage()); }
+
 $success = $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -28,15 +40,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
-                if ($id) {
-                    execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,category=?,active=?,position=?,updated_at=NOW() WHERE id=?",
-                        [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position,$id]);
-                    $success = 'Team member updated.';
+                if ($__tmHasCategory) {
+                    // Full query including category column
+                    if ($id) {
+                        execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,category=?,active=?,position=?,updated_at=NOW() WHERE id=?",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position,$id]);
+                    } else {
+                        execute("INSERT INTO team_members (name,role,bio,photo_url,email,linkedin_url,is_leadership,category,active,position,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position]);
+                    }
                 } else {
-                    execute("INSERT INTO team_members (name,role,bio,photo_url,email,linkedin_url,is_leadership,category,active,position,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position]);
-                    $success = 'Team member added.';
+                    // Fallback: category column unavailable — save without it
+                    if ($id) {
+                        execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,active=?,position=?,updated_at=NOW() WHERE id=?",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$active,$position,$id]);
+                    } else {
+                        execute("INSERT INTO team_members (name,role,bio,photo_url,email,linkedin_url,is_leadership,active,position,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$active,$position]);
+                    }
                 }
+                $success = $id ? 'Team member updated.' : 'Team member added.';
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
         }
     }
