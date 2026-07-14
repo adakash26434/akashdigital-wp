@@ -22,10 +22,14 @@ $__planIcons = [
 ];
 
 $plans = [];
+// Track whether the table exists so we only fall back to hardcoded plans
+// when the DB table is genuinely missing — not just when all plans are hidden.
+$__pricingTableOk = false;
 try {
     $dbPlans = query(
         "SELECT * FROM pricing_plans WHERE active=1 ORDER BY position, id LIMIT " . max(1, $pricingTeaserLimit)
     );
+    $__pricingTableOk = true; // query succeeded → table exists
     foreach ($dbPlans as $p) {
         $slug = strtolower($p['name']);
         $feats = json_decode($p['features'] ?? '[]', true) ?: [];
@@ -46,7 +50,10 @@ try {
     }
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-if (empty($plans)) {
+// Only use the hardcoded fallback when the pricing_plans table does not exist yet.
+// If the table exists but all plans are hidden (active=0), show nothing —
+// that is the admin's explicit choice.
+if (!$__pricingTableOk) {
     $plans = [
         ['name'=>'Starter','tag'=>'Small Businesses','price'=>'NPR 4,999','period'=>'/ month','cta'=>'Get started','cta_url'=>url('contact.php'),'highlight'=>false,'icon'=>'sprout','features'=>['Up to 500 users','Core Software Module','Web portal + notices','Email & ticket support']],
         ['name'=>'Growth','tag'=>'Growing Businesses — most popular','price'=>'NPR 12,999','period'=>'/ month','cta'=>'Book a demo','cta_url'=>url('contact.php'),'highlight'=>true,'icon'=>'trending-up','features'=>['Up to 5,000 users','Software + Mobile App','DMS + role-based access','Priority < 2 hr support']],
