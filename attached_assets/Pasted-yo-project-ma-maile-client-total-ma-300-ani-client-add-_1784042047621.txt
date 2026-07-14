@@ -1,0 +1,90 @@
+yo project ma maile client total ma 300+ ani client add garesi count increase huni bhaneko thiye ..yo theme derai project ma bhayeko le kunai ma 300+ nagari client add garesi nai tehi bata count garnu parni bho kunai ma 300+ADD HUNI BHAYO SO YO ADMIN MA KATAI SETTING MA ADMIN LE CHANGE GARNA MILNI RAKDIN YEDI USLE TENA NUMBER JATI RAKCHA TEHI BATA CLIENT ADD BHAYESI BADDAI JANI GARI.. FIRST KO SCREENSHOT MA DEKHIKO KO 7 YEAR PLUS 500 PLUS  10+ 15 + 7 RROVENCE PLUS YO DEFALUT MA YEHI RAKDIN ADMIN LE YESLAI MANAGE GARNA SAKNI GARI RAKNA LAI K K GARNU BHAYO BHANNU LA... SECOND SCREENSHOT KO STATER GROWHT RA CUSTOM BHANNI SECTION KO TRANSPARENT PRICING
+Flexible plans for institutions of all sizes
+No hidden fees, no surprises. Scale or upgrade your plan anytime as your business grows. MATRA RAKNI ANI TAALKO HIDE GARNA NI MILNI OPTION ...KINAKI KASLAI HIDE GARNI KASAI UNHIDE GARNU PARNI BHO SO..3 KO SCREENSHOT KO AYEKO ERROR KASARI FIX GARNI MALAI AHA CODE AND NOTE DINUS MA ARKO AI MA GIT CONNECT BHAYEKO LE YESLAI MILAI DINUS LA... ANI KI YO MA GIT KO REPO DINCHU YO MILAYERA GIT MA PR PATHAI DINUS LA https://github.com/adakash26434/akashdigital-wp.git CLEAR HUNUBHAYO NI MAILE BHANEKO KURA?
+
+Show less
+
+विस्तृत खोज गरी admin directory मा सेटिङ्ग खोजिरहेको।
+विस्तृत खोज गरी admin directory मा सेटिङ्ग खोजिरहेको।
+Good, found it. Let me view the relevant sections of admin/settings.php around lines 60-160 and 590-630.
+
+
+Ran 3 commands, viewed 2 files
+Ran 3 commands, viewed 2 files
+Found it — includes/pricing-teaser.php. Let's look at that.
+
+
+Viewed 5 files, ran 4 commands
+Viewed 5 files, ran 4 commands
+Now let's find the corresponding UI render for the "features" checkboxes and the "homepage" stat inputs (around line 619) to model new fields properly.
+
+
+Viewed 4 files, ran 3 commands
+Viewed 4 files, ran 3 commands
+
+Find checkbox helper and features UI block
+
+Script
+
+View features section UI checkboxes block
+I can add the pricing plans toggle to the array following the same pattern, then handle the save logic by checking if the checkbox is set. Now I need to look at the stat fields section around line 600-630 to see how those inputs are structured.
+
+
+View homepage stat fields UI rendering
+I'm looking at the stats UI section and noticing that the Happy Clients stat is being overridden dynamically in the index.php file regardless of what the admin sets. I need to adjust this logic so it only uses the dynamic value as a default when the field is empty, and I should add new admin fields to control the client count offset and manage the secondary stats block that sits outside the main stat loop.
+
+The plan is to restructure index.php by moving the siteSettings() call earlier so I can fetch the client count base number before computing the total client count, then replace the hardcoded 300 offset with a configurable value that defaults to 300 if not set.
+
+Now I need to verify whether siteSettings() is being called multiple times and if there's caching involved, since I want to avoid redundant database queries. I'm also noticing there's duplicate stats computation happening — once when building the $stats array and again in the stats-bar.php include — so I need to trace through where $statsBarItems gets populated and whether these two code paths are actually being used or if one is dead code.
+
+Show more
+
+Check if $stats array feeds into stats-bar include
+bash
+
+cd /home/claude/work/akashdigital-wp-main && grep -n '\$stats\b\|statsBarItems' index.php
+Output
+
+70:$stats = [];
+78:  $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2]];
+I'm noticing that $stats is being built but never actually used—it's dead code. The stats-bar.php file independently reads its own settings with defaults that happen to match index.php's, but it doesn't apply the dynamic client count override for the second stat, so the "Happy Clients" value isn't being dynamically updated in the visible stats bar.
+
+This means the real ask is to make the hardcoded 300 base number in the cooperative clients calculation configurable through the admin interface, while ensuring all the other stats (the 7+, 500+, 10+, 15+, and 7 provinces values) remain editable through the existing settings UI.
+
+So I need to add new admin-configurable settings for the client count base offset, the technology partners value and label, and the provinces value and label—basically making everything in that second stats row manageable through the admin panel instead of hardcoded. Let me start implementing this by reorganizing the index.php code to pull the site settings earlier and replace those hardcoded values with configurable ones. Adding settings fields... Now I'm adding a toggle for the pricing plans visibility to control whether the Starter/Growth/Enterprise cards display on the pricing page, along with the corresponding save logic and a conditional check in pricing.php to respect that setting. I'm debating whether to hide just the pricing cards section or also include the comparison table below it, since they both display the same plans. To keep the page from looking broken, I should probably toggle both together behind the same visibility flag, even though the user only explicitly mentioned the cards. Let me check the structure around lines 40-110 to see how the comparison table relates to the cards section.
+
+Show less
+
+View rest of pricing.php to understand full sections for toggle scope
+I'm wrapping both the pricing cards and comparison table together under the toggle so users can show or hide the entire plans section, while keeping the header and FAQ permanently visible. This aligns with what the user wants—the ability to collapse the plan details while maintaining the hero content and support information.
+
+Now I need to check if the homepage's own pricing teaser section also displays those same three-card grid, since that would need the same toggle treatment.
+
+
+View homepage pricing teaser section
+The homepage pricing teaser section needs the same toggle treatment since it uses the same include file. I'll wrap that section with the visibility check, keeping the header and "View all pricing" link visible even when cards are hidden—though if the cards themselves are toggled off, it makes sense to show a "learn more" link to the pricing page instead. For the pricing.php page, I'm keeping the hero header visible since that's what the user wants to preserve, but wrapping the pricing cards and comparison table in the toggle so they can be hidden independently. The header, FAQ section, and CTA banner stay visible regardless. I also need to verify that the siteSettings() function is available in pricing.php through the helpers include that's already being used.
+
+
+Check siteSettings and sv helper definitions
+
+Script
+Done
+Good. Now let's look at the Team Members error (SQLSTATE 42S22 unknown column 'category'). Let's check admin/team.php and the team/staff table schema/migrations.
+
+
+Identified database bug, orchestrated admin settings overhaul, implemented dynamic pricing visibility controls
+Identified database bug, orchestrated admin settings overhaul, implemented dynamic pricing visibility controls
+Now remove the duplicate $__s = siteSettings(); line further down, since it's already loaded:
+
+
+Remove duplicate siteSettings() call now that it's loaded earlier
+Remove duplicate siteSettings() call now that it's loaded earlier
+
+Remove duplicate siteSettings() call now that it's loaded earlier
+
+index.php
++4
+-4
+Done
+
+
