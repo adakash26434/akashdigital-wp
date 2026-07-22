@@ -3,14 +3,23 @@ require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
+require_once 'includes/mailer.php';
 $__s = siteSettings();
 $pageTitle = 'Careers — ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company'));
 $pageDesc  = 'Join ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' — open positions in software engineering, QA, design, and IT services.';
 
 $jobs = [];
-try { $jobs = query("SELECT * FROM job_listings WHERE active=1 ORDER BY created_at DESC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+try {
+    // Show only active jobs that have started publishing and haven't expired
+    $jobs = query(
+        "SELECT * FROM job_listings WHERE active=1 
+         AND (starts_at IS NULL OR starts_at <= CURDATE()) 
+         AND (deadline IS NULL OR deadline >= CURDATE()) 
+         ORDER BY position ASC, created_at DESC"
+    );
+} catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-// Check if job deadline has passed
+// Check if job deadline has passed (for display purposes - should already be filtered)
 function isJobExpired($job) {
     if (empty($job['deadline'])) return false;
     return strtotime($job['deadline']) < time();
@@ -30,26 +39,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     $phone     = trim($_POST['phone'] ?? '');
     $cover     = trim($_POST['cover_letter'] ?? '');
     $resume    = trim($_POST['resume_url'] ?? '');
+    $cv_file   = trim($_POST['cv_file'] ?? '');
 
-    // Verify job exists and deadline hasn't passed
+    // Verify job exists, is active, and within publish window
     $job = null;
-    try { $job = queryOne("SELECT * FROM job_listings WHERE id=? AND active=1", [$job_id]); } catch (\Throwable $e) {}
+    try { 
+        $job = queryOne(
+            "SELECT * FROM job_listings WHERE id=? AND active=1 
+             AND (starts_at IS NULL OR starts_at <= CURDATE()) 
+             AND (deadline IS NULL OR deadline >= CURDATE())",
+            [$job_id]
+        ); 
+    } catch (\Throwable $e) {}
     
     if (!$job) {
         $apply_error = 'This job posting is no longer available.';
-    } elseif (isJobExpired($job)) {
-        $apply_error = 'Application deadline has passed for this position.';
     } elseif (!$full_name || !$email) {
         $apply_error = 'Name and email are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $apply_error = 'Please enter a valid email address.';
     } else {
         try {
-            execute(
-                "INSERT INTO job_applications (job_listing_id, name, email, phone, cover_letter, resume_url) VALUES (?,?,?,?,?,?)",
-                [$job_id, $full_name, $email, $phone ?: null, $cover ?: null, $resume ?: null]
+            $appId = execute(
+                "INSERT INTO job_applications (job_listing_id, name, email, phone, cover_letter, resume_url, cv_file) VALUES (?,?,?,?,?,?,?)",
+                [$job_id, $full_name, $email, $phone ?: null, $cover ?: null, $resume ?: null, $cv_file ?: null]
             );
             $apply_success = true;
+            
+            // Send email notifications
+            $submittedApp = ['id' => $appId, 'name' => $full_name, 'email' => $email, 'phone' => $phone, 'cover_letter' => $cover, 'resume_url' => $resume, 'cv_file' => $cv_file];
+            notifyAdminNewJobApplication($submittedApp, $job);
+            notifyApplicantJobConfirmation($submittedApp, $job);
         } catch (\Throwable $e) {
             $apply_error = 'Something went wrong. Please try again.';
         }
@@ -230,8 +250,12 @@ ob_start(); ?>
             </div>
           </div>
           <div>
-            <label class="form-label">Resume / Portfolio URL</label>
-            <input type="url" name="resume_url" class="form-input" placeholder="https://drive.google.com/...">
+            <label class="form-label">Resume URL <span style="color:var(--muted-foreground);font-weight:400;">(LinkedIn, portfolio, etc.)</span></label>
+            <input type="url" name="resume_url" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
+          </div>
+          <div>
+            <label class="form-label">CV File URL <span style="color:var(--muted-foreground);font-weight:400;">(Google Drive, Dropbox link)</span></label>
+            <input type="url" name="cv_file" class="form-input" placeholder="https://drive.google.com/file/d/...">
           </div>
           <div>
             <label class="form-label">Cover Letter</label>

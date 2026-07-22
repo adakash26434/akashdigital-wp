@@ -207,7 +207,9 @@ function sqliteInit(PDO $pdo): void {
         requirements TEXT,
         perks TEXT,
         deadline TEXT,
+        starts_at TEXT,
         active INTEGER NOT NULL DEFAULT 1,
+        position INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now')),
         updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
