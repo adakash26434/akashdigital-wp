@@ -594,6 +594,56 @@ function resolveOgImageUrl(?string $pageOverride = null, ?array $settings = null
     return absoluteMediaUrl('/public/opengraph.jpg') ?: '/public/opengraph.jpg';
 }
 
+/** Prefer admin favicon, then logo (PNG/ICO), then bundled SVG. */
+function resolveFaviconUrl(?array $settings = null): string {
+    $settings = $settings ?? (function_exists('siteSettings') ? siteSettings() : []);
+    $candidates = [
+        trim((string)($settings['favicon_url'] ?? '')),
+        trim((string)($settings['logo_url'] ?? '')),
+        '/public/favicon.svg',
+    ];
+    foreach ($candidates as $c) {
+        if ($c === '') continue;
+        if (!ogImageIsUsable($c)) continue;
+        $abs = absoluteMediaUrl($c);
+        if ($abs !== '') return $abs;
+    }
+    return absoluteMediaUrl('/public/favicon.svg') ?: '/public/favicon.svg';
+}
+
+/**
+ * Apple / Facebook chrome icons prefer PNG/JPG (SVG often shows as a broken/red tile).
+ */
+function resolveAppleTouchIconUrl(?array $settings = null): string {
+    $settings = $settings ?? (function_exists('siteSettings') ? siteSettings() : []);
+    $candidates = [
+        trim((string)($settings['favicon_url'] ?? '')),
+        trim((string)($settings['logo_url'] ?? '')),
+        trim((string)($settings['og_image'] ?? '')),
+    ];
+    foreach ($candidates as $c) {
+        if ($c === '') continue;
+        if (!ogImageIsUsable($c)) continue;
+        $path = strtolower((string)(parse_url(absoluteMediaUrl($c), PHP_URL_PATH) ?? $c));
+        if (preg_match('/\.(svg)(\?|$)/', $path)) continue; // skip SVG for touch icon
+        $abs = absoluteMediaUrl($c);
+        if ($abs !== '') return $abs;
+    }
+    // Last raster fallback: site logo even if check failed, else SVG
+    $logo = trim((string)($settings['logo_url'] ?? ''));
+    if ($logo !== '') return absoluteMediaUrl($logo);
+    return resolveFaviconUrl($settings);
+}
+
+function faviconMimeFromUrl(string $url): string {
+    $path = strtolower((string)(parse_url($url, PHP_URL_PATH) ?? $url));
+    if (str_ends_with($path, '.svg')) return 'image/svg+xml';
+    if (str_ends_with($path, '.ico')) return 'image/x-icon';
+    if (str_ends_with($path, '.webp')) return 'image/webp';
+    if (str_ends_with($path, '.jpg') || str_ends_with($path, '.jpeg')) return 'image/jpeg';
+    return 'image/png';
+}
+
 // ── Audit log helper ─────────────────────────────────────────────
 // नेपालीमा: Admin action haru lai audit_log table ma record garne
 // Usage: logAudit('user.delete', 'Deleted user id=42', ['target_type'=>'user','target_id'=>42])

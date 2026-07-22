@@ -154,8 +154,23 @@ endif; ?>
 <script src="<?= $__siteUrl ?>/assets/vendor/lucide.min.js" defer></script>
 
 <link rel="manifest" href="<?= $__siteUrl ?>/manifest.php">
-<link rel="apple-touch-icon" href="<?= $__siteUrl ?>/public/favicon.svg">
-<link rel="icon" type="image/svg+xml" href="<?= $__siteUrl ?>/public/favicon.svg">
+<?php
+  $__favicon = function_exists('resolveFaviconUrl') ? resolveFaviconUrl($__s) : (rtrim($__siteUrl, '/') . '/public/favicon.svg');
+  $__touch   = function_exists('resolveAppleTouchIconUrl') ? resolveAppleTouchIconUrl($__s) : $__favicon;
+  $__favMime = function_exists('faviconMimeFromUrl') ? faviconMimeFromUrl($__favicon) : 'image/svg+xml';
+  // Cache-bust icons when local file changes
+  foreach (['__favicon' => &$__favicon, '__touch' => &$__touch] as $_k => &$_u) {
+      $__p = parse_url($_u, PHP_URL_PATH) ?: '';
+      $__f = dirname(__DIR__) . $__p;
+      if ($__p && is_file($__f) && !str_contains($_u, '?')) {
+          $_u .= '?v=' . filemtime($__f);
+      }
+  }
+  unset($_u);
+?>
+<link rel="apple-touch-icon" sizes="180x180" href="<?= e($__touch) ?>">
+<link rel="icon" type="<?= e($__favMime) ?>" href="<?= e($__favicon) ?>">
+<link rel="shortcut icon" href="<?= e($__favicon) ?>">
 
 <script>(function(){
   var srv = <?= json_encode($__themePref) ?>;

@@ -397,7 +397,7 @@ $tabs = [
             $imgLabel = 'Favicon (Site Icon)';
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
-          <p class="caption-meta" style="margin-top:-0.25rem;">Small icon shown in browser tab. Recommended: 32x32px PNG or ICO.</p>
+          <p class="caption-meta" style="margin-top:-0.25rem;">Browser tab + Facebook share icon. Prefer <strong>PNG 180×180</strong> (or ICO). SVG may show as a solid/broken tile in Facebook.</p>
           <button type="submit" class="btn btn-primary w-fit">Save General Settings</button>
         </div>
       </div>
