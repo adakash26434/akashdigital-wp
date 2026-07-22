@@ -147,7 +147,11 @@ ob_start(); ?>
 </section>
 
 <!-- Job listings -->
-<section class="st-section" id="openings" x-data="{dept:'',applyId:<?= $reopen_apply_id ? (int)$reopen_apply_id : 'null' ?>,applyTitle:<?= json_encode($reopen_apply_title, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>}">
+<section class="st-section" id="openings" x-data="<?= e(json_encode([
+  'dept' => '',
+  'applyId' => $reopen_apply_id ? (int)$reopen_apply_id : null,
+  'applyTitle' => (string)$reopen_apply_title,
+], JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP)) ?>">
   <div class="container">
     <div class="section-head section-head-tight">
       <span class="section-eyebrow">Open Roles</span>
@@ -224,7 +228,7 @@ ob_start(); ?>
             <?php if ($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id']): ?>
             <span class="careers-vacancy__applied">✓ Applied</span>
             <?php else: ?>
-            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary careers-vacancy__apply">
+            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= e(json_encode($job['title'] ?? '', JSON_UNESCAPED_UNICODE)) ?>" class="btn btn-primary careers-vacancy__apply">
               <?= __("cta_apply_now") ?> →
             </button>
             <?php endif; ?>
@@ -277,7 +281,7 @@ ob_start(); ?>
             include __DIR__ . '/includes/share-buttons.php';
             ?>
             <?php if (!($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id'])): ?>
-            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary btn-sm careers-vacancy__footer-apply">
+            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= e(json_encode($job['title'] ?? '', JSON_UNESCAPED_UNICODE)) ?>" class="btn btn-primary btn-sm careers-vacancy__footer-apply">
               <?= e(isNepali() ? 'यस पदको लागि आवेदन →' : 'Apply for this role →') ?>
             </button>
             <?php endif; ?>
