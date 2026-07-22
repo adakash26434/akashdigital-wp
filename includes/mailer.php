@@ -326,3 +326,76 @@ function sendEmailVerification(array $user, string $token): void {
 function sendVerificationResend(array $user, string $token): void {
     sendEmailVerification($user, $token);
 }
+
+// नेपालीमा: Admin lai naya job application ko notification pathaune
+function notifyAdminNewJobApplication(array $app, array $job): void {
+    try {
+        $settings   = siteSettings();
+        $adminEmail = $settings['contact_email'] ?? ('admin@' . (parse_url(SITE_URL, PHP_URL_HOST) ?: 'company.com'));
+        $applicant  = e($app['name'] ?? '');
+        $email      = e($app['email'] ?? '');
+        $phone      = e($app['phone'] ?? '—');
+        $jobTitle   = e($job['title'] ?? 'Open Application');
+        $coverLetter = nl2br(e($app['cover_letter'] ?? ''));
+        $resumeUrl   = e($app['resume_url'] ?? '');
+        $cvFile      = e($app['cv_file'] ?? '');
+        $link        = SITE_URL . '/admin/careers.php?tab=apps';
+
+        $html = "
+        <h2 style='margin:0 0 12px;font-size:18px;font-weight:700;color:#1e293b;'> New Job Application Received</h2>
+        <p style='font-size:15px;color:#475569;margin:0 0 20px;'>You have received a new application for the <strong>{$jobTitle}</strong> position.</p>
+        <table cellpadding='0' cellspacing='0' width='100%' style='border-collapse:collapse;margin-bottom:20px;'>
+          <tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;width:140px;border-bottom:1px solid #e2e8f0;'>Applicant</td>
+              <td style='padding:10px 12px;font-size:14px;font-weight:700;color:#1e293b;border-bottom:1px solid #e2e8f0;'>{$applicant}</td></tr>
+          <tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;'>Email</td>
+              <td style='padding:10px 12px;font-size:14px;border-bottom:1px solid #e2e8f0;'><a href='mailto:{$email}' style='color:#3b82f6;'>{$email}</a></td></tr>
+          <tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;'>Phone</td>
+              <td style='padding:10px 12px;font-size:14px;color:#1e293b;border-bottom:1px solid #e2e8f0;'>{$phone}</td></tr>
+          <tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;'>Position</td>
+              <td style='padding:10px 12px;font-size:14px;font-weight:700;color:#1e293b;border-bottom:1px solid #e2e8f0;'>{$jobTitle}</td></tr>";
+        
+        if ($resumeUrl) {
+            $html .= "<tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;'>Resume</td>
+              <td style='padding:10px 12px;font-size:14px;border-bottom:1px solid #e2e8f0;'><a href='{$resumeUrl}' target='_blank' style='color:#3b82f6;'>{$resumeUrl}</a></td></tr>";
+        }
+        
+        if ($cvFile) {
+            $html .= "<tr><td style='padding:10px 12px;background:#f8fafc;font-size:13px;font-weight:600;color:#64748b;border-bottom:1px solid #e2e8f0;'>CV File</td>
+              <td style='padding:10px 12px;font-size:14px;border-bottom:1px solid #e2e8f0;'><a href='{$cvFile}' target='_blank' style='color:#3b82f6;'>View CV</a></td></tr>";
+        }
+        
+        $html .= "</table>";
+        
+        if ($coverLetter) {
+            $html .= "<div style='background:#f0f9ff;border:1px solid #bae6fd;border-radius:8px;padding:16px;margin-bottom:24px;'>
+          <p style='font-size:12px;font-weight:600;color:#0369a1;margin:0 0 8px;text-transform:uppercase;letter-spacing:0.05em;'>Cover Letter</p>
+          <div style='font-size:14px;color:#1e293b;line-height:1.6;'>{$coverLetter}</div>
+        </div>";
+        }
+        
+        $html .= "<a href='{$link}' style='display:inline-block;padding:12px 24px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;'>View All Applications →</a>";
+
+        sendMail($adminEmail, "New Application: {$jobTitle} — {$applicant}", $html, ['reply_to' => $email]);
+    } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+}
+
+// नेपालीमा: Applicant lai confirmation email pathaune
+function notifyApplicantJobConfirmation(array $app, array $job): void {
+    try {
+        $settings = siteSettings();
+        $applicant = e($app['name'] ?? '');
+        $email     = e($app['email'] ?? '');
+        $jobTitle  = e($job['title'] ?? 'the position');
+        $siteName  = e(stSiteName());
+        $siteUrl   = SITE_URL;
+
+        $html = "
+        <h2 style='margin:0 0 12px;font-size:18px;font-weight:700;color:#1e293b;'> Application Received!</h2>
+        <p style='font-size:15px;color:#475569;margin:0 0 20px;'>Hi {$applicant}, thank you for applying for the <strong>{$jobTitle}</strong> position at {$siteName}.</p>
+        <p style='font-size:14px;color:#475569;margin:0 0 20px;'>We have received your application and will review it carefully. Our team will get in touch with you if your profile matches our requirements.</p>
+        <p style='font-size:14px;color:#475569;margin:0 0 24px;'>We appreciate your interest in joining our team!</p>
+        <a href='{$siteUrl}/careers.php' style='display:inline-block;padding:12px 24px;background:#3b82f6;color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;'>View All Open Positions →</a>";
+
+        sendMail($email, "Your application for {$jobTitle} — {$siteName}", $html);
+    } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+}

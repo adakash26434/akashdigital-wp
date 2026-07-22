@@ -1024,7 +1024,9 @@ CREATE TABLE IF NOT EXISTS job_listings (
   requirements LONGTEXT,
   perks        TEXT,
   deadline     DATE,
+  starts_at    DATE,
   active       TINYINT NOT NULL DEFAULT 1,
+  position     INT NOT NULL DEFAULT 0,
   created_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at   DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -1037,6 +1039,7 @@ CREATE TABLE IF NOT EXISTS job_applications (
   phone          VARCHAR(30),
   position       VARCHAR(255),
   resume_url     VARCHAR(500),
+  cv_file        VARCHAR(500),
   cover_letter   LONGTEXT,
   status         VARCHAR(30) NOT NULL DEFAULT 'new',
   notes          TEXT,
