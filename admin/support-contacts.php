@@ -62,7 +62,7 @@ $TYPE_CFG = [
     <h2 class="h-eyebrow-flat"> Support Contacts (<?=count($contacts)?>)</h2>
     <p style="font-size:0.8125rem;color:var(--muted-foreground);margin-top:0.25rem;">These contacts are shown to clients in the Client Portal. Keep them current.</p>
   </div>
-  <button onclick="document.getElementById('add-modal').style.display='flex'" class="btn btn-primary btn-sm">+ Add Contact</button>
+  <button type="button" onclick="afModalOpen('add-modal')" class="btn btn-primary btn-sm">+ Add Contact</button>
 </div>
 
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0.875rem;margin-bottom:1.5rem;">
@@ -112,40 +112,55 @@ $TYPE_CFG = [
 </div>
 
 <!-- Add Modal -->
-<div id="add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:1rem;padding:1.75rem;width:min(480px,95vw);box-shadow:var(--shadow-elevated);">
-    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;"> Add Contact</h3>
-    <form method="POST" class="col-1">
+<div id="add-modal" class="af-modal" onclick="if(event.target===this)afModalClose('add-modal')">
+  <div class="af-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="add-contact-title">
+    <div class="af-modal__header">
+      <div>
+        <h3 id="add-contact-title" class="af-modal__title">Add Contact</h3>
+        <p class="af-modal__sub">Phone, WhatsApp, email, or branch details for clients.</p>
+      </div>
+      <button type="button" onclick="afModalClose('add-modal')" class="st-modal-close" aria-label="Close"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="af-modal__body">
+    <form method="POST">
       <?=csrfField()?>
       <input type="hidden" name="action" value="add">
       <?php include __DIR__.'/../includes/_contact-form.php'; ?>
-      <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" onclick="document.getElementById('add-modal').style.display='none'" class="btn btn-outline">Cancel</button>
+      <div class="af-form-footer af-form-footer-buttons">
+        <button type="submit" class="btn btn-primary">Save Contact</button>
+        <button type="button" onclick="afModalClose('add-modal')" class="btn btn-outline">Cancel</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
 <!-- Edit Modal -->
-<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:1rem;padding:1.75rem;width:min(480px,95vw);box-shadow:var(--shadow-elevated);">
-    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;"> Edit Contact</h3>
-    <form method="POST" id="edit-form" class="col-1">
+<div id="edit-modal" class="af-modal" onclick="if(event.target===this)afModalClose('edit-modal')">
+  <div class="af-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="edit-contact-title">
+    <div class="af-modal__header">
+      <div>
+        <h3 id="edit-contact-title" class="af-modal__title">Edit Contact</h3>
+        <p class="af-modal__sub">Update contact details shown in the client portal.</p>
+      </div>
+      <button type="button" onclick="afModalClose('edit-modal')" class="st-modal-close" aria-label="Close"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="af-modal__body">
+    <form method="POST" id="edit-form">
       <?=csrfField()?>
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="id" id="edit-id">
       <?php include __DIR__.'/../includes/_contact-form.php'; ?>
-      <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
-        <button type="submit" class="btn btn-primary">Update</button>
-        <button type="button" onclick="document.getElementById('edit-modal').style.display='none'" class="btn btn-outline">Cancel</button>
+      <div class="af-form-footer af-form-footer-buttons">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" onclick="afModalClose('edit-modal')" class="btn btn-outline">Cancel</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
 <script>
-// नेपालीमा: openEditModal() — yo function le aafno kaam garchha
 function openEditModal(data) {
   document.getElementById('edit-id').value = data.id;
   const f = document.getElementById('edit-form');
@@ -155,7 +170,7 @@ function openEditModal(data) {
   });
   const pri = f.querySelector('[name="is_primary"]');
   if (pri) pri.checked = data.is_primary == 1;
-  document.getElementById('edit-modal').style.display = 'flex';
+  afModalOpen('edit-modal');
 }
 </script>
 

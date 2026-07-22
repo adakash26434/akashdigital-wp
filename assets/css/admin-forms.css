@@ -346,6 +346,89 @@
   min-height: 120px;
 }
 
+/* Share buttons (also used on admin careers list) */
+.st-share { display: inline-flex; align-items: center; }
+.st-share__actions { display: inline-flex; align-items: center; gap: 0.375rem; flex-wrap: wrap; }
+.st-share-btn {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.st-share-btn--wa:hover { background: #25d366; border-color: #25d366; color: #fff; }
+.st-share-btn--fb:hover { background: #1877f2; border-color: #1877f2; color: #fff; }
+.st-share-btn--in:hover { background: #0077b5; border-color: #0077b5; color: #fff; }
+.st-share-btn--x:hover  { background: #0f1419; border-color: #0f1419; color: #fff; }
+.st-share-btn--copy:hover,
+.st-share-btn--copy.st-share-btn--copied { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+/* ── Admin modal forms (subscriptions, contacts, etc.) ── */
+.af-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
+.af-modal.is-open { display: flex; }
+.af-modal__dialog {
+  background: var(--card);
+  border-radius: 1rem;
+  width: min(760px, 100%);
+  max-height: calc(100vh - 2rem);
+  overflow-y: auto;
+  box-shadow: var(--shadow-elevated);
+  border: 1px solid var(--border);
+  margin: auto;
+}
+.af-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--card);
+}
+.af-modal__title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.af-modal__sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+}
+.af-modal__body { padding: 0 1.5rem 1.5rem; }
+.af-modal-form .form-section { padding: 1.15rem 0; }
+.af-modal-form .form-section:first-child { padding-top: 0.75rem; }
+.af-modal-form .form-check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-top: 0.25rem;
+}
+.af-modal-form .form-check-row input[type="checkbox"] { width: 1rem; height: 1rem; }
+.af-modal-form .form-check-row .form-label { margin: 0; }
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
   .af-split {

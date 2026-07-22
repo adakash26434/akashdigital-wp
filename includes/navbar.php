@@ -8,7 +8,7 @@ $companyLinks = [
   ['href' => 'about.php#vision',     'key' => 'nav_vision',     'icon' => 'eye'],
   ['href' => 'about.php#leadership', 'key' => 'nav_leadership', 'icon' => 'badge-check'],
   ['href' => 'about.php#team',       'key' => 'nav_team',       'icon' => 'users'],
-  ['href' => 'careers.php',            'key' => 'nav_career',           'icon' => 'briefcase'],
+  ['href' => 'careers.php',            'key' => 'nav_career',           'icon' => 'briefcase', 'badge' => 'NEW', 'badge_until' => '2026-08-22'],
   ['href' => 'partners.php',           'key' => 'nav_solution_partners', 'icon' => 'handshake'],
   ['href' => 'technical-expertise.php','key' => 'nav_tech_expertise',    'icon' => 'cpu'],
 ];
@@ -83,6 +83,9 @@ if (!isset($__s)) $__s = siteSettings();
           aria-label="Company"
           class="nav-pill <?= $companyActive ? 'active' : '' ?>">
           <?= __('nav_company') ?>
+          <?php if (navHasChildBadge($companyLinks)): ?>
+          <span class="st-nav-badge st-nav-badge--pill">NEW</span>
+          <?php endif; ?>
           <svg id="st-chevron-company" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chev"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div id="st-dd-company" class="st-dropdown" x-cloak x-show="companyOpen" x-transition style="left:0;">
@@ -96,7 +99,10 @@ if (!isset($__s)) $__s = siteSettings();
              <?= $cActive ? 'aria-current="page"' : '' ?>
              class="st-dd-item <?= $cActive ? 'active' : '' ?>">
             <i data-lucide="<?= $cl['icon'] ?>" class="st-dd-icon" aria-hidden="true"></i>
-            <?= e(__($cl['key'])) ?>
+            <span class="st-dd-label"><?= e(__($cl['key'])) ?></span>
+            <?php if (navShowBadge($cl)): ?>
+            <span class="st-nav-badge"><?= e($cl['badge']) ?></span>
+            <?php endif; ?>
           </a>
           <?php endforeach; ?>
         </div>
@@ -240,6 +246,9 @@ if (!isset($__s)) $__s = siteSettings();
             <i data-lucide="<?= $l['icon'] ?>" style="width:15px;height:15px;opacity:0.5;flex-shrink:0;" aria-hidden="true"></i>
             <?php endif; ?>
             <?= e(__($l['key'])) ?>
+            <?php if (navShowBadge($l)): ?>
+            <span class="st-nav-badge"><?= e($l['badge']) ?></span>
+            <?php endif; ?>
           </span>
           <i data-lucide="chevron-right" style="width:13px;height:13px;opacity:0.3;flex-shrink:0;" aria-hidden="true"></i>
         </a>

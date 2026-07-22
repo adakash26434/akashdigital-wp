@@ -22,6 +22,24 @@ try {
 $departments = array_values(array_unique(array_filter(array_column($jobs, 'department'))));
 sort($departments);
 
+$highlightJobSlug = trim((string)($_GET['job'] ?? ''));
+$featuredJob      = null;
+if ($highlightJobSlug !== '') {
+    foreach ($jobs as $j) {
+        if (($j['slug'] ?? '') === $highlightJobSlug) {
+            $featuredJob = $j;
+            break;
+        }
+    }
+}
+if ($featuredJob) {
+    $co = $__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company');
+    $pageTitle = e($featuredJob['title']) . ' — Careers — ' . e($co);
+    $pageDesc  = !empty($featuredJob['short_desc'])
+        ? $featuredJob['short_desc']
+        : 'Apply for ' . ($featuredJob['title'] ?? 'this role') . ' at ' . $co . '.';
+}
+
 $apply_success = false;
 $apply_error   = '';
 
@@ -73,6 +91,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     }
 }
 
+$reopen_apply_id    = null;
+$reopen_apply_title = '';
+if ($apply_error && !empty($_POST['apply_job_id'])) {
+    $reopen_apply_id = (int)$_POST['apply_job_id'];
+    foreach ($jobs as $j) {
+        if ((int)$j['id'] === $reopen_apply_id) {
+            $reopen_apply_title = $j['title'] ?? '';
+            break;
+        }
+    }
+}
+
 require_once 'includes/header.php';
 ?>
 
@@ -117,7 +147,7 @@ ob_start(); ?>
 </section>
 
 <!-- Job listings -->
-<section class="st-section" id="openings" x-data="{dept:'',applyId:null,form:{full_name:'',email:'',phone:'',cover_letter:'',resume_url:''}}">
+<section class="st-section" id="openings" x-data="{dept:'',applyId:<?= $reopen_apply_id ? (int)$reopen_apply_id : 'null' ?>,applyTitle:<?= json_encode($reopen_apply_title, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>}">
   <div class="container">
     <div class="section-head section-head-tight">
       <span class="section-eyebrow">Open Roles</span>
@@ -151,9 +181,13 @@ ob_start(); ?>
     </div>
     <?php else: ?>
     <div class="col-1" id="job-list">
-      <?php foreach ($openJobs as $job): ?>
-      <div class="st-card" x-show="dept==='' || dept==='<?= e($job['department']??'') ?>'" style="padding:0;">
-        <div class="p-tile" x-data="{open:false}">
+      <?php foreach ($openJobs as $job):
+        $isHighlighted = $highlightJobSlug !== '' && ($job['slug'] ?? '') === $highlightJobSlug;
+        $jobShareUrl = jobListingPublicUrl($job);
+        $jobShareMsg = jobListingShareMessage($job);
+      ?>
+      <div class="st-card careers-job-card<?= $isHighlighted ? ' careers-job-card--highlight' : '' ?>" id="job-<?= e($job['slug'] ?? ('id-' . (int)$job['id'])) ?>" x-show="dept==='' || dept==='<?= e($job['department']??'') ?>'" style="padding:0;">
+        <div class="p-tile" x-data="{open:<?= $isHighlighted ? 'true' : 'false' ?>}">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
             <div>
               <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-bottom:0.5rem;">
@@ -173,14 +207,21 @@ ob_start(); ?>
               <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin-top:0.375rem;"><?= e($job['short_desc']) ?></p>
               <?php endif;?>
             </div>
-            <div style="display:flex;gap:0.5rem;flex-shrink:0;">
+            <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap;">
+              <?php
+              $shareUrl = $jobShareUrl;
+              $shareTitle = $job['title'] ?? 'Job opening';
+              $shareMessage = $jobShareMsg;
+              $shareCopyId = 'job-share-' . (int)$job['id'];
+              include __DIR__ . '/includes/share-buttons.php';
+              ?>
               <button @click="open=!open" class="btn btn-outline btn-sm">
                 <span x-text="open ? 'Hide Details ▲' : 'Details ▼'"></span>
               </button>
               <?php if ($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id']): ?>
               <span class="badge" style="background:var(--success-soft);border:1px solid var(--success-border);color:var(--success-fg);padding:0.5rem 1rem;"> Applied!</span>
               <?php else: ?>
-              <button @click="applyId=<?= (int)$job['id'] ?>" class="btn btn-primary btn-sm"><?= __("cta_apply_now") ?> →</button>
+              <button @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary btn-sm"><?= __("cta_apply_now") ?> →</button>
               <?php endif; ?>
             </div>
           </div>
@@ -204,6 +245,18 @@ ob_start(); ?>
               </ul>
             </div>
             <?php endif;?>
+            <div class="careers-job-share-bar">
+              <span class="careers-job-share-bar__text">Know someone perfect for this role?</span>
+              <?php
+              $shareUrl = $jobShareUrl;
+              $shareTitle = $job['title'] ?? 'Job opening';
+              $shareMessage = $jobShareMsg;
+              $shareVariant = 'bar';
+              $shareLabel = 'Share this vacancy';
+              $shareCopyId = 'job-share-bar-' . (int)$job['id'];
+              include __DIR__ . '/includes/share-buttons.php';
+              ?>
+            </div>
           </div>
         </div>
       </div>
@@ -214,59 +267,91 @@ ob_start(); ?>
 
     <!-- Apply Modal -->
     <div x-show="applyId !== null" x-cloak
-         @click.self="applyId=null" @keydown.escape.window="applyId=null"
+         @click.self="applyId=null; applyTitle=''" @keydown.escape.window="applyId=null; applyTitle=''"
          x-transition:enter="transition ease-out duration-200"
          x-transition:enter-start="opacity-0"
          x-transition:enter-end="opacity-100"
          x-transition:leave="transition ease-in duration-150"
          x-transition:leave-start="opacity-100"
          x-transition:leave-end="opacity-0"
-         class="modal-backdrop">
-      <div style="background:var(--card);border-radius:1.25rem;padding:2rem;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-elevated);">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
-          <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;color:var(--foreground);"><?= __("cta_apply_position") ?></h3>
-          <button @click="applyId=null" title="Close" aria-label="Close modal" class="st-modal-close"><i data-lucide="x" style="width:18px;height:18px;pointer-events:none;"></i></button>
+         class="modal-backdrop careers-apply-backdrop">
+      <div class="careers-apply-dialog" role="dialog" aria-modal="true" aria-labelledby="careers-apply-title">
+        <div class="careers-apply-header">
+          <div>
+            <p class="careers-apply-eyebrow">Job Application</p>
+            <h3 id="careers-apply-title" class="careers-apply-title"><?= __("cta_apply_position") ?></h3>
+            <p class="careers-apply-job" x-show="applyTitle" x-text="applyTitle"></p>
+          </div>
+          <button type="button" @click="applyId=null; applyTitle=''" title="Close" aria-label="Close" class="st-modal-close">
+            <i data-lucide="x" style="width:18px;height:18px;pointer-events:none;"></i>
+          </button>
         </div>
+
         <?php if ($apply_error): ?>
-        <div class="alert alert-error mb-1"><?= e($apply_error) ?></div>
+        <div class="alert alert-error careers-apply-alert"><?= e($apply_error) ?></div>
         <?php endif; ?>
-        <form method="POST" enctype="multipart/form-data" class="col-1">
+
+        <form method="POST" enctype="multipart/form-data" class="careers-apply-form">
           <?= csrfField() ?>
           <input type="hidden" name="apply_job_id" :value="applyId">
-          <div>
-            <label class="form-label">Full Name <span class="text-danger-token">*</span></label>
-            <input type="text" name="full_name" required class="form-input" placeholder="Your full name">
-          </div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-            <div>
-              <label class="form-label">Email <span class="text-danger-token">*</span></label>
-              <input type="email" name="email" required class="form-input" placeholder="you@email.com">
+
+          <div class="careers-apply-section">
+            <h4 class="careers-apply-section-title">Your details</h4>
+            <div class="careers-apply-field">
+              <label class="form-label" for="apply-full-name">Full Name <span class="text-danger-token">*</span></label>
+              <input type="text" id="apply-full-name" name="full_name" required class="form-input" placeholder="Your full name" autocomplete="name" value="<?= e($_POST['full_name'] ?? '') ?>">
             </div>
-            <div>
-              <label class="form-label">Phone</label>
-              <input type="tel" name="phone" class="form-input" placeholder="+977 98xxxxxxxx">
+            <div class="careers-apply-grid-2">
+              <div class="careers-apply-field">
+                <label class="form-label" for="apply-email">Email <span class="text-danger-token">*</span></label>
+                <input type="email" id="apply-email" name="email" required class="form-input" placeholder="you@email.com" autocomplete="email" value="<?= e($_POST['email'] ?? '') ?>">
+              </div>
+              <div class="careers-apply-field">
+                <label class="form-label" for="apply-phone">Phone</label>
+                <input type="tel" id="apply-phone" name="phone" class="form-input" placeholder="+977 98xxxxxxxx" autocomplete="tel" value="<?= e($_POST['phone'] ?? '') ?>">
+              </div>
             </div>
           </div>
-          <div>
-            <label class="form-label">Upload CV (PDF) <span class="text-danger-token">*</span></label>
-            <input type="file" name="resume_file" accept=".pdf,application/pdf" class="form-input">
-            <span class="form-hint">Max 5 MB. PDF only.</span>
+
+          <div class="careers-apply-section">
+            <h4 class="careers-apply-section-title">Resume / CV</h4>
+            <p class="careers-apply-section-hint">Upload a PDF or share a link — at least one is required.</p>
+            <div class="careers-apply-field">
+              <label class="form-label" for="careers-resume-file">Upload CV (PDF)</label>
+              <div class="careers-file-upload">
+                <input type="file" id="careers-resume-file" name="resume_file" accept=".pdf,application/pdf" class="careers-file-upload__input">
+                <label for="careers-resume-file" class="careers-file-upload__box">
+                  <i data-lucide="file-up" class="ic-20" style="color:var(--primary);"></i>
+                  <span class="careers-file-upload__title">Choose PDF file</span>
+                  <span class="careers-file-upload__hint">Max 5 MB · PDF only</span>
+                </label>
+              </div>
+            </div>
+            <details class="careers-apply-details"<?= (!empty($_POST['resume_url']) || !empty($_POST['cv_file'])) ? ' open' : '' ?>>
+              <summary>Or paste a link instead</summary>
+              <div class="careers-apply-details-body">
+                <div class="careers-apply-field">
+                  <label class="form-label" for="apply-resume-url">LinkedIn / Portfolio URL</label>
+                  <input type="url" id="apply-resume-url" name="resume_url" class="form-input" placeholder="https://linkedin.com/in/yourprofile" value="<?= e($_POST['resume_url'] ?? '') ?>">
+                </div>
+                <div class="careers-apply-field">
+                  <label class="form-label" for="apply-cv-url">Google Drive / Dropbox link</label>
+                  <input type="url" id="apply-cv-url" name="cv_file" class="form-input" placeholder="https://drive.google.com/file/d/..." value="<?= e($_POST['cv_file'] ?? '') ?>">
+                </div>
+              </div>
+            </details>
           </div>
-          <div>
-            <label class="form-label">Resume / Portfolio URL <span style="color:var(--muted-foreground);font-weight:400;">(LinkedIn, portfolio, etc.)</span></label>
-            <input type="url" name="resume_url" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
-            <span class="form-hint">Use this if you prefer sharing a profile or portfolio link instead of only a CV.</span>
+
+          <div class="careers-apply-section careers-apply-section--last">
+            <h4 class="careers-apply-section-title">Cover letter <span class="careers-apply-optional">(optional)</span></h4>
+            <div class="careers-apply-field">
+              <label class="form-label sr-only" for="apply-cover">Cover letter</label>
+              <textarea id="apply-cover" name="cover_letter" class="form-input careers-apply-textarea" rows="5" placeholder="Tell us why you are a great fit for this role..."><?= e($_POST['cover_letter'] ?? '') ?></textarea>
+            </div>
           </div>
-          <div>
-            <label class="form-label">Or CV File URL <span style="color:var(--muted-foreground);font-weight:400;">(Google Drive, Dropbox link)</span></label>
-            <input type="url" name="cv_file" class="form-input" placeholder="https://drive.google.com/file/d/...">
-          </div>
-          <div>
-            <label class="form-label">Cover Letter</label>
-            <textarea name="cover_letter" class="form-input" rows="4" placeholder="Tell us why you're a great fit..."></textarea>
-          </div>
-          <div style="display:flex;gap:0.75rem;justify-content:flex-end;padding-top:0.5rem;">
-            <button type="button" @click="applyId=null" class="btn btn-outline">Cancel</button>
+
+          <div class="careers-apply-actions">
+            <button type="button" @click="applyId=null; applyTitle=''" class="btn btn-outline">Cancel</button>
             <button type="submit" class="btn btn-primary">Submit Application →</button>
           </div>
         </form>
@@ -282,6 +367,37 @@ ob_start(); ?>
     </div>
   </div>
 </section>
+
+<script>
+(function () {
+  var input = document.getElementById('careers-resume-file');
+  if (!input) return;
+  var wrap = input.closest('.careers-file-upload');
+  var titleEl = wrap && wrap.querySelector('.careers-file-upload__title');
+  var hintEl = wrap && wrap.querySelector('.careers-file-upload__hint');
+  var defaultTitle = titleEl ? titleEl.textContent : '';
+  var defaultHint = hintEl ? hintEl.textContent : '';
+  input.addEventListener('change', function () {
+    if (!wrap || !titleEl) return;
+    if (this.files && this.files[0]) {
+      wrap.classList.add('has-file');
+      titleEl.textContent = this.files[0].name;
+      if (hintEl) hintEl.textContent = 'Click to change file';
+    } else {
+      wrap.classList.remove('has-file');
+      titleEl.textContent = defaultTitle;
+      if (hintEl) hintEl.textContent = defaultHint;
+    }
+  });
+})();
+(function () {
+  var params = new URLSearchParams(window.location.search);
+  var slug = params.get('job');
+  if (!slug) return;
+  var el = document.getElementById('job-' + slug);
+  if (el) setTimeout(function () { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }, 350);
+})();
+</script>
 
 <?php
 $ctaTitle = 'Build software that matters';

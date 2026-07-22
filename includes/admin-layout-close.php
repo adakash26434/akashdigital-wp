@@ -121,6 +121,15 @@ if ($e2) echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json
 if ($w)  echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json_encode($w).",'warning'));";
 ?>
 </script>
+<script>
+function afModalOpen(id){ var m=document.getElementById(id); if(m){ m.classList.add('is-open'); document.body.style.overflow='hidden'; if(window.lucide) lucide.createIcons(); } }
+function afModalClose(id){ var m=document.getElementById(id); if(m){ m.classList.remove('is-open'); document.body.style.overflow=''; } }
+document.addEventListener('keydown',function(e){
+  if(e.key!=='Escape')return;
+  document.querySelectorAll('.af-modal.is-open').forEach(function(m){ m.classList.remove('is-open'); });
+  document.body.style.overflow='';
+});
+</script>
 <script src="<?= asset('js/st-bs-datepicker.js') ?>" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {

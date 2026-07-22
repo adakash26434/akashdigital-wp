@@ -332,6 +332,54 @@ function isJobListingExpired(array $job): bool {
     return strtotime($job['deadline'] . ' 23:59:59') < time();
 }
 
+/** Public URL for a job listing (shareable, with ?job=slug deep link). */
+function jobListingPublicUrl(array $job): string {
+    $slug = trim((string)($job['slug'] ?? ''));
+    if ($slug !== '') {
+        return url('careers.php?job=' . rawurlencode($slug));
+    }
+    return url('careers.php#job-' . (int)($job['id'] ?? 0));
+}
+
+/** Pre-formatted share text for WhatsApp / copy. */
+function jobListingShareMessage(array $job): string {
+    $company = function_exists('stSiteName') ? stSiteName() : (defined('SITE_NAME') ? SITE_NAME : 'Company');
+    $lines   = ['We\'re hiring: ' . ($job['title'] ?? 'Open position') . ' at ' . $company];
+    if (!empty($job['location'])) $lines[] = '📍 ' . $job['location'];
+    if (!empty($job['department'])) $lines[] = $job['department'];
+    if (!empty($job['short_desc'])) $lines[] = $job['short_desc'];
+    $lines[] = 'Apply: ' . jobListingPublicUrl($job);
+    return implode("\n", $lines);
+}
+
+/** Social platform share URLs for a page or vacancy. */
+function socialShareLinks(string $url, string $title, ?string $message = null): array {
+    $text = $message ?? ($title . ' — ' . $url);
+    return [
+        'whatsapp' => 'https://wa.me/?text=' . rawurlencode($text),
+        'facebook' => 'https://www.facebook.com/sharer/sharer.php?u=' . rawurlencode($url),
+        'linkedin' => 'https://www.linkedin.com/sharing/share-offsite/?url=' . rawurlencode($url),
+        'twitter'  => 'https://twitter.com/intent/tweet?text=' . rawurlencode($title) . '&url=' . rawurlencode($url),
+        'telegram' => 'https://t.me/share/url?url=' . rawurlencode($url) . '&text=' . rawurlencode($title),
+    ];
+}
+
+/** Whether a nav link should show its badge (optional badge_until YYYY-MM-DD). */
+function navShowBadge(array $link): bool {
+    if (empty($link['badge'])) return false;
+    if (empty($link['badge_until'])) return true;
+    $until = strtotime((string)$link['badge_until'] . ' 23:59:59');
+    return $until !== false && $until >= time();
+}
+
+/** True if any link in a nav group has an active badge. */
+function navHasChildBadge(array $links): bool {
+    foreach ($links as $l) {
+        if (navShowBadge($l)) return true;
+    }
+    return false;
+}
+
 // ── Upload helper ─────────────────────────────────────────────────
 function handleUpload(string $field, string $dir = 'uploads'): ?string {
     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) return null;

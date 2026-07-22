@@ -127,117 +127,106 @@ $PRODUCTS = !empty($_db_ps)
   <div class="alert alert-error mb-1-25"><?= e($error) ?></div>
   <?php endif; ?>
 
-  <form method="POST" enctype="multipart/form-data" class="col-stack">
+  <form method="POST" enctype="multipart/form-data" class="st-form st-card" style="padding:1.5rem;">
     <?= csrfField() ?>
 
-    <div>
-      <label class="form-label">Subject <span class="text-danger-token">*</span></label>
-      <input type="text" name="subject" required minlength="3" maxlength="200" class="form-input"
-             value="<?= e($_POST['subject'] ?? '') ?>" placeholder="Short description of the issue">
-      <p class="caption-meta">Be specific — e.g. "Software: Unable to generate daily report"</p>
+    <div class="st-form-section">
+      <h3 class="st-form-section-title">Issue summary</h3>
+      <div class="st-form__group">
+        <label class="form-label">Subject <span class="text-danger-token">*</span></label>
+        <input type="text" name="subject" required minlength="3" maxlength="200" class="form-input"
+               value="<?= e($_POST['subject'] ?? '') ?>" placeholder="Short description of the issue">
+        <p class="st-form__hint">Be specific — e.g. "Unable to generate daily report"</p>
+      </div>
+      <div class="st-form__row">
+        <div class="st-form__group">
+          <label class="form-label">Category</label>
+          <select name="category" class="form-input">
+            <option value="">Select category</option>
+            <?php foreach($CATEGORIES as $c):?>
+            <option value="<?=$c?>" <?=($_POST['category']??'')===$c?'selected':''?>><?=$c?></option>
+            <?php endforeach;?>
+          </select>
+        </div>
+        <div class="st-form__group">
+          <label class="form-label">Product</label>
+          <select name="product" class="form-input">
+            <option value="">Select product</option>
+            <?php foreach($PRODUCTS as $p):?>
+            <option value="<?=$p?>" <?=($_POST['product']??'')===$p?'selected':''?>><?=$p?></option>
+            <?php endforeach;?>
+          </select>
+        </div>
+      </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
-      <div>
-        <label class="form-label">Category</label>
-        <select name="category" class="form-input">
-          <option value="">Select category</option>
-          <?php foreach($CATEGORIES as $c):?>
-          <option value="<?=$c?>" <?=($_POST['category']??'')===$c?'selected':''?>><?=$c?></option>
-          <?php endforeach;?>
-        </select>
-      </div>
-      <div>
-        <label class="form-label">Product</label>
-        <select name="product" class="form-input">
-          <option value="">Select product</option>
-          <?php foreach($PRODUCTS as $p):?>
-          <option value="<?=$p?>" <?=($_POST['product']??'')===$p?'selected':''?>><?=$p?></option>
-          <?php endforeach;?>
-        </select>
-      </div>
-    </div>
-
-    <div>
-      <label class="form-label">Priority</label>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;">
+    <div class="st-form-section">
+      <h3 class="st-form-section-title">Priority</h3>
+      <div class="st-priority-grid">
         <?php
         $pris = [
-          ['low',    icon('arrow-down',18,'color:var(--muted-foreground);'),   'Low',    'Non-urgent, when time permits'],
-          ['normal', icon('minus',18,'color:var(--primary-dark);'),        'Normal', 'Standard issue, 24h response'],
-          ['high',   icon('arrow-up',18,'color:var(--warning-fg);'),     'High',   'Affecting work, respond soon'],
-          ['urgent', icon('zap',18,'color:var(--danger-fg);'),          'Urgent', 'System down / critical loss'],
+          ['low',    icon('arrow-down',18,'color:var(--muted-foreground);'),   'Low',    'Non-urgent'],
+          ['normal', icon('minus',18,'color:var(--primary-dark);'),        'Normal', '24h response'],
+          ['high',   icon('arrow-up',18,'color:var(--warning-fg);'),     'High',   'Respond soon'],
+          ['urgent', icon('zap',18,'color:var(--danger-fg);'),          'Urgent', 'System down'],
         ];
         $selected_pri = $_POST['priority'] ?? 'normal';
         foreach ($pris as [$val,$priIco,$label,$hint]):?>
-        <label id="pri-<?=$val?>" style="cursor:pointer;padding:0.75rem 0.5rem;border-radius:0.75rem;border:2px solid <?=$selected_pri===$val?'var(--primary)':'var(--border)'?>;background:<?=$selected_pri===$val?'#eff6ff':'var(--background)'?>;text-align:center;transition:all 0.15s;">
-          <input type="radio" name="priority" value="<?=$val?>" <?=$selected_pri===$val?'checked':''?> style="display:none;">
+        <label class="st-priority-option">
+          <input type="radio" name="priority" value="<?=$val?>" <?=$selected_pri===$val?'checked':''?>>
           <div style="display:flex;justify-content:center;"><?=$priIco?></div>
-          <div style="font-size:0.75rem;font-weight:700;color:var(--foreground);margin-top:0.25rem;"><?=$label?></div>
-          <div style="font-size:0.6rem;color:var(--muted-foreground);margin-top:0.125rem;line-height:1.3;"><?=$hint?></div>
+          <div class="st-priority-option__label"><?=$label?></div>
+          <div class="st-priority-option__hint"><?=$hint?></div>
         </label>
         <?php endforeach;?>
       </div>
     </div>
 
-    <div>
-      <label class="form-label">Description <span class="text-danger-token">*</span></label>
-      <textarea name="body" required minlength="5" maxlength="8000" class="form-input" rows="8"
-                placeholder="Describe the issue in detail. Include:&#10;- What you were trying to do&#10;- What happened instead&#10;- Any error messages you saw&#10;- Steps to reproduce (if applicable)"><?= e($_POST['body'] ?? '') ?></textarea>
-      <p class="caption-meta">More detail = faster resolution.</p>
-    </div>
-
-    <!-- File Attachment -->
-    <div>
-      <label class="form-label">Attachment <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
-      <div id="drop-zone"
-           style="border:2px dashed var(--border);border-radius:0.875rem;padding:1.5rem;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--muted);"
-           onclick="document.getElementById('file-input').click()"
-           ondragover="event.preventDefault();this.style.borderColor='var(--primary)';this.style.background='#eff6ff';"
-           ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--muted)';"
-           ondrop="handleDrop(event)">
-        <div id="drop-text">
-          <div style="display:flex;justify-content:center;margin-bottom:0.5rem;"><?= icon('upload-cloud',28,'color:var(--muted-foreground);') ?></div>
-          <div style="font-size:0.875rem;font-weight:600;color:var(--foreground);">Drag & drop or click to attach</div>
-          <div class="caption-meta">JPG, PNG, PDF, GIF · max 8 MB</div>
-        </div>
-        <div id="file-preview" style="display:none;align-items:center;gap:0.75rem;justify-content:center;">
-          <span id="file-icon" style="display:flex;align-items:center;color:var(--muted-foreground);"></span>
-          <div style="text-align:left;">
-            <div id="file-name" style="font-size:0.875rem;font-weight:600;color:var(--foreground);"></div>
-            <div id="file-size" class="fs-xs-mt"></div>
-          </div>
-          <button type="button" onclick="clearFile(event)" style="background:none;border:none;cursor:pointer;color:var(--muted-foreground);display:flex;align-items:center;"><?= icon('x',16) ?></button>
-        </div>
+    <div class="st-form-section">
+      <h3 class="st-form-section-title">Details</h3>
+      <div class="st-form__group">
+        <label class="form-label">Description <span class="text-danger-token">*</span></label>
+        <textarea name="body" required minlength="5" maxlength="8000" class="form-input" rows="8"
+                  placeholder="Describe the issue in detail. Include what you tried, error messages, and steps to reproduce."><?= e($_POST['body'] ?? '') ?></textarea>
+        <p class="st-form__hint">More detail helps us resolve faster.</p>
       </div>
-      <input type="file" name="attachment" id="file-input" accept=".jpg,.jpeg,.png,.webp,.gif,.pdf" style="display:none;" onchange="showFilePreview(this.files[0])">
+      <div class="st-form__group">
+        <label class="form-label">Attachment <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
+        <div id="drop-zone" class="st-file-drop"
+             onclick="document.getElementById('file-input').click()"
+             ondragover="event.preventDefault();this.classList.add('is-dragover');"
+             ondragleave="this.classList.remove('is-dragover');"
+             ondrop="handleDrop(event)">
+          <div id="drop-text">
+            <div style="display:flex;justify-content:center;margin-bottom:0.5rem;"><?= icon('upload-cloud',28,'color:var(--muted-foreground);') ?></div>
+            <div style="font-size:0.875rem;font-weight:600;color:var(--foreground);">Drag & drop or click to attach</div>
+            <div class="st-form__hint">JPG, PNG, PDF, GIF · max 5 MB</div>
+          </div>
+          <div id="file-preview" style="display:none;align-items:center;gap:0.75rem;justify-content:center;">
+            <span id="file-icon" style="display:flex;align-items:center;color:var(--muted-foreground);"></span>
+            <div style="text-align:left;">
+              <div id="file-name" style="font-size:0.875rem;font-weight:600;color:var(--foreground);"></div>
+              <div id="file-size" class="fs-xs-mt"></div>
+            </div>
+            <button type="button" onclick="clearFile(event)" style="background:none;border:none;cursor:pointer;color:var(--muted-foreground);display:flex;align-items:center;"><?= icon('x',16) ?></button>
+          </div>
+        </div>
+        <input type="file" name="attachment" id="file-input" accept=".jpg,.jpeg,.png,.webp,.gif,.pdf" style="display:none;" onchange="showFilePreview(this.files[0])">
+      </div>
     </div>
 
-    <div style="display:flex;gap:0.75rem;align-items:center;padding-top:0.5rem;">
-      <button type="submit" class="btn btn-primary btn-md flex-1">Submit Ticket →</button>
+    <div class="st-form-actions" style="flex-direction:row;flex-wrap:wrap;">
+      <button type="submit" class="btn btn-primary btn-md" style="flex:1;">Submit Ticket →</button>
       <a href="<?= url('portal/tickets.php') ?>" class="btn btn-outline btn-md">Cancel</a>
     </div>
   </form>
 </div>
 
 <script>
-// Priority radio card highlighting
-document.querySelectorAll('[name="priority"]').forEach(r => {
-  r.addEventListener('change', () => {
-    document.querySelectorAll('[id^="pri-"]').forEach(l => {
-      const inp = l.querySelector('input');
-      l.style.borderColor = inp.checked ? 'var(--primary)' : 'var(--border)';
-      l.style.background  = inp.checked ? '#eff6ff' : 'var(--background)';
-    });
-  });
-});
-
-// नेपालीमा: formatBytes() — yo function le aafno kaam garchha
 function formatBytes(b) {
   return b > 1048576 ? (b/1048576).toFixed(1)+' MB' : (b/1024).toFixed(0)+' KB';
 }
 
-// नेपालीमा: showFilePreview() — yo function le aafno kaam garchha
 function showFilePreview(file) {
   if (!file) return;
   const isImg = file.type.startsWith('image/');
@@ -252,7 +241,6 @@ function showFilePreview(file) {
   document.getElementById('file-size').textContent = formatBytes(file.size);
 }
 
-// नेपालीमा: clearFile() — yo function le aafno kaam garchha
 function clearFile(e) {
   e.stopPropagation();
   document.getElementById('file-input').value = '';
@@ -260,11 +248,10 @@ function clearFile(e) {
   document.getElementById('file-preview').style.display = 'none';
 }
 
-// नेपालीमा: handleDrop() — yo function le aafno kaam garchha
 function handleDrop(e) {
   e.preventDefault();
-  document.getElementById('drop-zone').style.borderColor = 'var(--border)';
-  document.getElementById('drop-zone').style.background = 'var(--muted)';
+  var dz = document.getElementById('drop-zone');
+  dz.classList.remove('is-dragover');
   const file = e.dataTransfer.files[0];
   if (!file) return;
   const dt = new DataTransfer();

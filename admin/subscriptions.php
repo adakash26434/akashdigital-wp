@@ -126,7 +126,7 @@ $DEPLOY_ICONS = ['cloud'=>'','on-premise'=>'','hybrid'=>''];
       <?php endforeach;?>
     </div>
   </div>
-  <button onclick="document.getElementById('add-modal').style.display='flex'" class="btn btn-primary btn-sm">+ Add Subscription</button>
+  <button type="button" onclick="afModalOpen('add-modal')" class="btn btn-primary btn-sm">+ Add Subscription</button>
 </div>
 
 <!-- Table -->
@@ -200,35 +200,51 @@ $DEPLOY_ICONS = ['cloud'=>'','on-premise'=>'','hybrid'=>''];
 </div>
 
 <!-- Add Modal -->
-<div id="add-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:1rem;padding:1.75rem;width:min(640px,95vw);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-elevated);">
-    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;"> Add Subscription</h3>
+<div id="add-modal" class="af-modal" onclick="if(event.target===this)afModalClose('add-modal')">
+  <div class="af-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="add-sub-title">
+    <div class="af-modal__header">
+      <div>
+        <h3 id="add-sub-title" class="af-modal__title">Add Subscription</h3>
+        <p class="af-modal__sub">Link a client to a product plan and billing schedule.</p>
+      </div>
+      <button type="button" onclick="afModalClose('add-modal')" class="st-modal-close" aria-label="Close"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="af-modal__body">
     <form method="POST">
       <?=csrfField()?>
       <input type="hidden" name="action" value="add">
       <?php include __DIR__.'/../includes/_sub-form.php'; ?>
-      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
-        <button type="submit" class="btn btn-primary">Save</button>
-        <button type="button" onclick="document.getElementById('add-modal').style.display='none'" class="btn btn-outline">Cancel</button>
+      <div class="af-form-footer af-form-footer-buttons">
+        <button type="submit" class="btn btn-primary">Save Subscription</button>
+        <button type="button" onclick="afModalClose('add-modal')" class="btn btn-outline">Cancel</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
 <!-- Edit Modal -->
-<div id="edit-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--card);border-radius:1rem;padding:1.75rem;width:min(640px,95vw);max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-elevated);">
-    <h3 style="font-family:var(--font-display);font-size:1rem;font-weight:700;margin-bottom:1.25rem;"> Edit Subscription</h3>
+<div id="edit-modal" class="af-modal" onclick="if(event.target===this)afModalClose('edit-modal')">
+  <div class="af-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="edit-sub-title">
+    <div class="af-modal__header">
+      <div>
+        <h3 id="edit-sub-title" class="af-modal__title">Edit Subscription</h3>
+        <p class="af-modal__sub">Update plan, billing, or status for this client.</p>
+      </div>
+      <button type="button" onclick="afModalClose('edit-modal')" class="st-modal-close" aria-label="Close"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div class="af-modal__body">
     <form method="POST" id="edit-form">
       <?=csrfField()?>
       <input type="hidden" name="action" value="edit">
       <input type="hidden" name="id" id="edit-id">
       <?php include __DIR__.'/../includes/_sub-form.php'; ?>
-      <div style="display:flex;gap:0.75rem;margin-top:1.25rem;">
-        <button type="submit" class="btn btn-primary">Update</button>
-        <button type="button" onclick="document.getElementById('edit-modal').style.display='none'" class="btn btn-outline">Cancel</button>
+      <div class="af-form-footer af-form-footer-buttons">
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+        <button type="button" onclick="afModalClose('edit-modal')" class="btn btn-outline">Cancel</button>
       </div>
     </form>
+    </div>
   </div>
 </div>
 
@@ -267,7 +283,8 @@ function openEditModal(data) {
     const el = f.querySelector(`[name="${k}"]`);
     if (el) el.value = data[k] ?? '';
   });
-  m.style.display = 'flex';
+  m.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
 }
 </script>
 

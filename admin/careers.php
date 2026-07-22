@@ -248,10 +248,23 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
           <?php if(!empty($j['deadline'])):?>
           <div style="font-size:0.75rem;color:<?=$isExpired?'var(--danger-fg)':'var(--warning-fg)'?>;margin-top:0.25rem;">⏳ Deadline: <?=date('M j, Y',strtotime($j['deadline']))?><?=$isExpired?' (expired — hidden on site)':''?></div>
           <?php endif;?>
+          <?php if($isActive && !$isExpired && !empty($j['slug'])):?>
+          <div style="font-size:0.7rem;color:var(--muted-foreground);margin-top:0.35rem;word-break:break-all;">Share: <?=e(jobListingPublicUrl($j))?></div>
+          <?php endif;?>
         </div>
           </div>
         </div>
-        <div style="display:flex;gap:0.375rem;flex-shrink:0;">
+        <div style="display:flex;gap:0.375rem;flex-shrink:0;align-items:center;">
+          <?php if($isActive && !$isExpired): ?>
+          <?php
+          $shareUrl = jobListingPublicUrl($j);
+          $shareTitle = $j['title'] ?? 'Job opening';
+          $shareMessage = jobListingShareMessage($j);
+          $shareCopyId = 'admin-job-share-' . (int)$j['id'];
+          include __DIR__ . '/../includes/share-buttons.php';
+          ?>
+          <a href="<?=e(jobListingPublicUrl($j))?>" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="View on site"><i data-lucide="external-link" style="width:14px;height:14px;pointer-events:none;"></i></a>
+          <?php endif; ?>
           <a href="?edit=<?=$j['id']?>&tab=jobs" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
           <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
             <?=csrfField()?><input type="hidden" name="action" value="delete_job"><input type="hidden" name="id" value="<?=$j['id']?>">

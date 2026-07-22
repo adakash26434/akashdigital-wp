@@ -108,75 +108,74 @@ ob_start(); ?>
           <h2 style="font-family:var(--font-display);font-weight:800;font-size:1.375rem;color:var(--foreground);margin-bottom:0.375rem;letter-spacing:-0.02em;"><?= e(isNepali() ? 'सन्देश पठाउनुस' : 'Send us a message') ?></h2>
           <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin-bottom:2rem;"><?= e(isNepali() ? 'फारम भर्नुस — हामी २ व्यापार घन्टाभित्र जवाफ दिनेछौं।' : "Fill in the form and we'll get back to you within 2 business hours.") ?></p>
 
-          <form method="POST" action="" novalidate>
+          <form method="POST" action="" novalidate class="st-form">
             <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
 
-            <div class="grid-2">
-              <div>
-                <label class="form-label" for="name">
-                  <?= e(__('contact_name')) ?> <span class="text-danger-token">*</span>
-                </label>
-                <div class="pos-rel">
-                  <i data-lucide="user" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="text" id="name" name="name" class="form-input" style="padding-left:2.25rem;" placeholder="Aarav Shrestha" required value="<?= e($_POST['name']??'') ?>" autocomplete="name">
+            <div class="st-form-section">
+              <h3 class="st-form-section-title"><?= e(isNepali() ? 'सम्पर्क विवरण' : 'Contact details') ?></h3>
+              <div class="st-form__row">
+                <div class="st-form__group">
+                  <label class="form-label" for="name"><?= e(__('contact_name')) ?> <span class="text-danger-token">*</span></label>
+                  <div class="st-form-icon-field">
+                    <i data-lucide="user" class="st-form-icon" aria-hidden="true"></i>
+                    <input type="text" id="name" name="name" class="form-input" placeholder="Aarav Shrestha" required value="<?= e($_POST['name']??'') ?>" autocomplete="name">
+                  </div>
+                </div>
+                <div class="st-form__group">
+                  <label class="form-label" for="email"><?= e(__('contact_email')) ?> <span class="text-danger-token">*</span></label>
+                  <div class="st-form-icon-field">
+                    <i data-lucide="mail" class="st-form-icon" aria-hidden="true"></i>
+                    <input type="email" id="email" name="email" class="form-input" placeholder="you@business.com.np" required value="<?= e($_POST['email']??'') ?>" autocomplete="email">
+                  </div>
                 </div>
               </div>
-              <div>
-                <label class="form-label" for="email">
-                  <?= e(__('contact_email')) ?> <span class="text-danger-token">*</span>
-                </label>
-                <div class="pos-rel">
-                  <i data-lucide="mail" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="email" id="email" name="email" class="form-input" style="padding-left:2.25rem;" placeholder="you@business.com.np" required value="<?= e($_POST['email']??'') ?>" autocomplete="email">
+              <div class="st-form__row">
+                <div class="st-form__group">
+                  <label class="form-label" for="phone"><?= e(__('contact_phone')) ?></label>
+                  <div class="st-form-icon-field">
+                    <i data-lucide="phone" class="st-form-icon" aria-hidden="true"></i>
+                    <input type="tel" id="phone" name="phone" class="form-input" placeholder="+977 98X-XXX-XXXX" value="<?= e($_POST['phone']??'') ?>" autocomplete="tel" inputmode="tel">
+                  </div>
+                </div>
+                <div class="st-form__group">
+                  <label class="form-label" for="org"><?= e(__('contact_org')) ?></label>
+                  <div class="st-form-icon-field">
+                    <i data-lucide="building-2" class="st-form-icon" aria-hidden="true"></i>
+                    <input type="text" id="org" name="org" class="form-input" placeholder="Himalayan Saving Co-op" value="<?= e($_POST['org']??'') ?>">
+                  </div>
                 </div>
               </div>
             </div>
 
-            <div class="grid-2">
-              <div>
-                <label class="form-label" for="phone"><?= e(__('contact_phone')) ?></label>
-                <div class="pos-rel">
-                  <i data-lucide="phone" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="tel" id="phone" name="phone" class="form-input" style="padding-left:2.25rem;" placeholder="+977 98X-XXX-XXXX" value="<?= e($_POST['phone']??'') ?>" autocomplete="tel" inputmode="tel">
+            <div class="st-form-section">
+              <h3 class="st-form-section-title"><?= e(isNepali() ? 'तपाईंको सोध' : 'Your enquiry') ?></h3>
+              <div class="st-form__group">
+                <label class="form-label" for="subject"><?= e(isNepali() ? 'के मा रुचि राख्नुहुन्छ?' : 'What are you interested in?') ?></label>
+                <div class="st-form-icon-field">
+                  <i data-lucide="list" class="st-form-icon" aria-hidden="true"></i>
+                  <select id="subject" name="subject" class="form-select">
+                    <?php foreach ($_ct_subjects as $s): ?>
+                    <option value="<?= e($s) ?>" <?= (($preProduct && stripos($s,$preProduct)!==false)||($_POST['subject']??'')===$s)?'selected':''; ?>><?= e($s) ?></option>
+                    <?php endforeach; ?>
+                  </select>
                 </div>
               </div>
-              <div>
-                <label class="form-label" for="org"><?= e(__('contact_org')) ?></label>
-                <div class="pos-rel">
-                  <i data-lucide="building-2" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                  <input type="text" id="org" name="org" class="form-input" style="padding-left:2.25rem;" placeholder="Himalayan Saving Co-op" value="<?= e($_POST['org']??'') ?>">
-                </div>
+              <div class="st-form__group">
+                <label class="form-label" for="message"><?= e(__('contact_message')) ?> <span class="text-danger-token">*</span></label>
+                <textarea id="message" name="message" class="form-textarea" rows="5"
+                  placeholder="Tell us about your business — what software you need, your team size, current setup, and how we can help…"
+                  required><?= e($_POST['message']??'') ?></textarea>
               </div>
             </div>
 
-            <div class="mb-1">
-              <label class="form-label" for="subject"><?= e(isNepali() ? 'के मा रुचि राख्नुहुन्छ?' : 'What are you interested in?') ?></label>
-              <div class="pos-rel">
-                <i data-lucide="list" style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--muted-foreground);pointer-events:none;"></i>
-                <select id="subject" name="subject" class="form-select" style="padding-left:2.25rem;">
-                  <?php foreach ($_ct_subjects as $s): ?>
-                  <option value="<?= e($s) ?>" <?= (($preProduct && stripos($s,$preProduct)!==false)||($_POST['subject']??'')===$s)?'selected':''; ?>><?= e($s) ?></option>
-                  <?php endforeach; ?>
-                </select>
-              </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" placeholder="Website">
+            <div class="st-form-actions">
+              <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">
+                <i data-lucide="send" class="ic-16"></i>
+                <?= e(__('contact_send')) ?>
+              </button>
+              <p class="st-form__hint" style="text-align:center;margin:0;"><?= e(isNepali() ? 'हामी २ व्यापार घन्टाभित्र जवाफ दिन्छौं · सोम–शुक्र बिहान ९ देखि साँझ ६ बजेसम्म' : 'We respond within 2 business hours · Mon–Fri 9 AM–6 PM') ?></p>
             </div>
-
-            <div style="margin-bottom:1.75rem;">
-              <label class="form-label" for="message">
-                <?= e(__('contact_message')) ?> <span class="text-danger-token">*</span>
-              </label>
-              <textarea id="message" name="message" class="form-textarea" rows="5"
-                placeholder="Tell us about your business — what software you need, your team size, current setup, and how we can help…"
-                required><?= e($_POST['message']??'') ?></textarea>
-            </div>
-
-            <!-- Honeypot: bots will fill this hidden field -->
-            <input type="text" name="website" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" placeholder="Website">
-            <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">
-              <i data-lucide="send" class="ic-16"></i>
-              <?= e(__('contact_send')) ?>
-            </button>
-            <p style="text-align:center;margin-top:1rem;font-size:var(--text-xs);color:var(--muted-foreground);"><?= e(isNepali() ? 'हामी २ व्यापार घन्टाभित्र जवाफ दिन्छौं · सोम–शुक्र बिहान ९ देखि साँझ ६ बजेसम्म' : 'We respond within 2 business hours · Mon–Fri 9 AM–6 PM') ?></p>
           </form>
         </div>
       </div>

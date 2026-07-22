@@ -135,7 +135,7 @@ include 'includes/page-hero.php';
         </div>
         <div id="date-info" style="margin-top:1.5rem;padding:1rem;background:var(--background);border:1px solid var(--border);border-radius:0.75rem;font-size:var(--text-sm);color:var(--foreground);display:none;"></div>
         <div style="margin-top:1rem;padding:0.75rem 1rem;background:var(--success-soft);border-radius:0.625rem;border:1px solid var(--success-border);font-size:var(--text-sm);color:var(--success-fg);">
-          ℹ Supported BS range: 1975 – 2100. Calculation uses NepSoft algorithm.
+          ℹ Supported BS range: 2000 – 2100. Uses official month-length lookup (Hamro Patro / Nepal Calendar verified).
         </div>
       </div>
     </div>
@@ -176,6 +176,7 @@ include 'includes/page-hero.php';
 }
 </style>
 
+<script src="<?= e(asset('js/st-bs-datepicker.js')) ?>"></script>
 <script>
 /* ─── Preeti to Unicode ─── */
 const PREETI_MAP = {
@@ -285,39 +286,36 @@ function toggleSchedule() {
 }
 window.addEventListener('DOMContentLoaded', calcEmi);
 
-/* ─── BS / AD Date Converter ─── */
-const BS_MONTHS = [[0],[31,31,32,31,31,31,30,30,29,30,29,31],[31,31,32,31,32,31,30,29,30,29,30,30],[31,32,31,32,31,30,30,30,29,29,30,31],[30,32,31,32,31,30,30,30,29,30,29,31],[31,31,32,31,31,30,30,30,29,30,29,31],[31,31,32,32,31,30,30,29,30,29,29,31],[30,32,31,32,31,30,30,29,30,29,30,30],[30,32,31,32,31,30,30,30,29,29,30,31],[31,31,32,31,31,31,30,29,29,30,29,31],[31,31,32,31,31,30,30,29,30,29,30,30],[31,31,32,32,31,30,30,30,29,30,29,30],[30,32,31,32,31,30,30,30,29,30,30,31],[31,31,32,31,31,31,30,30,29,30,29,31],[31,31,32,31,32,30,30,29,30,29,29,31],[31,32,31,32,31,30,30,29,30,29,30,30]];
-const BS_START = {y:1975,m:1,d:1};
-const AD_START = new Date(1918, 3, 13);
-// नेपालीमा: bsDaysFrom1975() — yo function le aafno kaam garchha
-function bsDaysFrom1975(y,m,d){let t=0;for(let i=1975;i<y;i++){for(let j=1;j<=12;j++)t+=BS_MONTHS[(i-1975)%16+1]?.[j]??30;}for(let j=1;j<m;j++)t+=BS_MONTHS[(y-1975)%16+1]?.[j]??30;t+=d-1;return t;}
-// नेपालीमा: convertBS() — yo function le aafno kaam garchha
+/* ─── BS / AD Date Converter (uses assets/js/st-bs-datepicker.js) ─── */
+const BS_MONTH_NAMES = ['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'];
 function convertBS(){
   const v=document.getElementById('bs-date').value.trim();
   const m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
-  if(!m)return;
-  const [,sy,sm,sd]=[...m].map(Number);
-  if(sy<1975||sy>2090||sm<1||sm>12||sd<1||sd>32){document.getElementById('date-info').style.display='block';document.getElementById('date-info').textContent='Out of supported range.';return;}
-  const days=bsDaysFrom1975(sy,sm,sd);
-  const ad=new Date(AD_START.getTime()+days*86400000);
-  document.getElementById('ad-date').value=ad.toISOString().substring(0,10);
-  const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  if(!m||typeof window.bsToAd!=='function')return;
+  const sy=+m[1], sm=+m[2], sd=+m[3];
+  if(sy<2000||sy>2100||sm<1||sm>12||sd<1||sd>32){
+    document.getElementById('date-info').style.display='block';
+    document.getElementById('date-info').textContent='Out of supported range (2000–2100).';
+    return;
+  }
+  const ad=window.bsToAd(sy, sm, sd);
+  document.getElementById('ad-date').value=ad.getFullYear()+'-'+String(ad.getMonth()+1).padStart(2,'0')+'-'+String(ad.getDate()).padStart(2,'0');
   document.getElementById('date-info').style.display='block';
-  document.getElementById('date-info').innerHTML=`<strong>BS:</strong> ${sy}/${sm}/${sd} &nbsp;&nbsp; <strong>AD:</strong> ${ad.toLocaleDateString('en-US',opts)}`;
+  document.getElementById('date-info').innerHTML=`<strong>BS:</strong> ${sy} ${BS_MONTH_NAMES[sm-1]} ${sd} &nbsp;&nbsp; <strong>AD:</strong> ${ad.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'})}`;
 }
-// नेपालीमा: convertAD() — yo function le aafno kaam garchha
 function convertAD(){
   const v=document.getElementById('ad-date').value;
-  if(!v)return;
-  const ad=new Date(v+'T00:00:00');
-  const diff=Math.round((ad-AD_START)/86400000);
-  if(diff<0){document.getElementById('date-info').textContent='Before supported range.';document.getElementById('date-info').style.display='block';return;}
-  let rem=diff,y=1975,m=1;
-  outer:for(y=1975;y<=2090;y++){for(m=1;m<=12;m++){const days=BS_MONTHS[(y-1975)%16+1]?.[m]??30;if(rem<days)break outer;rem-=days;}}
-  const d=rem+1;
-  document.getElementById('bs-date').value=`${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+  if(!v||typeof window.adToBs!=='function')return;
+  const p=v.split('-').map(Number);
+  const bs=window.adToBs(p[0], p[1], p[2]);
+  if(!bs||bs.y<2000||bs.y>2100){
+    document.getElementById('date-info').style.display='block';
+    document.getElementById('date-info').textContent='Before supported range.';
+    return;
+  }
+  document.getElementById('bs-date').value=`${bs.y}-${String(bs.m).padStart(2,'0')}-${String(bs.d).padStart(2,'0')}`;
   document.getElementById('date-info').style.display='block';
-  document.getElementById('date-info').innerHTML=`<strong>AD:</strong> ${v} &nbsp;&nbsp; <strong>BS:</strong> ${y} ${['Baisakh','Jestha','Ashadh','Shrawan','Bhadra','Ashwin','Kartik','Mangsir','Poush','Magh','Falgun','Chaitra'][m-1]} ${d}`;
+  document.getElementById('date-info').innerHTML=`<strong>AD:</strong> ${v} &nbsp;&nbsp; <strong>BS:</strong> ${bs.y} ${BS_MONTH_NAMES[bs.m-1]} ${bs.d}`;
 }
 
 /* ─── Number to Words ─── */
