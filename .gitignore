@@ -1,9 +1,13 @@
 
 # Production config with credentials
 config-production.php
+includes/config-production.php
 includes/dev-config.php
 diagnostic.php
 DEPLOYMENT_READY.md
+
+# Dev artifacts (screenshots, one-off imports)
+attached_assets/
 
 # Database files (dev SQLite)
 data/*.db

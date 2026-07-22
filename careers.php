@@ -193,6 +193,7 @@ ob_start(); ?>
       <?php endforeach; ?>
     </div>
     <?php endif; ?>
+    <?php endif; ?>
 
     <!-- Apply Modal -->
     <div x-show="applyId !== null" x-cloak
