@@ -91,8 +91,126 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
 </div>
 
 <?php if($tab === 'jobs'): ?>
-<div class="af-split" style="grid-template-columns:1fr <?=($editing||isset($_GET['new']))?'380px':'0px'?>;">
 
+<?php if($editing || isset($_GET['new'])): ?>
+<!-- Full-width job form (easier to fill than narrow side panel) -->
+<div class="careers-form-wrap">
+  <div class="st-card careers-job-form">
+    <div class="careers-form-header">
+      <div>
+        <a href="?tab=jobs" class="careers-form-back">← Back to job listings</a>
+        <h3 class="careers-form-title"><?=$editing ? 'Edit Job' : 'Post New Job'?></h3>
+        <p class="careers-form-sub">Fill in the details below. Published jobs appear on the public careers page.</p>
+      </div>
+      <a href="?tab=jobs" class="btn btn-outline btn-sm">Cancel</a>
+    </div>
+
+    <form method="POST" class="careers-form-body">
+      <?=csrfField()?>
+      <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
+      <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
+
+      <div class="form-section">
+        <div class="form-section-title">Basic information</div>
+        <div class="form-group">
+          <label class="form-label">Job Title <span class="text-danger-token">*</span></label>
+          <input type="text" name="title" required class="form-input" value="<?=e($editing['title']??'')?>" placeholder="e.g., Senior Backend Developer" minlength="3" maxlength="150">
+          <span class="form-hint">Clear role name — 3 to 150 characters.</span>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Short Summary</label>
+          <input type="text" name="short_desc" class="form-input" maxlength="300" value="<?=e($editing['short_desc']??'')?>" placeholder="One line shown on the careers listing card">
+          <span class="form-hint">Brief teaser visible before applicants open full details.</span>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Department</label>
+            <input type="text" name="department" class="form-input" value="<?=e($editing['department']??'')?>" placeholder="Engineering">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Location</label>
+            <input type="text" name="location" class="form-input" value="<?=e($editing['location']??'Kathmandu, Nepal')?>" placeholder="Kathmandu, Nepal">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">URL Slug</label>
+          <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="Leave blank to auto-generate">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Compensation & type</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Job Type</label>
+            <select name="type" class="form-input">
+              <?php foreach($TYPE_LABELS as $tv=>$tl):?>
+              <option value="<?=$tv?>" <?=($editing['type']??'full-time')===$tv?'selected':''?>><?=$tl?></option>
+              <?php endforeach;?>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Salary Range</label>
+            <input type="text" name="salary_range" class="form-input" value="<?=e($editing['salary_range']??'')?>" placeholder="NPR 40k – 60k / month">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Experience Required</label>
+          <input type="text" name="experience" class="form-input" value="<?=e($editing['experience']??'')?>" placeholder="e.g., 2+ years PHP & MySQL">
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Schedule & visibility</div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Application Deadline</label>
+            <input type="date" data-bs-picker name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
+            <span class="form-hint">Job hides from the site after this date.</span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Publish From <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
+            <input type="date" data-bs-picker name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>">
+            <span class="form-hint">Leave empty to show immediately.</span>
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Sort Order</label>
+            <input type="number" name="position" class="form-input" value="<?=(int)($editing['position']??0)?>" min="0" placeholder="0">
+            <span class="form-hint">Lower numbers appear first on the careers page.</span>
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label class="row-check" style="margin-top:1.75rem;">
+              <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
+              <span>Open — accepting applications</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="form-section-title">Full description</div>
+        <div class="form-group">
+          <label class="form-label">Job Description</label>
+          <textarea name="description" class="form-input form-textarea" rows="6" placeholder="Describe the role, responsibilities, and what success looks like..."><?=e($editing['description']??'')?></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Requirements</label>
+          <textarea name="requirements" class="form-input form-textarea" rows="5" placeholder="- 2+ years PHP&#10;- MySQL & REST API experience&#10;- Good communication in Nepali/English"><?=e($editing['requirements']??'')?></textarea>
+          <span class="form-hint">One requirement per line. Shown as a checklist on the careers page.</span>
+        </div>
+      </div>
+
+      <div class="af-form-footer af-form-footer-buttons">
+        <button type="submit" class="btn btn-primary"><?=$editing?'Save Changes':'Post Job'?></button>
+        <a href="?tab=jobs" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<?php else: ?>
 <!-- Job list -->
 <div>
   <div class="row-between-mb">
@@ -101,7 +219,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
   </div>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
     <?php if(empty($jobs)):?>
-    <div class="af-empty">No jobs posted yet!</div>
+    <div class="af-empty">No jobs posted yet! Click <strong>+ Post Job</strong> to create your first opening.</div>
     <?php else: $sn=1; foreach($jobs as $j): $isActive=(bool)$j['active']; $isExpired=isJobListingExpired($j); ?>
     <div class="st-card" style="padding:1rem 1.25rem;<?=!$isActive||$isExpired?'opacity:0.75;':''?>">
       <div style="display:flex;align-items:flex-start;gap:0.75rem;<?=!$isActive||$isExpired?'opacity:0.75;':''?>">
@@ -141,113 +259,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
     <?php endforeach;endif;?>
   </div>
 </div>
-
-<?php if($editing || isset($_GET['new'])):?>
-<!-- Job form panel -->
-<div class="af-panel">
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);">
-      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?' Edit Job':' Post New Job'?></h3>
-      <a href="?tab=jobs" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">✕ Cancel</a>
-    </div>
-    
-    <form method="POST" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
-      <?=csrfField()?>
-      <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
-      <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
-
-      <!-- Tab nav — sticky at top (single tab but keeping structure consistent) -->
-      <div style="flex-shrink:0;margin-bottom:0.75rem;">
-        <div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);margin-bottom:0.5rem;">Job Details</div>
-      </div>
-
-      <!-- Tab content container — scrollable -->
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
-
-      <div>
-        <label class="form-label">Job Title <span class="text-danger-token">*</span></label>
-        <input type="text" name="title" required class="form-input" value="<?=e($editing['title']??'')?>" placeholder="e.g., Senior Backend Developer" minlength="3" maxlength="150">
-        <span class="form-hint">Job position title (3-150 chars).</span>
-      </div>
-      <div>
-        <label class="form-label">Short Summary <span style="color:var(--muted-foreground);font-weight:400;">(shown on listing cards)</span></label>
-        <input type="text" name="short_desc" class="form-input" maxlength="300" value="<?=e($editing['short_desc']??'')?>" placeholder="Build and scale our Core Banking platform.">
-      </div>
-      <div>
-        <label class="form-label">Slug</label>
-        <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto">
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-        <div>
-          <label class="form-label">Department</label>
-          <input type="text" name="department" class="form-input" value="<?=e($editing['department']??'')?>" placeholder="Engineering">
-        </div>
-        <div>
-          <label class="form-label">Location</label>
-          <input type="text" name="location" class="form-input" value="<?=e($editing['location']??'Kathmandu, Nepal')?>">
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-        <div>
-          <label class="form-label">Job Type</label>
-          <select name="type" class="form-input">
-            <?php foreach($TYPE_LABELS as $tv=>$tl):?>
-            <option value="<?=$tv?>" <?=($editing['type']??'full-time')===$tv?'selected':''?>><?=$tl?></option>
-            <?php endforeach;?>
-          </select>
-        </div>
-        <div>
-          <label class="form-label">Salary Range</label>
-          <input type="text" name="salary_range" class="form-input" value="<?=e($editing['salary_range']??'')?>" placeholder="NPR 40k–60k">
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-        <div>
-          <label class="form-label">Experience Required</label>
-          <input type="text" name="experience" class="form-input" value="<?=e($editing['experience']??'')?>" placeholder="2+ years PHP">
-        </div>
-        <div>
-          <label class="form-label">Application Deadline</label>
-          <input type="date" data-bs-picker name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
-        <div>
-          <label class="form-label">Publish From <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
-          <input type="date" data-bs-picker name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>" placeholder="Leave empty to publish now">
-          <span class="form-hint">Job will not show before this date.</span>
-        </div>
-        <div>
-          <label class="form-label">Sort Order</label>
-          <input type="number" name="position" class="form-input" value="<?=(int)($editing['position']??0)?>" min="0" placeholder="0">
-          <span class="form-hint">Lower numbers appear first.</span>
-        </div>
-      </div>
-      <div>
-        <label class="form-label">Job Description</label>
-        <textarea name="description" class="form-input fs-sm-r" rows="4"><?=e($editing['description']??'')?></textarea>
-      </div>
-      <div>
-        <label class="form-label">Requirements</label>
-        <textarea name="requirements" class="form-input fs-sm-r" rows="3" placeholder="- 2+ years PHP&#10;- MySQL experience"><?=e($editing['requirements']??'')?></textarea>
-      </div>
-      <label class="row-check">
-        <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
-        <span>Open / Accepting Applications</span>
-      </label>
-
-      </div><!-- /scrollable-content -->
-
-      <!-- Footer: always visible & sticky -->
-      <div class="af-form-footer" style="margin-top:1rem;padding:1rem 0;border-top:1px solid var(--border);display:flex;gap:0.5rem;flex-shrink:0;">
-        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Job':'Post Job'?></button>
-        <a href="?tab=jobs" class="btn btn-ghost flex-1">Cancel</a>
-      </div>
-    </form>
-  </div>
-</div>
-<?php endif;?>
-</div>
+<?php endif; ?>
 
 <?php else: // Applications tab ?>
 <div>

@@ -272,6 +272,80 @@
   gap: 0.5rem;
 }
 
+/* ── Careers job form (full-width, not cramped sidebar) ─ */
+.careers-form-wrap {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.careers-job-form {
+  padding: 1.5rem 1.75rem;
+}
+.careers-form-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.careers-form-back {
+  display: inline-block;
+  font-size: 0.8125rem;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  margin-bottom: 0.5rem;
+}
+.careers-form-back:hover {
+  color: var(--primary);
+}
+.careers-form-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+.careers-form-sub {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
+  line-height: 1.5;
+}
+.careers-form-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.careers-form-body .form-section {
+  padding: 1.25rem 0;
+}
+.careers-form-body .form-section:first-child {
+  padding-top: 0;
+}
+.careers-form-body .form-group {
+  margin-bottom: 1rem;
+}
+.careers-form-body .form-group:last-child {
+  margin-bottom: 0;
+}
+.careers-form-body .form-grid-2 {
+  margin-bottom: 1rem;
+}
+.careers-form-body .form-label {
+  font-size: 0.8125rem;
+  margin-bottom: 0.4rem;
+}
+.careers-form-body .form-hint {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--muted-foreground);
+  line-height: 1.4;
+}
+.careers-form-body .form-textarea {
+  min-height: 120px;
+}
+
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
   .af-split {
