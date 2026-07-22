@@ -402,4 +402,18 @@ function runDbMigrations() {
             execute("ALTER TABLE job_applications ADD COLUMN cv_file TEXT");
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M21: ' . $e->getMessage()); }
+
+    try {
+        // Migration 22: Widen job_listings text columns (live DBs may have smaller limits)
+        if (dbTableExists('job_listings')) {
+            if (defined('DB_DRIVER') && DB_DRIVER === 'sqlite') {
+                // SQLite columns are already flexible TEXT types
+            } else {
+                execute("ALTER TABLE job_listings MODIFY COLUMN experience VARCHAR(255) NULL");
+                execute("ALTER TABLE job_listings MODIFY COLUMN salary_range VARCHAR(255) NULL");
+                execute("ALTER TABLE job_listings MODIFY COLUMN department VARCHAR(255) NULL");
+                execute("ALTER TABLE job_listings MODIFY COLUMN location VARCHAR(255) NULL");
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M22: ' . $e->getMessage()); }
 }

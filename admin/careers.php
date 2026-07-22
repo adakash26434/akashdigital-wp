@@ -37,6 +37,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active      = isset($_POST['active']) ? 1 : 0;
 
         if (!$title) { $error = 'Job title is required.'; }
+        elseif (mb_strlen($experience) > 255) { $error = 'Experience field is too long (max 255 characters). Use Job Description for details.'; }
+        elseif (mb_strlen($salary_range) > 255) { $error = 'Salary range is too long (max 255 characters).'; }
+        elseif (mb_strlen($short_desc) > 500) { $error = 'Short summary is too long (max 500 characters).'; }
         else {
             $existSlug = queryOne("SELECT id FROM job_listings WHERE slug=? AND id!=?",[$slug,$id]);
             if ($existSlug) $slug .= '-' . time();
@@ -156,7 +159,8 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         </div>
         <div class="form-group">
           <label class="form-label">Experience Required</label>
-          <input type="text" name="experience" class="form-input" value="<?=e($editing['experience']??'')?>" placeholder="e.g., 2+ years PHP & MySQL">
+          <input type="text" name="experience" class="form-input" maxlength="255" value="<?=e($editing['experience']??'')?>" placeholder="e.g., 2+ years PHP & MySQL">
+          <span class="form-hint">Short phrase only (max 255 chars). Put full details in Job Description below.</span>
         </div>
       </div>
 
