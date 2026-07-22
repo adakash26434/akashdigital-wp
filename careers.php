@@ -19,12 +19,6 @@ try {
     );
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-// Check if job deadline has passed (for display purposes - should already be filtered)
-function isJobExpired($job) {
-    if (empty($job['deadline'])) return false;
-    return strtotime($job['deadline']) < time();
-}
-
 $departments = array_values(array_unique(array_filter(array_column($jobs, 'department'))));
 sort($departments);
 
@@ -39,25 +33,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     $phone     = trim($_POST['phone'] ?? '');
     $cover     = trim($_POST['cover_letter'] ?? '');
     $resume    = trim($_POST['resume_url'] ?? '');
-    $cv_file   = trim($_POST['cv_file'] ?? '');
+    $cv_file   = handleUpload('resume_file', 'uploads/applications') ?: trim($_POST['cv_file'] ?? '');
 
     // Verify job exists, is active, and within publish window
     $job = null;
     try { 
         $job = queryOne(
             "SELECT * FROM job_listings WHERE id=? AND active=1 
-             AND (starts_at IS NULL OR starts_at <= CURDATE()) 
-             AND (deadline IS NULL OR deadline >= CURDATE())",
+             AND (starts_at IS NULL OR starts_at <= CURDATE())",
             [$job_id]
         ); 
     } catch (\Throwable $e) {}
     
     if (!$job) {
         $apply_error = 'This job posting is no longer available.';
+    } elseif (isJobListingExpired($job)) {
+        $apply_error = 'Application deadline has passed for this position.';
     } elseif (!$full_name || !$email) {
         $apply_error = 'Name and email are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $apply_error = 'Please enter a valid email address.';
+    } elseif (!$resume && !$cv_file) {
+        $apply_error = 'Please upload your CV (PDF) or provide a resume link.';
     } else {
         try {
             $appId = execute(
@@ -144,7 +141,7 @@ ob_start(); ?>
     </div>
     <?php else: 
       $openJobs = [];
-      foreach ($jobs as $j) { if (!isJobExpired($j)) $openJobs[] = $j; }
+      foreach ($jobs as $j) { if (!isJobListingExpired($j)) $openJobs[] = $j; }
     ?>
     <?php if(empty($openJobs)): ?>
     <div style="border:2px dashed var(--border);border-radius:1.25rem;padding:4rem 2rem;text-align:center;color:var(--muted-foreground);">
@@ -194,7 +191,7 @@ ob_start(); ?>
             <div style="font-size:var(--text-sm);color:var(--foreground);line-height:1.7;white-space:pre-line;"><?= e($job['description']) ?></div>
             <?php endif;?>
             <?php
-            $reqs = json_decode($job['requirements'] ?? '[]', true) ?? [];
+            $reqs = parseJobRequirements($job['requirements'] ?? '');
             if (!empty($reqs)): ?>
             <div class="mt-1">
               <div style="font-size:var(--text-sm);font-weight:700;color:var(--foreground);margin-bottom:0.625rem;">Requirements</div>
@@ -212,6 +209,7 @@ ob_start(); ?>
       </div>
       <?php endforeach; ?>
     </div>
+    <?php endif; ?>
     <?php endif; ?>
 
     <!-- Apply Modal -->
@@ -232,7 +230,7 @@ ob_start(); ?>
         <?php if ($apply_error): ?>
         <div class="alert alert-error mb-1"><?= e($apply_error) ?></div>
         <?php endif; ?>
-        <form method="POST" class="col-1">
+        <form method="POST" enctype="multipart/form-data" class="col-1">
           <?= csrfField() ?>
           <input type="hidden" name="apply_job_id" :value="applyId">
           <div>
@@ -250,11 +248,17 @@ ob_start(); ?>
             </div>
           </div>
           <div>
-            <label class="form-label">Resume URL <span style="color:var(--muted-foreground);font-weight:400;">(LinkedIn, portfolio, etc.)</span></label>
-            <input type="url" name="resume_url" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
+            <label class="form-label">Upload CV (PDF) <span class="text-danger-token">*</span></label>
+            <input type="file" name="resume_file" accept=".pdf,application/pdf" class="form-input">
+            <span class="form-hint">Max 5 MB. PDF only.</span>
           </div>
           <div>
-            <label class="form-label">CV File URL <span style="color:var(--muted-foreground);font-weight:400;">(Google Drive, Dropbox link)</span></label>
+            <label class="form-label">Resume / Portfolio URL <span style="color:var(--muted-foreground);font-weight:400;">(LinkedIn, portfolio, etc.)</span></label>
+            <input type="url" name="resume_url" class="form-input" placeholder="https://linkedin.com/in/yourprofile">
+            <span class="form-hint">Use this if you prefer sharing a profile or portfolio link instead of only a CV.</span>
+          </div>
+          <div>
+            <label class="form-label">Or CV File URL <span style="color:var(--muted-foreground);font-weight:400;">(Google Drive, Dropbox link)</span></label>
             <input type="url" name="cv_file" class="form-input" placeholder="https://drive.google.com/file/d/...">
           </div>
           <div>

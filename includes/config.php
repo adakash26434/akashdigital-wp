@@ -5,11 +5,15 @@
 // ══════════════════════════════════════════════════════════════
 
 // ── Auto-load production config overrides ────────────────
-// If config-production.php exists, load it (for production server)
-// This allows different credentials on each environment
-if (file_exists(__DIR__ . '/config-production.php')) {
-    require_once __DIR__ . '/config-production.php';
+// Supports both project root (README/SETUP) and includes/ (legacy deploys).
+$__prodConfig = __DIR__ . '/config-production.php';
+$__rootConfig = dirname(__DIR__) . '/config-production.php';
+if (file_exists($__prodConfig)) {
+    require_once $__prodConfig;
+} elseif (file_exists($__rootConfig)) {
+    require_once $__rootConfig;
 }
+unset($__prodConfig, $__rootConfig);
 
 // ── Auto-load local dev config (optional) ────────────────
 // Place a local-only `dev-config.php` next to this file to override

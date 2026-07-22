@@ -56,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $jobs = [];
-try { $jobs = query("SELECT id,title,slug,department,location,type,salary_range,experience,short_desc,active,position FROM job_listings ORDER BY position ASC, id DESC"); }
+try { $jobs = query("SELECT id,title,slug,department,location,type,salary_range,experience,short_desc,deadline,active,position,starts_at FROM job_listings ORDER BY position ASC, id DESC"); }
 catch(\Throwable $e) { 
-    try { $jobs = query("SELECT id,title,department,location,type FROM job_listings ORDER BY id DESC"); }
+    try { $jobs = query("SELECT id,title,department,location,type,deadline,active FROM job_listings ORDER BY id DESC"); }
     catch(\Throwable $e2) { $error = 'job_listings table not found. Run database.sql.'; }
 }
 
@@ -102,16 +102,18 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
     <?php if(empty($jobs)):?>
     <div class="af-empty">No jobs posted yet!</div>
-    <?php else: $sn=1; foreach($jobs as $j): $isActive=(bool)$j['active']; ?>
-    <div class="st-card" style="padding:1rem 1.25rem;<?=!$isActive?'opacity:0.6;':''?>">
-      <div style="display:flex;align-items:flex-start;gap:0.75rem;<?=!$isActive?'opacity:0.6;':''?>">
+    <?php else: $sn=1; foreach($jobs as $j): $isActive=(bool)$j['active']; $isExpired=isJobListingExpired($j); ?>
+    <div class="st-card" style="padding:1rem 1.25rem;<?=!$isActive||$isExpired?'opacity:0.75;':''?>">
+      <div style="display:flex;align-items:flex-start;gap:0.75rem;<?=!$isActive||$isExpired?'opacity:0.75;':''?>">
         <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>
         <div class="flex-1" style="flex:1;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
             <div class="flex-1">
               <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.25rem;">
             <span style="font-weight:700;color:var(--foreground);"><?=e($j['title'])?></span>
-            <?php if($isActive):?>
+            <?php if($isExpired):?>
+            <span style="font-size:0.625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--danger-soft);color:var(--danger-fg);font-weight:700;">EXPIRED</span>
+            <?php elseif($isActive):?>
             <span style="font-size:0.625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--success-soft);color:var(--success-fg);font-weight:700;">OPEN</span>
             <?php else:?>
             <span style="font-size:0.625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--muted);color:var(--muted-foreground);font-weight:700;">CLOSED</span>
@@ -122,7 +124,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
             <?php if(!empty($j['salary_range'])):?> · <?=e($j['salary_range'])?><?php endif;?>
           </div>
           <?php if(!empty($j['deadline'])):?>
-          <div style="font-size:0.75rem;color:<?=strtotime($j['deadline'])<time()?'var(--danger-fg)':'var(--warning-fg)'?>;margin-top:0.25rem;">⏳ Deadline: <?=date('M j, Y',strtotime($j['deadline']))?></div>
+          <div style="font-size:0.75rem;color:<?=$isExpired?'var(--danger-fg)':'var(--warning-fg)'?>;margin-top:0.25rem;">⏳ Deadline: <?=date('M j, Y',strtotime($j['deadline']))?><?=$isExpired?' (expired — hidden on site)':''?></div>
           <?php endif;?>
         </div>
           </div>
@@ -249,7 +251,10 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
 
 <?php else: // Applications tab ?>
 <div>
-  <div style="margin-bottom:1rem;font-size:0.875rem;color:var(--muted-foreground);"><?=count($apps)?> total · <?=$pending_apps?> pending review</div>
+  <div style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+    <span style="font-size:0.875rem;color:var(--muted-foreground);"><?=count($apps)?> total · <?=$pending_apps?> pending review</span>
+    <a href="applications.php" class="btn btn-outline btn-sm">Full applications desk →</a>
+  </div>
   <div class="st-card ov-hidden">
   <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
@@ -269,13 +274,13 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:0.75rem 1rem;font-weight:700;color:var(--muted-foreground);font-size:0.75rem;"><?=$sn++?></td>
           <td style="padding:0.75rem 1rem;font-weight:600;color:var(--foreground);">
-            <?=e($a['full_name']??$a['name']??'—')?>
+            <?=e(applicantName($a))?>
             <?php if(!empty($a['cover_letter'])):?>
             <button type="button" onclick="alert('Cover Letter:\n\n<?=e(addslashes(substr($a['cover_letter'],0,500)))?><?=strlen($a['cover_letter'])>500?'...':''?>')" class="btn btn-ghost btn-sm" title="View Cover Letter" style="padding:0.1rem 0.3rem;font-size:0.65rem;margin-left:0.25rem;">📄</button>
             <?php endif;?>
           </td>
           <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);">
-            <div><?=e($a['email']??'—')?></div>
+            <div><a href="mailto:<?=e($a['email']??'')?>" class="text-primary"><?=e($a['email']??'—')?></a></div>
             <?php if(!empty($a['phone'])):?><div style="font-size:0.7rem;"><?=e($a['phone'])?></div><?php endif;?>
           </td>
           <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><?=e($a['job_title']??'Open Application')?></td>
@@ -292,6 +297,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
           <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;"><?=timeAgo($a['created_at'])?></td>
           <td class="p-row">
             <div style="display:flex;gap:0.25rem;">
+              <a href="applications.php?view=<?=$a['id']?>" class="btn btn-ghost btn-sm" title="View details"><i data-lucide="eye" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <?php if(!empty($a['resume_url'])):?>
               <a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-ghost btn-sm" title="Resume URL"><i data-lucide="link" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <?php endif;?>

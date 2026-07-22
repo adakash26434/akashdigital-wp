@@ -275,7 +275,7 @@ $__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Application
       ?>
       <div style="display:flex;align-items:center;gap:0.75rem;padding:0.625rem 1.25rem;<?=!$last?'border-bottom:1px solid var(--border);':''?>">
         <div class="flex-1-min">
-          <div style="font-size:0.8125rem;font-weight:600;color:var(--foreground);"><?=e($a['full_name']??$a['name']??'—')?></div>
+          <div style="font-size:0.8125rem;font-weight:600;color:var(--foreground);"><?=e(applicantName($a))?></div>
           <div class="fs-2xs-mt"><?=e($a['job_title']??'Open application')?></div>
         </div>
         <span style="font-size:0.625rem;padding:0.1rem 0.4rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;"><?=strtoupper($a['status']??'new')?></span>
