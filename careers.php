@@ -186,80 +186,104 @@ ob_start(); ?>
         $jobShareUrl = jobListingPublicUrl($job);
         $jobShareMsg = jobListingShareMessage($job);
       ?>
-      <div class="st-card careers-job-card<?= $isHighlighted ? ' careers-job-card--highlight' : '' ?>" id="job-<?= e($job['slug'] ?? ('id-' . (int)$job['id'])) ?>" x-show="dept==='' || dept==='<?= e($job['department']??'') ?>'" style="padding:0;">
-        <div class="p-tile" x-data="{open:<?= $isHighlighted ? 'true' : 'false' ?>}">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-            <div>
-              <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-bottom:0.5rem;">
-                <?php if(!empty($job['department'])): ?><span class="badge badge-primary"><?= e($job['department']) ?></span><?php endif;?>
-                <?php if(!empty($job['type'])): ?><span class="badge badge-secondary"><?= e(ucfirst(str_replace('_',' ',$job['type']))) ?></span><?php endif;?>
-                <?php if(!empty($job['location'])): ?><span class="badge" style="background:var(--background);border:1px solid var(--border);color:var(--muted-foreground);"> <?= e($job['location']) ?></span><?php endif;?>
-                <?php if(!empty($job['salary_range'])): ?><span class="badge" style="background:var(--success-soft);border:1px solid var(--success-border);color:var(--success-fg);"> <?= e($job['salary_range']) ?></span><?php endif;?>
-                <?php if(!empty($job['deadline'])): ?>
-                <?php $daysLeft = ceil((strtotime($job['deadline']) - time()) / 86400); ?>
-                <span class="badge <?=$daysLeft <= 3 ? 'badge-error' : 'badge-warning'?>" style="background:<?=$daysLeft <= 3 ? 'var(--danger-soft)' : 'var(--warning-soft)'?>;border:1px solid <?=$daysLeft <= 3 ? 'var(--danger-border)' : 'var(--warning-border)'?>;color:<?=$daysLeft <= 3 ? 'var(--danger-fg)' : 'var(--warning-fg)'?>;">
-                  ⏳ <?=date('M j', strtotime($job['deadline']))?> (<?=$daysLeft?>d left)
-                </span>
-                <?php endif;?>
-              </div>
-              <h3 style="font-family:var(--font-display);font-size:var(--text-lg);font-weight:700;color:var(--foreground);"><?= e($job['title']) ?></h3>
-              <?php if(!empty($job['short_desc'])): ?>
-              <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin-top:0.375rem;"><?= e($job['short_desc']) ?></p>
+      <article class="careers-vacancy<?= $isHighlighted ? ' careers-vacancy--highlight' : '' ?>" id="job-<?= e($job['slug'] ?? ('id-' . (int)$job['id'])) ?>" x-show="dept==='' || dept==='<?= e($job['department']??'') ?>'" x-data="{open:<?= $isHighlighted ? 'true' : 'false' ?>}">
+        <?php $daysLeft = jobListingDaysLeft($job); ?>
+        <div class="careers-vacancy__layout">
+          <div class="careers-vacancy__main">
+            <div class="careers-vacancy__tags">
+              <?php if(!empty($job['department'])): ?><span class="careers-vacancy__tag careers-vacancy__tag--dept"><?= e($job['department']) ?></span><?php endif;?>
+              <?php if(!empty($job['type'])): ?><span class="careers-vacancy__tag careers-vacancy__tag--type"><?= e(jobListingTypeLabel($job['type'])) ?></span><?php endif;?>
+              <?php if($daysLeft !== null): ?>
+              <span class="careers-vacancy__tag careers-vacancy__tag--deadline<?= $daysLeft <= 3 ? ' is-urgent' : '' ?>">
+                <i data-lucide="clock" class="ic-12"></i>
+                <?= date('M j', strtotime($job['deadline'])) ?> · <?= $daysLeft ?>d left
+              </span>
               <?php endif;?>
             </div>
-            <div style="display:flex;gap:0.5rem;flex-shrink:0;align-items:center;flex-wrap:wrap;">
-              <?php
-              $shareUrl = $jobShareUrl;
-              $shareTitle = $job['title'] ?? 'Job opening';
-              $shareMessage = $jobShareMsg;
-              $shareCopyId = 'job-share-' . (int)$job['id'];
-              include __DIR__ . '/includes/share-buttons.php';
-              ?>
-              <button @click="open=!open" class="btn btn-outline btn-sm">
-                <span x-text="open ? 'Hide Details ▲' : 'Details ▼'"></span>
-              </button>
-              <?php if ($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id']): ?>
-              <span class="badge" style="background:var(--success-soft);border:1px solid var(--success-border);color:var(--success-fg);padding:0.5rem 1rem;"> Applied!</span>
-              <?php else: ?>
-              <button @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary btn-sm"><?= __("cta_apply_now") ?> →</button>
-              <?php endif; ?>
-            </div>
+
+            <h3 class="careers-vacancy__title"><?= e($job['title']) ?></h3>
+
+            <?php if(!empty($job['short_desc'])): ?>
+            <p class="careers-vacancy__summary"><?= e($job['short_desc']) ?></p>
+            <?php endif;?>
+
+            <ul class="careers-vacancy__facts">
+              <?php if(!empty($job['location'])): ?>
+              <li><i data-lucide="map-pin" class="ic-14"></i><span><?= e($job['location']) ?></span></li>
+              <?php endif;?>
+              <?php if(!empty($job['salary_range'])): ?>
+              <li><i data-lucide="banknote" class="ic-14"></i><span><?= e($job['salary_range']) ?></span></li>
+              <?php endif;?>
+              <?php if(!empty($job['experience'])): ?>
+              <li><i data-lucide="briefcase" class="ic-14"></i><span><?= e($job['experience']) ?></span></li>
+              <?php endif;?>
+            </ul>
           </div>
 
-          <!-- Expandable description -->
-          <div x-show="open" x-transition style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid var(--border);">
-            <?php if(!empty($job['description'])): ?>
-            <div style="font-size:var(--text-sm);color:var(--foreground);line-height:1.7;white-space:pre-line;"><?= e($job['description']) ?></div>
-            <?php endif;?>
+          <aside class="careers-vacancy__aside">
+            <?php if ($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id']): ?>
+            <span class="careers-vacancy__applied">✓ Applied</span>
+            <?php else: ?>
+            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary careers-vacancy__apply">
+              <?= __("cta_apply_now") ?> →
+            </button>
+            <?php endif; ?>
+            <button type="button" @click="open=!open" class="btn btn-outline btn-sm careers-vacancy__toggle">
+              <span x-text="open ? '<?= e(isNepali() ? 'विवरण लुकाउनुहोस्' : 'Hide details') ?>' : '<?= e(isNepali() ? 'विवरण हेर्नुहोस्' : 'View details') ?>'"></span>
+              <i data-lucide="chevron-down" class="ic-14 careers-vacancy__chev" :class="open && 'is-open'"></i>
+            </button>
+            <div class="careers-vacancy__share-label"><?= e(isNepali() ? 'Share गर्नुहोस्' : 'Share vacancy') ?></div>
             <?php
-            $reqs = parseJobRequirements($job['requirements'] ?? '');
-            if (!empty($reqs)): ?>
-            <div class="mt-1">
-              <div style="font-size:var(--text-sm);font-weight:700;color:var(--foreground);margin-bottom:0.625rem;">Requirements</div>
-              <ul style="list-style:none;padding:0;display:flex;flex-direction:column;gap:0.375rem;">
-                <?php foreach($reqs as $r):?>
-                <li style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
-                  <i data-lucide="check" class="ic-13" style="color:var(--primary);margin-top:0.1rem;flex-shrink:0;"></i><?= e($r) ?>
-                </li>
-                <?php endforeach;?>
-              </ul>
-            </div>
-            <?php endif;?>
-            <div class="careers-job-share-bar">
-              <span class="careers-job-share-bar__text">Know someone perfect for this role?</span>
-              <?php
-              $shareUrl = $jobShareUrl;
-              $shareTitle = $job['title'] ?? 'Job opening';
-              $shareMessage = $jobShareMsg;
-              $shareVariant = 'bar';
-              $shareLabel = 'Share this vacancy';
-              $shareCopyId = 'job-share-bar-' . (int)$job['id'];
-              include __DIR__ . '/includes/share-buttons.php';
-              ?>
-            </div>
-          </div>
+            $shareUrl = $jobShareUrl;
+            $shareTitle = $job['title'] ?? 'Job opening';
+            $shareMessage = $jobShareMsg;
+            $shareCopyId = 'job-share-' . (int)$job['id'];
+            include __DIR__ . '/includes/share-buttons.php';
+            ?>
+          </aside>
         </div>
-      </div>
+
+        <div class="careers-vacancy__body" x-show="open" x-transition>
+          <?php if(!empty($job['description'])): ?>
+          <section class="careers-vacancy__section">
+            <h4 class="careers-vacancy__section-title"><?= e(isNepali() ? 'यस पदको बारेमा' : 'About this role') ?></h4>
+            <div class="careers-vacancy__prose"><?= e($job['description']) ?></div>
+          </section>
+          <?php endif;?>
+
+          <?php $reqs = parseJobRequirements($job['requirements'] ?? ''); if (!empty($reqs)): ?>
+          <section class="careers-vacancy__section">
+            <h4 class="careers-vacancy__section-title"><?= e(isNepali() ? 'आवश्यकता' : 'Requirements') ?></h4>
+            <ul class="careers-vacancy__reqs">
+              <?php foreach($reqs as $r):?>
+              <li><i data-lucide="check-circle-2" class="ic-15"></i><span><?= e($r) ?></span></li>
+              <?php endforeach;?>
+            </ul>
+          </section>
+          <?php endif;?>
+
+          <footer class="careers-vacancy__footer">
+            <div class="careers-vacancy__footer-text">
+              <strong><?= e(isNepali() ? 'साथीलाई सिफारिस गर्नुहुन्छ?' : 'Know someone who fits?') ?></strong>
+              <span><?= e(isNepali() ? 'यो vacancy share गर्नुहोस्।' : 'Share this opening with your network.') ?></span>
+            </div>
+            <?php
+            $shareUrl = $jobShareUrl;
+            $shareTitle = $job['title'] ?? 'Job opening';
+            $shareMessage = $jobShareMsg;
+            $shareVariant = 'bar';
+            $shareLabel = 'Share';
+            $shareCopyId = 'job-share-bar-' . (int)$job['id'];
+            include __DIR__ . '/includes/share-buttons.php';
+            ?>
+            <?php if (!($apply_success && (int)($_POST['apply_job_id']??0) === (int)$job['id'])): ?>
+            <button type="button" @click="applyId=<?= (int)$job['id'] ?>; applyTitle=<?= json_encode($job['title'], JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP) ?>" class="btn btn-primary btn-sm careers-vacancy__footer-apply">
+              <?= e(isNepali() ? 'यस पदको लागि आवेदन →' : 'Apply for this role →') ?>
+            </button>
+            <?php endif; ?>
+          </footer>
+        </div>
+      </article>
       <?php endforeach; ?>
     </div>
     <?php endif; ?>

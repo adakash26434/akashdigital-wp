@@ -380,6 +380,24 @@ function navHasChildBadge(array $links): bool {
     return false;
 }
 
+/** Human-readable employment type for job cards. */
+function jobListingTypeLabel(?string $type): string {
+    $map = [
+        'full-time'  => 'Full-time',
+        'part-time'  => 'Part-time',
+        'contract'   => 'Contract',
+        'internship' => 'Internship',
+    ];
+    $key = strtolower(trim((string)$type));
+    return $map[$key] ?? ucfirst(str_replace('_', ' ', $key ?: 'Role'));
+}
+
+/** Days remaining until job deadline (null if open-ended). */
+function jobListingDaysLeft(array $job): ?int {
+    if (empty($job['deadline'])) return null;
+    return (int)ceil((strtotime($job['deadline'] . ' 23:59:59') - time()) / 86400);
+}
+
 // ── Upload helper ─────────────────────────────────────────────────
 function handleUpload(string $field, string $dir = 'uploads'): ?string {
     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) return null;
