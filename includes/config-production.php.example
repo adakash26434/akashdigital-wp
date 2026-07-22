@@ -1,0 +1,20 @@
+<?php
+/**
+ * PRODUCTION SECRETS — copy to config-production.php and fill in values.
+ * Location: includes/config-production.php (same folder as config.php)
+ * NEVER commit config-production.php to GitHub.
+ */
+
+define('DB_HOST',    'localhost');
+define('DB_NAME',    'YOUR_CPANEL_DATABASE_NAME');
+define('DB_USER',    'YOUR_CPANEL_DATABASE_USER');
+define('DB_PASS',    'YOUR_CPANEL_DATABASE_PASSWORD');
+define('DB_CHARSET', 'utf8mb4');
+
+define('SITE_URL', 'https://aakashdigital.com.np');
+
+// Keep the same key you already use on live — do NOT change unless you want all sessions reset.
+// Generate new: php -r "echo bin2hex(random_bytes(32));"
+define('APP_SECRET_KEY', 'PASTE_YOUR_EXISTING_SECRET_KEY_HERE');
+
+define('APP_ENV', 'production');
