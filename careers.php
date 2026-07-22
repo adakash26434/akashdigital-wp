@@ -5,8 +5,8 @@ require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
 require_once 'includes/mailer.php';
 $__s = siteSettings();
-$pageTitle = 'Careers — ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company'));
-$pageDesc  = 'Join ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' — open positions in software engineering, QA, design, and IT services.';
+$pageTitle = 'Careers — ' . stCompanyName();
+$pageDesc  = 'Join ' . stCompanyName() . ' — open positions in software engineering, QA, design, and IT services.';
 
 $jobs = [];
 try {
@@ -33,8 +33,8 @@ if ($highlightJobSlug !== '') {
     }
 }
 if ($featuredJob) {
-    $co = $__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company');
-    $pageTitle = e($featuredJob['title']) . ' — Careers — ' . e($co);
+    $co = stCompanyName();
+    $pageTitle = ($featuredJob['title'] ?? 'Role') . ' — Careers — ' . $co;
     $pageDesc  = !empty($featuredJob['short_desc'])
         ? $featuredJob['short_desc']
         : 'Apply for ' . ($featuredJob['title'] ?? 'this role') . ' at ' . $co . '.';

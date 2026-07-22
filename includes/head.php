@@ -36,8 +36,23 @@ if ($__addr !== '') $__defaultDesc .= ' | ' . $__addr;
 $__title     = $pageTitle ?? $__siteName;
 $__desc      = $pageDesc  ?? $__defaultDesc;
 $__siteUrl   = defined('SITE_URL') ? SITE_URL : '';
-$__ogImage   = $ogImage ?? rtrim($__siteUrl, '/') . '/public/opengraph.jpg';
+$__company   = function_exists('stCompanyName') ? stCompanyName() : ($__s['company_name'] ?? $__siteName);
+$__ogImage   = function_exists('resolveOgImageUrl')
+    ? resolveOgImageUrl($ogImage ?? null, $__s)
+    : ($ogImage ?? rtrim($__siteUrl, '/') . '/public/opengraph.jpg');
+// Cache-bust OG image when the local file changes so Facebook/WhatsApp refetch
+if (str_contains((string)$__ogImage, '/public/opengraph.jpg') || str_contains((string)$__ogImage, '/uploads/')) {
+    $__ogPath = parse_url($__ogImage, PHP_URL_PATH) ?: '';
+    $__ogFs   = dirname(__DIR__) . $__ogPath;
+    if ($__ogPath && is_file($__ogFs)) {
+        $__ogImage .= (str_contains($__ogImage, '?') ? '&' : '?') . 'v=' . filemtime($__ogFs);
+    }
+}
 $__ogUrl     = rtrim($__siteUrl, '/') . '/' . ltrim($_SERVER['REQUEST_URI'] ?? '/', '/');
+$__ogLogo    = function_exists('absoluteMediaUrl')
+    ? absoluteMediaUrl($__s['logo_url'] ?? '')
+    : '';
+if ($__ogLogo === '') $__ogLogo = rtrim($__siteUrl, '/') . '/assets/img/logo.png';
 $__themePref = (function_exists('currentUser') ? (currentUser()['theme_pref'] ?? '') : '');
 
 // Cache-busting: append the file's last-modified time as ?v= so browsers
@@ -62,18 +77,24 @@ $__asset = function (string $path) use ($__siteUrl, $__assetRoot): string {
 <meta property="og:title"       content="<?= e($__title) ?>">
 <meta property="og:description" content="<?= e($__desc) ?>">
 <meta property="og:image"       content="<?= e($__ogImage) ?>">
+<meta property="og:image:alt"   content="<?= e($__company) ?>">
 <meta property="og:url"         content="<?= e($__ogUrl) ?>">
+<meta property="og:site_name"   content="<?= e($__company) ?>">
+<meta property="og:locale"      content="<?= (function_exists('isNepali') && isNepali()) ? 'ne_NP' : 'en_US' ?>">
 <link rel="canonical"           href="<?= e($__ogUrl) ?>">
 <meta property="og:type"        content="website">
 <meta name="twitter:card"       content="summary_large_image">
-<?php if ($__indexable && !empty($__s['site_name'])): ?>
+<meta name="twitter:title"      content="<?= e($__title) ?>">
+<meta name="twitter:description" content="<?= e($__desc) ?>">
+<meta name="twitter:image"      content="<?= e($__ogImage) ?>">
+<?php if (!empty($__s['site_name']) || !empty($__company)): ?>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "Organization",
-  "name": "<?= e($__s['site_name'] ?? '') ?>",
-  "url": "<?= e($__siteUrl) ?>",
-  "logo": "<?= e($__siteUrl) ?>/assets/img/logo.png"
+  "name": <?= json_encode($__company, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>,
+  "url": <?= json_encode($__siteUrl, JSON_UNESCAPED_SLASHES) ?>,
+  "logo": <?= json_encode($__ogLogo, JSON_UNESCAPED_SLASHES) ?>
 }
 </script>
 <?php endif; ?>

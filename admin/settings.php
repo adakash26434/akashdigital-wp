@@ -415,7 +415,7 @@ $tabs = [
           <div>
             <label class="form-label">Company Name</label>
             <input type="text" name="company_name" class="form-input" value="<?= e(sv($s,'company_name',stSiteName())) ?>" placeholder="Company name">
-            <span class="form-hint">Used in WhatsApp message, copyright, and meta tags.</span>
+            <span class="form-hint">Used in WhatsApp, copyright, page titles, and Facebook/LinkedIn share previews. Check spelling carefully (e.g. Digital not Digitla).</span>
           </div>
           <div>
             <label class="form-label">Company Website</label>
@@ -1054,7 +1054,16 @@ $tabs = [
             $imgLabel = 'Default OG Image (1200×630px recommended)';
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
-          <p class="caption-meta" style="margin-top:-0.25rem;">Used for Facebook, WhatsApp, LinkedIn previews.</p>
+          <p class="caption-meta" style="margin-top:-0.25rem;">
+            Used for Facebook, WhatsApp, LinkedIn link previews. Upload your <strong>current brand</strong> banner here — it overrides the old default screenshot.
+            After changing, refresh Facebook cache:
+            <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener" style="color:var(--primary);">Sharing Debugger → Scrape Again</a>
+          </p>
+          <?php if (empty(sv($s,'og_image'))): ?>
+          <div class="alert alert-warning" style="margin-top:0.5rem;font-size:0.8125rem;">
+            No custom OG image set — social shares may still show the legacy preview image. Upload one above for Aakash Digital branding.
+          </div>
+          <?php endif; ?>
           <div>
             <label class="form-label">Google Analytics Measurement ID</label>
             <input type="text" name="google_analytics_id" class="form-input" value="<?= e(sv($s,'google_analytics_id')) ?>" placeholder="G-XXXXXXXXXX">

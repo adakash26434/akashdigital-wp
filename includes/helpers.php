@@ -497,6 +497,38 @@ function normalizeImageUrl(string $url) {
     return $url;
 }
 
+/** Turn a relative /uploads/... path or absolute URL into a full https URL for OG/schema. */
+function absoluteMediaUrl(?string $url): string {
+    $url = trim((string)$url);
+    if ($url === '') return '';
+    if (preg_match('#^https?://#i', $url)) return $url;
+    if (str_starts_with($url, '//')) return 'https:' . $url;
+    $base = rtrim(defined('SITE_URL') ? (string)SITE_URL : '', '/');
+    if ($base === '') return $url;
+    if ($url[0] !== '/') $url = '/' . $url;
+    return $base . $url;
+}
+
+/**
+ * Social preview image: page override → Settings OG image → site logo → legacy fallback.
+ * Prefer uploading a 1200×630 image in Admin → Settings → SEO.
+ */
+function resolveOgImageUrl(?string $pageOverride = null, ?array $settings = null): string {
+    $settings = $settings ?? (function_exists('siteSettings') ? siteSettings() : []);
+    $candidates = [
+        trim((string)($pageOverride ?? '')),
+        trim((string)($settings['og_image'] ?? '')),
+        trim((string)($settings['logo_url'] ?? '')),
+    ];
+    foreach ($candidates as $c) {
+        if ($c === '') continue;
+        $abs = absoluteMediaUrl($c);
+        if ($abs !== '') return $abs;
+    }
+    $fallback = absoluteMediaUrl('/public/opengraph.jpg');
+    return $fallback !== '' ? $fallback : '/public/opengraph.jpg';
+}
+
 // ── Audit log helper ─────────────────────────────────────────────
 // नेपालीमा: Admin action haru lai audit_log table ma record garne
 // Usage: logAudit('user.delete', 'Deleted user id=42', ['target_type'=>'user','target_id'=>42])
