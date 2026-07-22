@@ -130,7 +130,12 @@ if (isset($_GET['view'])) {
       <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.75rem;">Contact Info</div>
       <div style="font-size:0.875rem;margin-bottom:0.25rem;"><strong>Email:</strong> <a href="mailto:<?=e($detail['email'])?>" class="text-primary"><?=e($detail['email'])?></a></div>
       <?php if($detail['phone']):?><div class="fs-md"><strong>Phone:</strong> <?=e($detail['phone'])?></div><?php endif;?>
-      <?php if($detail['resume_url']):?><div style="font-size:0.875rem;margin-top:0.5rem;"><a href="<?=e($detail['resume_url'])?>" target="_blank" class="btn btn-outline btn-sm"> View Resume</a></div><?php endif;?>
+      <?php if(!empty($detail['resume_url']) || !empty($detail['cv_file'])):?>
+      <div style="display:flex;gap:0.5rem;flex-wrap:wrap;font-size:0.875rem;margin-top:0.5rem;">
+        <?php if(!empty($detail['resume_url'])):?><a href="<?=e($detail['resume_url'])?>" target="_blank" class="btn btn-outline btn-sm">View Resume</a><?php endif;?>
+        <?php if(!empty($detail['cv_file'])):?><a href="<?=e($detail['cv_file'])?>" target="_blank" class="btn btn-outline btn-sm">View CV</a><?php endif;?>
+      </div>
+      <?php endif;?>
     </div>
     <form method="POST">
       <?= csrfField() ?><input type="hidden" name="action" value="status"><input type="hidden" name="id" value="<?=(int)$detail['id']?>">
@@ -186,7 +191,8 @@ if (isset($_GET['view'])) {
     </div>
     <span style="padding:0.25rem 0.75rem;border-radius:9999px;background:<?=$bg?>;color:<?=$col?>;font-size:0.75rem;font-weight:600;white-space:nowrap;"><?=$lbl?></span>
     <div style="display:flex;gap:0.375rem;flex-shrink:0;">
-      <?php if(!empty($a['resume_url'])):?><a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-outline btn-sm">CV</a><?php endif;?>
+      <?php if(!empty($a['resume_url'])):?><a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-outline btn-sm">Resume</a><?php endif;?>
+      <?php if(!empty($a['cv_file'])):?><a href="<?=e($a['cv_file'])?>" target="_blank" class="btn btn-outline btn-sm">CV</a><?php endif;?>
       <a href="?view=<?=$a['id']?>" class="btn btn-outline btn-sm">View →</a>
       <form method="POST" class="inline" onsubmit="return confirm('Delete this application?')">
         <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$a['id']?>">
