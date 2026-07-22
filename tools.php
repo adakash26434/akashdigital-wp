@@ -176,7 +176,7 @@ include 'includes/page-hero.php';
 }
 </style>
 
-<script src="<?= e(asset('js/st-bs-datepicker.js')) ?>"></script>
+<script src="<?= e(asset('js/st-bs-datepicker.js')) ?>?v=1.3"></script>
 <script>
 /* ─── Preeti to Unicode ─── */
 const PREETI_MAP = {

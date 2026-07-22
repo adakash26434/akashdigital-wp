@@ -1,5 +1,5 @@
 /**
- * Narayani Infosys — Nepali BS Datepicker  (v1.2)
+ * Narayani Infosys — Nepali BS Datepicker  (v1.3)
  * Self-contained. No external dependencies.
  *
  * Usage:  <input type="date" name="foo" data-bs-picker>
@@ -243,32 +243,40 @@
     hidden.dataset.bsPickerInit = '1';
     hidden.style.display = 'none';
 
-    var isOptional = hidden.hasAttribute('data-bs-optional');
-    var minToday   = hidden.hasAttribute('data-bs-min-today');
-    var minAdStr   = hidden.getAttribute('data-bs-min-ad');
-    var minAdDate  = minAdStr ? parseAdStr(minAdStr) : (minToday ? todayAdStart() : null);
+    var isOptional   = hidden.hasAttribute('data-bs-optional');
+    var minToday     = hidden.hasAttribute('data-bs-min-today');
+    var defaultToday = hidden.hasAttribute('data-bs-default-today');
+    var minAdStr     = hidden.getAttribute('data-bs-min-ad');
+    var minAdDate    = minAdStr ? parseAdStr(minAdStr) : (minToday ? todayAdStart() : null);
     if (minAdDate && !isValidJobAd(minAdDate)) minAdDate = todayAdStart();
 
     // Check if datetime-local
     var isDateTime = hidden.type === 'datetime-local';
     var savedTime = '';
     
-    // Determine initial BS date (reject zero/epoch garbage like AD 1943-04-14)
+    // Determine initial BS date from AD value (YYYY-MM-DD or YYYY-MM-DDTHH:MM)
     var initBs = null;
     if (hidden.value) {
       var adInit = parseAdStr(hidden.value);
       if (isValidJobAd(adInit)) {
-        var p = hidden.value.split(isDateTime ? 'T' : '-');
-        if (p[0]) {
-          var dateParts = p[0].split('-');
-          initBs = adToBs(+dateParts[0], +dateParts[1], +dateParts[2]);
-          if (isDateTime && p[1]) {
-            savedTime = p[1].substring(0, 5);
-          }
+        initBs = adToBs(adInit.getFullYear(), adInit.getMonth() + 1, adInit.getDate());
+        if (isDateTime && hidden.value.indexOf('T') !== -1) {
+          savedTime = hidden.value.split('T')[1].substring(0, 5);
         }
+        // Keep hidden value in canonical AD form
+        hidden.value = toAdStr(adInit) + (isDateTime && savedTime ? 'T' + savedTime + ':00' : '');
+      } else {
+        hidden.value = '';
       }
-      if (!initBs) hidden.value = '';
     }
+
+    // Required date fields with no value → default to today (e.g. Application Deadline)
+    if (!initBs && defaultToday && !isOptional) {
+      var todayDef = todayAdStart();
+      initBs = adToBs(todayDef.getFullYear(), todayDef.getMonth() + 1, todayDef.getDate());
+      hidden.value = toAdStr(todayDef);
+    }
+
     var today = new Date();
     var curBs = initBs || adToBs(today.getFullYear(), today.getMonth() + 1, today.getDate());
     var viewY = curBs.y, viewM = curBs.m;

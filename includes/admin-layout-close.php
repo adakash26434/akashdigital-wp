@@ -130,7 +130,7 @@ document.addEventListener('keydown',function(e){
   document.body.style.overflow='';
 });
 </script>
-<script src="<?= asset('js/st-bs-datepicker.js') ?>" defer></script>
+<script src="<?= asset('js/st-bs-datepicker.js') ?>?v=1.3" defer></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   if (window.initBsPickers) window.initBsPickers();

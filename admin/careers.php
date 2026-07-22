@@ -172,12 +172,17 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Application Deadline</label>
-            <input type="date" data-bs-picker data-bs-min-today name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
-            <span class="form-hint">Pick a future date (BS calendar). Job hides after this date. Use Today + pick a future day — not year 2000 BS.</span>
+            <?php
+              $deadlineVal = normalizeJobListingDate($editing['deadline'] ?? '') ?? '';
+              if ($deadlineVal === '' && empty($editing['id'])) $deadlineVal = date('Y-m-d');
+            ?>
+            <input type="date" data-bs-picker data-bs-min-today data-bs-default-today name="deadline" class="form-input" value="<?=e($deadlineVal)?>">
+            <span class="form-hint">Defaults to today (BS). Change to any future date — job hides after deadline.</span>
           </div>
           <div class="form-group">
             <label class="form-label">Publish From <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
-            <input type="date" data-bs-picker data-bs-optional name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>">
+            <?php $startsVal = normalizeJobListingDate($editing['starts_at'] ?? '') ?? ''; ?>
+            <input type="date" data-bs-picker data-bs-optional name="starts_at" class="form-input" value="<?=e($startsVal)?>">
             <span class="form-hint">Leave empty to show immediately. Clear (×) if you do not need a start date.</span>
           </div>
         </div>

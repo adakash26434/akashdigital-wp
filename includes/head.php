@@ -107,7 +107,7 @@ endif; ?>
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/admin.css')) ?>">
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/admin-forms.css')) ?>">
   <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/st-bs-datepicker.css">
-  <script src="<?= $__siteUrl ?>/assets/js/st-bs-datepicker.js" defer></script>
+  <script src="<?= $__siteUrl ?>/assets/js/st-bs-datepicker.js?v=1.3" defer></script>
 
   <style>
   /* ST token overrides win over DaisyUI defaults */
