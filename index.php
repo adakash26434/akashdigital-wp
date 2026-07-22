@@ -58,6 +58,8 @@ try {
 
 // ── Site settings (CMS-driven homepage content) ──────────────────
 $__s = siteSettings();
+// Recompute client count using the admin-configurable offset (default 300)
+$__clientCount = count($__logoClients) + count($partnerClients) + (int)(($__s['client_count_offset'] ?? '') !== '' ? $__s['client_count_offset'] : 300);
 
 // Stats bar — admin-editable, fallback to defaults
 // Stat #2 (Happy Clients) uses actual count from clients + partners DB
@@ -419,9 +421,9 @@ include 'includes/stats-bar.php';
     <div class="container">
       <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
         <?php foreach ([
-          [$__clientCount . '+', 'Cooperative Clients',  'building-2'],
-          ['15+',  'Technology Partners',  'layers'],
-          ['7',    'Provinces Covered',    'map-pin'],
+          [$__clientCount . '+', ($__s['stat_coop_clients_label'] ?? '') ?: 'Cooperative Clients', 'building-2'],
+          [($__s['stat_partners_value'] ?? '') ?: '15+', ($__s['stat_partners_label'] ?? '') ?: 'Technology Partners', 'layers'],
+          [($__s['stat_provinces_value'] ?? '') ?: '7', ($__s['stat_provinces_label'] ?? '') ?: 'Provinces Covered', 'map-pin'],
         ] as [$n, $l, $ic]):
           preg_match('/^([\d,.]+)/', $n, $mm);
           $nNum = $mm[1] ?? $n;
@@ -866,7 +868,9 @@ function sTab(slug){
       <h2 class="section-title"><?= cms($__s,'home_pricing_title') ?: (isNepali() ? 'हरेक व्यवसायका लागि <span class="tg">योजना</span>' : 'Plans for <span class="tg">every business</span>') ?></h2>
       <p class="section-lede"><?= e(cms($__s,'home_pricing_sub') ?: (isNepali() ? 'कुनै लुकेको शुल्क छैन। जुनसुकै बेला अपग्रेड। हरेक योजनामा स्थानीय सहयोग।' : 'No hidden fees. Upgrade any time. Local support in every plan.')) ?></p>
     </div>
+    <?php if (($__s['pricing_cards_visible'] ?? '1') !== '0'): ?>
     <?php include 'includes/pricing-teaser.php'; ?>
+    <?php endif; ?>
     <div class="section-foot animate-fade-up">
       <a href="<?= url('pricing.php') ?>" class="arr">
         <?= e(__('home_pricing_link')) ?> <i data-lucide="arrow-right" class="ic-14"></i>

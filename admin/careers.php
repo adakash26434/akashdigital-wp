@@ -32,6 +32,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $description = trim($_POST['description'] ?? '');
         $requirements= trim($_POST['requirements'] ?? '');
         $deadline    = $_POST['deadline'] ?: null;
+        $starts_at   = $_POST['starts_at'] ?: null;
+        $position    = (int)($_POST['position'] ?? 0);
         $active      = isset($_POST['active']) ? 1 : 0;
 
         if (!$title) { $error = 'Job title is required.'; }
@@ -40,12 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($existSlug) $slug .= '-' . time();
             try {
                 if ($id) {
-                    execute("UPDATE job_listings SET title=?,slug=?,department=?,location=?,type=?,salary_range=?,experience=?,short_desc=?,description=?,requirements=?,deadline=?,active=?,updated_at=NOW() WHERE id=?",
-                        [$title,$slug,$department,$location,$type,$salary_range?:null,$experience?:null,$short_desc?:null,$description,$requirements,$deadline,$active,$id]);
+                    execute("UPDATE job_listings SET title=?,slug=?,department=?,location=?,type=?,salary_range=?,experience=?,short_desc=?,description=?,requirements=?,deadline=?,starts_at=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                        [$title,$slug,$department,$location,$type,$salary_range?:null,$experience?:null,$short_desc?:null,$description,$requirements,$deadline,$starts_at,$position,$active,$id]);
                     $success = 'Job updated.';
                 } else {
-                    execute("INSERT INTO job_listings (title,slug,department,location,type,salary_range,experience,short_desc,description,requirements,deadline,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$title,$slug,$department,$location,$type,$salary_range?:null,$experience?:null,$short_desc?:null,$description,$requirements,$deadline,$active]);
+                    execute("INSERT INTO job_listings (title,slug,department,location,type,salary_range,experience,short_desc,description,requirements,deadline,starts_at,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                        [$title,$slug,$department,$location,$type,$salary_range?:null,$experience?:null,$short_desc?:null,$description,$requirements,$deadline,$starts_at,$position,$active]);
                     $success = 'Job posted.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
@@ -54,9 +56,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $jobs = [];
-try { $jobs = query("SELECT id,title,slug,department,location,type,salary_range,experience,short_desc,deadline,active,position FROM job_listings ORDER BY position,id"); }
+try { $jobs = query("SELECT id,title,slug,department,location,type,salary_range,experience,short_desc,deadline,active,position,starts_at FROM job_listings ORDER BY position ASC, id DESC"); }
 catch(\Throwable $e) { 
-    try { $jobs = query("SELECT id,title,department,location,type,deadline,active FROM job_listings ORDER BY id"); }
+    try { $jobs = query("SELECT id,title,department,location,type,deadline,active FROM job_listings ORDER BY id DESC"); }
     catch(\Throwable $e2) { $error = 'job_listings table not found. Run database.sql.'; }
 }
 
@@ -209,6 +211,18 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
           <input type="date" data-bs-picker name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
         </div>
       </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div>
+          <label class="form-label">Publish From <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
+          <input type="date" data-bs-picker name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>" placeholder="Leave empty to publish now">
+          <span class="form-hint">Job will not show before this date.</span>
+        </div>
+        <div>
+          <label class="form-label">Sort Order</label>
+          <input type="number" name="position" class="form-input" value="<?=(int)($editing['position']??0)?>" min="0" placeholder="0">
+          <span class="form-hint">Lower numbers appear first.</span>
+        </div>
+      </div>
       <div>
         <label class="form-label">Job Description</label>
         <textarea name="description" class="form-input fs-sm-r" rows="4"><?=e($editing['description']??'')?></textarea>
@@ -245,7 +259,7 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
   <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">
   <table style="width:100%;border-collapse:collapse;font-size:0.8125rem;">
       <thead><tr style="border-bottom:2px solid var(--border);background:var(--muted);">
-        <?php foreach(['#','Applicant','Email','Position','Status','Applied',''] as $h):?>
+        <?php foreach(['#','Applicant','Email / Phone','Position','Status','Applied',''] as $h):?>
         <th style="padding:0.625rem 1rem;text-align:left;font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:var(--muted-foreground);"><?=$h?></th>
         <?php endforeach;?>
       </tr></thead>
@@ -259,9 +273,17 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         ?>
         <tr style="border-bottom:1px solid var(--border);">
           <td style="padding:0.75rem 1rem;font-weight:700;color:var(--muted-foreground);font-size:0.75rem;"><?=$sn++?></td>
-          <td style="padding:0.75rem 1rem;font-weight:600;color:var(--foreground);"><?=e(applicantName($a))?></td>
-          <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><a href="mailto:<?=e($a['email']??'')?>" class="text-primary"><?=e($a['email']??'—')?></a></td>
-          <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><?=e($a['job_title']??'—')?></td>
+          <td style="padding:0.75rem 1rem;font-weight:600;color:var(--foreground);">
+            <?=e(applicantName($a))?>
+            <?php if(!empty($a['cover_letter'])):?>
+            <button type="button" onclick="alert('Cover Letter:\n\n<?=e(addslashes(substr($a['cover_letter'],0,500)))?><?=strlen($a['cover_letter'])>500?'...':''?>')" class="btn btn-ghost btn-sm" title="View Cover Letter" style="padding:0.1rem 0.3rem;font-size:0.65rem;margin-left:0.25rem;">📄</button>
+            <?php endif;?>
+          </td>
+          <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);">
+            <div><a href="mailto:<?=e($a['email']??'')?>" class="text-primary"><?=e($a['email']??'—')?></a></div>
+            <?php if(!empty($a['phone'])):?><div style="font-size:0.7rem;"><?=e($a['phone'])?></div><?php endif;?>
+          </td>
+          <td style="padding:0.75rem 1rem;font-size:0.75rem;color:var(--muted-foreground);"><?=e($a['job_title']??'Open Application')?></td>
           <td class="p-row">
             <form method="POST" class="inline">
               <?=csrfField()?><input type="hidden" name="action" value="update_app_status"><input type="hidden" name="id" value="<?=$a['id']?>">
@@ -277,7 +299,10 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
             <div style="display:flex;gap:0.25rem;">
               <a href="applications.php?view=<?=$a['id']?>" class="btn btn-ghost btn-sm" title="View details"><i data-lucide="eye" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <?php if(!empty($a['resume_url'])):?>
-              <a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-ghost btn-sm" title="Resume"><i data-lucide="file-text" style="width:13px;height:13px;pointer-events:none;"></i></a>
+              <a href="<?=e($a['resume_url'])?>" target="_blank" class="btn btn-ghost btn-sm" title="Resume URL"><i data-lucide="link" style="width:13px;height:13px;pointer-events:none;"></i></a>
+              <?php endif;?>
+              <?php if(!empty($a['cv_file'])):?>
+              <a href="<?=e($a['cv_file'])?>" target="_blank" class="btn btn-ghost btn-sm" title="CV File"><i data-lucide="file-text" style="width:13px;height:13px;pointer-events:none;"></i></a>
               <?php endif;?>
               <form method="POST" class="inline" onsubmit="return confirm('Remove?')">
                 <?=csrfField()?><input type="hidden" name="action" value="delete_app"><input type="hidden" name="id" value="<?=$a['id']?>">

@@ -2459,11 +2459,12 @@ input[type="checkbox"]:hover {
 .footer-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .social-pill {
   display: grid; place-items: center; width: 2.25rem; height: 2.25rem;
-  border-radius: 9999px; border: 1px solid var(--footer-border);
-  color: var(--footer-fg); transition: all 0.2s; text-decoration: none;
+  border-radius: 9999px; border: 1px solid rgba(241,245,249,0.28);
+  color: rgba(241,245,249,0.85); transition: all 0.2s; text-decoration: none;
 }
-.social-pill:hover { color: var(--footer-fg-strong); border-color: rgba(59,130,246,0.6); background: rgba(59,130,246,0.12); }
-.social-pill-yt:hover { border-color: rgba(239,68,68,0.6); background: rgba(239,68,68,0.1); }
+.social-pill svg, .social-pill i { color: inherit; fill: currentColor; }
+.social-pill:hover { color: #fff; border-color: rgba(59,130,246,0.7); background: rgba(59,130,246,0.18); }
+.social-pill-yt:hover { border-color: rgba(239,68,68,0.7); background: rgba(239,68,68,0.15); }
 
 /* ── Back / breadcrumb / muted inline links ─────────────────── */
 .st-back-link {

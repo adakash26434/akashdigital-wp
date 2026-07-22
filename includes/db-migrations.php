@@ -64,8 +64,9 @@ function runDbMigrations() {
 
     try {
         // Migration 1: Add team category field
+        // Note: TEXT DEFAULT is invalid in MySQL 5.7+; use VARCHAR(50) so DEFAULT works on both MySQL and SQLite.
         if (!dbColumnExists('team_members', 'category')) {
-            execute("ALTER TABLE team_members ADD COLUMN category TEXT DEFAULT 'management'");
+            execute("ALTER TABLE team_members ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'management'");
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M1: ' . $e->getMessage()); }
 
@@ -382,4 +383,23 @@ function runDbMigrations() {
             execute("ALTER TABLE clients ADD COLUMN installation_cost REAL DEFAULT NULL AFTER integration_charge");
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M19: ' . $e->getMessage()); }
+
+    try {
+        // Migration 20: Add position, starts_at columns to job_listings for ordering and scheduled publishing
+        if (dbTableExists('job_listings')) {
+            if (!dbColumnExists('job_listings', 'position')) {
+                execute("ALTER TABLE job_listings ADD COLUMN position INTEGER NOT NULL DEFAULT 0");
+            }
+            if (!dbColumnExists('job_listings', 'starts_at')) {
+                execute("ALTER TABLE job_listings ADD COLUMN starts_at TEXT");
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M20: ' . $e->getMessage()); }
+
+    try {
+        // Migration 21: Add cv_file column to job_applications for file upload
+        if (dbTableExists('job_applications') && !dbColumnExists('job_applications', 'cv_file')) {
+            execute("ALTER TABLE job_applications ADD COLUMN cv_file TEXT");
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M21: ' . $e->getMessage()); }
 }
