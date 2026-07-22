@@ -1,5 +1,5 @@
 /**
- * Narayani Infosys — Nepali BS Datepicker  (v1.1)
+ * Narayani Infosys — Nepali BS Datepicker  (v1.2)
  * Self-contained. No external dependencies.
  *
  * Usage:  <input type="date" name="foo" data-bs-picker>
@@ -188,6 +188,28 @@
     return d.getFullYear() + '-' + z2(d.getMonth() + 1) + '-' + z2(d.getDate());
   }
 
+  function parseAdStr(str) {
+    if (!str) return null;
+    var p = str.split('T')[0].split('-');
+    if (p.length < 3) return null;
+    var y = +p[0], m = +p[1], d = +p[2];
+    if (!y || !m || !d) return null;
+    return new Date(y, m - 1, d);
+  }
+
+  function adTs(d) {
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  }
+
+  function isValidJobAd(d) {
+    return d && adTs(d) >= adTs(new Date(1970, 0, 1));
+  }
+
+  function todayAdStart() {
+    var n = new Date();
+    return new Date(n.getFullYear(), n.getMonth(), n.getDate());
+  }
+
   /* ── Convert number to Nepali numeral ───────────────────────── */
   function toNepaliNum(n) {
     var nepaliDigits = ['०','१','२','३','४','५','६','७','८','९'];
@@ -221,25 +243,61 @@
     hidden.dataset.bsPickerInit = '1';
     hidden.style.display = 'none';
 
+    var isOptional = hidden.hasAttribute('data-bs-optional');
+    var minToday   = hidden.hasAttribute('data-bs-min-today');
+    var minAdStr   = hidden.getAttribute('data-bs-min-ad');
+    var minAdDate  = minAdStr ? parseAdStr(minAdStr) : (minToday ? todayAdStart() : null);
+    if (minAdDate && !isValidJobAd(minAdDate)) minAdDate = todayAdStart();
+
     // Check if datetime-local
     var isDateTime = hidden.type === 'datetime-local';
     var savedTime = '';
     
-    // Determine initial BS date
+    // Determine initial BS date (reject zero/epoch garbage like AD 1943-04-14)
     var initBs = null;
     if (hidden.value) {
-      var p = hidden.value.split(isDateTime ? 'T' : '-');
-      if (p[0]) {
-        var dateParts = p[0].split('-');
-        initBs = adToBs(+dateParts[0], +dateParts[1], +dateParts[2]);
-        if (isDateTime && p[1]) {
-          savedTime = p[1].substring(0, 5); // HH:MM
+      var adInit = parseAdStr(hidden.value);
+      if (isValidJobAd(adInit)) {
+        var p = hidden.value.split(isDateTime ? 'T' : '-');
+        if (p[0]) {
+          var dateParts = p[0].split('-');
+          initBs = adToBs(+dateParts[0], +dateParts[1], +dateParts[2]);
+          if (isDateTime && p[1]) {
+            savedTime = p[1].substring(0, 5);
+          }
         }
       }
+      if (!initBs) hidden.value = '';
     }
     var today = new Date();
     var curBs = initBs || adToBs(today.getFullYear(), today.getMonth() + 1, today.getDate());
     var viewY = curBs.y, viewM = curBs.m;
+
+    function adAllowed(ad) {
+      if (!isValidJobAd(ad)) return false;
+      if (minAdDate && adTs(ad) < adTs(minAdDate)) return false;
+      return true;
+    }
+
+    function setDate(by, bm, bd, ad) {
+      if (!adAllowed(ad)) return false;
+      initBs = { y: by, m: bm, d: bd };
+      var timeVal = timeInput ? timeInput.value : '';
+      hidden.value = toAdStr(ad) + (isDateTime && timeVal ? 'T' + timeVal + ':00' : '');
+      disp.value   = formatBs(by, bm, bd);
+      adLabel.textContent = ad.toLocaleDateString('en-GB', {year:'numeric',month:'short',day:'numeric'}) + ' AD';
+      clearBtn.style.display = '';
+      hidden.dispatchEvent(new Event('change', {bubbles:true}));
+      return true;
+    }
+
+    function clearDate() {
+      initBs = null;
+      hidden.value = '';
+      disp.value   = '';
+      clearBtn.style.display = 'none';
+      adLabel.textContent = '';
+    }
 
     // Wrapper
     var wrap = document.createElement('div');
@@ -255,7 +313,9 @@
     disp.className = (hidden.className || 'form-input') + ' st-bsp-display';
     disp.placeholder = 'BS मिति छान्नुहोस्';
     disp.style.cssText = 'cursor:pointer;padding-right:2.25rem;';
-    if (initBs) disp.value = formatBs(initBs.y, initBs.m, initBs.d);
+    if (initBs) {
+      disp.value = formatBs(initBs.y, initBs.m, initBs.d);
+    }
     wrap.insertBefore(disp, hidden);
     
     // Time input for datetime-local
@@ -314,27 +374,28 @@
     var btnNext  = popup.querySelector('#bsp-next');
     var btnToday = popup.querySelector('.st-bsp-today');
 
+    if (initBs) {
+      var initAd = bsToAd(initBs.y, initBs.m, initBs.d);
+      adLabel.textContent = initAd.toLocaleDateString('en-GB', {year:'numeric',month:'short',day:'numeric'}) + ' AD';
+    }
+
     function renderPopup() {
       titleEl.textContent = toNepaliNum(viewY) + ' ' + BS_M[viewM - 1];
       bodyEl.innerHTML = buildGrid(viewY, viewM, initBs);
-      // day click handlers
       bodyEl.querySelectorAll('.st-bsp-day').forEach(function(btn) {
         btn.addEventListener('click', function() {
           var d = +this.dataset.d;
-          initBs = { y: viewY, m: viewM, d: d };
           var ad = bsToAd(viewY, viewM, d);
-          var timeVal = timeInput ? timeInput.value : '';
-          hidden.value = toAdStr(ad) + (isDateTime && timeVal ? 'T' + timeVal + ':00' : '');
-          disp.value   = formatBs(viewY, viewM, d);
-          adLabel.textContent = ad.toLocaleDateString('ne-NP', {year:'numeric',month:'short',day:'numeric'});
-          clearBtn.style.display = '';
+          if (!setDate(viewY, viewM, d, ad)) {
+            disp.style.borderColor = 'var(--danger, #dc2626)';
+            setTimeout(function() { disp.style.borderColor = ''; }, 1200);
+            return;
+          }
           closePopup();
-          hidden.dispatchEvent(new Event('change', {bubbles:true}));
         });
       });
-      // Update AD label for current view (first day of month)
       var firstAd = bsToAd(viewY, viewM, 1);
-      adLabel.textContent = firstAd.toLocaleDateString('ne-NP', {year:'numeric',month:'short',day:'numeric'}) + ' (AD)';
+      adLabel.textContent = firstAd.toLocaleDateString('en-GB', {year:'numeric',month:'short',day:'numeric'}) + ' AD';
     }
 
     function openPopup() {
@@ -396,21 +457,14 @@
       var now = new Date();
       var t = adToBs(now.getFullYear(), now.getMonth() + 1, now.getDate());
       viewY = t.y; viewM = t.m;
-      initBs = t;
-      var timeVal = timeInput ? timeInput.value : '';
-      hidden.value = toAdStr(now) + (isDateTime && timeVal ? 'T' + timeVal + ':00' : '');
-      disp.value   = formatBs(t.y, t.m, t.d);
-      clearBtn.style.display = '';
-      renderPopup();
-      closePopup();
-      hidden.dispatchEvent(new Event('change', {bubbles:true}));
+      if (setDate(t.y, t.m, t.d, now)) {
+        renderPopup();
+        closePopup();
+      }
     });
     clearBtn.addEventListener('click', function(e) {
       e.stopPropagation();
-      initBs = null;
-      hidden.value = '';
-      disp.value   = '';
-      clearBtn.style.display = 'none';
+      clearDate();
     });
     
     // Sync time with hidden field on time change
@@ -425,6 +479,23 @@
     document.addEventListener('click', function(e) {
       if (!wrap.contains(e.target)) closePopup();
     });
+
+    var form = hidden.closest('form');
+    if (form) {
+      if (!form._bsPickerSubmitHook) {
+        form._bsPickerSubmitHook = true;
+        form.addEventListener('submit', function() {
+          form.querySelectorAll('[data-bs-picker]').forEach(function(el) {
+            var w = el.closest('.st-bsp-wrap');
+            if (!w) return;
+            var dEl = w.querySelector('.st-bsp-display');
+            if (el.hasAttribute('data-bs-optional') && dEl && !dEl.value.trim()) {
+              el.value = '';
+            }
+          });
+        });
+      }
+    }
   }
 
   /* ── Public API ──────────────────────────────────────────────── */

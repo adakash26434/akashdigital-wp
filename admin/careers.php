@@ -31,8 +31,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $short_desc  = trim($_POST['short_desc'] ?? '');
         $description = trim($_POST['description'] ?? '');
         $requirements= trim($_POST['requirements'] ?? '');
-        $deadline    = $_POST['deadline'] ?: null;
-        $starts_at   = $_POST['starts_at'] ?: null;
+        $deadline    = normalizeJobListingDate($_POST['deadline'] ?? '');
+        $starts_at   = normalizeJobListingDate($_POST['starts_at'] ?? '');
         $position    = (int)($_POST['position'] ?? 0);
         $active      = isset($_POST['active']) ? 1 : 0;
 
@@ -40,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif (mb_strlen($experience) > 255) { $error = 'Experience field is too long (max 255 characters). Use Job Description for details.'; }
         elseif (mb_strlen($salary_range) > 255) { $error = 'Salary range is too long (max 255 characters).'; }
         elseif (mb_strlen($short_desc) > 500) { $error = 'Short summary is too long (max 500 characters).'; }
+        elseif ($deadline && !jobListingDateIsFutureOrToday($deadline)) {
+            $error = 'Application deadline must be today or a future date. Clear the field and pick again (avoid BS year 2000 — that is 1943 AD).';
+        }
         else {
             $existSlug = queryOne("SELECT id FROM job_listings WHERE slug=? AND id!=?",[$slug,$id]);
             if ($existSlug) $slug .= '-' . time();
@@ -169,13 +172,13 @@ $TYPE_LABELS = ['full-time'=>'Full-time','part-time'=>'Part-time','contract'=>'C
         <div class="form-grid-2">
           <div class="form-group">
             <label class="form-label">Application Deadline</label>
-            <input type="date" data-bs-picker name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
-            <span class="form-hint">Job hides from the site after this date.</span>
+            <input type="date" data-bs-picker data-bs-min-today name="deadline" class="form-input" value="<?=e(substr($editing['deadline']??'',0,10))?>">
+            <span class="form-hint">Pick a future date (BS calendar). Job hides after this date. Use Today + pick a future day — not year 2000 BS.</span>
           </div>
           <div class="form-group">
             <label class="form-label">Publish From <span style="font-weight:400;color:var(--muted-foreground);">(optional)</span></label>
-            <input type="date" data-bs-picker name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>">
-            <span class="form-hint">Leave empty to show immediately.</span>
+            <input type="date" data-bs-picker data-bs-optional name="starts_at" class="form-input" value="<?=e(substr($editing['starts_at']??'',0,10))?>">
+            <span class="form-hint">Leave empty to show immediately. Clear (×) if you do not need a start date.</span>
           </div>
         </div>
         <div class="form-grid-2">

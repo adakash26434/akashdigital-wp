@@ -398,6 +398,33 @@ function jobListingDaysLeft(array $job): ?int {
     return (int)ceil((strtotime($job['deadline'] . ' 23:59:59') - time()) / 86400);
 }
 
+/**
+ * Normalize YYYY-MM-DD from admin forms (BS picker hidden AD field).
+ * Rejects empty/zero dates and mistaken BS-epoch AD values (1943-04-14).
+ */
+function normalizeJobListingDate(?string $value): ?string {
+    $value = trim((string)$value);
+    if ($value === '' || $value === '0000-00-00' || str_starts_with($value, '0000-')) {
+        return null;
+    }
+    $date = substr($value, 0, 10);
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        return null;
+    }
+    $ts = strtotime($date);
+    if ($ts === false || $ts < strtotime('1970-01-01')) {
+        return null;
+    }
+    return $date;
+}
+
+/** True if a job listing date is valid for public visibility checks. */
+function jobListingDateIsFutureOrToday(?string $date): bool {
+    if (!$date) return true;
+    $ts = strtotime($date);
+    return $ts !== false && $ts >= strtotime('today');
+}
+
 // ── Upload helper ─────────────────────────────────────────────────
 function handleUpload(string $field, string $dir = 'uploads'): ?string {
     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) return null;
