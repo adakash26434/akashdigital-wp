@@ -188,11 +188,11 @@ $csrf = csrfToken();
             <div class="grid grid-cols-2 gap-4 mb-4">
                 <div class="form-group">
                     <label class="form-label">Start Date</label>
-                    <input type="datetime-local" name="starts_at" class="form-input">
+                    <input type="datetime-local" data-bs-picker name="starts_at" class="form-input">
                 </div>
                 <div class="form-group">
                     <label class="form-label">End Date</label>
-                    <input type="datetime-local" name="ends_at" class="form-input">
+                    <input type="datetime-local" data-bs-picker name="ends_at" class="form-input">
                 </div>
             </div>
             <div class="form-group mb-6">

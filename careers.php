@@ -275,8 +275,7 @@ ob_start(); ?>
             $shareUrl = $jobShareUrl;
             $shareTitle = $job['title'] ?? 'Job opening';
             $shareMessage = $jobShareMsg;
-            $shareVariant = 'bar';
-            $shareLabel = 'Share';
+            $shareVariant = 'compact';
             $shareCopyId = 'job-share-bar-' . (int)$job['id'];
             include __DIR__ . '/includes/share-buttons.php';
             ?>

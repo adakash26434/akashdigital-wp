@@ -242,7 +242,7 @@ function stTab(id) {
   <!-- Post update to open incident (compact, inline) -->
   <div class="st-card p-tile" style="margin-bottom:1rem;border-left:3px solid var(--danger-fg);">
     <h4 style="font-size:.8125rem;font-weight:700;margin-bottom:.75rem;color:var(--danger-fg);">Post Update on Open Incident</h4>
-    <form method="post" style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:.625rem;align-items:end;">
+    <form method="post" class="status-incident-form">
       <?=csrfField()?>
       <input type="hidden" name="action" value="incident_update">
       <div>

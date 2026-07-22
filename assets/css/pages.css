@@ -2249,13 +2249,14 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
 .st-share--bar {
   flex-wrap: wrap;
   justify-content: space-between;
+  align-items: center;
   gap: 0.75rem;
   width: 100%;
   padding: 0.875rem 1rem;
   margin-top: 1rem;
   border-radius: 0.75rem;
-  background: var(--muted, rgba(15, 23, 42, 0.04));
-  border: 1px solid var(--border);
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
 }
 .st-share__label {
   font-size: 0.8125rem;
@@ -2513,17 +2514,21 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
   flex-wrap: wrap;
   gap: 1rem;
   margin-top: 1.75rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+  border-radius: 0.875rem;
+  background: color-mix(in srgb, var(--primary) 7%, var(--card));
 }
 .careers-vacancy__footer-text {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
   min-width: 12rem;
+  flex: 1 1 10rem;
 }
 .careers-vacancy__footer-text strong {
   font-size: 0.875rem;
+  font-weight: 700;
   color: var(--foreground);
 }
 .careers-vacancy__footer-text span {
@@ -2531,11 +2536,13 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
   color: var(--muted-foreground);
 }
 .careers-vacancy__footer .st-share--bar {
-  flex: 1;
+  flex: 0 1 auto;
+  width: auto;
   justify-content: flex-end;
   gap: 0.75rem;
   border: none;
   padding: 0;
+  margin: 0;
   background: transparent;
 }
 .careers-vacancy__footer-apply {
@@ -2573,5 +2580,17 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
   .st-share--bar {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* ── Portal profile layout ────────────────────────────────────── */
+.portal-profile-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 900px) {
+  .portal-profile-grid {
+    grid-template-columns: 1fr 1fr;
   }
 }

@@ -499,7 +499,7 @@ $LOST_REASONS = ['Budget constraints'=>'Budget constraints','Went with competito
     <!-- Quick actions -->
     <div class="st-card" style="padding:1.125rem;">
       <div style="font-size:0.8125rem;font-weight:700;margin-bottom:0.875rem;">Update Stage</div>
-      <form method="POST" x-data="{stage:'<?= $lead['stage'] ?>'}" style="display:flex;flex-direction:column;gap:0.75rem;">
+      <form method="POST" x-data="<?= e(json_encode(['stage' => (string)($lead['stage'] ?? '')], JSON_UNESCAPED_UNICODE)) ?>" style="display:flex;flex-direction:column;gap:0.75rem;">
         <?= csrfField() ?><input type="hidden" name="action" value="update_stage">
         <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0.5rem;">
           <?php foreach ($STAGES as $sk => [$sico,$sbg2,$scol2,$slbl2]): ?>

@@ -89,16 +89,16 @@ $prefix = isset($prefix) ? $prefix : (isset($id) ? 'edit' : 'add');
     <div class="form-grid-2">
       <div class="form-group">
         <label class="form-label">Start Date</label>
-        <input type="date" name="starts_at" class="form-input" value="<?=date('Y-m-d')?>">
+        <input type="date" data-bs-picker name="starts_at" class="form-input" value="<?=date('Y-m-d')?>">
       </div>
       <div class="form-group">
         <label class="form-label">Expiry Date</label>
-        <input type="date" name="expires_at" class="form-input">
+        <input type="date" data-bs-picker name="expires_at" class="form-input">
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Next Renewal</label>
-      <input type="date" name="next_renewal" class="form-input">
+      <input type="date" data-bs-picker name="next_renewal" class="form-input">
     </div>
     <div class="form-group">
       <label class="form-label">Notes (internal)</label>

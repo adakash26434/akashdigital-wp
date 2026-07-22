@@ -68,7 +68,7 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;" class="md:grid-cols-2">
+<div class="portal-profile-grid">
 
   <!-- LEFT: Profile form -->
   <div>
@@ -83,7 +83,7 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
         <div>
           <div style="font-weight:700;color:var(--foreground);"><?= e($__user['display_name']??'Client') ?></div>
           <div class="fs-sm-mt"><?= e($__user['email']) ?></div>
-          <div style="font-size:0.6875rem;margin-top:0.25rem;padding:0.125rem 0.5rem;border-radius:9999px;background:#dbeafe;color:var(--primary-dark);display:inline-block;font-weight:600;">
+          <div style="font-size:0.6875rem;margin-top:0.25rem;padding:0.125rem 0.5rem;border-radius:9999px;background:color-mix(in srgb, var(--primary) 14%, transparent);color:var(--primary);display:inline-block;font-weight:600;">
             Client Account
           </div>
         </div>
@@ -171,7 +171,7 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
         foreach ($contacts as [$icon,$label,$val,$href]):?>
         <a href="<?= e($href) ?>" target="<?= str_starts_with($href,'http')?'_blank':'_self' ?>" rel="noreferrer"
            style="display:flex;align-items:center;gap:0.875rem;padding:0.875rem 1rem;border-radius:0.75rem;border:1px solid var(--border);background:var(--background);text-decoration:none;transition:all 0.15s;"
-           onmouseover="this.style.borderColor='var(--primary)';this.style.background='#eff6ff'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--background)'">
+           onmouseover="this.style.borderColor='var(--primary)';this.style.background='color-mix(in srgb, var(--primary) 10%, var(--background))'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--background)'">
           <span style="font-size:1.25rem;"><?= $icon ?></span>
           <div>
             <div style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);"><?= e($label) ?></div>

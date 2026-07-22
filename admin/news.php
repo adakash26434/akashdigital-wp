@@ -252,7 +252,7 @@ $CATS = ['General','Product Update','Company News','Cooperatives Nepal','Technol
         </div>
         <div>
           <label class="form-label">Publish Date / Time</label>
-          <input type="datetime-local" name="published_at" class="form-input" value="<?=e(isset($editing['published_at'])&&$editing['published_at']?str_replace(' ','T',substr($editing['published_at'],0,16)):'')?>">
+          <input type="datetime-local" data-bs-picker name="published_at" class="form-input" value="<?=e(isset($editing['published_at'])&&$editing['published_at']?str_replace(' ','T',substr($editing['published_at'],0,16)):'')?>">
         </div>
         <div style="display:flex;gap:1rem;flex-wrap:wrap;">
           <label class="row-check">

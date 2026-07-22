@@ -85,15 +85,15 @@ if (isset($_GET['view'])) {
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
 
 <!-- Stats row -->
-<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:0.75rem;margin-bottom:1.75rem;">
-  <a href="applications.php" style="text-decoration:none;" class="st-card" style="padding:1rem;text-align:center;">
-    <div style="font-size:1.375rem;font-weight:800;color:var(--primary);"><?= array_sum($counts) ?></div>
-    <div style="font-size:0.75rem;color:var(--muted-foreground);margin-top:0.125rem;">Total</div>
+<div class="apps-stats-row">
+  <a href="applications.php" class="apps-stat-tile<?= $status_filter === '' ? ' is-active' : '' ?>">
+    <div class="apps-stat-tile__value" style="color:var(--primary);"><?= array_sum($counts) ?></div>
+    <div class="apps-stat-tile__label">Total</div>
   </a>
   <?php foreach($STATUS_COLORS as $s=>[$bg,$col,$lbl]):?>
-  <a href="?status=<?=$s?>" style="text-decoration:none;display:block;padding:1rem;border-radius:0.875rem;border:1px solid var(--border);text-align:center;background:<?= $status_filter===$s?$bg:'var(--card)' ?>;">
-    <div style="font-size:1.375rem;font-weight:800;color:<?=$col?>;"><?= $counts[$s]??0 ?></div>
-    <div style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.125rem;"><?=$lbl?></div>
+  <a href="?status=<?=$s?>" class="apps-stat-tile<?= $status_filter===$s ? ' is-active' : '' ?>" style="<?= $status_filter===$s ? 'background:'.$bg.';' : '' ?>">
+    <div class="apps-stat-tile__value" style="color:<?=$col?>;"><?= $counts[$s]??0 ?></div>
+    <div class="apps-stat-tile__label"><?=$lbl?></div>
   </a>
   <?php endforeach;?>
 </div>
@@ -125,7 +125,7 @@ if (isset($_GET['view'])) {
     <?php [$bg,$col,$lbl] = $STATUS_COLORS[$detail['status']??'new']??['#dbeafe','var(--primary-dark)','New']; ?>
     <span style="padding:0.375rem 0.875rem;border-radius:9999px;background:<?=$bg?>;color:<?=$col?>;font-size:0.8125rem;font-weight:600;"><?=$lbl?></span>
   </div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;">
+  <div class="apps-detail-grid">
     <div style="padding:1rem;background:var(--background);border-radius:0.625rem;border:1px solid var(--border);">
       <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.75rem;">Contact Info</div>
       <div style="font-size:0.875rem;margin-bottom:0.25rem;"><strong>Email:</strong> <a href="mailto:<?=e($detail['email'])?>" class="text-primary"><?=e($detail['email'])?></a></div>
@@ -196,7 +196,7 @@ if (isset($_GET['view'])) {
       <a href="?view=<?=$a['id']?>" class="btn btn-outline btn-sm">View →</a>
       <form method="POST" class="inline" onsubmit="return confirm('Delete this application?')">
         <?= csrfField() ?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$a['id']?>">
-        <button class="btn btn-outline btn-sm text-danger-token"></button>
+        <button type="submit" class="btn btn-outline btn-sm text-danger-token" title="Delete application" aria-label="Delete application">Delete</button>
       </form>
     </div>
   </div>

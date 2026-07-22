@@ -203,11 +203,11 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
           <label class="form-label">Starts At</label>
-          <input type="datetime-local" name="starts_at" class="form-input" value="<?=e($edit['starts_at']??'')?>">
+          <input type="datetime-local" data-bs-picker name="starts_at" class="form-input" value="<?=e($edit['starts_at']??'')?>">
         </div>
         <div>
           <label class="form-label">Ends At</label>
-          <input type="datetime-local" name="ends_at" class="form-input" value="<?=e($edit['ends_at']??'')?>">
+          <input type="datetime-local" data-bs-picker name="ends_at" class="form-input" value="<?=e($edit['ends_at']??'')?>">
         </div>
       </div>
 
