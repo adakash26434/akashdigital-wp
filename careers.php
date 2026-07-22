@@ -10,12 +10,6 @@ $pageDesc  = 'Join ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NA
 $jobs = [];
 try { $jobs = query("SELECT * FROM job_listings WHERE active=1 ORDER BY created_at DESC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-// Check if job deadline has passed
-function isJobExpired($job) {
-    if (empty($job['deadline'])) return false;
-    return strtotime($job['deadline']) < time();
-}
-
 $departments = array_values(array_unique(array_filter(array_column($jobs, 'department'))));
 sort($departments);
 
@@ -30,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     $phone     = trim($_POST['phone'] ?? '');
     $cover     = trim($_POST['cover_letter'] ?? '');
     $resume    = trim($_POST['resume_url'] ?? '');
+    $uploaded  = handleUpload('resume_file', 'uploads/applications');
+    if ($uploaded) {
+        $resume = $uploaded;
+    }
 
     // Verify job exists and deadline hasn't passed
     $job = null;
@@ -37,12 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     
     if (!$job) {
         $apply_error = 'This job posting is no longer available.';
-    } elseif (isJobExpired($job)) {
+    } elseif (isJobListingExpired($job)) {
         $apply_error = 'Application deadline has passed for this position.';
     } elseif (!$full_name || !$email) {
         $apply_error = 'Name and email are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $apply_error = 'Please enter a valid email address.';
+    } elseif (!$resume) {
+        $apply_error = 'Please upload your CV (PDF) or provide a resume link.';
     } else {
         try {
             execute(
@@ -124,7 +124,7 @@ ob_start(); ?>
     </div>
     <?php else: 
       $openJobs = [];
-      foreach ($jobs as $j) { if (!isJobExpired($j)) $openJobs[] = $j; }
+      foreach ($jobs as $j) { if (!isJobListingExpired($j)) $openJobs[] = $j; }
     ?>
     <?php if(empty($openJobs)): ?>
     <div style="border:2px dashed var(--border);border-radius:1.25rem;padding:4rem 2rem;text-align:center;color:var(--muted-foreground);">
@@ -174,7 +174,7 @@ ob_start(); ?>
             <div style="font-size:var(--text-sm);color:var(--foreground);line-height:1.7;white-space:pre-line;"><?= e($job['description']) ?></div>
             <?php endif;?>
             <?php
-            $reqs = json_decode($job['requirements'] ?? '[]', true) ?? [];
+            $reqs = parseJobRequirements($job['requirements'] ?? '');
             if (!empty($reqs)): ?>
             <div class="mt-1">
               <div style="font-size:var(--text-sm);font-weight:700;color:var(--foreground);margin-bottom:0.625rem;">Requirements</div>
@@ -213,7 +213,7 @@ ob_start(); ?>
         <?php if ($apply_error): ?>
         <div class="alert alert-error mb-1"><?= e($apply_error) ?></div>
         <?php endif; ?>
-        <form method="POST" class="col-1">
+        <form method="POST" enctype="multipart/form-data" class="col-1">
           <?= csrfField() ?>
           <input type="hidden" name="apply_job_id" :value="applyId">
           <div>
@@ -231,8 +231,14 @@ ob_start(); ?>
             </div>
           </div>
           <div>
-            <label class="form-label">Resume / Portfolio URL</label>
+            <label class="form-label">Upload CV (PDF) <span class="text-danger-token">*</span></label>
+            <input type="file" name="resume_file" accept=".pdf,application/pdf" class="form-input">
+            <span class="form-hint">Max 5 MB. PDF only.</span>
+          </div>
+          <div>
+            <label class="form-label">Or Resume / Portfolio URL</label>
             <input type="url" name="resume_url" class="form-input" placeholder="https://drive.google.com/...">
+            <span class="form-hint">Use this if you prefer sharing a Google Drive or portfolio link instead of uploading.</span>
           </div>
           <div>
             <label class="form-label">Cover Letter</label>

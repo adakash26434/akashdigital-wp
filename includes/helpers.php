@@ -308,6 +308,30 @@ function paginate(int $total, int $perPage, int $current): array {
     ];
 }
 
+// ── Job application helpers ───────────────────────────────────────
+function applicantName(array $row): string {
+    $name = trim($row['name'] ?? $row['full_name'] ?? '');
+    return $name !== '' ? $name : '—';
+}
+
+function parseJobRequirements(?string $raw): array {
+    if ($raw === null || trim($raw) === '') return [];
+    $decoded = json_decode($raw, true);
+    if (is_array($decoded) && !empty($decoded)) return $decoded;
+    $lines = preg_split('/\r\n|\r|\n/', $raw);
+    $reqs = [];
+    foreach ($lines as $line) {
+        $line = ltrim(trim($line), "-•* \t");
+        if ($line !== '') $reqs[] = $line;
+    }
+    return $reqs;
+}
+
+function isJobListingExpired(array $job): bool {
+    if (empty($job['deadline'])) return false;
+    return strtotime($job['deadline'] . ' 23:59:59') < time();
+}
+
 // ── Upload helper ─────────────────────────────────────────────────
 function handleUpload(string $field, string $dir = 'uploads'): ?string {
     if (!isset($_FILES[$field]) || $_FILES[$field]['error'] !== UPLOAD_ERR_OK) return null;

@@ -119,7 +119,7 @@ if (isset($_GET['view'])) {
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
     <div>
       <a href="applications.php" style="font-size:0.8125rem;color:var(--muted-foreground);text-decoration:none;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--muted-foreground)'">← Back to list</a>
-      <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;margin-top:0.5rem;"><?= e($detail['full_name']) ?></h2>
+      <h2 style="font-family:var(--font-display);font-size:1.25rem;font-weight:700;margin-top:0.5rem;"><?= e(applicantName($detail)) ?></h2>
       <p style="font-size:0.875rem;color:var(--muted-foreground);">Applied for: <strong><?= e($detail['job_title'] ?? 'Unknown') ?></strong> · <?= date('M j, Y', strtotime($detail['created_at'])) ?></p>
     </div>
     <?php [$bg,$col,$lbl] = $STATUS_COLORS[$detail['status']??'new']??['#dbeafe','var(--primary-dark)','New']; ?>
@@ -173,9 +173,9 @@ if (isset($_GET['view'])) {
     [$bg,$col,$lbl] = $STATUS_COLORS[$a['status']??'new'] ?? ['#dbeafe','var(--primary-dark)','New'];
   ?>
   <div class="st-card" style="padding:1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
-    <span class="avatar avatar-sm" style="background:var(--gradient-primary);color:#fff;flex-shrink:0;"><?= strtoupper(substr($a['full_name'],0,1)) ?></span>
+    <span class="avatar avatar-sm" style="background:var(--gradient-primary);color:#fff;flex-shrink:0;"><?= strtoupper(substr(applicantName($a),0,1)) ?></span>
     <div class="flex-1-min">
-      <div style="font-weight:700;font-size:0.9375rem;color:var(--foreground);"><?= e($a['full_name']) ?></div>
+      <div style="font-weight:700;font-size:0.9375rem;color:var(--foreground);"><?= e(applicantName($a)) ?></div>
       <div class="fs-sm-mt">
         <?= e($a['email']) ?>
         <?php if(!empty($a['phone'])): ?> · <?= e($a['phone']) ?><?php endif; ?>
