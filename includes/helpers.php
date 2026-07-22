@@ -510,8 +510,71 @@ function absoluteMediaUrl(?string $url): string {
 }
 
 /**
+ * Map a media URL to a local filesystem path when it belongs to this site.
+ * Returns '' if the file cannot be resolved locally.
+ */
+function localMediaPath(?string $url): string {
+    $url = trim((string)$url);
+    if ($url === '') return '';
+
+    $path = '';
+    if (preg_match('#^https?://#i', $url) || str_starts_with($url, '//')) {
+        $path = (string)(parse_url($url, PHP_URL_PATH) ?? '');
+        // Only treat same-site paths as local
+        $host = parse_url($url, PHP_URL_HOST);
+        $siteHost = defined('SITE_URL') ? parse_url((string)SITE_URL, PHP_URL_HOST) : null;
+        if ($host && $siteHost && strcasecmp((string)$host, (string)$siteHost) !== 0) {
+            return ''; // remote CDN — assume OK
+        }
+    } else {
+        $path = $url[0] === '/' ? $url : '/' . $url;
+    }
+    if ($path === '' || $path === '/') return '';
+
+    $root = dirname(__DIR__); // project root (includes/ → ../)
+    // Prefer includes/ parent (project root)
+    $candidates = [
+        $root . $path,
+        dirname($root) . $path, // safety
+    ];
+    // Also try from document-style public_html layout
+    if (defined('SITE_URL')) {
+        $candidates[] = $root . '/..' . $path;
+    }
+    foreach ($candidates as $fs) {
+        $real = realpath($fs);
+        if ($real && is_file($real)) return $real;
+        if (is_file($fs)) return $fs;
+    }
+    // Direct check without realpath (symlink issues)
+    $direct = $root . $path;
+    return is_file($direct) ? $direct : '';
+}
+
+/** True if URL is usable for OG (local file exists, or remote non-site URL). */
+function ogImageIsUsable(?string $url): bool {
+    $url = trim((string)$url);
+    if ($url === '') return false;
+
+    // Remote absolute URL on another host — keep (cannot verify cheaply)
+    if (preg_match('#^https?://#i', $url)) {
+        $host = parse_url($url, PHP_URL_HOST);
+        $siteHost = defined('SITE_URL') ? parse_url((string)SITE_URL, PHP_URL_HOST) : null;
+        if ($host && $siteHost && strcasecmp((string)$host, (string)$siteHost) !== 0) {
+            return true;
+        }
+    }
+
+    $local = localMediaPath($url);
+    if ($local !== '') return true;
+
+    // Same-site URL but file missing → unusable (would 404 → blank Facebook preview)
+    return false;
+}
+
+/**
  * Social preview image: page override → Settings OG image → site logo → legacy fallback.
- * Prefer uploading a 1200×630 image in Admin → Settings → SEO.
+ * Skips missing local files so Facebook never gets a 404 white preview.
  */
 function resolveOgImageUrl(?string $pageOverride = null, ?array $settings = null): string {
     $settings = $settings ?? (function_exists('siteSettings') ? siteSettings() : []);
@@ -519,14 +582,16 @@ function resolveOgImageUrl(?string $pageOverride = null, ?array $settings = null
         trim((string)($pageOverride ?? '')),
         trim((string)($settings['og_image'] ?? '')),
         trim((string)($settings['logo_url'] ?? '')),
+        '/public/opengraph.jpg',
     ];
     foreach ($candidates as $c) {
         if ($c === '') continue;
+        if (!ogImageIsUsable($c)) continue;
         $abs = absoluteMediaUrl($c);
         if ($abs !== '') return $abs;
     }
-    $fallback = absoluteMediaUrl('/public/opengraph.jpg');
-    return $fallback !== '' ? $fallback : '/public/opengraph.jpg';
+    // Last resort absolute fallback even if file check failed (dev)
+    return absoluteMediaUrl('/public/opengraph.jpg') ?: '/public/opengraph.jpg';
 }
 
 // ── Audit log helper ─────────────────────────────────────────────

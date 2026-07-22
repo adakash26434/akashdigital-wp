@@ -1055,13 +1055,21 @@ $tabs = [
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
           <p class="caption-meta" style="margin-top:-0.25rem;">
-            Used for Facebook, WhatsApp, LinkedIn link previews. Upload your <strong>current brand</strong> banner here — it overrides the old default screenshot.
+            Used for Facebook, WhatsApp, LinkedIn link previews. Upload a <strong>1200×630 JPG/PNG</strong> of your current brand — required for a proper preview image.
             After changing, refresh Facebook cache:
             <a href="https://developers.facebook.com/tools/debug/" target="_blank" rel="noopener" style="color:var(--primary);">Sharing Debugger → Scrape Again</a>
           </p>
-          <?php if (empty(sv($s,'og_image'))): ?>
+          <?php
+            $ogSet = trim((string)sv($s,'og_image'));
+            $ogOk  = $ogSet !== '' && function_exists('ogImageIsUsable') && ogImageIsUsable($ogSet);
+          ?>
+          <?php if ($ogSet === ''): ?>
           <div class="alert alert-warning" style="margin-top:0.5rem;font-size:0.8125rem;">
-            No custom OG image set — social shares may still show the legacy preview image. Upload one above for Aakash Digital branding.
+            No custom OG image set. Upload one above so shares show your brand (not a blank or legacy preview).
+          </div>
+          <?php elseif (!$ogOk): ?>
+          <div class="alert alert-error" style="margin-top:0.5rem;font-size:0.8125rem;">
+            Saved OG image file is <strong>missing (404)</strong> — Facebook shows a blank preview. Clear it and upload a new image, then Scrape Again in the Debugger.
           </div>
           <?php endif; ?>
           <div>
