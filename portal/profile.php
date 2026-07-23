@@ -165,9 +165,9 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
           ['','Phone / Call', $contactPhone, 'tel:'.preg_replace('/\D/','',$contactPhone)],
           ['','Email Support', $contactEmail, 'mailto:'.$contactEmail],
         ];
-        if ($whatsappNum || (function_exists('stWhatsAppNumber') && stWhatsAppNumber() !== '')) {
-            $waHref = function_exists('stWhatsAppUrl') ? stWhatsAppUrl($__user, 'portal-profile') : ('https://wa.me/'.preg_replace('/\D/','',$whatsappNum).'?text='.urlencode('Hello ' . stCompanyName() . ' Support!'));
-            $waDisp = '+'.(function_exists('stWhatsAppNumber') ? stWhatsAppNumber() : preg_replace('/\D/','',$whatsappNum));
+        $waHref = function_exists('stWhatsAppUrl') ? stWhatsAppUrl($__user, 'portal-profile') : '';
+        if ($waHref !== '') {
+            $waDisp = '+'.(function_exists('stWhatsAppNumber') ? stWhatsAppNumber() : preg_replace('/\D/','',(string)$whatsappNum));
             $waLabel = function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp';
             $contacts[] = ['',$waLabel, $waDisp, $waHref];
         }

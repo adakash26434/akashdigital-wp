@@ -121,6 +121,12 @@ $PRODUCTS = !empty($_db_ps)
     <a href="<?= url('portal/tickets.php') ?>" style="font-size:0.8125rem;color:var(--muted-foreground);text-decoration:none;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--muted-foreground)'">← Back to Tickets</a>
     <h1 style="font-family:var(--font-display);font-size:1.375rem;font-weight:700;color:var(--foreground);margin-top:0.5rem;">Open a Support Ticket</h1>
     <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:0.25rem;">Our team responds within 24 hours (business days). For urgent issues, mark the priority as Urgent.</p>
+    <?php $__waTip = function_exists('stWhatsAppUrl') ? stWhatsAppUrl($__user ?? null, 'new-ticket') : ''; if ($__waTip !== ''): ?>
+    <p style="font-size:0.8125rem;margin-top:0.625rem;padding:0.625rem 0.875rem;border-radius:0.625rem;background:color-mix(in srgb, #25d366 12%, var(--card));border:1px solid color-mix(in srgb, #25d366 30%, var(--border));color:var(--foreground);">
+      Need a quick answer? <a href="<?= e($__waTip) ?>" target="_blank" rel="noopener noreferrer" style="color:#15803d;font-weight:700;text-decoration:none;"><?= e(function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp') ?> →</a>
+      Use a ticket for tracked issues and attachments.
+    </p>
+    <?php endif; ?>
   </div>
 
   <?php if ($error): ?>
