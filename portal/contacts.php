@@ -12,11 +12,12 @@ $fallback = [];
 if (empty($contacts)) {
     $p = stContactPhone();
     $e = stContactEmail();
-    $w = $__s['whatsapp_number'] ?? '';
+    $w = function_exists('stWhatsAppNumber') ? stWhatsAppNumber() : preg_replace('/\D/', '', (string)($__s['whatsapp_number'] ?? ''));
     $a = stAddress();
+    $waLabel = function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp';
     if ($p !== '') $fallback[] = ['','Main Office',      $p, 'phone',     'Mon–Fri 9am–6pm', 1];
     if ($e !== '') $fallback[] = ['','Email Support',    $e, 'email',     'Reply within 24 hours', 1];
-    if ($w) $fallback[] = ['','WhatsApp',  '+'.$w, 'whatsapp', 'Quick queries & screenshots', 1];
+    if ($w) $fallback[] = ['',$waLabel,  '+'.$w, 'whatsapp', 'Quick queries, screenshots & live support', 1];
     if ($a !== '') $fallback[] = ['','Office Address', $a, 'address', 'Walk-ins welcome', 0];
 }
 
@@ -32,7 +33,12 @@ $TYPE_CFG = [
 // नेपालीमा: contactHref() — yo function le aafno kaam garchha
 function contactHref(string $type, string $value): string {
     if ($type === 'phone' || $type === 'emergency') return 'tel:'.preg_replace('/\D/', '', $value);
-    if ($type === 'whatsapp') return 'https://wa.me/'.preg_replace('/\D/', '', $value).'?text='.urlencode('Hello ' . stSiteName() . ' Support!');
+    if ($type === 'whatsapp') {
+        // Prefer central support WA URL (personalized) when settings number matches / is set
+        $support = function_exists('stWhatsAppUrl') ? stWhatsAppUrl(null, 'portal-contacts') : '';
+        if ($support !== '') return $support;
+        return 'https://wa.me/'.preg_replace('/\D/', '', $value).'?text='.urlencode('Hello ' . stCompanyName() . ' Support!');
+    }
     if ($type === 'email')    return 'mailto:'.$value;
     return '#';
 }
@@ -115,8 +121,12 @@ foreach ($items as $c):
       [url('portal/services.php'),                '','My Services',             'View your active subscriptions'],
       [url('products.php'),                       '','Browse Products',         'Explore our software lineup'],
     ];
+    $__waPortal = function_exists('stWhatsAppUrl') ? stWhatsAppUrl($__user ?? null, 'portal-contacts') : '';
+    if ($__waPortal !== '') {
+        array_unshift($actions, [$__waPortal, '', function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp', 'Chat now — screenshots & quick help']);
+    }
     foreach($actions as [$href,$icon,$title,$desc]):?>
-    <a href="<?=$href?>" style="display:flex;align-items:flex-start;gap:0.75rem;padding:1rem;border-radius:0.875rem;border:1px solid var(--border);background:var(--background);text-decoration:none;transition:all 0.15s;"
+    <a href="<?=e($href)?>" <?= str_starts_with((string)$href, 'http') ? 'target="_blank" rel="noopener noreferrer"' : '' ?> style="display:flex;align-items:flex-start;gap:0.75rem;padding:1rem;border-radius:0.875rem;border:1px solid var(--border);background:var(--background);text-decoration:none;transition:all 0.15s;"
        onmouseover="this.style.borderColor='var(--primary)';this.style.background='var(--card)'" onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--background)'">
       <span style="font-size:1.25rem;"><?=$icon?></span>
       <div>

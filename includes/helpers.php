@@ -96,6 +96,7 @@ function siteSettings(): array {
         'whatsapp_number'  => null,
         'whatsapp_enabled' => true,
         'whatsapp_message' => "Hello! I'm interested in your software.",
+        'whatsapp_label'   => 'Support WhatsApp',
         'maintenance_mode' => false,
     ];
     // Try to get site settings, but gracefully fall back to defaults if DB is unavailable
@@ -244,6 +245,90 @@ function stContactPhone(): string {
 function stAddress(): string {
     $s = siteSettings();
     return trim((string)($s['address'] ?? ''));
+}
+
+/** Digits-only WhatsApp number (country code + number), or '' if disabled/empty. */
+function stWhatsAppNumber(): string {
+    $s = siteSettings();
+    $en = $s['whatsapp_enabled'] ?? '1';
+    if ($en === false || $en === 0 || $en === '0') return '';
+    return preg_replace('/\D/', '', (string)($s['whatsapp_number'] ?? '')) ?: '';
+}
+
+function stWhatsAppLabel(): string {
+    $s = siteSettings();
+    $label = trim((string)($s['whatsapp_label'] ?? ''));
+    return $label !== '' ? $label : 'Support WhatsApp';
+}
+
+/**
+ * Personalized click-to-chat message.
+ * Placeholders in Settings message: {name} {org} {email} {phone} {company} {page}
+ */
+function stWhatsAppMessage(?array $user = null, ?string $pageHint = null): string {
+    $s = siteSettings();
+    $company = stCompanyName();
+    $tpl = trim((string)($s['whatsapp_message'] ?? ''));
+    if ($tpl === '') {
+        $tpl = 'Hello {company} Support!';
+    }
+
+    $name = '';
+    $org  = '';
+    $email = '';
+    $phone = '';
+    if ($user) {
+        $name  = trim((string)($user['display_name'] ?? $user['name'] ?? ''));
+        $org   = trim((string)($user['org_name'] ?? ''));
+        $email = trim((string)($user['email'] ?? ''));
+        $phone = trim((string)($user['phone'] ?? ''));
+    } elseif (function_exists('currentUser')) {
+        $u = currentUser();
+        if ($u) {
+            $name  = trim((string)($u['display_name'] ?? $u['name'] ?? ''));
+            $org   = trim((string)($u['org_name'] ?? ''));
+            $email = trim((string)($u['email'] ?? ''));
+            $phone = trim((string)($u['phone'] ?? ''));
+        }
+    }
+
+    $page = trim((string)($pageHint ?? ''));
+    if ($page === '' && !empty($_SERVER['REQUEST_URI'])) {
+        $page = basename(parse_url((string)$_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '');
+    }
+
+    $msg = strtr($tpl, [
+        '{name}'    => $name !== '' ? $name : 'Guest',
+        '{org}'     => $org !== '' ? $org : '—',
+        '{email}'   => $email !== '' ? $email : '—',
+        '{phone}'   => $phone !== '' ? $phone : '—',
+        '{company}' => $company,
+        '{page}'    => $page !== '' ? $page : 'website',
+    ]);
+
+    // If template has no placeholders and user is logged in, append identity for support staff
+    $hasPlaceholder = (bool)preg_match('/\{(name|org|email|phone|company|page)\}/', $tpl);
+    if (!$hasPlaceholder && ($name !== '' || $org !== '' || $email !== '')) {
+        $bits = array_filter([
+            $name !== '' ? 'Name: ' . $name : '',
+            $org !== '' ? 'Org: ' . $org : '',
+            $email !== '' ? 'Email: ' . $email : '',
+            $phone !== '' ? 'Phone: ' . $phone : '',
+        ]);
+        if ($bits) {
+            $msg = rtrim($msg) . "\n\n—\n" . implode("\n", $bits);
+        }
+    }
+
+    return $msg;
+}
+
+/** Full wa.me URL for support chat (empty string if WhatsApp disabled / no number). */
+function stWhatsAppUrl(?array $user = null, ?string $pageHint = null): string {
+    $num = stWhatsAppNumber();
+    if ($num === '') return '';
+    $text = stWhatsAppMessage($user, $pageHint);
+    return 'https://wa.me/' . $num . '?text=' . rawurlencode($text);
 }
 
 // ── CSRF helpers ────────────────────────────────────────────────

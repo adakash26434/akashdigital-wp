@@ -54,6 +54,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } elseif ($section === 'whatsapp') {
             saveSetting('whatsapp_number',  trim($_POST['whatsapp_number'] ?? ''));
             saveSetting('whatsapp_message', trim($_POST['whatsapp_message'] ?? ''));
+            saveSetting('whatsapp_label',   trim($_POST['whatsapp_label'] ?? '') ?: 'Support WhatsApp');
             saveSetting('whatsapp_enabled', isset($_POST['whatsapp_enabled']) ? '1' : '0');
             $success = 'WhatsApp settings saved.';
         } elseif ($section === 'features') {
@@ -508,11 +509,15 @@ $tabs = [
     <form method="POST">
       <?= csrfField() ?><input type="hidden" name="section" value="whatsapp">
       <div class="st-card p-card-lg">
-        <h3 class="h-eyebrow"> WhatsApp Float Button</h3>
-        <div style="margin-bottom:1.25rem;padding:1rem;background:#f0fdf4;border-radius:0.625rem;border:1px solid #bbf7d0;font-size:0.8125rem;color:#15803d;">
-          The WhatsApp float button appears on all public pages (bottom-right corner). Leave the number blank to hide it.
+        <h3 class="h-eyebrow">Support WhatsApp</h3>
+        <div style="margin-bottom:1.25rem;padding:1rem;background:color-mix(in srgb, var(--success) 10%, var(--card));border-radius:0.625rem;border:1px solid color-mix(in srgb, var(--success) 28%, var(--border));font-size:0.8125rem;color:var(--foreground);line-height:1.55;">
+          Float button shows on <strong>public pages</strong> and <strong>client portal</strong>. Use a dedicated <strong>WhatsApp Business</strong> number (not personal). Logged-in clients get name/org auto-appended so your team knows who is chatting.
         </div>
         <div class="col-stack">
+          <div>
+            <label class="form-label">Button label</label>
+            <input type="text" name="whatsapp_label" class="form-input" value="<?= e(sv($s,'whatsapp_label','Support WhatsApp')) ?>" placeholder="Support WhatsApp" maxlength="40">
+          </div>
           <div>
             <label class="form-label">WhatsApp Number (with country code)</label>
             <input type="text" name="whatsapp_number" class="form-input" value="<?= e(sv($s,'whatsapp_number')) ?>" placeholder="9779800000000">
@@ -520,21 +525,35 @@ $tabs = [
           </div>
           <div>
             <label class="form-label">Pre-filled Message</label>
-            <textarea name="whatsapp_message" class="form-input" rows="3" placeholder="Hello! I'm interested in your software."><?php 
-              $defaultMsg = 'Hello ' . e($s['company_name'] ?? ($s['site_name'] ?? SITE_NAME)) . '! I\'m interested in your software.';
+            <textarea name="whatsapp_message" class="form-input" rows="4" placeholder="Hello {company} Support! I need help with…"><?php 
+              $defaultMsg = 'Hello {company} Support! I need help.';
               echo e(sv($s,'whatsapp_message', $defaultMsg));
             ?></textarea>
+            <p class="caption-meta">Placeholders: <code>{name}</code> <code>{org}</code> <code>{email}</code> <code>{phone}</code> <code>{company}</code> <code>{page}</code>. If you skip placeholders, logged-in client details are still appended automatically.</p>
           </div>
           <div>
             <label class="row-check">
               <input type="checkbox" name="whatsapp_enabled" id="wa_en" <?= sv($s,'whatsapp_enabled','1') !== '0' ? 'checked' : '' ?>>
-              <span>Enable WhatsApp button</span>
+              <span>Enable WhatsApp button (site + portal)</span>
             </label>
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save WhatsApp Settings</button>
         </div>
       </div>
     </form>
+
+    <div class="st-card p-card-lg" style="margin-top:1.25rem;">
+      <h3 class="h-eyebrow">Team setup checklist (WhatsApp Business)</h3>
+      <ol style="margin:0;padding-left:1.25rem;font-size:0.875rem;line-height:1.7;color:var(--foreground);">
+        <li>Register a <strong>dedicated support number</strong> (SIM / business line) — do not use staff personal WhatsApp.</li>
+        <li>Install <strong>WhatsApp Business</strong> on one primary phone and complete the business profile (name, hours, address).</li>
+        <li>On each support PC: open <a href="https://web.whatsapp.com" target="_blank" rel="noopener" style="color:var(--primary);">web.whatsapp.com</a> → <strong>Link a device</strong> (Business allows multiple linked computers).</li>
+        <li>Create <strong>Quick replies</strong> (greeting, ticket link, office hours) and <strong>Labels</strong> (New / In progress / Escalated).</li>
+        <li>Set an <strong>Away message</strong> for after office hours pointing clients to the portal ticket form.</li>
+        <li>When a new chat arrives: note client name/org from the prefilled message → open or create a portal ticket if needed.</li>
+      </ol>
+      <p class="caption-meta" style="margin-top:1rem;">Later upgrade: WhatsApp Cloud API / WATI for inbox inside this admin panel. Do not use unofficial WhatsApp scrapers.</p>
+    </div>
   </div>
 
   <!-- Homepage -->

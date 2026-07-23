@@ -165,8 +165,11 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
           ['','Phone / Call', $contactPhone, 'tel:'.preg_replace('/\D/','',$contactPhone)],
           ['','Email Support', $contactEmail, 'mailto:'.$contactEmail],
         ];
-        if ($whatsappNum) {
-            $contacts[] = ['','WhatsApp', '+'.preg_replace('/\D/','',$whatsappNum), 'https://wa.me/'.preg_replace('/\D/','',$whatsappNum).'?text='.urlencode('Hello ' . stCompanyName() . ' Support!')];
+        if ($whatsappNum || (function_exists('stWhatsAppNumber') && stWhatsAppNumber() !== '')) {
+            $waHref = function_exists('stWhatsAppUrl') ? stWhatsAppUrl($__user, 'portal-profile') : ('https://wa.me/'.preg_replace('/\D/','',$whatsappNum).'?text='.urlencode('Hello ' . stCompanyName() . ' Support!'));
+            $waDisp = '+'.(function_exists('stWhatsAppNumber') ? stWhatsAppNumber() : preg_replace('/\D/','',$whatsappNum));
+            $waLabel = function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp';
+            $contacts[] = ['',$waLabel, $waDisp, $waHref];
         }
         foreach ($contacts as [$icon,$label,$val,$href]):?>
         <a href="<?= e($href) ?>" target="<?= str_starts_with($href,'http')?'_blank':'_self' ?>" rel="noreferrer"
