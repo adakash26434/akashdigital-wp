@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $slug        = trim($_POST['slug']        ?? '') ?: makeSlug($title);
         $tagline     = trim($_POST['tagline']     ?? '');
         $summary     = trim($_POST['summary']     ?? '');
+        $description = trim($_POST['description'] ?? '');
         $badge       = trim($_POST['badge']       ?? '');
         
         // Sanitize price: only accept numeric values, reject 'Custom' string
@@ -62,33 +63,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         elseif (!$error) {
             try {
                 if ($id) {
-                    // Try full update first, fallback if columns missing
+                    // Try full update first (with description), then without description, then minimal
                     try {
                         execute(
-                            "UPDATE services SET title=?,slug=?,tagline=?,summary=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
-                            [$title,$slug,$tagline,$summary,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
+                            "UPDATE services SET title=?,slug=?,tagline=?,summary=?,description=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
                         );
                     } catch(\Throwable $fe) {
-                        // Fallback: update without tagline/summary columns
-                        execute(
-                            "UPDATE services SET title=?,slug=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
-                            [$title,$slug,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
-                        );
+                        try {
+                            execute(
+                                "UPDATE services SET title=?,slug=?,tagline=?,summary=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                                [$title,$slug,$tagline,$summary,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
+                            );
+                        } catch(\Throwable $fe2) {
+                            execute(
+                                "UPDATE services SET title=?,slug=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                                [$title,$slug,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
+                            );
+                        }
                     }
                     $success = 'Service updated.';
                 } else {
-                    // Try full insert first, fallback if columns missing
                     try {
                         execute(
-                            "INSERT INTO services (title,slug,tagline,summary,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                            [$title,$slug,$tagline,$summary,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
+                            "INSERT INTO services (title,slug,tagline,summary,description,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
                         );
                     } catch(\Throwable $fe) {
-                        // Fallback: insert without tagline/summary columns
-                        execute(
-                            "INSERT INTO services (title,slug,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                            [$title,$slug,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
-                        );
+                        try {
+                            execute(
+                                "INSERT INTO services (title,slug,tagline,summary,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                                [$title,$slug,$tagline,$summary,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
+                            );
+                        } catch(\Throwable $fe2) {
+                            execute(
+                                "INSERT INTO services (title,slug,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                                [$title,$slug,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
+                            );
+                        }
                     }
                     $success = 'Service added.';
                 }
@@ -186,6 +198,9 @@ $ICONS_JSON = json_encode($ICONS);
         <div class="fs-2xs-mt">slug: <?=e($s['slug'])?> · pos: <?=$s['position']?> · <?=e($s['icon_color']??'')?></div>
       </div>
       <div class="tbl-act-group">
+        <?php if (!empty($s['slug']) && !empty($s['active'])): ?>
+        <a href="<?= url('service-detail.php?slug=' . urlencode($s['slug'])) ?>" target="_blank" rel="noopener" class="tbl-act" title="View public detail"><i data-lucide="external-link" style="width:13px;height:13px;pointer-events:none;"></i></a>
+        <?php endif; ?>
         <a href="?edit=<?=$s['id']?>" class="tbl-act" title="Edit"><i data-lucide="pencil" style="width:13px;height:13px;pointer-events:none;"></i></a>
         <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
           <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$s['id']?>">
@@ -203,9 +218,14 @@ $ICONS_JSON = json_encode($ICONS);
   <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;"
        x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($editing['screenshot_url'] ?? ''), ENT_QUOTES) ?>)">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:0.75rem;flex-wrap:wrap;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'✏ Edit Service':'➕ New Service'?></h3>
-      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <?php if ($editing && !empty($editing['slug'])): ?>
+        <a href="<?= url('service-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="font-size:0.75rem;">View detail page</a>
+        <?php endif; ?>
+        <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
+      </div>
     </div>
 
     <!-- Tab bar -->
@@ -328,13 +348,24 @@ $ICONS_JSON = json_encode($ICONS);
 
       <!-- ══ TAB: CONTENT ══ -->
       <div x-show="tab==='content'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
+        <div class="alert" style="background:color-mix(in srgb,var(--primary) 8%,var(--card));border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;line-height:1.55;">
+          These fields power the public <strong>More details</strong> page.
+          Summary + highlights show on listing cards; description + chips enrich the detail page.
+          <?php if (!empty($editing['slug'])): ?>
+          <div style="margin-top:0.5rem;"><a href="<?= url('service-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="text-primary font-medium">Preview detail page →</a></div>
+          <?php endif; ?>
+        </div>
         <div>
-          <label class="form-label">Summary / Description</label>
+          <label class="form-label">Summary <span class="caption-meta">(listing card + detail hero)</span></label>
           <textarea name="summary" class="form-input" rows="3" placeholder="Describe what this service does…"><?=e($editing['summary']??'')?></textarea>
+        </div>
+        <div>
+          <label class="form-label">Full Description <span class="caption-meta">(detail page — optional)</span></label>
+          <textarea name="description" class="form-input" rows="4" placeholder="Longer detail text for the More details page…"><?=e($editing['description']??'')?></textarea>
         </div>
 
         <div>
-          <label class="form-label">Highlights <span class="caption-meta">(one per line → ✓ bullet points on card)</span></label>
+          <label class="form-label">Highlights <span class="caption-meta">(one per line → ✓ bullets on card &amp; detail)</span></label>
           <textarea name="highlights" class="form-input" rows="5" placeholder="Member & KYC&#10;Savings & FD&#10;Loan Lifecycle&#10;NRB Reports"><?php
             $hArr = json_decode($editing['highlights']??'[]', true);
             echo e(is_array($hArr) ? implode("\n", $hArr) : ($editing['highlights']??''));
@@ -343,7 +374,7 @@ $ICONS_JSON = json_encode($ICONS);
 
         <!-- Feature Chips tag input -->
         <div>
-          <label class="form-label">Feature Chips <span class="caption-meta">(pill badges on public page)</span></label>
+          <label class="form-label">Feature Chips <span class="caption-meta">(pills on listing + detail)</span></label>
           <div @click="$refs.chipField.focus()"
                style="min-height:2.5rem;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:0.5rem;background:var(--background);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;cursor:text;">
             <template x-for="(chip, i) in chips" :key="i">
@@ -387,7 +418,7 @@ $ICONS_JSON = json_encode($ICONS);
 
         <!-- Screenshot upload -->
         <div>
-          <label class="form-label">Screenshot / Product Image <span class="caption-meta">(shown on public page)</span></label>
+          <label class="form-label">Screenshot / Image <span class="caption-meta">(listing card + More details page)</span></label>
           <div @dragover.prevent="imgDrag=true" @dragleave="imgDrag=false" @drop.prevent="onDrop($event)"
                :style="imgDrag?'border-color:var(--primary);background:var(--primary-light);':''"
                style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"

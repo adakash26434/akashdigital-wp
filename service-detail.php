@@ -10,7 +10,7 @@ if (!$slug) { header('Location: ' . url('services.php')); exit; }
 $service = null;
 try {
     $service = queryOne(
-        "SELECT id, title AS name, slug, tagline, summary, badge, price_from,
+        "SELECT id, title AS name, slug, tagline, summary, description, badge, price_from,
                 COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
                 icon_color, highlights, features, screenshot_url, active
          FROM services WHERE slug=? AND active=1",
@@ -19,14 +19,24 @@ try {
 } catch (\Throwable $e) {
     try {
         $service = queryOne(
-            "SELECT id, title AS name, slug, badge, price_from,
+            "SELECT id, title AS name, slug, tagline, summary, badge, price_from,
                     COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
                     icon_color, highlights, features, screenshot_url, active
              FROM services WHERE slug=? AND active=1",
             [$slug]
         );
     } catch (\Throwable $e2) {
-        error_log('[' . basename(__FILE__) . ']' . $e2->getMessage());
+        try {
+            $service = queryOne(
+                "SELECT id, title AS name, slug, badge, price_from,
+                        COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
+                        icon_color, highlights, features, screenshot_url, active
+                 FROM services WHERE slug=? AND active=1",
+                [$slug]
+            );
+        } catch (\Throwable $e3) {
+            error_log('[' . basename(__FILE__) . ']' . $e3->getMessage());
+        }
     }
 }
 
@@ -111,7 +121,10 @@ require_once 'includes/header.php';
         <p style="font-size:var(--text-lg);color:var(--primary);font-weight:600;margin-bottom:1rem;"><?= e($service['tagline']) ?></p>
         <?php endif; ?>
         <?php if (!empty($service['summary'])): ?>
-        <p style="font-size:var(--text-md);color:var(--muted-foreground);line-height:1.7;margin-bottom:2rem;"><?= e($service['summary']) ?></p>
+        <p style="font-size:var(--text-md);color:var(--muted-foreground);line-height:1.7;margin-bottom:1.25rem;"><?= e($service['summary']) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($service['description'])): ?>
+        <div style="font-size:var(--text-sm);color:var(--muted-foreground);line-height:1.7;margin-bottom:2rem;white-space:pre-wrap;"><?= e($service['description']) ?></div>
         <?php endif; ?>
 
         <?php if (!empty($highlights)): ?>

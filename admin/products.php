@@ -194,6 +194,9 @@ if (!empty($_GET['edit'])) {
           </td>
           <td class="p-row">
             <div style="display:flex;gap:0.375rem;">
+              <?php if (!empty($p['slug']) && !empty($p['active'])): ?>
+              <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="View public detail" style="padding:.25rem .4375rem;"><i data-lucide="external-link" style="width:14px;height:14px;pointer-events:none;"></i></a>
+              <?php endif; ?>
               <a href="?edit=<?=$p['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
               <form method="POST" class="inline" onsubmit="return confirm('Delete product \'<?=addslashes(e($p['name']))?>\'? This cannot be undone.')">
                 <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$p['id']?>">
@@ -211,9 +214,14 @@ if (!empty($_GET['edit'])) {
 
 <div id="aft-form" style="<?=$afActive==='form'?'display:block':'display:none'?>">
   <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:0.75rem;flex-wrap:wrap;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?= $editing ? '✏ Edit Product' : '➕ New Product' ?></h3>
-      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <?php if ($editing && !empty($editing['slug'])): ?>
+        <a href="<?= url('product-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="font-size:0.75rem;">View detail page</a>
+        <?php endif; ?>
+        <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
+      </div>
     </div>
 
     <form method="POST">
@@ -367,20 +375,27 @@ if (!empty($_GET['edit'])) {
 
       <!-- Tab: Content -->
       <div class="af-tab-pane" data-tab-pane="content" style="padding-bottom:2rem;">
-        <div>
-          <label class="form-label">Short Summary</label>
-          <textarea name="summary" class="form-input fs-sm-r" rows="2"><?=e($editing['summary']??'')?></textarea>
+        <div class="alert" style="background:color-mix(in srgb,var(--primary) 8%,var(--card));border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;line-height:1.55;margin-bottom:0.75rem;">
+          These fields power the public <strong>More details</strong> page (<code>product-detail.php</code>).
+          Summary + highlights also appear on the listing cards. Fill description and features for a richer detail page.
+          <?php if (!empty($editing['slug'])): ?>
+          <div style="margin-top:0.5rem;"><a href="<?= url('product-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="text-primary font-medium">Preview detail page →</a></div>
+          <?php endif; ?>
         </div>
         <div>
-          <label class="form-label">Full Description <span style="color:var(--muted-foreground);font-weight:400;">(HTML ok)</span></label>
-          <textarea name="description" class="form-input fs-sm-r" rows="5"><?=e($editing['description']??'')?></textarea>
+          <label class="form-label">Short Summary <span class="caption-meta">(listing card + detail hero)</span></label>
+          <textarea name="summary" class="form-input fs-sm-r" rows="2" placeholder="One short paragraph visitors see first…"><?=e($editing['summary']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label">Features <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
+          <label class="form-label">Full Description <span class="caption-meta">(detail page — plain text preferred)</span></label>
+          <textarea name="description" class="form-input fs-sm-r" rows="5" placeholder="Longer explanation shown on More details…"><?=e($editing['description']??'')?></textarea>
+        </div>
+        <div>
+          <label class="form-label">Features <span class="caption-meta">(one per line → detail page checklist)</span></label>
           <textarea name="features" class="form-input fs-sm-r" rows="4" placeholder="NRB-compliant reports&#10;Mobile Banking&#10;Multi-branch support"><?=e($editing['features_text']??'')?></textarea>
         </div>
         <div>
-          <label class="form-label">Highlights <span style="color:var(--muted-foreground);font-weight:400;">(one per line)</span></label>
+          <label class="form-label">Highlights <span class="caption-meta">(one per line → listing card bullets)</span></label>
           <textarea name="highlights" class="form-input fs-sm-r" rows="2" placeholder="120+ cooperatives&#10;24/7 support"><?=e($editing['highlights_text']??'')?></textarea>
         </div>
       </div>
@@ -414,8 +429,8 @@ if (!empty($_GET['edit'])) {
         </div>
         <div>
           <label class="form-label">
-            Demo Screenshot URL
-            <span style="color:var(--muted-foreground);font-weight:400;"> — "See it in action" tabs</span>
+            Demo Screenshot
+            <span style="color:var(--muted-foreground);font-weight:400;"> — homepage “See it in action” + More details gallery</span>
           </label>
           <input type="url" name="demo_screenshot_url" id="dss_url_<?=($editing['id']??'new')?>" class="form-input"
                  value="<?=e($editing['demo_screenshot_url']??'')?>" placeholder="https://… or upload below">
