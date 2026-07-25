@@ -253,14 +253,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('services_section_eyebrow', trim($_POST['services_section_eyebrow'] ?? ''));
             saveSetting('services_why_title',        trim($_POST['services_why_title']       ?? ''));
             saveSetting('services_why_subtitle',     trim($_POST['services_why_subtitle']    ?? ''));
+            saveSetting('services_price_footnote',   trim($_POST['services_price_footnote']  ?? ''));
             saveSetting('services_cta_title',        trim($_POST['services_cta_title']       ?? ''));
             saveSetting('services_cta_subtitle',     trim($_POST['services_cta_subtitle']    ?? ''));
             // नेपाली variants
             saveSetting('services_section_eyebrow_np', trim($_POST['services_section_eyebrow_np'] ?? ''));
             saveSetting('services_why_title_np',       trim($_POST['services_why_title_np']       ?? ''));
             saveSetting('services_why_subtitle_np',    trim($_POST['services_why_subtitle_np']    ?? ''));
+            saveSetting('services_price_footnote_np',  trim($_POST['services_price_footnote_np']  ?? ''));
             saveSetting('services_cta_title_np',       trim($_POST['services_cta_title_np']       ?? ''));
             saveSetting('services_cta_subtitle_np',    trim($_POST['services_cta_subtitle_np']    ?? ''));
+            for ($i = 1; $i <= 6; $i++) {
+                saveSetting("services_why_{$i}_icon",  trim($_POST["services_why_{$i}_icon"]  ?? ''));
+                saveSetting("services_why_{$i}_title", trim($_POST["services_why_{$i}_title"] ?? ''));
+                saveSetting("services_why_{$i}_desc",  trim($_POST["services_why_{$i}_desc"]  ?? ''));
+                saveSetting("services_why_{$i}_title_np", trim($_POST["services_why_{$i}_title_np"] ?? ''));
+                saveSetting("services_why_{$i}_desc_np",  trim($_POST["services_why_{$i}_desc_np"]  ?? ''));
+            }
+        } elseif ($section === 'products_page') {
+            saveSetting('products_trust_banner',     trim($_POST['products_trust_banner']     ?? ''));
+            saveSetting('products_trust_banner_np',  trim($_POST['products_trust_banner_np']  ?? ''));
+            saveSetting('products_price_footnote',   trim($_POST['products_price_footnote']   ?? ''));
+            saveSetting('products_price_footnote_np',trim($_POST['products_price_footnote_np']?? ''));
+            saveSetting('products_addons_eyebrow',   trim($_POST['products_addons_eyebrow']   ?? ''));
+            saveSetting('products_addons_eyebrow_np',trim($_POST['products_addons_eyebrow_np']?? ''));
+            saveSetting('products_addons_title',     trim($_POST['products_addons_title']     ?? ''));
+            saveSetting('products_addons_title_np',  trim($_POST['products_addons_title_np']  ?? ''));
+            $addonsRaw = trim($_POST['products_addons_json'] ?? '');
+            $addonsDecoded = json_decode($addonsRaw, true);
+            if (is_array($addonsDecoded)) {
+                $clean = [];
+                foreach ($addonsDecoded as $a) {
+                    if (!is_array($a)) continue;
+                    $clean[] = [
+                        'active'    => !empty($a['active']),
+                        'link_type' => in_array(($a['link_type'] ?? ''), ['product', 'service'], true) ? $a['link_type'] : 'custom',
+                        'link_id'   => (int)($a['link_id'] ?? 0),
+                        'icon'      => trim((string)($a['icon'] ?? 'puzzle')) ?: 'puzzle',
+                        'title'     => trim((string)($a['title'] ?? '')),
+                        'desc'      => trim((string)($a['desc'] ?? '')),
+                        'price'     => trim((string)($a['price'] ?? '')),
+                        'box'       => trim((string)($a['box'] ?? 'icon-box-blue')) ?: 'icon-box-blue',
+                    ];
+                }
+                saveSetting('products_addons', json_encode($clean, JSON_UNESCAPED_UNICODE));
+            }
         } elseif ($section === 'security') {
             saveSetting('require_2fa_for_staff',   isset($_POST['require_2fa_for_staff']) ? '1' : '0');
             saveSetting('require_2fa_for_clients', isset($_POST['require_2fa_for_clients']) ? '1' : '0');
@@ -316,6 +353,36 @@ function biTA(array $s, string $name, string $label, string $phEn='', string $ph
 
 $social = is_array($s['social_links'] ?? null) ? $s['social_links'] : [];
 
+// Catalog for Products Page add-on linking + pricing hints
+$__addonProducts = [];
+$__addonServices = [];
+try {
+    $__addonProducts = query("SELECT id, name FROM products WHERE active=1 ORDER BY position, id");
+} catch (\Throwable $e) {}
+try {
+    $__addonServices = query("SELECT id, title AS name FROM services WHERE active=1 ORDER BY position, id");
+} catch (\Throwable $e) {}
+
+$__addonsForEditor = [];
+$__addonsRaw = $s['products_addons'] ?? '';
+if (is_string($__addonsRaw) && $__addonsRaw !== '') {
+    $__addonsForEditor = json_decode($__addonsRaw, true) ?: [];
+} elseif (is_array($__addonsRaw)) {
+    $__addonsForEditor = $__addonsRaw;
+}
+if (empty($__addonsForEditor)) {
+    $__addonsForEditor = productsAddonsDefaults();
+}
+
+$__whyCardDefaults = [
+    1 => ['map-pin',    'Nepal-first',       'Offices across all provinces — on-site support when you need it.'],
+    2 => ['shield',     'Secure by design',  'End-to-end encryption, role-based access and audit trails built in.'],
+    3 => ['zap',        'Fast deployment',   'Website live in 2 weeks, mobile app in 3 — fast and reliable.'],
+    4 => ['life-buoy',  'Always on',         '24×7 support via WhatsApp, phone and a dedicated client portal.'],
+    5 => ['calendar',   'BS Calendar',       'Nepali calendar native in every module — no conversion needed.'],
+    6 => ['file-check', 'NRB Aligned',       'Fully aligned with Nepal Rastra Bank and government compliance requirements.'],
+];
+
 $tabs = [
     ['general',       icon('settings',13),      'General'],
     ['company',       icon('building-2',13),    'Company'],
@@ -324,6 +391,7 @@ $tabs = [
     ['whatsapp',      icon('message-circle',13), 'WhatsApp'],
     ['homepage',      icon('layout',13),         'Homepage'],
     ['about_page',    icon('building-2',13),     'About Page'],
+    ['products_page', icon('box',13),            'Products Page'],
     ['services_page', icon('layers',13),         'Services Page'],
     ['leadership',    icon('users',13),          'Leadership'],
     ['footer',        icon('align-bottom',13),   'Footer'],
@@ -360,12 +428,12 @@ $tabs = [
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
 
-<div x-data="{tab:'general'}" x-effect="$nextTick(()=>{ if(typeof lucide!=='undefined') lucide.createIcons(); })">
+<div x-data="{tab:(location.hash.replace('#','')||'general')}" x-effect="$nextTick(()=>{ if(typeof lucide!=='undefined') lucide.createIcons(); })">
 
   <!-- Tab nav -->
   <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-bottom:2rem;border-bottom:1px solid var(--border);padding-bottom:1rem;">
     <?php foreach ($tabs as [$id,$icon,$label]): ?>
-    <button @click="tab='<?=$id?>'" :class="tab==='<?=$id?>' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'" style="display:inline-flex;align-items:center;gap:0.375rem;">
+    <button type="button" @click="tab='<?=$id?>'; history.replaceState(null,'','#<?=$id?>')" :class="tab==='<?=$id?>' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'" style="display:inline-flex;align-items:center;gap:0.375rem;">
       <?=$icon?> <?=$label?>
     </button>
     <?php endforeach; ?>
@@ -1474,6 +1542,112 @@ $tabs = [
     </form>
   </div>
 
+  <!-- ── Products Page tab ────────────────────────────────────── -->
+  <div x-show="tab==='products_page'" x-cloak>
+    <form method="POST"
+          x-data="productsAddonsEditor(<?= htmlspecialchars(json_encode([
+              'items'    => array_values($__addonsForEditor),
+              'products' => $__addonProducts,
+              'services' => $__addonServices,
+          ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') ?>)">
+      <?= csrfField() ?><input type="hidden" name="section" value="products_page">
+      <input type="hidden" name="products_addons_json" :value="JSON.stringify(items)">
+      <div class="st-card p-card-lg col-stack">
+        <h3 class="h-eyebrow">Products Page Text</h3>
+        <p class="caption-meta" style="margin-top:-0.5rem;">
+          Individual products are managed in
+          <a href="<?= url('admin/products.php') ?>" class="text-primary">Admin → Products</a>.
+          Compare plans live under
+          <a href="<?= url('admin/pricing.php') ?>" class="text-primary">Admin → Pricing</a>
+          and the
+          <a href="<?= url('admin/pricing-table.php') ?>" class="text-primary">Comparison Table</a>.
+          Leave fields blank to keep the current live defaults.
+        </p>
+
+        <?php biI($s,'products_trust_banner','Trust banner (under hero)','All plans include free setup consultation · Annual billing = 2 months free','सबै योजनामा निःशुल्क सेटअप परामर्श · वार्षिक भुक्तानी = २ महिना निःशुल्क') ?>
+        <?php biTA($s,'products_price_footnote','Price footnote under product grid','All prices in Nepali Rupees (NPR) · One-time setup fee applies · Annual plans include 2 months free ·','सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा २ महिना निःशुल्क ·',2) ?>
+
+        <hr style="border:none;border-top:1px solid var(--border);">
+        <h3 class="h-eyebrow">Optional add-ons section</h3>
+        <?php biI($s,'products_addons_eyebrow','Section eyebrow','Optional add-ons','वैकल्पिक एड-अनहरू') ?>
+        <?php biI($s,'products_addons_title','Section title','Extend your platform','आफ्नो प्लेटफर्म विस्तार गर्नुस') ?>
+
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
+          <p class="caption-meta" style="margin:0;">Link a card to a product/service to pull name, summary and price automatically. Overrides fill gaps only.</p>
+          <button type="button" class="btn btn-outline btn-sm" @click="addItem()"><?= icon('plus',14) ?> Add card</button>
+        </div>
+
+        <template x-for="(item, idx) in items" :key="idx">
+          <div class="st-card" style="padding:1rem;border:1px solid var(--border);display:flex;flex-direction:column;gap:0.625rem;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+              <label class="row-check" style="margin:0;">
+                <input type="checkbox" x-model="item.active">
+                <span>Visible</span>
+              </label>
+              <div style="display:flex;gap:0.375rem;">
+                <button type="button" class="btn btn-ghost btn-sm" @click="moveItem(idx,-1)" :disabled="idx===0">↑</button>
+                <button type="button" class="btn btn-ghost btn-sm" @click="moveItem(idx,1)" :disabled="idx===items.length-1">↓</button>
+                <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);" @click="removeItem(idx)"><?= icon('trash-2',14) ?></button>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;">
+              <div>
+                <label class="form-label">Link type</label>
+                <select class="form-input" x-model="item.link_type" @change="if(item.link_type==='custom') item.link_id=0">
+                  <option value="custom">Custom (manual text)</option>
+                  <option value="product">Product</option>
+                  <option value="service">Service</option>
+                </select>
+              </div>
+              <div x-show="item.link_type==='product'">
+                <label class="form-label">Product</label>
+                <select class="form-input" x-model.number="item.link_id">
+                  <option value="0">— Select —</option>
+                  <template x-for="p in products" :key="p.id">
+                    <option :value="p.id" x-text="p.name"></option>
+                  </template>
+                </select>
+              </div>
+              <div x-show="item.link_type==='service'">
+                <label class="form-label">Service</label>
+                <select class="form-input" x-model.number="item.link_id">
+                  <option value="0">— Select —</option>
+                  <template x-for="sv in services" :key="sv.id">
+                    <option :value="sv.id" x-text="sv.name"></option>
+                  </template>
+                </select>
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:0.625rem;">
+              <div>
+                <label class="form-label">Icon</label>
+                <input type="text" class="form-input" x-model="item.icon" placeholder="puzzle">
+              </div>
+              <div>
+                <label class="form-label">Title override</label>
+                <input type="text" class="form-input" x-model="item.title" placeholder="Leave blank if linked">
+              </div>
+              <div>
+                <label class="form-label">Price override</label>
+                <input type="text" class="form-input" x-model="item.price" placeholder="from NPR 8,000">
+              </div>
+            </div>
+            <div>
+              <label class="form-label">Description override</label>
+              <textarea class="form-input" rows="2" x-model="item.desc" placeholder="Leave blank if linked"></textarea>
+            </div>
+          </div>
+        </template>
+
+        <div class="alert" style="background:var(--muted);border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;color:var(--foreground);display:flex;gap:0.625rem;align-items:flex-start;">
+          <?= icon('lightbulb',14,'color:var(--warning);flex-shrink:0;') ?>
+          <div>Detail page copy (description, features, highlights, screenshots) is edited per product in <a href="<?= url('admin/products.php') ?>" class="text-primary font-medium">Admin → Products</a>. Listing cards use “More details” → product detail page.</div>
+        </div>
+        <button type="submit" class="btn btn-primary w-fit"><?= icon('save',15) ?> Save Products Page</button>
+      </div>
+    </form>
+  </div>
+
   <!-- ── Services Page tab ────────────────────────────────────── -->
   <div x-show="tab==='services_page'" x-cloak>
     <form method="POST">
@@ -1489,6 +1663,22 @@ $tabs = [
         <?php biI($s,'services_section_eyebrow','Section Eyebrow (above "Why choose us")','Why choose us','हामीलाई किन छान्ने') ?>
         <?php biI($s,'services_why_title','"Why Choose Us" Section Title','Why clients choose us','किन ग्राहकहरूले हामीलाई रोज्छन्') ?>
         <?php biTA($s,'services_why_subtitle','"Why Choose Us" Subtitle / Supporting Text','...','...',2) ?>
+        <?php biTA($s,'services_price_footnote','Price footnote under service grid','All prices in NPR · One-time setup fee applies · Discounts available on annual plans ·','सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा छुट ·',2) ?>
+
+        <hr style="border:none;border-top:1px solid var(--border);">
+        <h3 class="h-eyebrow">Why choose us — 6 cards</h3>
+        <p class="caption-meta" style="margin-top:-0.5rem;">Icon uses Lucide icon name (e.g. map-pin, shield). Title/description support EN + NP.</p>
+        <?php foreach ($__whyCardDefaults as $i => [$di, $dt, $dd]): ?>
+        <div class="st-card" style="padding:0.875rem;border:1px solid var(--border);">
+          <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);margin-bottom:0.5rem;">Card <?= $i ?></div>
+          <div style="margin-bottom:0.625rem;">
+            <label class="form-label">Icon</label>
+            <input type="text" name="services_why_<?= $i ?>_icon" class="form-input" value="<?= e(sv($s, "services_why_{$i}_icon", $di)) ?>" placeholder="<?= e($di) ?>" style="max-width:180px;">
+          </div>
+          <?php biI($s, "services_why_{$i}_title", 'Title', $dt, '') ?>
+          <?php biI($s, "services_why_{$i}_desc", 'Description', $dd, '') ?>
+        </div>
+        <?php endforeach; ?>
 
         <hr style="border:none;border-top:1px solid var(--border);">
         <h3 class="h-eyebrow">Bottom CTA Section</h3>
@@ -1497,7 +1687,7 @@ $tabs = [
 
         <div class="alert" style="background:var(--muted);border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;color:var(--foreground);display:flex;gap:0.625rem;align-items:flex-start;">
           <?= icon('lightbulb',14,'color:var(--warning);flex-shrink:0;') ?>
-          <div>To add, edit or remove services go to <a href="<?= url('admin/services.php') ?>" class="text-primary font-medium">Admin → Services</a>. Each service has its own icon, color, title, summary and feature chips.</div>
+          <div>To add, edit or remove services go to <a href="<?= url('admin/services.php') ?>" class="text-primary font-medium">Admin → Services</a>. Each service has its own icon, color, title, summary and feature chips. Listing cards link to the service detail page.</div>
         </div>
         <button type="submit" class="btn btn-primary w-fit"><?= icon('save',15) ?> Save Services Page</button>
       </div>
@@ -1550,6 +1740,42 @@ $tabs = [
   </div>
 
 </div>
+
+<script>
+function productsAddonsEditor(cfg) {
+  const items = (cfg.items || []).map(function (a) {
+    return {
+      active: a.active !== false && a.active !== 0 && a.active !== '0',
+      link_type: a.link_type || 'custom',
+      link_id: Number(a.link_id || 0),
+      icon: a.icon || 'puzzle',
+      title: a.title || '',
+      desc: a.desc || '',
+      price: a.price || '',
+      box: a.box || 'icon-box-blue'
+    };
+  });
+  return {
+    items: items,
+    products: cfg.products || [],
+    services: cfg.services || [],
+    addItem() {
+      this.items.push({
+        active: true, link_type: 'custom', link_id: 0,
+        icon: 'puzzle', title: '', desc: '', price: '', box: 'icon-box-blue'
+      });
+    },
+    removeItem(idx) { this.items.splice(idx, 1); },
+    moveItem(idx, dir) {
+      const j = idx + dir;
+      if (j < 0 || j >= this.items.length) return;
+      const t = this.items[idx];
+      this.items.splice(idx, 1);
+      this.items.splice(j, 0, t);
+    }
+  };
+}
+</script>
 
 <?php require_once '../includes/admin-layout-close.php'; ?>
 <?php

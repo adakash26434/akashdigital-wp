@@ -6,6 +6,8 @@ require_once 'includes/helpers.php';
 $pageTitle = 'Products & Services — ' . stSiteName();
 $pageDesc  = 'Software solutions and IT services — Web Development, Document Management, HR & Payroll, IT Support and more.';
 
+$__s = siteSettings();
+
 $__colorMap = [
   'blue'=>'icon-box-blue','teal'=>'icon-box-teal','purple'=>'icon-box-purple',
   'amber'=>'icon-box-amber','green'=>'icon-box-green','rose'=>'icon-box-rose',
@@ -70,6 +72,18 @@ if (empty($products)) {
     $products = $__productDefaults;
 }
 
+$trustBanner = cms($__s, 'products_trust_banner', __('trust_setup_free'));
+$priceFootnote = cms(
+    $__s,
+    'products_price_footnote',
+    isNepali()
+        ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा २ महिना निःशुल्क ·'
+        : 'All prices in Nepali Rupees (NPR) · One-time setup fee applies · Annual plans include 2 months free ·'
+);
+$addons = resolveProductsAddons($__s);
+$addonsEyebrow = cms($__s, 'products_addons_eyebrow', isNepali() ? 'वैकल्पिक एड-अनहरू' : 'Optional add-ons');
+$addonsTitle   = cms($__s, 'products_addons_title', isNepali() ? 'आफ्नो प्लेटफर्म विस्तार गर्नुस' : 'Extend your platform');
+
 include 'includes/header.php';
 ?>
 
@@ -81,7 +95,7 @@ $heroSubtitle    = __('products_hero_sub');
 ob_start(); ?>
 <div class="section-eyebrow section-eyebrow-primary">
   <i data-lucide="shield-check" class="ic-11"></i>
-  <?= e(__('trust_setup_free')) ?>
+  <?= e($trustBanner) ?>
 </div>
 <?php $heroActions = ob_get_clean(); include 'includes/page-hero.php'; ?>
 
@@ -135,47 +149,60 @@ ob_start(); ?>
             <?php endforeach; ?>
           </div>
           <?php endif; ?>
-          <a href="<?= url('contact.php') ?>?product=<?= urlencode($p['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
-            <?= e(isNepali() ? __('hero_cta_demo') : 'Request a demo') ?>
-            <i data-lucide="arrow-right" class="ic-14"></i>
-          </a>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
+            <a href="<?= url('contact.php') ?>?product=<?= urlencode($p['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
+              <?= e(isNepali() ? __('hero_cta_demo') : 'Request a demo') ?>
+              <i data-lucide="arrow-right" class="ic-14"></i>
+            </a>
+            <?php if (!empty($p['slug'])): ?>
+            <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
+              <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
+            </a>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
 
     <p class="text-center text-muted" style="margin-top:1.75rem;font-size:var(--text-sm);">
-      <?= e(isNepali() ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा २ महिना निःशुल्क ·' : 'All prices in Nepali Rupees (NPR) · One-time setup fee applies · Annual plans include 2 months free ·') ?>
+      <?= e($priceFootnote) ?>
       <a href="<?= url('pricing.php') ?>" class="text-primary"><?= e(isNepali() ? 'पूरा मूल्य योजना हेर्नुस' : 'See full pricing plans') ?></a>
     </p>
   </div>
 </section>
 
+<?php if (!empty($addons)): ?>
 <section class="st-section st-section--tinted">
   <div class="container">
     <div class="section-head section-head-tight">
-      <div class="section-eyebrow mb-3q"><?= e(isNepali() ? 'वैकल्पिक एड-अनहरू' : 'Optional add-ons') ?></div>
-      <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(isNepali() ? 'आफ्नो प्लेटफर्म विस्तार गर्नुस' : 'Extend your platform') ?></h2>
+      <div class="section-eyebrow mb-3q"><?= e($addonsEyebrow) ?></div>
+      <h2 class="h-display section-title" style="margin-bottom:0;"><?= e($addonsTitle) ?></h2>
     </div>
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.875rem;">
-      <?php foreach ([
-        ['puzzle','Custom Reports','Business / audit / management-specific reports','from NPR 8,000','icon-box-blue'],
-        ['database','Data Migration','From Excel, FoxPro or legacy systems','from NPR 25,000','icon-box-purple'],
-        ['graduation-cap','On-site Training','Full-day training for branch staff','NPR 15,000/day','icon-box-amber'],
-        ['plug','Third-party Integration','Payment gateways, APIs, third-party services','from NPR 12,000','icon-box-teal'],
-      ] as [$icon,$t,$d,$price,$box]): ?>
-      <div class="feature-card text-center">
+      <?php foreach ($addons as $addon): ?>
+      <?php
+        $cardTag = !empty($addon['detail_url']) ? 'a' : 'div';
+        $cardHref = !empty($addon['detail_url']) ? ' href="' . e($addon['detail_url']) . '"' : '';
+        $cardExtra = !empty($addon['detail_url']) ? ' style="text-decoration:none;color:inherit;display:block;"' : '';
+      ?>
+      <<?= $cardTag ?><?= $cardHref ?> class="feature-card text-center"<?= $cardExtra ?>>
         <div class="feature-card__icon" style="margin-inline:auto;">
-          <i data-lucide="<?= $icon ?>" class="ic-18" style="color:var(--primary);"></i>
+          <i data-lucide="<?= e($addon['icon']) ?>" class="ic-18" style="color:var(--primary);"></i>
         </div>
-        <div style="font-family:var(--font-display);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;font-size:var(--text-sm);"><?= e($t) ?></div>
-        <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:0 0 0.5rem;line-height:1.55;"><?= e($d) ?></p>
-        <span style="font-size:var(--text-sm);font-weight:700;color:var(--primary);"><?= e($price) ?></span>
-      </div>
+        <div style="font-family:var(--font-display);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;font-size:var(--text-sm);"><?= e($addon['title']) ?></div>
+        <?php if (!empty($addon['desc'])): ?>
+        <p style="font-size:var(--text-xs);color:var(--muted-foreground);margin:0 0 0.5rem;line-height:1.55;"><?= e($addon['desc']) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($addon['price'])): ?>
+        <span style="font-size:var(--text-sm);font-weight:700;color:var(--primary);"><?= e($addon['price']) ?></span>
+        <?php endif; ?>
+      </<?= $cardTag ?>>
       <?php endforeach; ?>
     </div>
   </div>
 </section>
+<?php endif; ?>
 
 <?php
 $ctaTitle = isNepali() ? 'कुन उत्पादन सही हो निश्चित छैन?' : 'Not sure which product fits?';

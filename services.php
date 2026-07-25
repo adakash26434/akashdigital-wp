@@ -158,17 +158,24 @@ ob_start(); ?>
           </div>
           <?php endif; ?>
 
-          <a href="<?= url('contact.php') ?>?service=<?= urlencode($svc['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
-            <?= e(__('services_get_quote')) ?>
-            <i data-lucide="arrow-right" class="ic-14"></i>
-          </a>
+          <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
+            <a href="<?= url('contact.php') ?>?service=<?= urlencode($svc['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
+              <?= e(__('services_get_quote')) ?>
+              <i data-lucide="arrow-right" class="ic-14"></i>
+            </a>
+            <?php if (!empty($svc['slug'])): ?>
+            <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
+              <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
+            </a>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
 
     <p class="text-center text-muted" style="margin-top:1.75rem;font-size:var(--text-sm);">
-      <?= e(isNepali() ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा छुट ·' : 'All prices in NPR · One-time setup fee applies · Discounts available on annual plans ·') ?>
+      <?= e(cms($__s, 'services_price_footnote', isNepali() ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा छुट ·' : 'All prices in NPR · One-time setup fee applies · Discounts available on annual plans ·')) ?>
       <a href="<?= url('contact.php') ?>" class="text-primary"><?= e(isNepali() ? 'विशेष उद्धरण माग्नुस' : 'Request a custom quote') ?></a>
     </p>
   </div>

@@ -4,6 +4,11 @@ require_once '../includes/admin-layout.php';
 
 $success = $error = '';
 
+$catalogProducts = [];
+try {
+    $catalogProducts = query("SELECT id, name, slug FROM products WHERE active=1 ORDER BY position, id");
+} catch (\Throwable $e) {}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
     $action = $_POST['action'] ?? '';
@@ -19,6 +24,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $period     = trim($_POST['period'] ?? '');
         $cta_label  = trim($_POST['cta_label'] ?? 'Get started');
         $cta_url    = trim($_POST['cta_url'] ?? '');
+        $linkProductId = (int)($_POST['link_product_id'] ?? 0);
+        if ($linkProductId > 0) {
+            foreach ($catalogProducts as $cp) {
+                if ((int)$cp['id'] === $linkProductId) {
+                    $cta_url = 'product-detail.php?slug=' . rawurlencode((string)$cp['slug']);
+                    break;
+                }
+            }
+        }
         $is_popular = isset($_POST['is_popular']) ? 1 : 0;
         $active     = isset($_POST['active']) ? 1 : 0;
         $position   = (int)($_POST['position'] ?? 0);
@@ -58,6 +72,18 @@ if (!empty($_GET['edit'])) {
     catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 }
 $showForm = !empty($_GET['new']) || $editing;
+
+$linkedProductId = 0;
+$editingCta = (string)($editing['cta_url'] ?? '');
+if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $editingCta, $m)) {
+    $slugMatch = rawurldecode($m[1]);
+    foreach ($catalogProducts as $cp) {
+        if ((string)$cp['slug'] === $slugMatch) {
+            $linkedProductId = (int)$cp['id'];
+            break;
+        }
+    }
+}
 ?>
 
 <?php if($success):?><div class="alert alert-success mb-1"><?=e($success)?></div><?php endif;?>
@@ -163,9 +189,22 @@ $showForm = !empty($_GET['new']) || $editing;
       </div>
       <div>
         <label class="form-label">Button URL</label>
-        <input type="text" name="cta_url" class="form-input" placeholder="/contact.php" value="<?=e($editing['cta_url']??'')?>">
+        <input type="text" name="cta_url" id="plan-cta-url" class="form-input" placeholder="/contact.php" value="<?=e($editing['cta_url']??'')?>">
       </div>
     </div>
+    <?php if (!empty($catalogProducts)): ?>
+    <div>
+      <label class="form-label">Link button to product <span style="font-weight:400;color:var(--muted-foreground);">(optional — sets Button URL)</span></label>
+      <select name="link_product_id" class="form-input" id="plan-link-product"
+              onchange="(function(sel){var o=sel.options[sel.selectedIndex];var u=document.getElementById('plan-cta-url');if(!u)return;if(sel.value==='0'){if(u.value.indexOf('product-detail.php')===0)u.value='';return;}u.value='product-detail.php?slug='+encodeURIComponent(o.getAttribute('data-slug')||'');})(this)">
+        <option value="0">— Custom URL / contact —</option>
+        <?php foreach ($catalogProducts as $cp): ?>
+        <option value="<?= (int)$cp['id'] ?>" data-slug="<?= e($cp['slug']) ?>" <?= $linkedProductId === (int)$cp['id'] ? 'selected' : '' ?>><?= e($cp['name']) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <p class="caption-meta" style="margin-top:0.35rem;">Uses the product detail page so plan CTAs stay linked to the Products catalog (single source).</p>
+    </div>
+    <?php endif; ?>
     <div>
       <label class="form-label">Features <span style="font-weight:400;color:var(--muted-foreground);">(one per line)</span></label>
       <textarea name="features" class="form-input" rows="7" placeholder="Core Banking (up to 500 members)&#10;Email + ticket support&#10;Monthly backups"><?php

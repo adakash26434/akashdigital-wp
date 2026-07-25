@@ -729,6 +729,116 @@ function faviconMimeFromUrl(string $url): string {
     return 'image/png';
 }
 
+/**
+ * Default optional add-ons shown on products.php when products_addons is empty.
+ * Keep in sync with the live hardcoded list so public stays unchanged until admin saves.
+ */
+function productsAddonsDefaults(): array {
+    return [
+        ['active' => true, 'link_type' => 'custom', 'link_id' => 0, 'icon' => 'puzzle',         'title' => 'Custom Reports',         'desc' => 'Business / audit / management-specific reports', 'price' => 'from NPR 8,000',  'box' => 'icon-box-blue'],
+        ['active' => true, 'link_type' => 'custom', 'link_id' => 0, 'icon' => 'database',       'title' => 'Data Migration',         'desc' => 'From Excel, FoxPro or legacy systems',           'price' => 'from NPR 25,000', 'box' => 'icon-box-purple'],
+        ['active' => true, 'link_type' => 'custom', 'link_id' => 0, 'icon' => 'graduation-cap', 'title' => 'On-site Training',        'desc' => 'Full-day training for branch staff',             'price' => 'NPR 15,000/day',  'box' => 'icon-box-amber'],
+        ['active' => true, 'link_type' => 'custom', 'link_id' => 0, 'icon' => 'plug',           'title' => 'Third-party Integration', 'desc' => 'Payment gateways, APIs, third-party services',   'price' => 'from NPR 12,000', 'box' => 'icon-box-teal'],
+    ];
+}
+
+/**
+ * Resolve products-page add-ons from site_settings (or defaults).
+ * Linked product/service rows supply name/summary/price/icon when active.
+ *
+ * @return list<array{icon:string,title:string,desc:string,price:string,box:string,detail_url:?string}>
+ */
+function resolveProductsAddons(?array $settings = null): array {
+    $settings = $settings ?? siteSettings();
+    $raw = $settings['products_addons'] ?? '';
+    $items = [];
+    if (is_string($raw) && $raw !== '') {
+        $decoded = json_decode($raw, true);
+        if (is_array($decoded)) $items = $decoded;
+    } elseif (is_array($raw)) {
+        $items = $raw;
+    }
+    if (empty($items)) {
+        $items = productsAddonsDefaults();
+    }
+
+    $colorMap = [
+        'blue' => 'icon-box-blue', 'teal' => 'icon-box-teal', 'purple' => 'icon-box-purple',
+        'amber' => 'icon-box-amber', 'green' => 'icon-box-green', 'rose' => 'icon-box-rose',
+        'orange' => 'icon-box-orange', 'indigo' => 'icon-box-indigo', 'gray' => 'icon-box-gray',
+    ];
+
+    $out = [];
+    foreach ($items as $item) {
+        if (!is_array($item)) continue;
+        if (isset($item['active']) && !$item['active']) continue;
+
+        $linkType = (string)($item['link_type'] ?? 'custom');
+        $linkId   = (int)($item['link_id'] ?? 0);
+        $icon     = trim((string)($item['icon'] ?? '')) ?: 'puzzle';
+        $title    = trim((string)($item['title'] ?? ''));
+        $desc     = trim((string)($item['desc'] ?? ''));
+        $price    = trim((string)($item['price'] ?? ''));
+        $box      = trim((string)($item['box'] ?? 'icon-box-blue')) ?: 'icon-box-blue';
+        $detailUrl = null;
+
+        if ($linkType === 'product' && $linkId > 0) {
+            try {
+                $row = queryOne(
+                    "SELECT name, slug, summary, price_from, lucide_icon, icon_color FROM products WHERE id=? AND active=1",
+                    [$linkId]
+                );
+                if ($row) {
+                    if ($title === '') $title = (string)$row['name'];
+                    if ($desc === '')  $desc  = (string)($row['summary'] ?? '');
+                    if ($icon === 'puzzle' || empty($item['icon'])) {
+                        $icon = trim((string)($row['lucide_icon'] ?? '')) ?: $icon;
+                    }
+                    if ($price === '' && !empty($row['price_from'])) {
+                        $price = 'from NPR ' . number_format((float)$row['price_from'], 0);
+                    }
+                    $color = strtolower((string)($row['icon_color'] ?? 'blue'));
+                    if (empty($item['box'])) $box = $colorMap[$color] ?? $box;
+                    $detailUrl = url('product-detail.php?slug=' . urlencode((string)$row['slug']));
+                }
+            } catch (\Throwable $e) { /* keep overrides */ }
+        } elseif ($linkType === 'service' && $linkId > 0) {
+            try {
+                $row = queryOne(
+                    "SELECT title AS name, slug, summary, price_from,
+                            COALESCE(lucide_icon, icon, 'layers') AS lucide_icon, icon_color
+                     FROM services WHERE id=? AND active=1",
+                    [$linkId]
+                );
+                if ($row) {
+                    if ($title === '') $title = (string)$row['name'];
+                    if ($desc === '')  $desc  = (string)($row['summary'] ?? '');
+                    if ($icon === 'puzzle' || empty($item['icon'])) {
+                        $icon = trim((string)($row['lucide_icon'] ?? '')) ?: $icon;
+                    }
+                    if ($price === '' && !empty($row['price_from'])) {
+                        $price = 'from NPR ' . number_format((float)$row['price_from'], 0);
+                    }
+                    $color = strtolower((string)($row['icon_color'] ?? 'blue'));
+                    if (empty($item['box'])) $box = $colorMap[$color] ?? $box;
+                    $detailUrl = url('service-detail.php?slug=' . urlencode((string)$row['slug']));
+                }
+            } catch (\Throwable $e) { /* keep overrides */ }
+        }
+
+        if ($title === '') continue;
+        $out[] = [
+            'icon'       => $icon,
+            'title'      => $title,
+            'desc'       => $desc,
+            'price'      => $price,
+            'box'        => $box,
+            'detail_url' => $detailUrl,
+        ];
+    }
+    return $out;
+}
+
 // ── Audit log helper ─────────────────────────────────────────────
 // नेपालीमा: Admin action haru lai audit_log table ma record garne
 // Usage: logAudit('user.delete', 'Deleted user id=42', ['target_type'=>'user','target_id'=>42])

@@ -41,7 +41,7 @@ try {
     $services = query("SELECT slug, title, updated_at FROM services WHERE active=1 ORDER BY position,id");
     foreach ($services as $s) {
         $dynamicPages[] = [
-            'services.php?slug=' . urlencode($s['slug']),
+            'service-detail.php?slug=' . urlencode($s['slug']),
             $s['title'] ?? 'Service',
             'monthly', '0.7', $s['updated_at'] ?? null
         ];
@@ -53,7 +53,7 @@ try {
     $products = query("SELECT slug, name, updated_at FROM products WHERE active=1 ORDER BY position,id");
     foreach ($products as $p) {
         $dynamicPages[] = [
-            'products.php?slug=' . urlencode($p['slug']),
+            'product-detail.php?slug=' . urlencode($p['slug']),
             $p['name'] ?? 'Product',
             'monthly', '0.8', $p['updated_at'] ?? null
         ];
@@ -137,7 +137,7 @@ require_once __DIR__ . '/includes/header.php';
       <h2><i data-lucide="layers" class="ic-18-p"></i> Services</h2>
       <div class="sitemap-links">
         <?php foreach ($services as $s): ?>
-        <a href="<?= url('services.php?slug=' . urlencode($s['slug'])) ?>"><i data-lucide="zap"></i><?= e($s['title'] ?? 'Service') ?></a>
+        <a href="<?= url('service-detail.php?slug=' . urlencode($s['slug'])) ?>"><i data-lucide="zap"></i><?= e($s['title'] ?? 'Service') ?></a>
         <?php endforeach; ?>
       </div>
     </div>
@@ -149,7 +149,7 @@ require_once __DIR__ . '/includes/header.php';
       <h2><i data-lucide="package" class="ic-18-p"></i> Products</h2>
       <div class="sitemap-links">
         <?php foreach ($products as $p): ?>
-        <a href="<?= url('products.php?slug=' . urlencode($p['slug'])) ?>"><i data-lucide="box"></i><?= e($p['name'] ?? 'Product') ?></a>
+        <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>"><i data-lucide="box"></i><?= e($p['name'] ?? 'Product') ?></a>
         <?php endforeach; ?>
       </div>
     </div>

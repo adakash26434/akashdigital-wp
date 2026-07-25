@@ -328,6 +328,8 @@ $__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Application
       ['About Page',         'building-2',   url('admin/settings.php').'#about_page',     'Mission, values, vision quote'],
       ['Services List',      'layers',       url('admin/services.php'),                   'Add/edit/reorder services'],
       ['Services Page Text', 'align-left',   url('admin/settings.php').'#services_page',  '"Why choose us", CTA copy'],
+      ['Products Page Text', 'box',          url('admin/settings.php').'#products_page',  'Trust banner, add-ons'],
+      ['Pricing Plans',      'tag',          url('admin/pricing.php'),                    'Plans + product CTA link'],
       ['Leadership Messages','users',        url('admin/settings.php').'#leadership',     'Chairman & CEO messages'],
       ['Team Members',       'user-check',   url('admin/team.php'),                       'Staff photos & bios'],
       ['Products',           'package',      url('admin/products.php'),                   'Software product cards'],

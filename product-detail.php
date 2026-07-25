@@ -18,7 +18,6 @@ if (!$product) {
     require_once 'includes/header.php';
     ?>
     <div style="min-height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1rem;text-align:center;padding:4rem 1rem;">
-      <div style="font-size:var(--text-5xl);"></div>
       <h1 style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;">Product Not Found</h1>
       <p class="text-muted">This product may have been moved or is no longer available.</p>
       <a href="<?= url('products.php') ?>" class="btn btn-primary">← All Products</a>
@@ -28,10 +27,31 @@ if (!$product) {
     exit;
 }
 
-$features  = json_decode($product['features'] ?? '[]', true) ?? [];
-$modules   = json_decode($product['modules'] ?? '[]', true) ?? [];
-$tech_stack = json_decode($product['tech_stack'] ?? '[]', true) ?? [];
-$screenshots = json_decode($product['screenshots'] ?? '[]', true) ?? [];
+$features = json_decode($product['features'] ?? '[]', true) ?: [];
+$highlights = json_decode($product['highlights'] ?? '[]', true) ?: [];
+if (empty($features) && !empty($highlights)) {
+    $features = $highlights;
+}
+
+$modules = [];
+if (!empty($product['modules'])) {
+    $modules = json_decode($product['modules'], true) ?: [];
+}
+
+$tech_stack = [];
+if (!empty($product['tech_stack'])) {
+    $tech_stack = json_decode($product['tech_stack'], true) ?: [];
+}
+
+$screenshots = [];
+if (!empty($product['screenshots'])) {
+    $screenshots = json_decode($product['screenshots'], true) ?: [];
+}
+if (empty($screenshots) && !empty($product['demo_screenshot_url'])) {
+    $screenshots = [$product['demo_screenshot_url']];
+}
+
+$lucideIcon = trim((string)($product['lucide_icon'] ?? '')) ?: 'package';
 
 // Demo request
 $demo_success = false;
@@ -55,27 +75,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['demo_product'])) {
                 [(int)$product['id'], $product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]
             );
             $demo_success = true;
-        } catch(\Throwable $e) {
-            $demo_error = 'Something went wrong. Please try again.';
+        } catch (\Throwable $e) {
+            // Fallback without product_id column
+            try {
+                execute(
+                    "INSERT INTO demo_requests (product_name, org_name, contact_name, contact_email, contact_phone, message)
+                     VALUES (?,?,?,?,?,?)",
+                    [$product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]
+                );
+                $demo_success = true;
+            } catch (\Throwable $e2) {
+                $demo_error = 'Something went wrong. Please try again.';
+            }
         }
     }
 }
 
-// Pricing plan for this product
+// Pricing plan for this product (optional columns — never 500)
 $plan = null;
 try {
-    $plan = queryOne("SELECT * FROM pricing_plans WHERE active=1 AND JSON_CONTAINS(product_ids, ?) ORDER BY sort_order LIMIT 1", [json_encode((int)$product['id'])]);
-} catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+    $plan = queryOne(
+        "SELECT * FROM pricing_plans WHERE active=1 AND JSON_CONTAINS(product_ids, ?) ORDER BY position LIMIT 1",
+        [json_encode((int)$product['id'])]
+    );
+} catch (\Throwable $e) {
+    try {
+        $plan = queryOne(
+            "SELECT * FROM pricing_plans WHERE active=1 AND JSON_CONTAINS(product_ids, ?) ORDER BY sort_order LIMIT 1",
+            [json_encode((int)$product['id'])]
+        );
+    } catch (\Throwable $e2) { /* optional */ }
+}
 
 // Related products
 $related = [];
 try {
-    $related = query("SELECT id,name,slug,tagline,icon FROM products WHERE active=1 AND id!=? ORDER BY sort_order LIMIT 3", [(int)$product['id']]);
-} catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+    $related = query(
+        "SELECT id, name, slug, tagline, lucide_icon FROM products WHERE active=1 AND id!=? ORDER BY position, id LIMIT 3",
+        [(int)$product['id']]
+    );
+} catch (\Throwable $e) {
+    try {
+        $related = query(
+            "SELECT id, name, slug, tagline FROM products WHERE active=1 AND id!=? ORDER BY id LIMIT 3",
+            [(int)$product['id']]
+        );
+    } catch (\Throwable $e2) { /* optional */ }
+}
 
 $pageTitle = $product['name'] . ' — ' . ($product['tagline'] ?? '') . ' | ' . stSiteName();
 $pageDesc  = $product['summary'] ?? $product['tagline'] ?? '';
-$ogImage   = !empty($product['icon']) ? url($product['icon']) : (!empty($screenshots[0]) ? url($screenshots[0]) : null);
+$ogImage   = !empty($screenshots[0]) ? $screenshots[0] : null;
 require_once 'includes/header.php';
 ?>
 
@@ -94,12 +144,11 @@ require_once 'includes/header.php';
 <section style="background:var(--card);padding:3rem 1.5rem 3.5rem;">
   <div class="container" style="max-width:72rem;">
     <div style="display:grid;grid-template-columns:1fr 380px;gap:4rem;align-items:start;" class="product-hero-grid">
-      <!-- Left -->
       <div>
         <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
-          <?php if (!empty($product['icon'])): ?>
-          <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:var(--gradient-primary);display:grid;place-items:center;font-size:1.75rem;box-shadow:var(--shadow-glow);"><?= e($product['icon']) ?></div>
-          <?php endif; ?>
+          <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:var(--gradient-primary);display:grid;place-items:center;box-shadow:var(--shadow-glow);">
+            <i data-lucide="<?= e($lucideIcon) ?>" style="width:1.5rem;height:1.5rem;color:#fff;"></i>
+          </div>
           <?php if (!empty($product['badge'])): ?>
           <span class="badge badge-primary"><?= e($product['badge']) ?></span>
           <?php endif; ?>
@@ -112,15 +161,18 @@ require_once 'includes/header.php';
         <p style="font-size:var(--text-lg);color:var(--primary);font-weight:600;margin-bottom:1rem;"><?= e($product['tagline']) ?></p>
         <?php endif; ?>
         <?php if (!empty($product['summary'])): ?>
-        <p style="font-size:var(--text-md);color:var(--muted-foreground);line-height:1.7;margin-bottom:2rem;"><?= e($product['summary']) ?></p>
+        <p style="font-size:var(--text-md);color:var(--muted-foreground);line-height:1.7;margin-bottom:1.25rem;"><?= e($product['summary']) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($product['description'])): ?>
+        <div style="font-size:var(--text-sm);color:var(--muted-foreground);line-height:1.7;margin-bottom:2rem;white-space:pre-wrap;"><?= e($product['description']) ?></div>
         <?php endif; ?>
 
-        <!-- Features list -->
         <?php if (!empty($features)): ?>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:2rem;">
           <?php foreach (array_slice($features, 0, 8) as $f): ?>
           <div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--foreground);">
-            <span style="color:var(--secondary);margin-top:0.1rem;flex-shrink:0;"></span><?= e($f) ?>
+            <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;margin-top:0.1rem;"></i>
+            <?= e($f) ?>
           </div>
           <?php endforeach; ?>
         </div>
@@ -129,6 +181,7 @@ require_once 'includes/header.php';
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
           <a href="#demo" class="btn btn-primary btn-lg">Request a Free Demo →</a>
           <a href="<?= url('pricing.php') ?>" class="btn btn-outline btn-lg">View Pricing</a>
+          <a href="<?= url('contact.php') ?>?product=<?= urlencode($product['name']) ?>" class="btn btn-ghost btn-lg">Contact us</a>
         </div>
 
         <?php if (!empty($tech_stack)): ?>
@@ -139,9 +192,14 @@ require_once 'includes/header.php';
           <?php endforeach; ?>
         </div>
         <?php endif; ?>
+
+        <?php if (!empty($product['price_from'])): ?>
+        <p style="margin-top:1.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
+          From <strong style="color:var(--primary);font-size:var(--text-lg);">NPR <?= e(number_format((float)$product['price_from'], 0)) ?></strong>
+        </p>
+        <?php endif; ?>
       </div>
 
-      <!-- Right: Demo card -->
       <div id="demo">
         <div class="st-card" style="padding:1.75rem;position:sticky;top:5rem;">
           <h3 style="font-family:var(--font-display);font-size:var(--text-md);font-weight:700;color:var(--foreground);margin-bottom:0.25rem;">Request a Free Demo</h3>
@@ -149,7 +207,6 @@ require_once 'includes/header.php';
 
           <?php if ($demo_success): ?>
           <div style="padding:1.25rem;border-radius:0.875rem;background:var(--success-soft);border:1px solid var(--success-border);text-align:center;">
-            <div style="font-size:2rem;margin-bottom:0.5rem;"></div>
             <div style="font-weight:700;color:var(--success-fg);margin-bottom:0.25rem;">Demo Requested!</div>
             <div style="font-size:var(--text-sm);color:var(--success-fg);">We'll contact you within 24 hours to schedule your demo.</div>
           </div>
@@ -190,7 +247,6 @@ require_once 'includes/header.php';
   </div>
 </section>
 
-<!-- Screenshots -->
 <?php if (!empty($screenshots)): ?>
 <section class="section" style="background:var(--background);">
   <div class="container">
@@ -209,7 +265,6 @@ require_once 'includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- Modules -->
 <?php if (!empty($modules)): ?>
 <section class="section" style="background:var(--card);border-top:1px solid var(--border);">
   <div class="container">
@@ -221,7 +276,7 @@ require_once 'includes/header.php';
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.875rem;">
       <?php foreach ($modules as $mod): ?>
       <div style="display:flex;align-items:center;gap:0.625rem;padding:0.875rem 1rem;border-radius:0.75rem;border:1px solid var(--border);background:var(--background);">
-        <span style="color:var(--secondary);font-size:var(--text-md);flex-shrink:0;"></span>
+        <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;"></i>
         <span style="font-size:var(--text-sm);font-weight:500;color:var(--foreground);"><?= e($mod) ?></span>
       </div>
       <?php endforeach; ?>
@@ -230,7 +285,6 @@ require_once 'includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- All Features -->
 <?php if (!empty($features) && count($features) > 8): ?>
 <section class="section">
   <div class="container" style="max-width:64rem;">
@@ -241,7 +295,8 @@ require_once 'includes/header.php';
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.625rem;">
       <?php foreach ($features as $f): ?>
       <div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--foreground);padding:0.5rem;">
-        <span style="color:var(--secondary);margin-top:0.1rem;flex-shrink:0;"></span><?= e($f) ?>
+        <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;margin-top:0.1rem;"></i>
+        <?= e($f) ?>
       </div>
       <?php endforeach; ?>
     </div>
@@ -249,7 +304,6 @@ require_once 'includes/header.php';
 </section>
 <?php endif; ?>
 
-<!-- Related products -->
 <?php if (!empty($related)): ?>
 <section class="section" style="background:var(--card);border-top:1px solid var(--border);">
   <div class="container">
@@ -258,7 +312,9 @@ require_once 'includes/header.php';
       <?php foreach ($related as $r): ?>
       <a href="<?= url('product-detail.php?slug='.urlencode($r['slug'])) ?>" class="st-card st-card-link">
         <div style="display:flex;align-items:center;gap:0.875rem;margin-bottom:0.75rem;">
-          <?php if(!empty($r['icon'])): ?><div style="width:2.5rem;height:2.5rem;border-radius:0.625rem;background:var(--gradient-primary);display:grid;place-items:center;font-size:var(--text-xl);"><?= e($r['icon']) ?></div><?php endif;?>
+          <div style="width:2.5rem;height:2.5rem;border-radius:0.625rem;background:var(--gradient-primary);display:grid;place-items:center;">
+            <i data-lucide="<?= e($r['lucide_icon'] ?? 'package') ?>" style="width:1rem;height:1rem;color:#fff;"></i>
+          </div>
           <h3 style="font-family:var(--font-display);font-size:var(--text-md);font-weight:700;color:var(--foreground);"><?= e($r['name']) ?></h3>
         </div>
         <p style="font-size:var(--text-sm);color:var(--muted-foreground);"><?= e($r['tagline'] ?? '') ?></p>
