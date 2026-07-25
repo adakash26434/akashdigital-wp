@@ -31,9 +31,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $isoLogo = normalizeImageUrl($isoLogoIn);
             if ($isoLogo === false) throw new \RuntimeException('ISO Logo URL is invalid. Use an absolute URL or a site-root path like /uploads/..');
             saveSetting('iso_logo_url', $isoLogo);
-            saveSetting('developed_by_name', trim($_POST['developed_by_name'] ?? ''));
-            saveSetting('developed_by_url',  trim($_POST['developed_by_url'] ?? ''));
-            saveSetting('custom_footer_text', trim($_POST['custom_footer_text'] ?? ''));
+            saveSetting('developed_by_name', '');
+            saveSetting('developed_by_url',  '');
+            saveSetting('custom_footer_text', '');
             $success = 'Company settings saved.';
         } elseif ($section === 'contact') {
             saveSetting('contact_email', trim($_POST['contact_email'] ?? ''));
@@ -497,7 +497,7 @@ $tabs = [
       <?= csrfField() ?><input type="hidden" name="section" value="company">
       <div class="st-card p-card-lg">
         <h3 class="h-eyebrow">Company Details</h3>
-        <p class="caption-meta" style="margin-top:-0.5rem;">Company name, website, and developer attribution displayed across the site.</p>
+        <p class="caption-meta" style="margin-top:-0.5rem;">Company name and website used across the site. Footer developer credit is hardcoded.</p>
         <div class="col-stack">
           <div>
             <label class="form-label">Company Name</label>
@@ -514,17 +514,8 @@ $tabs = [
             require __DIR__ . '/../includes/admin-img-upload.php';
           ?>
           <p class="caption-meta" style="margin-top:-0.25rem;">Displayed beside the site logo in the header (e.g. ISO 9001 / ISO 27001 badge). Leave blank to hide.</p>
-          <hr style="border:none;border-top:1px solid var(--border);margin:0.5rem 0;">
-          <h4 style="font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.5rem;">Developer Attribution</h4>
-          <div>
-            <label class="form-label">Developed By Name</label>
-            <input type="text" name="developed_by_name" class="form-input" value="<?= e(sv($s,'developed_by_name',stSiteName())) ?>" placeholder="Company name">
-            <span class="form-hint">Developed by Aakash Adhikari (hardcoded).</span>
-          </div>
-          <div>
-            <label class="form-label">Custom Footer Text (optional)</label>
-            <input type="text" name="custom_footer_text" class="form-input" value="<?= e(sv($s,'custom_footer_text')) ?>" placeholder="| Developed & Design By: Your Name">
-            <span class="form-hint">Add extra text after "Developed by Aakash Adhikari".</span>
+          <div class="alert" style="background:var(--muted);border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;line-height:1.5;">
+            Footer credit is fixed: <strong>Developed &amp; Design By Aakash Adhikari</strong> (not editable). Copyright company name comes from Company Name / Footer settings only.
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save Company Settings</button>
         </div>
