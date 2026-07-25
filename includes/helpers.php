@@ -79,8 +79,9 @@ function getFlash(string $key): ?string {
 }
 
 // ── Site settings from key-value table ─────────────────────────
-function siteSettings(): array {
+function siteSettings(bool $refresh = false): array {
     static $cache = null;
+    if ($refresh) $cache = null;
     if ($cache !== null) return $cache;
     $defaults = [
         'site_name'        => SITE_NAME,
@@ -329,6 +330,274 @@ function stWhatsAppUrl(?array $user = null, ?string $pageHint = null): string {
     if ($num === '') return '';
     $text = stWhatsAppMessage($user, $pageHint);
     return 'https://wa.me/' . $num . '?text=' . rawurlencode($text);
+}
+
+/** Whether the public AI assistant float is enabled and has a usable key. */
+function stAiChatEnabled(): bool {
+    $s = siteSettings();
+    if (($s['ai_chat_enabled'] ?? '0') !== '1') return false;
+    $key = trim((string)($s['ai_chat_api_key'] ?? ''));
+    return $key !== '' && stAiChatProvider() !== '';
+}
+
+function stAiChatProvider(): string {
+    $s = siteSettings();
+    $p = strtolower(trim((string)($s['ai_chat_provider'] ?? 'openai')));
+    return in_array($p, ['openai', 'gemini', 'deepseek'], true) ? $p : 'openai';
+}
+
+function stAiChatLabel(): string {
+    $s = siteSettings();
+    $label = trim((string)($s['ai_chat_label'] ?? ''));
+    return $label !== '' ? $label : 'AI Assistant';
+}
+
+function stAiChatWelcome(): string {
+    $s = siteSettings();
+    $w = trim((string)($s['ai_chat_welcome'] ?? ''));
+    if ($w !== '') return $w;
+    return 'Hi! Ask me about our products, services, pricing, or how to contact us. I only know public website information.';
+}
+
+/**
+ * Public-only knowledge pack for the AI assistant.
+ * Never includes API keys, admin users, CRM, applications, or internal settings.
+ */
+function stAiChatPublicContext(): string {
+    $s = siteSettings();
+    $lines = [];
+    $lines[] = 'Company: ' . stCompanyName();
+    if (!empty($s['site_tagline'])) $lines[] = 'Tagline: ' . trim((string)$s['site_tagline']);
+    if (stAddress() !== '') $lines[] = 'Address: ' . stAddress();
+    if (stContactPhone() !== '') $lines[] = 'Phone: ' . stContactPhone();
+    if (stContactEmail() !== '') $lines[] = 'Email: ' . stContactEmail();
+    $support = trim((string)($s['support_email'] ?? ''));
+    if ($support !== '') $lines[] = 'Support email: ' . $support;
+    if (!empty($s['about_mission_p1'])) $lines[] = 'Mission: ' . trim((string)$s['about_mission_p1']);
+    if (!empty($s['about_mission_p2'])) $lines[] = 'Mission (cont.): ' . trim((string)$s['about_mission_p2']);
+
+    try {
+        $products = query(
+            "SELECT name, tagline, summary, badge, price_from, features, highlights
+             FROM products WHERE active=1 ORDER BY position, id LIMIT 20"
+        );
+        if ($products) {
+            $lines[] = '';
+            $lines[] = 'PRODUCTS (public catalog):';
+            foreach ($products as $p) {
+                $price = !empty($p['price_from']) ? ('NPR ' . number_format((float)$p['price_from'], 0)) : 'Contact for price';
+                $feats = json_decode($p['features'] ?? '[]', true) ?: [];
+                $highs = json_decode($p['highlights'] ?? '[]', true) ?: [];
+                $bits = array_slice(array_filter(array_merge($highs, $feats)), 0, 8);
+                $lines[] = '- ' . $p['name']
+                    . (!empty($p['badge']) ? ' [' . $p['badge'] . ']' : '')
+                    . ': ' . trim((string)($p['tagline'] ?: $p['summary'] ?: ''))
+                    . ' | From: ' . $price
+                    . ($bits ? (' | Features: ' . implode('; ', $bits)) : '');
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $services = query(
+            "SELECT title AS name, tagline, summary, badge, price_from, features, highlights
+             FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
+        );
+        if ($services) {
+            $lines[] = '';
+            $lines[] = 'SERVICES (public catalog):';
+            foreach ($services as $sv) {
+                $price = (!empty($sv['price_from']) && (float)$sv['price_from'] > 0)
+                    ? ('NPR ' . number_format((float)$sv['price_from'], 0))
+                    : 'Contact for quote';
+                $feats = [];
+                if (!empty($sv['features'])) {
+                    $decoded = json_decode($sv['features'], true);
+                    $feats = is_array($decoded)
+                        ? $decoded
+                        : array_filter(array_map('trim', explode(',', (string)$sv['features'])));
+                }
+                $highs = json_decode($sv['highlights'] ?? '[]', true) ?: [];
+                $bits = array_slice(array_filter(array_merge($highs, $feats)), 0, 8);
+                $lines[] = '- ' . $sv['name']
+                    . (!empty($sv['badge']) ? ' [' . $sv['badge'] . ']' : '')
+                    . ': ' . trim((string)($sv['tagline'] ?: $sv['summary'] ?: ''))
+                    . ' | From: ' . $price
+                    . ($bits ? (' | Features: ' . implode('; ', $bits)) : '');
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $plans = query(
+            "SELECT name, tag, price_label, period, features FROM pricing_plans WHERE active=1 ORDER BY position, id LIMIT 12"
+        );
+        if ($plans) {
+            $lines[] = '';
+            $lines[] = 'PRICING PLANS (public):';
+            foreach ($plans as $pl) {
+                $feats = json_decode($pl['features'] ?? '[]', true) ?: [];
+                $lines[] = '- ' . $pl['name']
+                    . (!empty($pl['tag']) ? ' (' . $pl['tag'] . ')' : '')
+                    . ': ' . ($pl['price_label'] ?? '') . ' ' . ($pl['period'] ?? '')
+                    . ($feats ? (' | Includes: ' . implode('; ', array_slice($feats, 0, 10))) : '');
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $faqs = query("SELECT question, answer FROM faqs WHERE active=1 ORDER BY position, id LIMIT 15");
+        if ($faqs) {
+            $lines[] = '';
+            $lines[] = 'FAQs (public):';
+            foreach ($faqs as $f) {
+                $lines[] = 'Q: ' . trim((string)$f['question']);
+                $ans = (string)($f['answer'] ?? '');
+                $lines[] = 'A: ' . trim(function_exists('mb_substr') ? mb_substr($ans, 0, 400) : substr($ans, 0, 400));
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    $lines[] = '';
+    $lines[] = 'Public pages: Home, About, Products, Services, Pricing, Portfolio, News, Careers, FAQ, Contact, Tools.';
+    $lines[] = 'For demos or custom quotes, direct people to Contact or Request a demo.';
+
+    return implode("\n", $lines);
+}
+
+function stAiChatSystemPrompt(): string {
+    $s = siteSettings();
+    $extra = trim((string)($s['ai_chat_system_extra'] ?? ''));
+    $company = stCompanyName();
+    $prompt = "You are the public website assistant for {$company}.\n"
+        . "You ONLY answer using the PUBLIC WEBSITE INFORMATION provided below.\n"
+        . "Hard rules:\n"
+        . "1. NEVER reveal, invent, or discuss admin panel, staff accounts, passwords, API keys, database contents, CRM leads, invoices, job applications, internal tickets, or any private/customer data.\n"
+        . "2. If asked about admin, login credentials, keys, or internal systems, politely refuse and suggest contacting support via the public Contact page or WhatsApp if available.\n"
+        . "3. If you do not know something from the public context, say you do not have that info and suggest Contact / Request a demo.\n"
+        . "4. Keep answers concise and helpful. You may reply in English or Nepali to match the visitor.\n"
+        . "5. Do not claim to access pages behind login or admin URLs.\n";
+    if ($extra !== '') {
+        $prompt .= "\nAdditional public guidance from the site owner:\n" . $extra . "\n";
+    }
+    $prompt .= "\n--- PUBLIC WEBSITE INFORMATION ---\n" . stAiChatPublicContext();
+    return $prompt;
+}
+
+/**
+ * Call the configured AI provider. Returns reply text or throws RuntimeException.
+ *
+ * @param list<array{role:string,content:string}> $history User/assistant turns (no system)
+ */
+function stAiChatComplete(array $history): string {
+    if (!stAiChatEnabled()) {
+        throw new \RuntimeException('AI chat is not configured.');
+    }
+    $s = siteSettings();
+    $apiKey = trim((string)($s['ai_chat_api_key'] ?? ''));
+    $provider = stAiChatProvider();
+    $system = stAiChatSystemPrompt();
+
+    $clean = [];
+    foreach (array_slice($history, -10) as $m) {
+        if (!is_array($m)) continue;
+        $role = ($m['role'] ?? '') === 'assistant' ? 'assistant' : 'user';
+        $content = trim((string)($m['content'] ?? ''));
+        if ($content === '') continue;
+        $len = function_exists('mb_strlen') ? mb_strlen($content) : strlen($content);
+        if ($len > 1500) {
+            $content = function_exists('mb_substr') ? mb_substr($content, 0, 1500) : substr($content, 0, 1500);
+        }
+        $clean[] = ['role' => $role, 'content' => $content];
+    }
+    if (empty($clean)) {
+        throw new \RuntimeException('Message required.');
+    }
+
+    if ($provider === 'gemini') {
+        return stAiChatCallGemini($apiKey, $system, $clean);
+    }
+    $base = $provider === 'deepseek'
+        ? 'https://api.deepseek.com/v1/chat/completions'
+        : 'https://api.openai.com/v1/chat/completions';
+    $model = $provider === 'deepseek' ? 'deepseek-chat' : 'gpt-4o-mini';
+    return stAiChatCallOpenAiCompat($base, $apiKey, $model, $system, $clean);
+}
+
+function stAiChatHttpJson(string $url, array $headers, array $body, int $timeout = 45): array {
+    if (!function_exists('curl_init')) {
+        throw new \RuntimeException('cURL is required for AI chat.');
+    }
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => $timeout,
+        CURLOPT_CONNECTTIMEOUT => 10,
+        CURLOPT_HTTPHEADER     => $headers,
+        CURLOPT_POSTFIELDS     => json_encode($body, JSON_UNESCAPED_UNICODE),
+    ]);
+    $raw = curl_exec($ch);
+    $err = curl_error($ch);
+    $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+    if ($raw === false) {
+        throw new \RuntimeException('AI request failed: ' . ($err ?: 'network error'));
+    }
+    $data = json_decode($raw, true);
+    if (!is_array($data)) {
+        throw new \RuntimeException('Invalid AI response.');
+    }
+    if ($code >= 400) {
+        $msg = $data['error']['message'] ?? $data['error'] ?? ('HTTP ' . $code);
+        if (is_array($msg)) $msg = json_encode($msg);
+        $snip = function_exists('mb_substr') ? mb_substr((string)$msg, 0, 200) : substr((string)$msg, 0, 200);
+        throw new \RuntimeException('AI provider error: ' . $snip);
+    }
+    return $data;
+}
+
+function stAiChatCallOpenAiCompat(string $url, string $apiKey, string $model, string $system, array $history): string {
+    $messages = array_merge(
+        [['role' => 'system', 'content' => $system]],
+        $history
+    );
+    $data = stAiChatHttpJson($url, [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiKey,
+    ], [
+        'model'       => $model,
+        'messages'    => $messages,
+        'temperature' => 0.4,
+        'max_tokens'  => 800,
+    ]);
+    $text = trim((string)($data['choices'][0]['message']['content'] ?? ''));
+    if ($text === '') throw new \RuntimeException('Empty AI reply.');
+    return $text;
+}
+
+function stAiChatCallGemini(string $apiKey, string $system, array $history): string {
+    $contents = [];
+    foreach ($history as $m) {
+        $contents[] = [
+            'role'  => $m['role'] === 'assistant' ? 'model' : 'user',
+            'parts' => [['text' => $m['content']]],
+        ];
+    }
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . rawurlencode($apiKey);
+    $data = stAiChatHttpJson($url, [
+        'Content-Type: application/json',
+    ], [
+        'systemInstruction' => ['parts' => [['text' => $system]]],
+        'contents'          => $contents,
+        'generationConfig'  => [
+            'temperature'     => 0.4,
+            'maxOutputTokens' => 800,
+        ],
+    ]);
+    $text = trim((string)($data['candidates'][0]['content']['parts'][0]['text'] ?? ''));
+    if ($text === '') throw new \RuntimeException('Empty AI reply.');
+    return $text;
 }
 
 // ── CSRF helpers ────────────────────────────────────────────────

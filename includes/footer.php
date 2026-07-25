@@ -157,11 +157,14 @@ try {
   </div>
 </footer>
 
-<!-- ── Floating Action Buttons (WhatsApp + Live Chat) ── -->
+<!-- ── Floating Action Buttons (WhatsApp + AI + Live Chat) ── -->
 <div class="st-float-actions">
 <?php
   $__waUrl = function_exists('stWhatsAppUrl') ? stWhatsAppUrl() : '';
   $__waLabel = function_exists('stWhatsAppLabel') ? stWhatsAppLabel() : 'Support WhatsApp';
+  $__aiOn = function_exists('stAiChatEnabled') && stAiChatEnabled();
+  $__aiLabel = function_exists('stAiChatLabel') ? stAiChatLabel() : 'AI Assistant';
+  $__aiWelcome = function_exists('stAiChatWelcome') ? stAiChatWelcome() : 'Hi! Ask me about our products and services.';
 ?>
 <?php if ($__waUrl !== ''): ?>
   <a href="<?= e($__waUrl) ?>"
@@ -171,8 +174,46 @@ try {
   </a>
 <?php endif; ?>
 
+<?php if ($__aiOn): ?>
+<div id="st-ai-widget" style="display:contents;">
+  <button type="button" id="st-ai-btn" onclick="stAiToggle()" title="<?= e($__aiLabel) ?>"
+    class="st-float-btn st-ai-trigger"
+    aria-label="<?= e($__aiLabel) ?>"
+    aria-expanded="false">
+    <i data-lucide="bot" id="st-ai-icon-open" style="width:20px;height:20px;flex-shrink:0;"></i>
+    <i data-lucide="x" id="st-ai-icon-close" style="width:18px;height:18px;display:none;flex-shrink:0;"></i>
+    <span class="st-float-label"><?= e($__aiLabel) ?></span>
+  </button>
+
+  <div id="st-ai-panel" role="dialog" aria-label="<?= e($__aiLabel) ?>" style="display:none;width:22rem;border-radius:1.25rem;overflow:hidden;box-shadow:0 20px 60px rgba(15,23,42,0.18),0 4px 16px rgba(15,23,42,0.10);border:1px solid var(--border);background:var(--card);flex-direction:column;max-height:80vh;">
+    <div style="background:linear-gradient(135deg,#0f766e,#0ea5e9);padding:1rem 1.25rem;display:flex;align-items:center;gap:0.75rem;">
+      <div style="width:2.25rem;height:2.25rem;border-radius:9999px;background:rgba(255,255,255,0.2);display:grid;place-items:center;flex-shrink:0;">
+        <i data-lucide="bot" style="width:16px;height:16px;color:#fff;"></i>
+      </div>
+      <div class="flex-1">
+        <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:var(--text-base);"><?= e($__aiLabel) ?></div>
+        <div style="font-size:var(--text-xs);color:rgba(255,255,255,0.75);">Public site info only</div>
+      </div>
+    </div>
+    <div id="st-ai-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;min-height:220px;max-height:320px;"></div>
+    <div style="padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;">
+      <input type="text" id="st-ai-input" placeholder="Ask about products, pricing…" class="form-input" style="flex:1;font-size:var(--text-sm);"
+             onkeydown="if(event.key==='Enter'){event.preventDefault();stAiSend();}">
+      <button type="button" onclick="stAiSend()" class="btn btn-primary btn-sm" style="flex-shrink:0;padding:0 0.875rem;" id="st-ai-send-btn">
+        <i data-lucide="send" class="ic-14"></i>
+      </button>
+    </div>
+    <div style="padding:0.45rem 0.75rem 0.65rem;font-size:0.625rem;color:var(--muted-foreground);text-align:center;line-height:1.4;">
+      Answers use public website content only — not admin or private data.
+      <?php if ($__waUrl !== ''): ?> · <a href="<?= e($__waUrl) ?>" target="_blank" rel="noopener" class="text-primary">WhatsApp</a><?php endif; ?>
+      · <a href="<?= url('contact.php') ?>" class="text-primary">Contact</a>
+    </div>
+  </div>
+</div>
+<?php endif; ?>
+
 <!-- ── Live Chat Widget ── -->
-<?php if (($__s['live_chat_enabled'] ?? true) !== false): ?>
+<?php if (($__s['live_chat_enabled'] ?? true) !== false && ($__s['live_chat_enabled'] ?? '1') !== '0'): ?>
 <div id="st-chat-widget" style="display:contents;">
   <button id="st-chat-btn" onclick="stChatToggle()" title="Chat with us"
     class="st-float-btn st-chat-trigger"
@@ -260,6 +301,103 @@ if ($fs) echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json
 if ($fe) echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json_encode($fe).",'error'));";
 if ($fw) echo "document.addEventListener('DOMContentLoaded',()=>showToast(".json_encode($fw).",'warning'));";
 ?>
+
+<?php if (!empty($__aiOn)): ?>
+/* ── AI Assistant ── */
+const ST_AI_URL = <?= json_encode(url('api/ai-chat.php')) ?>;
+const ST_AI_WELCOME = <?= json_encode($__aiWelcome, JSON_UNESCAPED_UNICODE) ?>;
+let stAiHistory = [];
+let stAiBusy = false;
+let stAiBooted = false;
+
+function stAiToggle() {
+  const panel = document.getElementById('st-ai-panel');
+  const iconO = document.getElementById('st-ai-icon-open');
+  const iconC = document.getElementById('st-ai-icon-close');
+  const btn = document.getElementById('st-ai-btn');
+  if (!panel) return;
+  const isOpen = panel.style.display !== 'none';
+  panel.style.display = isOpen ? 'none' : 'flex';
+  panel.style.flexDirection = 'column';
+  if (iconO) iconO.style.display = isOpen ? 'block' : 'none';
+  if (iconC) iconC.style.display = isOpen ? 'none' : 'block';
+  if (btn) btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
+  // Close human live-chat panel if open
+  const live = document.getElementById('st-chat-panel');
+  if (!isOpen && live && live.style.display !== 'none') {
+    live.style.display = 'none';
+    const lo = document.getElementById('st-chat-icon-open');
+    const lc = document.getElementById('st-chat-icon-close');
+    if (lo) lo.style.display = 'block';
+    if (lc) lc.style.display = 'none';
+  }
+  if (!isOpen && !stAiBooted) {
+    stAiBooted = true;
+    stAiAddBubble('assistant', ST_AI_WELCOME);
+    setTimeout(() => document.getElementById('st-ai-input')?.focus(), 50);
+  }
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function stAiEsc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function stAiAddBubble(role, text) {
+  const box = document.getElementById('st-ai-messages');
+  if (!box) return;
+  const isMe = role === 'user';
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;justify-content:' + (isMe ? 'flex-end' : 'flex-start') + ';';
+  div.innerHTML = '<div style="max-width:85%;padding:0.5rem 0.75rem;border-radius:' +
+    (isMe ? '1rem 0.25rem 1rem 1rem' : '0.25rem 1rem 1rem 1rem') +
+    ';background:' + (isMe ? 'var(--primary)' : 'var(--muted)') +
+    ';color:' + (isMe ? '#fff' : 'var(--foreground)') +
+    ';font-size:var(--text-sm);line-height:1.5;white-space:pre-wrap;word-break:break-word;">' +
+    stAiEsc(text) + '</div>';
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function stAiSend() {
+  if (stAiBusy) return;
+  const input = document.getElementById('st-ai-input');
+  const msg = (input?.value || '').trim();
+  if (!msg) return;
+  input.value = '';
+  stAiAddBubble('user', msg);
+  stAiHistory.push({ role: 'user', content: msg });
+  stAiBusy = true;
+  const btn = document.getElementById('st-ai-send-btn');
+  if (btn) btn.disabled = true;
+  stAiAddBubble('assistant', '…');
+  const box = document.getElementById('st-ai-messages');
+  const pending = box ? box.lastElementChild : null;
+
+  fetch(ST_AI_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({ message: msg, history: stAiHistory.slice(0, -1) })
+  })
+    .then(r => r.json().then(d => ({ ok: r.ok, d })))
+    .then(({ ok, d }) => {
+      const reply = (d && d.reply) ? d.reply : (d && d.error) ? d.error : 'Something went wrong.';
+      if (pending) pending.remove();
+      stAiAddBubble('assistant', reply);
+      if (ok && d.reply) stAiHistory.push({ role: 'assistant', content: d.reply });
+      if (stAiHistory.length > 16) stAiHistory = stAiHistory.slice(-16);
+    })
+    .catch(() => {
+      if (pending) pending.remove();
+      stAiAddBubble('assistant', 'Network error. Please try again or use Contact / WhatsApp.');
+    })
+    .finally(() => {
+      stAiBusy = false;
+      if (btn) btn.disabled = false;
+      input?.focus();
+    });
+}
+<?php endif; ?>
 
 /* ── Live Chat ── */
 let stConvId = localStorage.getItem('st_conv_id') ? parseInt(localStorage.getItem('st_conv_id')) : 0;

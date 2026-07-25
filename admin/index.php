@@ -329,6 +329,7 @@ $__alertLabels = ['Open Tickets','New Contacts','Demo Requests','Job Application
       ['Services List',      'layers',       url('admin/services.php'),                   'Add/edit/reorder services'],
       ['Services Page Text', 'align-left',   url('admin/settings.php').'#services_page',  '"Why choose us", CTA copy'],
       ['Products Page Text', 'box',          url('admin/settings.php').'#products_page',  'Trust banner, add-ons'],
+      ['AI Chat Assistant',  'bot',          url('admin/settings.php').'#ai_chat',         'ChatGPT / Gemini / DeepSeek'],
       ['Pricing Plans',      'tag',          url('admin/pricing.php'),                    'Plans + product CTA link'],
       ['Leadership Messages','users',        url('admin/settings.php').'#leadership',     'Chairman & CEO messages'],
       ['Team Members',       'user-check',   url('admin/team.php'),                       'Staff photos & bios'],

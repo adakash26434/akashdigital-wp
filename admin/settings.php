@@ -57,6 +57,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             saveSetting('whatsapp_label',   trim($_POST['whatsapp_label'] ?? '') ?: 'Support WhatsApp');
             saveSetting('whatsapp_enabled', isset($_POST['whatsapp_enabled']) ? '1' : '0');
             $success = 'WhatsApp settings saved.';
+        } elseif ($section === 'ai_chat') {
+            $provider = strtolower(trim($_POST['ai_chat_provider'] ?? 'openai'));
+            if (!in_array($provider, ['openai', 'gemini', 'deepseek'], true)) $provider = 'openai';
+            saveSetting('ai_chat_provider', $provider);
+            saveSetting('ai_chat_enabled', isset($_POST['ai_chat_enabled']) ? '1' : '0');
+            saveSetting('ai_chat_label', trim($_POST['ai_chat_label'] ?? '') ?: 'AI Assistant');
+            saveSetting('ai_chat_welcome', trim($_POST['ai_chat_welcome'] ?? ''));
+            saveSetting('ai_chat_system_extra', trim($_POST['ai_chat_system_extra'] ?? ''));
+            if (!empty($_POST['ai_chat_clear_key'])) {
+                saveSetting('ai_chat_api_key', '');
+            } else {
+                $newKey = trim($_POST['ai_chat_api_key'] ?? '');
+                if ($newKey !== '') {
+                    saveSetting('ai_chat_api_key', $newKey);
+                }
+            }
+            $success = 'AI Chat settings saved.';
         } elseif ($section === 'features') {
             saveSetting('maintenance_mode',      isset($_POST['maintenance_mode']) ? '1' : '0');
             saveSetting('support_enabled',       isset($_POST['support_enabled']) ? '1' : '0');
@@ -312,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$s = siteSettings();
+$s = siteSettings(true);
 
 // Helper: get a setting value
 function sv(array $s, string $key, string $default = ''): string {
@@ -389,6 +406,7 @@ $tabs = [
     ['contact',       icon('mail',13),           'Contact'],
     ['social',        icon('share-2',13),        'Social'],
     ['whatsapp',      icon('message-circle',13), 'WhatsApp'],
+    ['ai_chat',       icon('bot',13),            'AI Chat'],
     ['homepage',      icon('layout',13),         'Homepage'],
     ['about_page',    icon('building-2',13),     'About Page'],
     ['products_page', icon('box',13),            'Products Page'],
@@ -622,6 +640,68 @@ $tabs = [
       </ol>
       <p class="caption-meta" style="margin-top:1rem;">Later upgrade: WhatsApp Cloud API / WATI for inbox inside this admin panel. Do not use unofficial WhatsApp scrapers.</p>
     </div>
+  </div>
+
+  <!-- AI Chat -->
+  <?php
+    $__aiKeySet = trim((string)($s['ai_chat_api_key'] ?? '')) !== '';
+    $__aiProv = sv($s, 'ai_chat_provider', 'openai');
+  ?>
+  <div x-show="tab==='ai_chat'" x-cloak>
+    <form method="POST">
+      <?= csrfField() ?><input type="hidden" name="section" value="ai_chat">
+      <div class="st-card p-card-lg">
+        <h3 class="h-eyebrow">AI Chat Assistant</h3>
+        <div style="margin-bottom:1.25rem;padding:1rem;background:color-mix(in srgb, var(--primary) 8%, var(--card));border-radius:0.625rem;border:1px solid color-mix(in srgb, var(--primary) 22%, var(--border));font-size:0.8125rem;color:var(--foreground);line-height:1.55;">
+          Public pages show an <strong>AI Assistant</strong> float (like WhatsApp). The bot only receives <strong>public</strong> company, products, services, pricing, and FAQ data — never admin credentials, CRM, applications, or API keys.
+          Enable only after you paste a valid provider key. Keys stay on the server and are never sent to the browser.
+        </div>
+        <div class="col-stack">
+          <div>
+            <label class="row-check">
+              <input type="checkbox" name="ai_chat_enabled" <?= sv($s,'ai_chat_enabled','0') === '1' ? 'checked' : '' ?>>
+              <span>Enable AI chat float on public pages</span>
+            </label>
+            <?php if (sv($s,'ai_chat_enabled','0') === '1' && !$__aiKeySet): ?>
+            <p class="caption-meta" style="color:var(--danger);margin-top:0.35rem;">Enabled but no API key saved — float stays hidden until a key is stored.</p>
+            <?php endif; ?>
+          </div>
+          <div>
+            <label class="form-label">AI Provider</label>
+            <select name="ai_chat_provider" class="form-input">
+              <option value="openai" <?= $__aiProv === 'openai' ? 'selected' : '' ?>>ChatGPT (OpenAI — gpt-4o-mini)</option>
+              <option value="gemini" <?= $__aiProv === 'gemini' ? 'selected' : '' ?>>Google Gemini (gemini-2.0-flash)</option>
+              <option value="deepseek" <?= $__aiProv === 'deepseek' ? 'selected' : '' ?>>DeepSeek (deepseek-chat)</option>
+            </select>
+          </div>
+          <div>
+            <label class="form-label">API Key <?= $__aiKeySet ? '<span style="color:var(--success);font-weight:600;">· saved</span>' : '' ?></label>
+            <input type="password" name="ai_chat_api_key" class="form-input" value="" placeholder="<?= $__aiKeySet ? '••••••••  (leave blank to keep current key)' : 'Paste API key…' ?>" autocomplete="new-password">
+            <p class="caption-meta">Leave blank to keep the existing key. OpenAI: platform.openai.com · Gemini: aistudio.google.com · DeepSeek: platform.deepseek.com</p>
+            <?php if ($__aiKeySet): ?>
+            <label class="row-check" style="margin-top:0.5rem;">
+              <input type="checkbox" name="ai_chat_clear_key" value="1">
+              <span>Remove saved API key</span>
+            </label>
+            <?php endif; ?>
+          </div>
+          <div>
+            <label class="form-label">Button label</label>
+            <input type="text" name="ai_chat_label" class="form-input" value="<?= e(sv($s,'ai_chat_label','AI Assistant')) ?>" maxlength="40" placeholder="AI Assistant">
+          </div>
+          <div>
+            <label class="form-label">Welcome message</label>
+            <textarea name="ai_chat_welcome" class="form-input" rows="2" placeholder="Hi! Ask me about our products…"><?= e(sv($s,'ai_chat_welcome')) ?></textarea>
+          </div>
+          <div>
+            <label class="form-label">Extra public guidance (optional)</label>
+            <textarea name="ai_chat_system_extra" class="form-input" rows="3" placeholder="e.g. We serve cooperatives across Nepal. Office hours Sun–Fri 10am–5pm."><?= e(sv($s,'ai_chat_system_extra')) ?></textarea>
+            <p class="caption-meta">Only public marketing facts. Do not paste secrets, admin URLs, or private client data here.</p>
+          </div>
+          <button type="submit" class="btn btn-primary w-fit"><?= icon('save',15) ?> Save AI Chat Settings</button>
+        </div>
+      </div>
+    </form>
   </div>
 
   <!-- Homepage -->

@@ -2913,6 +2913,21 @@ html.dark #st-navbar.is-scrolled {
   box-shadow: 0 6px 24px rgba(37,211,102,0.45);
 }
 
+/* AI Assistant — teal / sky */
+.st-ai-trigger {
+  background: linear-gradient(135deg, #0f766e, #0ea5e9);
+  box-shadow: 0 4px 16px rgba(14,165,233,0.35);
+}
+.st-ai-trigger:hover {
+  box-shadow: 0 6px 24px rgba(14,165,233,0.5);
+}
+#st-ai-panel {
+  position: absolute;
+  bottom: 3.5rem;
+  right: 0;
+  z-index: 2;
+}
+
 /* Chat trigger — primary blue gradient */
 .st-chat-trigger {
   background: var(--gradient-primary);
