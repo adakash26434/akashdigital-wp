@@ -4,7 +4,16 @@ require_once '../includes/admin-layout.php';
 
 $success = $error = '';
 $currentPage = $_GET['page'] ?? 'home';
-
+?>
+<div class="alert" style="background:color-mix(in srgb,var(--warning) 12%,var(--card));border:1px solid color-mix(in srgb,var(--warning) 35%,var(--border));border-radius:0.625rem;padding:0.875rem 1rem;margin-bottom:1.25rem;font-size:0.8125rem;line-height:1.55;">
+  <strong>Prefer Site Settings.</strong>
+  Most public homepage / about / services copy is edited in
+  <a href="<?= url('admin/settings.php') ?>" class="text-primary font-medium">Admin → Settings</a>
+  (Homepage, About Page, Services Page, Products Page, Footer).
+  Keys saved here that don’t match Settings field names may not appear on the live site.
+  Use this page only for legacy fields you already rely on.
+</div>
+<?php
 // Save settings
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();

@@ -1945,9 +1945,9 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
 .st-scroll-top {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
-  z-index: 999;
-  display: flex;
+  right: 5.25rem;
+  z-index: 970;
+  display: none;
   align-items: center;
   justify-content: center;
   width: 2.5rem;
@@ -1964,6 +1964,7 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
   box-shadow: 0 4px 12px rgba(15,23,42,0.1);
 }
 .st-scroll-top.visible {
+  display: flex;
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;

@@ -61,7 +61,7 @@ ob_start(); ?>
             
             foreach($_pricingPlans as $_pplan):
             ?>
-            <th class="text-center" style="<?=$_pplan['id']===2?'background:rgba(37,99,235,0.06);color:var(--primary);':''?>"><?=e($_pplan['name'])?></th>
+            <th class="text-center" style="<?=!empty($_pplan['is_popular'])?'background:rgba(37,99,235,0.06);color:var(--primary);':''?>"><?=e($_pplan['name'])?></th>
             <?php endforeach; ?>
           </tr>
         </thead>
@@ -101,7 +101,7 @@ ob_start(); ?>
               $_isCheck = $_val === '✓';
               $_color = $_isCheck ? 'var(--secondary)' : ($_val === '—' ? 'var(--muted-foreground)' : 'var(--foreground)');
             ?>
-            <td style="text-align:center;background:<?=$_pplan['id']===2?'rgba(37,99,235,0.04)':''?>;color:<?=$_color?>;font-weight:<?=$_isCheck?'600':'400'?>;"><?=e($_val)?></td>
+            <td style="text-align:center;background:<?=!empty($_pplan['is_popular'])?'rgba(37,99,235,0.04)':''?>;color:<?=$_color?>;font-weight:<?=$_isCheck?'600':'400'?>;"><?=e($_val)?></td>
             <?php endforeach; ?>
           </tr>
           <?php endforeach; ?>

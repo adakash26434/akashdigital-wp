@@ -73,9 +73,11 @@ try {
     }
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-// Only use defaults if DB returned nothing (suggests empty services table)
 if (empty($services)) {
     $services = $__svcDefaults;
+    $servicesFromDb = false;
+} else {
+    $servicesFromDb = true;
 }
 
 include 'includes/header.php';
@@ -163,7 +165,7 @@ ob_start(); ?>
               <?= e(__('services_get_quote')) ?>
               <i data-lucide="arrow-right" class="ic-14"></i>
             </a>
-            <?php if (!empty($svc['slug'])): ?>
+            <?php if (!empty($servicesFromDb) && !empty($svc['slug'])): ?>
             <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
             </a>

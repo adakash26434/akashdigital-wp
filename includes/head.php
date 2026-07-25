@@ -52,7 +52,7 @@ $__ogUrl     = rtrim($__siteUrl, '/') . '/' . ltrim($_SERVER['REQUEST_URI'] ?? '
 $__ogLogo    = function_exists('absoluteMediaUrl')
     ? absoluteMediaUrl($__s['logo_url'] ?? '')
     : '';
-if ($__ogLogo === '') $__ogLogo = rtrim($__siteUrl, '/') . '/assets/img/logo.png';
+if ($__ogLogo === '') $__ogLogo = rtrim($__siteUrl, '/') . '/assets/images/logo.png';
 $__themePref = (function_exists('currentUser') ? (currentUser()['theme_pref'] ?? '') : '');
 
 // Cache-busting: append the file's last-modified time as ?v= so browsers

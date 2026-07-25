@@ -26,7 +26,7 @@ try {
           <?php endif; ?>
         </a>
         <p style="color:rgba(241,245,249,0.5);font-size:var(--text-sm);line-height:1.75;max-width:21rem;margin:0 0 1.5rem;">
-          <?= e($__s['footer_tagline'] ?? "Trusted software & IT solutions partner.") ?>
+          <?= e(function_exists('cms') ? cms($__s, 'footer_tagline', 'Trusted software & IT solutions partner.') : ($__s['footer_tagline'] ?? 'Trusted software & IT solutions partner.')) ?>
         </p>
         
         <!-- Address from site settings -->
@@ -106,7 +106,7 @@ try {
           <?php if (!empty($_footerProducts)): ?>
             <?php foreach ($_footerProducts as $_fp): ?>
             <li>
-              <a href="<?= url('products.php') . (!empty($_fp['slug']) ? '#'.e($_fp['slug']) : '') ?>" class="footer-link-strong">
+              <a href="<?= !empty($_fp['slug']) ? url('product-detail.php?slug=' . urlencode($_fp['slug'])) : url('products.php') ?>" class="footer-link-strong">
                 <?= e($_fp['name']) ?>
               </a>
             </li>
@@ -138,8 +138,26 @@ try {
   <div style="border-top:1px solid rgba(241,245,249,0.07);">
     <div class="container" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
       <p style="font-size:var(--text-xs);color:rgba(241,245,249,0.35);margin:0;">
-        <?= sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME)) ?>
-        | Developed by <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>
+        <?php
+          $__copyTpl = trim((string)($__s['copyright_text'] ?? ''));
+          if ($__copyTpl === '' && function_exists('cms')) {
+              $__copyTpl = cms($__s, 'copyright_text', '');
+          }
+          if ($__copyTpl !== '') {
+              echo e(str_replace(
+                  ['{year}', '{site}', '{company}'],
+                  [date('Y'), stSiteName(), stCompanyName()],
+                  $__copyTpl
+              ));
+          } else {
+              echo sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME));
+          }
+          $__devName = trim((string)($__s['developed_by_name'] ?? ''));
+          $__devUrl  = trim((string)($__s['developed_by_url'] ?? ''));
+          if ($__devName === '') $__devName = 'Aakash Adhikari';
+          if ($__devUrl === '') $__devUrl = 'https://tankaadhikari.com.np/#about';
+        ?>
+        | Developed by <a href="<?= e($__devUrl) ?>" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;"><?= e($__devName) ?></a>
         <?php if(!empty($__s['custom_footer_text'])): ?>
           | <?= e($__s['custom_footer_text']) ?>
         <?php endif; ?>
@@ -156,6 +174,16 @@ try {
     </div>
   </div>
 </footer>
+
+<?php if (($__s['newsletter_enabled'] ?? '0') === '1'): ?>
+<div class="container" style="padding:0 1.5rem 1.5rem;">
+  <form id="st-newsletter-form" onsubmit="stSubscribe(event);return false;" style="max-width:28rem;margin:0 auto;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;justify-content:center;">
+    <label for="sub-email-input" class="sr-only">Email</label>
+    <input type="email" id="sub-email-input" required placeholder="Your email for updates" class="form-input" style="flex:1;min-width:12rem;font-size:var(--text-sm);">
+    <button type="submit" id="sub-submit-btn" class="btn btn-primary btn-sm">Subscribe</button>
+  </form>
+</div>
+<?php endif; ?>
 
 <!-- ── Floating Action Buttons (WhatsApp + AI + Live Chat) ── -->
 <div class="st-float-actions">
@@ -219,7 +247,7 @@ try {
     class="st-float-btn st-chat-trigger"
     aria-label="Open chat"
     aria-expanded="false">
-    <i data-lucide="message-circle" id="st-chat-icon-open" style="width:20px;height:20px;flex-shrink:0;"></i>
+    <i data-lucide="headphones" id="st-chat-icon-open" style="width:20px;height:20px;flex-shrink:0;"></i>
     <i data-lucide="x" id="st-chat-icon-close" style="width:18px;height:18px;display:none;flex-shrink:0;"></i>
     <span class="st-float-label">Live Chat</span>
   </button>
@@ -414,7 +442,19 @@ function stChatToggle() {
   panel.style.flexDirection = 'column';
   iconO.style.display = isOpen ? 'block' : 'none';
   iconC.style.display = isOpen ? 'none' : 'block';
+  // Close AI panel if open
+  const ai = document.getElementById('st-ai-panel');
+  if (!isOpen && ai && ai.style.display !== 'none') {
+    ai.style.display = 'none';
+    const ao = document.getElementById('st-ai-icon-open');
+    const ac = document.getElementById('st-ai-icon-close');
+    if (ao) ao.style.display = 'block';
+    if (ac) ac.style.display = 'none';
+    const ab = document.getElementById('st-ai-btn');
+    if (ab) ab.setAttribute('aria-expanded', 'false');
+  }
   if (!isOpen && stConvId) { stChatShowThread(); stStartPoll(); }
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 function stChatStart() {
@@ -430,7 +470,7 @@ function stChatStart() {
         stConvId = data.id;
         localStorage.setItem('st_conv_id', stConvId);
         stChatShowThread();
-        stAddMsg('admin','Hi, '+data.visitor_name+'! Thanks for reaching out. Our team will respond shortly. You can also <a href="<?= url('portal/tickets-new.php') ?>" style="color:#60a5fa;">open a ticket</a> for tracked support.',true);
+        stAddMsg('admin','Hi, '+data.visitor_name+'! Thanks for reaching out. Our team will respond shortly. You can also open a tracked support ticket from the Client Portal.',true);
         stStartPoll();
       } else { showToast(data.error||'Failed to start chat.','error'); }
     }).catch(()=>showToast('Network error.','error'));
@@ -457,7 +497,10 @@ function stAddMsg(sender, text, isNew=false) {
   const isMe = sender === 'visitor';
   const div  = document.createElement('div');
   div.style.cssText = 'display:flex;justify-content:'+(isMe?'flex-end':'flex-start')+';';
-  div.innerHTML = '<div style="max-width:80%;padding:0.5rem 0.75rem;border-radius:'+(isMe?'1rem 0.25rem 1rem 1rem':'0.25rem 1rem 1rem 1rem')+';background:'+(isMe?'var(--primary)':'var(--muted)')+';color:'+(isMe?'#fff':'var(--foreground)')+';font-size:var(--text-sm);line-height:1.5;">'+text+'</div>';
+  const bubble = document.createElement('div');
+  bubble.style.cssText = 'max-width:80%;padding:0.5rem 0.75rem;border-radius:'+(isMe?'1rem 0.25rem 1rem 1rem':'0.25rem 1rem 1rem 1rem')+';background:'+(isMe?'var(--primary)':'var(--muted)')+';color:'+(isMe?'#fff':'var(--foreground)')+';font-size:var(--text-sm);line-height:1.5;white-space:pre-wrap;word-break:break-word;';
+  bubble.textContent = String(text || '').replace(/<[^>]+>/g, ' ');
+  div.appendChild(bubble);
   box.appendChild(div);
   box.scrollTop = box.scrollHeight;
 }

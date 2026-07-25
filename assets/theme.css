@@ -2952,11 +2952,11 @@ html.dark #st-navbar.is-scrolled {
   max-height: 80vh;
 }
 
-/* Scroll-to-top button */
+/* Scroll-to-top — sit LEFT of float stack so buttons don’t overlap */
 .st-scroll-top {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
+  right: 5.25rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 9999px;
@@ -2981,7 +2981,7 @@ html.dark #st-navbar.is-scrolled {
 @media (max-width: 480px) {
   .st-float-actions { bottom: 1rem; right: 1rem; }
   .st-float-btn { height: 2.5rem; padding: 0 0.75rem; max-width: 2.5rem; }
-  .st-scroll-top { bottom: 1rem; right: 1rem; }
+  .st-scroll-top { bottom: 1rem; right: 4.5rem; }
 }
 
 /* End § 34 */

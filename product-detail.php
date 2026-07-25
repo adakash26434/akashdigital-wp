@@ -68,29 +68,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['demo_product'])) {
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $demo_error = 'Please enter a valid email address.';
     } else {
-        try {
-            execute(
-                "INSERT INTO demo_requests (product_id, product_name, org_name, contact_name, contact_email, contact_phone, message)
-                 VALUES (?,?,?,?,?,?,?)",
-                [(int)$product['id'], $product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]
-            );
-            $demo_success = true;
-        } catch (\Throwable $e) {
-            // Fallback without product_id column
+        $inserted = false;
+        // Live schema: product, org_name, contact_name, email, phone, message
+        $attempts = [
+            ["INSERT INTO demo_requests (product, org_name, contact_name, email, phone, message) VALUES (?,?,?,?,?,?)",
+             [$product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]],
+            ["INSERT INTO demo_requests (product, org_name, contact_name, contact_email, contact_phone, message) VALUES (?,?,?,?,?,?)",
+             [$product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]],
+            ["INSERT INTO demo_requests (product_name, org_name, contact_name, email, phone, message) VALUES (?,?,?,?,?,?)",
+             [$product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]],
+        ];
+        foreach ($attempts as [$sql, $params]) {
             try {
-                execute(
-                    "INSERT INTO demo_requests (product_name, org_name, contact_name, contact_email, contact_phone, message)
-                     VALUES (?,?,?,?,?,?)",
-                    [$product['name'], $org, $name, $email, $phone ?: null, $msg ?: null]
-                );
-                $demo_success = true;
-            } catch (\Throwable $e2) {
-                $demo_error = 'Something went wrong. Please try again.';
+                execute($sql, $params);
+                $inserted = true;
+                break;
+            } catch (\Throwable $e) { /* try next schema variant */ }
+        }
+        if ($inserted) {
+            $demo_success = true;
+            if (function_exists('notifyAdminNewContact')) {
+                try {
+                    notifyAdminNewContact([
+                        'name' => $name,
+                        'email' => $email,
+                        'phone' => $phone,
+                        'org_name' => $org,
+                        'subject' => 'Demo request: ' . $product['name'],
+                        'message' => $msg ?: '(no message)',
+                    ]);
+                } catch (\Throwable $e) { /* non-fatal */ }
             }
+        } else {
+            $demo_error = 'Something went wrong. Please try again.';
         }
     }
 }
-
 // Pricing plan for this product (optional columns — never 500)
 $plan = null;
 try {

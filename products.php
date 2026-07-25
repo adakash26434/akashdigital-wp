@@ -70,6 +70,9 @@ try {
 
 if (empty($products)) {
     $products = $__productDefaults;
+    $productsFromDb = false;
+} else {
+    $productsFromDb = true;
 }
 
 $trustBanner = cms($__s, 'products_trust_banner', __('trust_setup_free'));
@@ -154,7 +157,7 @@ ob_start(); ?>
               <?= e(isNepali() ? __('hero_cta_demo') : 'Request a demo') ?>
               <i data-lucide="arrow-right" class="ic-14"></i>
             </a>
-            <?php if (!empty($p['slug'])): ?>
+            <?php if (!empty($productsFromDb) && !empty($p['slug'])): ?>
             <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
             </a>

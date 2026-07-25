@@ -8,6 +8,9 @@ DEPLOYMENT_READY.md
 
 # Dev artifacts (screenshots, one-off imports)
 attached_assets/
+.replit
+replit.md
+AUDIT_REPORT.md
 
 # Database files (dev SQLite)
 data/*.db

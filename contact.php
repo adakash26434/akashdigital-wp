@@ -48,6 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $__s         = siteSettings();
 $csrf        = generateCsrf();
 $preProduct  = e($_GET['product'] ?? '');
+$preService  = e($_GET['service'] ?? '');
+$preInterest = $preProduct !== '' ? $preProduct : $preService;
 
 // ── Build subject list: enquiry types + live products + services ──────────────
 $_ct_base = ['General Enquiry','Request a Demo','Get a Pricing Quote'];
@@ -155,7 +157,7 @@ ob_start(); ?>
                   <i data-lucide="list" class="st-form-icon" aria-hidden="true"></i>
                   <select id="subject" name="subject" class="form-select">
                     <?php foreach ($_ct_subjects as $s): ?>
-                    <option value="<?= e($s) ?>" <?= (($preProduct && stripos($s,$preProduct)!==false)||($_POST['subject']??'')===$s)?'selected':''; ?>><?= e($s) ?></option>
+                    <option value="<?= e($s) ?>" <?= (($preInterest && stripos($s,$preInterest)!==false)||($_POST['subject']??'')===$s)?'selected':''; ?>><?= e($s) ?></option>
                     <?php endforeach; ?>
                   </select>
                 </div>
