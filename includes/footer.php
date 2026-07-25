@@ -152,15 +152,19 @@ try {
           } else {
               echo sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME));
           }
+          $__customFoot = trim((string)($__s['custom_footer_text'] ?? ''));
           $__devName = trim((string)($__s['developed_by_name'] ?? ''));
           $__devUrl  = trim((string)($__s['developed_by_url'] ?? ''));
-          if ($__devName === '') $__devName = 'Aakash Adhikari';
           if ($__devUrl === '') $__devUrl = 'https://tankaadhikari.com.np/#about';
+          // Prefer one attribution line only (avoid "Developed by" twice)
+          if ($__customFoot !== '') {
+              echo ' | ' . e($__customFoot);
+          } elseif ($__devName !== '') {
+              echo ' | Developed by <a href="' . e($__devUrl) . '" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">' . e($__devName) . '</a>';
+          } else {
+              echo ' | Developed by <a href="' . e($__devUrl) . '" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>';
+          }
         ?>
-        | Developed by <a href="<?= e($__devUrl) ?>" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;"><?= e($__devName) ?></a>
-        <?php if(!empty($__s['custom_footer_text'])): ?>
-          | <?= e($__s['custom_footer_text']) ?>
-        <?php endif; ?>
       </p>
       <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
         <a href="<?= url('privacy.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">गोपनीयता</a>
@@ -174,16 +178,6 @@ try {
     </div>
   </div>
 </footer>
-
-<?php if (($__s['newsletter_enabled'] ?? '0') === '1'): ?>
-<div class="container" style="padding:0 1.5rem 1.5rem;">
-  <form id="st-newsletter-form" onsubmit="stSubscribe(event);return false;" style="max-width:28rem;margin:0 auto;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;justify-content:center;">
-    <label for="sub-email-input" class="sr-only">Email</label>
-    <input type="email" id="sub-email-input" required placeholder="Your email for updates" class="form-input" style="flex:1;min-width:12rem;font-size:var(--text-sm);">
-    <button type="submit" id="sub-submit-btn" class="btn btn-primary btn-sm">Subscribe</button>
-  </form>
-</div>
-<?php endif; ?>
 
 <!-- ── Floating Action Buttons (WhatsApp + AI + Live Chat) ── -->
 <div class="st-float-actions">

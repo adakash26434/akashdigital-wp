@@ -1125,7 +1125,7 @@ $tabs = [
         $toggles = [
           ['maintenance_mode',   ' Maintenance Mode', 'Show a maintenance page to all public visitors.'],
           ['support_enabled',    ' Support Portal',   'Allow clients to login and submit support tickets.'],
-          ['newsletter_enabled', ' Newsletter Signup','Show newsletter subscribe form in the footer.'],
+          ['newsletter_enabled', ' Newsletter Signup','Reserved flag — public footer subscribe form is off until a proper dark-footer design is added.'],
           ['demo_enabled',       ' Demo Requests',    'Allow visitors to request product demos.'],
           ['careers_enabled',    ' Careers Page',     'Show the open positions / careers page.'],
           ['gallery_enabled',    ' Gallery Page',     'Show the public photo gallery.'],
