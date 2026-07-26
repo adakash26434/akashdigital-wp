@@ -39,19 +39,19 @@ $__trust = siteTrustStats($__s);
 $__logoClients = $__trust['marquee_items'];
 $__clientCount = $__trust['client_count'];
 
-// Stats bar — admin-editable values/labels (stat_1..4). Live client HEADCOUNT
-// is applied only when the label clearly means clients served (see siteTrustLabelIsClientCount).
+// Stats bar — admin-editable values/labels (stat_1..4). Normalization + live
+// client headcount happen inside includes/stats-bar.php.
 $_def = [
-  ['10+',  'Years of Experience',   'calendar'],
-  ['650+', 'Happy Clients', 'users'],
-  ['7+',   'Major Products',        'layers'],
-  ['100%', 'Client Retention Rate', 'shield-check'],
+  ['10+',   'Years of Experience',   'calendar',     'Years in the field'],
+  ['650+',  'Happy Clients',         'users',        'Organisations we support'],
+  ['7+',    'Major Products',        'layers',       'Core platforms live'],
+  ['99.9%', 'Client Retention Rate', 'shield-check', 'Long-term partnerships'],
 ];
 $stats = [];
 for ($__i=1;$__i<=4;$__i++) {
   $v = trim($__s["stat_{$__i}_value"] ?? '');
   $l = cms($__s, "stat_{$__i}_label");
-  $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2]];
+  $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2], $_def[$__i-1][3]];
 }
 unset($__i,$v,$l,$_def);
 

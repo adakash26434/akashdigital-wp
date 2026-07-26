@@ -222,6 +222,70 @@ function siteTrustCtaSubtitle(?array $settings = null): string {
     return 'Join ' . $t['client_display'] . ' happy clients already running on our digital platform. Talk to our experts about a solution tailored to your organisation.';
 }
 
+/**
+ * Clean one impact-stat pair so messy admin values don't look broken publicly.
+ * @return array{0:string,1:string,2:string,3:string} value, label, icon, hint
+ */
+function siteStatNormalizeItem(array $row, int $index = 0): array {
+    $defaults = [
+        ['10+',   'Years of Experience',   'calendar',     'Years in the field'],
+        ['650+',  'Happy Clients',         'users',        'Organisations we support'],
+        ['7+',    'Major Products',        'layers',       'Core platforms live'],
+        ['99.9%', 'Client Retention Rate', 'shield-check', 'Long-term partnerships'],
+    ];
+    $def = $defaults[$index] ?? ['—', 'Stat', 'star', ''];
+
+    $val  = trim((string)($row[0] ?? ''));
+    $lab  = trim((string)($row[1] ?? ''));
+    $icon = trim((string)($row[2] ?? ''));
+    $hint = trim((string)($row[3] ?? ''));
+
+    if ($lab === '' || preg_match('/^[\d.,+\s%<]+$/u', $lab)) {
+        $lab = $def[1];
+    }
+    if ($val === '') $val = $def[0];
+
+    if (preg_match('/^([\d,.]+)([A-Za-z].+)$/u', $val, $m)) {
+        $val = $m[1] . ' ' . $m[2];
+    }
+
+    $ll = mb_strtolower($lab);
+
+    if (preg_match('/year|experience|वर्ष/', $ll)) {
+        if (preg_match('/(\d+)\s*years?/i', $val, $m) || preg_match('/(\d+)\s*years?/i', $lab, $m)) {
+            $val = $m[1] . '+';
+        } elseif (!preg_match('/\d/', $val)) {
+            $val = $def[0];
+        }
+        if ($icon === '') $icon = 'calendar';
+        if ($hint === '') $hint = 'Years in the field';
+    }
+
+    if (preg_match('/product|platform|solution/', $ll)) {
+        if ($val === '' || preg_match('/^<\s*[\d.]/u', $val) || preg_match('/\bhr\b|hour|min|ticket|response/i', $val)) {
+            $val = '7+';
+        }
+        if ($icon === '') $icon = 'layers';
+        if ($hint === '') $hint = 'Core platforms live';
+    }
+
+    if (preg_match('/retention|uptime|sla/', $ll)) {
+        if ($val === '' || !preg_match('/\d/', $val)) $val = '99.9%';
+        if ($icon === '') $icon = 'shield-check';
+        if ($hint === '') $hint = 'Long-term partnerships';
+    }
+
+    if (siteTrustLabelIsClientCount($lab)) {
+        if ($icon === '') $icon = 'users';
+        if ($hint === '') $hint = 'Live client count';
+    }
+
+    if ($icon === '') $icon = $def[2];
+    if ($hint === '') $hint = $def[3];
+
+    return [$val, $lab, $icon, $hint];
+}
+
 // ── Form helper functions — always available (not DB-dependent) ──────────────
 
 function formInput(string $label, string $name, mixed $value = '', array $opts = []): string {

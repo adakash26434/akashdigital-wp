@@ -1858,6 +1858,15 @@ html.dark .st-dropdown {
   margin-top: 0.3rem;
   font-weight: 500;
 }
+.st-stat__hint {
+  display: block;
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  opacity: 0.85;
+  margin-top: 0.2rem;
+  line-height: 1.35;
+  font-weight: 500;
+}
 
 /* ── Banners ─────────────────────────────────────────────────── */
 .st-banner {
