@@ -384,7 +384,14 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 ══════════════════════════════════════════════ -->
 <?php
 $statsBarAnimate = true;
-$statsBarItems   = $stats; // already uses live client count for Happy Clients
+$statsBarItems   = $stats;
+$statsBarEyebrow = cms($__s, 'home_stats_eyebrow') ?: (isNepali() ? 'हाम्रा नतिजाहरू' : 'Our Impact');
+$statsBarTitle   = cms($__s, 'home_stats_title') ?: (isNepali()
+  ? 'नेपालभरिका व्यवसायलाई <span class="tg">शक्ति</span> दिने सङ्ख्या'
+  : 'Numbers that power businesses <span class="tg">across Nepal</span>');
+$statsBarSub     = cms($__s, 'home_stats_sub') ?: (isNepali()
+  ? 'क्लाइन्ट, अनुभव, उत्पादन र रिटेन्सन — हामीले दिनुपर्ने भरोसाका मुख्य मापदण्डहरू।'
+  : 'Clients, experience, products, and retention — the proof points behind our delivery.');
 include 'includes/stats-bar.php';
 ?>
 

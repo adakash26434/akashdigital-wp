@@ -3,8 +3,11 @@
  * Shared public stats strip — card layout with icons.
  *
  * Optional before include:
- *   $statsBarItems — [[value, label, icon?], ...] (max 4)
- *   $statsBarAnimate — bool, count-up on scroll (default true on home only)
+ *   $statsBarItems    — [[value, label, icon?], ...] (max 4)
+ *   $statsBarAnimate  — bool, count-up on scroll (default false)
+ *   $statsBarEyebrow  — small pill above the grid
+ *   $statsBarTitle    — HTML-safe heading (may include <span class="tg">)
+ *   $statsBarSub      — supporting sentence under the heading
  */
 if (empty($statsBarItems)) {
     $__s = function_exists('siteSettings') ? siteSettings() : [];
@@ -27,7 +30,23 @@ if (empty($statsBarItems)) {
     unset($__i, $v, $l, $_def);
 }
 
-// Single source: any "clients / cooperatives" stat uses homepage trust count
+// Fix accidental number-only labels + "9Years" spacing
+$_defLabels = ['Years of Experience', 'Happy Clients', 'Major Products', 'Client Retention Rate'];
+foreach ($statsBarItems as $__i => $__row) {
+    if (!is_array($__row)) continue;
+    $__lab = trim((string)($__row[1] ?? ''));
+    if ($__lab === '' || preg_match('/^[\d.,+\s%<]+$/u', $__lab)) {
+        $statsBarItems[$__i][1] = $_defLabels[$__i] ?? 'Stat';
+    }
+    $__val = trim((string)($__row[0] ?? ''));
+    // "9Years" → "9 Years" (keep "519+" / "99.9%" untouched)
+    if (preg_match('/^([\d,.]+)([A-Za-z].+)$/u', $__val, $__vm)) {
+        $statsBarItems[$__i][0] = $__vm[1] . ' ' . $__vm[2];
+    }
+}
+unset($__i, $__row, $__lab, $__val, $__vm, $_defLabels);
+
+// Live client HEADCOUNT only when label clearly means clients served
 if (function_exists('siteTrustStats') && function_exists('siteTrustLabelIsClientCount') && !empty($statsBarItems)) {
     try {
         $__trustBar = siteTrustStats(isset($__s) && is_array($__s) ? $__s : null);
@@ -41,23 +60,45 @@ if (function_exists('siteTrustStats') && function_exists('siteTrustLabelIsClient
     } catch (\Throwable $e) { /* keep configured values */ }
 }
 
-// Default icons per position if not set
-$_statIcons = ['building-2', 'map-pin', 'zap', 'shield-check'];
+$_statIcons = ['calendar', 'users', 'layers', 'shield-check'];
 
 $statsBarAnimate = $statsBarAnimate ?? false;
 $statsBarId      = $statsBarId ?? 'stats-bar';
+$statsBarEyebrow = trim((string)($statsBarEyebrow ?? ''));
+$statsBarTitle   = (string)($statsBarTitle ?? '');
+$statsBarSub     = trim((string)($statsBarSub ?? ''));
+$__hasHead       = ($statsBarEyebrow !== '' || $statsBarTitle !== '' || $statsBarSub !== '');
 ?>
-<div class="st-stats">
+<div class="st-stats<?= $__hasHead ? ' st-stats--headed' : '' ?>">
   <div class="container st-stats__container">
+    <?php if ($__hasHead): ?>
+    <div class="animate-fade-up section-head section-head-tight st-stats__head">
+      <?php if ($statsBarEyebrow !== ''): ?>
+      <div class="section-eyebrow section-eyebrow-primary mb-card">
+        <i data-lucide="bar-chart-3" class="ic-11"></i>
+        <?= e($statsBarEyebrow) ?>
+      </div>
+      <?php endif; ?>
+      <?php if ($statsBarTitle !== ''): ?>
+      <h2 class="section-title" style="margin-bottom:<?= $statsBarSub !== '' ? '0.65rem' : '0' ?>;">
+        <?= $statsBarTitle /* intentional HTML from cms / trusted defaults */ ?>
+      </h2>
+      <?php endif; ?>
+      <?php if ($statsBarSub !== ''): ?>
+      <p class="st-stats__lede"><?= e($statsBarSub) ?></p>
+      <?php endif; ?>
+    </div>
+    <?php endif; ?>
+
     <div class="st-stats__grid" id="<?= e($statsBarId) ?>">
       <?php foreach ($statsBarItems as $__idx => [$v, $l, $icon]):
         $icon = $icon ?: ($_statIcons[$__idx] ?? 'star');
         preg_match('/^([\d,.]+)/', (string)$v, $m);
         $num = $m[1] ?? '';
-        $suf = $num ? ltrim(substr((string)$v, strlen($num))) : '';
+        $suf = $num !== '' ? ltrim(substr((string)$v, strlen($num))) : '';
       ?>
       <div class="st-stat"
-           <?php if ($statsBarAnimate && $num): ?>
+           <?php if ($statsBarAnimate && $num !== '' && ctype_digit(str_replace([',','.'], '', $num))): ?>
            data-sv="<?= e($v) ?>"
            data-sn="<?= e(str_replace([',', '.'], '', $num)) ?>"
            data-ss="<?= e($suf) ?>"
@@ -66,7 +107,7 @@ $statsBarId      = $statsBarId ?? 'stats-bar';
           <i data-lucide="<?= e($icon) ?>" class="st-stat__icon"></i>
         </div>
         <div class="st-stat__value">
-          <span class="sne"><?= e($num ?: $v) ?></span><?php if ($suf): ?><span class="st-stat__accent"><?= e($suf) ?></span><?php endif; ?>
+          <span class="sne"><?= e($num !== '' ? $num : $v) ?></span><?php if ($suf !== ''): ?><span class="st-stat__accent"><?= e($suf) ?></span><?php endif; ?>
         </div>
         <div class="st-stat__label"><?= e($l) ?></div>
       </div>
@@ -99,9 +140,11 @@ $statsBarId      = $statsBarId ?? 'stats-bar';
         else el.textContent = (f.replace(/[^\d,.]/g, '') || n);
       })();
     });
-  }, { threshold: 0.35 });
+  }, {threshold: 0.35});
   io.observe(bar);
 })();
 </script>
-<?php endif;
-unset($statsBarItems, $statsBarAnimate, $statsBarId, $_statIcons);
+<?php endif; ?>
+<?php
+unset($statsBarItems, $statsBarAnimate, $statsBarId, $statsBarEyebrow, $statsBarTitle, $statsBarSub, $_statIcons, $__hasHead);
+?>

@@ -3250,6 +3250,20 @@ html.dark #st-navbar.is-scrolled {
   background: var(--background);
   padding: 1.5rem 0;
 }
+.st-stats--headed {
+  padding: 2.75rem 0 2rem;
+}
+.st-stats__head {
+  margin-bottom: 1.5rem;
+}
+.st-stats__lede {
+  max-width: 36rem;
+  margin: 0 auto;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: 1.7;
+  text-align: center;
+}
 
 /* ── Trust partners section (home): head → proof strip → marquee ── */
 .trust-partners {

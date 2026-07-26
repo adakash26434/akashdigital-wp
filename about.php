@@ -46,7 +46,16 @@ $heroSubtitle    = __('about_hero_sub', stCompanyName());
 include 'includes/page-hero.php';
 ?>
 
-<?php include 'includes/stats-bar.php'; ?>
+<?php
+$statsBarEyebrow = isNepali() ? 'हाम्रा नतिजाहरू' : 'Our Impact';
+$statsBarTitle   = isNepali()
+  ? 'नेपालभरिका व्यवसायलाई <span class="tg">शक्ति</span> दिने सङ्ख्या'
+  : 'Numbers that power businesses <span class="tg">across Nepal</span>';
+$statsBarSub     = isNepali()
+  ? 'क्लाइन्ट, अनुभव, उत्पादन र रिटेन्सन — हामीले दिनुपर्ने भरोसाका मुख्य मापदण्डहरू।'
+  : 'Clients, experience, products, and retention — the proof points behind our delivery.';
+include 'includes/stats-bar.php';
+?>
 
 <?php
 // Same partners proof strip + Logo → Name → Address scroll as Home

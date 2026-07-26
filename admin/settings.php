@@ -105,7 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             for ($i = 1; $i <= 4; $i++) {
                 saveSetting("stat_{$i}_value", trim($_POST["stat_{$i}_value"] ?? ''));
                 saveSetting("stat_{$i}_label", trim($_POST["stat_{$i}_label"] ?? ''));
+                saveSetting("stat_{$i}_label_np", trim($_POST["stat_{$i}_label_np"] ?? ''));
             }
+            saveSetting('home_stats_eyebrow',    trim($_POST['home_stats_eyebrow']    ?? ''));
+            saveSetting('home_stats_eyebrow_np', trim($_POST['home_stats_eyebrow_np'] ?? ''));
+            saveSetting('home_stats_title',      trim($_POST['home_stats_title']      ?? ''));
+            saveSetting('home_stats_title_np',   trim($_POST['home_stats_title_np']   ?? ''));
+            saveSetting('home_stats_sub',        trim($_POST['home_stats_sub']        ?? ''));
+            saveSetting('home_stats_sub_np',     trim($_POST['home_stats_sub_np']     ?? ''));
             // Secondary stats (Clients section — Cooperative Clients, Partners, Provinces)
             saveSetting('client_count_offset',    (string)(int)($_POST['client_count_offset'] ?? 300));
             saveSetting('stat_coop_clients_label', trim($_POST['stat_coop_clients_label'] ?? ''));
@@ -772,7 +779,10 @@ $tabs = [
 
             <!-- Hero Stats -->
             <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Stats (4 boxes below headline)</div>
-            <p class="caption-meta" style="margin-top:0;">Only boxes whose label is clearly a <strong>client headcount</strong> (e.g. “Happy Clients”, “Clients served”) use the live DB count. Labels like “Client Retention Rate” or “Years of Experience” keep the value you type below.</p>
+            <p class="caption-meta" style="margin-top:0;">Section head appears above the 4 cards (same pattern as Our Partners). Only headcount labels like “Clients served” use the live DB count.</p>
+            <?php biI($s,'home_stats_eyebrow','Stats section eyebrow','Our Impact','हाम्रा नतिजाहरू') ?>
+            <?php biI($s,'home_stats_title','Stats section title','Numbers that power businesses <span class="tg">across Nepal</span>','नेपालभरिका व्यवसायलाई <span class="tg">शक्ति</span> दिने सङ्ख्या') ?>
+            <?php biTA($s,'home_stats_sub','Stats section supporting text','Clients, experience, products, and retention — the proof points behind our delivery.','क्लाइन्ट, अनुभव, उत्पादन र रिटेन्सन — हामीले दिनुपर्ने भरोसाका मुख्य मापदण्डहरू।',2) ?>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <?php
               $defaultStats = [
