@@ -63,6 +63,49 @@ function dbEnsureColumns(string $table, array $cols): void {
     }
 }
 
+/**
+ * Older live MySQL often has ENUM('client','partner') etc. Admin forms send
+ * extra values (channel/solution/investor) → SQLSTATE 1265 Data truncated.
+ * Widen ENUM/SET/short VARCHAR to the given MySQL definition. No-op on SQLite.
+ */
+function dbEnsureFlexibleStringColumn(string $table, string $column, string $mysqlDefinition): void {
+    if (defined('DB_DRIVER') && DB_DRIVER === 'sqlite') return;
+    if (!preg_match('/^[a-zA-Z0-9_]+$/', $table) || !preg_match('/^[a-zA-Z0-9_]+$/', $column)) return;
+    if (!dbTableExists($table)) return;
+
+    try {
+        if (!dbColumnExists($table, $column)) {
+            execute("ALTER TABLE `$table` ADD COLUMN `$column` $mysqlDefinition");
+            return;
+        }
+
+        $info = queryOne(
+            "SELECT DATA_TYPE, COLUMN_TYPE, CHARACTER_MAXIMUM_LENGTH
+             FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?
+             LIMIT 1",
+            [$table, $column]
+        );
+        if (!$info) return;
+
+        $dataType = strtolower((string)($info['DATA_TYPE'] ?? ''));
+        $needsWiden = in_array($dataType, ['enum', 'set'], true);
+
+        if (!$needsWiden && in_array($dataType, ['char', 'varchar'], true)) {
+            $len = (int)($info['CHARACTER_MAXIMUM_LENGTH'] ?? 0);
+            if (preg_match('/VARCHAR\((\d+)\)/i', $mysqlDefinition, $m) && $len > 0 && $len < (int)$m[1]) {
+                $needsWiden = true;
+            }
+        }
+
+        if ($needsWiden) {
+            execute("ALTER TABLE `$table` MODIFY COLUMN `$column` $mysqlDefinition");
+        }
+    } catch (\Throwable $e) {
+        error_log("[db-migrations] flexible {$table}.{$column}: " . $e->getMessage());
+    }
+}
+
 function runDbMigrations() {
     // Migration 0: Create site_settings table if it doesn't exist
     try {
@@ -821,4 +864,15 @@ function runDbMigrations() {
             'position'    => "INT NOT NULL DEFAULT 0",
         ]);
     } catch (\Throwable $e) { error_log('[db-migrations] M34: ' . $e->getMessage()); }
+
+    try {
+        // Migration 35: widen ENUM `type` columns that admin forms write freely
+        // (fixes: SQLSTATE[01000] Warning: 1265 Data truncated for column 'type')
+        dbEnsureFlexibleStringColumn('partners', 'type', "VARCHAR(30) NOT NULL DEFAULT 'client'");
+        dbEnsureFlexibleStringColumn('job_listings', 'type', "VARCHAR(30) NOT NULL DEFAULT 'full-time'");
+        dbEnsureFlexibleStringColumn('announcements', 'type', "VARCHAR(30) NOT NULL DEFAULT 'info'");
+        dbEnsureFlexibleStringColumn('support_contacts', 'type', "VARCHAR(30) NOT NULL DEFAULT 'phone'");
+        dbEnsureFlexibleStringColumn('crm_followups', 'type', "VARCHAR(30) NOT NULL DEFAULT 'call'");
+        dbEnsureFlexibleStringColumn('activity_log', 'type', "VARCHAR(50) NOT NULL");
+    } catch (\Throwable $e) { error_log('[db-migrations] M35: ' . $e->getMessage()); }
 }

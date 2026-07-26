@@ -27,6 +27,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $address   = trim($_POST['address'] ?? '');
         $show_on_contact = isset($_POST['show_on_contact']) ? 1 : 0;
 
+        $allowedTypes = ['client', 'partner', 'channel', 'solution', 'investor'];
+        if (!in_array($type, $allowedTypes, true)) $type = 'client';
+
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
@@ -41,6 +44,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     try {
                         if (!dbColumnExists('partners', $col)) execute($sql);
                     } catch (\Throwable $eCol) { /* already exists or no ALTER privilege */ }
+                }
+                // Live DBs may still have ENUM('client','partner') — widen before save
+                if (function_exists('dbEnsureFlexibleStringColumn')) {
+                    dbEnsureFlexibleStringColumn('partners', 'type', "VARCHAR(30) NOT NULL DEFAULT 'client'");
                 }
 
                 if ($id) {
