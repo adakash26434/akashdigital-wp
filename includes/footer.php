@@ -201,10 +201,14 @@ try {
       <div style="width:2.25rem;height:2.25rem;border-radius:9999px;background:rgba(255,255,255,0.2);display:grid;place-items:center;flex-shrink:0;">
         <i data-lucide="bot" style="width:16px;height:16px;color:#fff;"></i>
       </div>
-      <div class="flex-1">
+      <div class="flex-1" style="min-width:0;">
         <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:var(--text-base);"><?= e($__aiLabel) ?></div>
         <div style="font-size:var(--text-xs);color:rgba(255,255,255,0.75);">Public site info only</div>
       </div>
+      <button type="button" onclick="stAiToggle()" title="Close" aria-label="Close AI Assistant"
+        style="width:2rem;height:2rem;border-radius:9999px;border:none;background:rgba(255,255,255,0.18);color:#fff;display:grid;place-items:center;cursor:pointer;flex-shrink:0;padding:0;">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+      </button>
     </div>
     <div id="st-ai-messages" style="flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.5rem;min-height:220px;max-height:320px;"></div>
     <div style="padding:0.75rem;border-top:1px solid var(--border);display:flex;gap:0.5rem;">
