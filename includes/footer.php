@@ -244,11 +244,14 @@ try {
       <div style="width:2.25rem;height:2.25rem;border-radius:9999px;background:rgba(255,255,255,0.2);display:grid;place-items:center;flex-shrink:0;">
         <i data-lucide="headphones" style="width:16px;height:16px;color:#fff;"></i>
       </div>
-      <div class="flex-1">
+      <div class="flex-1" style="min-width:0;">
         <div style="font-family:var(--font-display);font-weight:700;color:#fff;font-size:var(--text-base);"><?= e($__s['site_name'] ?? SITE_NAME) ?> Support</div>
         <div style="font-size:var(--text-xs);color:rgba(255,255,255,0.7);">Usually responds within minutes</div>
       </div>
-      <span style="width:0.5rem;height:0.5rem;border-radius:9999px;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,0.25);"></span>
+      <button type="button" onclick="stChatToggle()" title="Close" aria-label="Close live chat"
+        style="width:2rem;height:2rem;border-radius:9999px;border:none;background:rgba(255,255,255,0.18);color:#fff;display:grid;place-items:center;cursor:pointer;flex-shrink:0;padding:0;">
+        <i data-lucide="x" style="width:16px;height:16px;"></i>
+      </button>
     </div>
     <div id="st-chat-start" style="padding:1.25rem;display:flex;flex-direction:column;gap:0.875rem;">
       <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin:0;">Hi there! Tell us your name and we'll connect you with our support team right away.</p>
