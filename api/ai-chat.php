@@ -52,15 +52,18 @@ if ((function_exists('mb_strlen') ? mb_strlen($message) : strlen($message)) > 15
 // Soft block obvious admin/secret fishing before calling the model
 $lower = function_exists('mb_strtolower') ? mb_strtolower($message) : strtolower($message);
 $blockedHints = [
-    'admin password', 'api key', 'apikey', 'secret key', 'database password',
+    'admin password', 'admin login', 'admin panel', 'admin url', 'admin username',
+    'api key', 'apikey', 'secret key', 'database password', 'db password', 'smtp password',
     'wp-admin', '/admin/', 'phpmyadmin', 'crm lead', 'show me all customers',
-    'job application', 'cv file', 'invoice pdf',
+    'customer list', 'client list dump', 'invoice pdf', 'all invoices',
+    'job application', 'cv file', 'uploaded cv', 'ticket internal', 'staff password',
+    'show me the key', 'reveal the key', 'dump the database',
 ];
 foreach ($blockedHints as $hint) {
     if (str_contains($lower, $hint)) {
         aiChatJson([
             'ok'      => true,
-            'reply'   => 'I can only help with public website information (products, services, pricing, contact). For private or account matters, please use the Contact page or WhatsApp support.',
+            'reply'   => 'I can only help with public website information (products, services, pricing, about, careers, contact). I cannot access or share admin or private data. Please use the Contact page or WhatsApp for account matters.',
             'blocked' => true,
         ]);
     }

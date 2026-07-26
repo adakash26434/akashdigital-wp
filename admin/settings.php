@@ -668,7 +668,7 @@ $tabs = [
             <label class="form-label">AI Provider</label>
             <select name="ai_chat_provider" class="form-input">
               <option value="openai" <?= $__aiProv === 'openai' ? 'selected' : '' ?>>ChatGPT (OpenAI — gpt-4o-mini)</option>
-              <option value="gemini" <?= $__aiProv === 'gemini' ? 'selected' : '' ?>>Google Gemini (gemini-2.0-flash)</option>
+              <option value="gemini" <?= $__aiProv === 'gemini' ? 'selected' : '' ?>>Google Gemini (gemini-3.5-flash)</option>
               <option value="deepseek" <?= $__aiProv === 'deepseek' ? 'selected' : '' ?>>DeepSeek (deepseek-chat)</option>
             </select>
           </div>

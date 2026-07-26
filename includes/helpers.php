@@ -526,143 +526,414 @@ function stAiChatWelcome(): string {
     return 'Hi! Ask me about our products, services, pricing, or how to contact us. I only know public website information.';
 }
 
+/** Strip HTML and truncate plain text for the public AI knowledge pack. */
+function stAiChatPlain(?string $text, int $max = 700): string {
+    $t = html_entity_decode(strip_tags((string)$text), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $t = preg_replace('/\s+/u', ' ', $t) ?? $t;
+    $t = trim($t);
+    if ($t === '') return '';
+    $len = function_exists('mb_strlen') ? mb_strlen($t) : strlen($t);
+    if ($len > $max) {
+        $t = (function_exists('mb_substr') ? mb_substr($t, 0, max(1, $max - 1)) : substr($t, 0, max(1, $max - 1))) . '…';
+    }
+    return $t;
+}
+
+/** Decode JSON list fields (features/highlights) into clean strings. */
+function stAiChatJsonList(?string $json, int $limit = 20): array {
+    $arr = json_decode((string)$json, true);
+    if (!is_array($arr)) {
+        $arr = array_filter(array_map('trim', explode(',', (string)$json)));
+    }
+    $out = [];
+    foreach ($arr as $item) {
+        if (is_array($item)) {
+            $item = $item['name'] ?? $item['title'] ?? $item['label'] ?? $item['text'] ?? '';
+            if (is_array($item)) $item = '';
+        }
+        $item = trim((string)$item);
+        if ($item === '') continue;
+        $out[] = $item;
+        if (count($out) >= $limit) break;
+    }
+    return $out;
+}
+
 /**
  * Public-only knowledge pack for the AI assistant.
- * Never includes API keys, admin users, CRM, applications, or internal settings.
+ * Whitelist: public marketing pages only.
+ * Never includes API keys, admin users, CRM, tickets, applications, invoices, or secrets.
  */
 function stAiChatPublicContext(): string {
     $s = siteSettings();
     $lines = [];
-    $lines[] = 'Company: ' . stCompanyName();
-    if (!empty($s['site_tagline'])) $lines[] = 'Tagline: ' . trim((string)$s['site_tagline']);
+
+    $lines[] = 'COMPANY (public):';
+    $lines[] = 'Name: ' . stCompanyName();
+    if (!empty($s['site_tagline'])) $lines[] = 'Tagline: ' . stAiChatPlain((string)$s['site_tagline'], 240);
+    $website = trim((string)($s['company_website'] ?? ''));
+    if ($website !== '') $lines[] = 'Website: ' . $website;
     if (stAddress() !== '') $lines[] = 'Address: ' . stAddress();
     if (stContactPhone() !== '') $lines[] = 'Phone: ' . stContactPhone();
     if (stContactEmail() !== '') $lines[] = 'Email: ' . stContactEmail();
     $support = trim((string)($s['support_email'] ?? ''));
     if ($support !== '') $lines[] = 'Support email: ' . $support;
-    if (!empty($s['about_mission_p1'])) $lines[] = 'Mission: ' . trim((string)$s['about_mission_p1']);
-    if (!empty($s['about_mission_p2'])) $lines[] = 'Mission (cont.): ' . trim((string)$s['about_mission_p2']);
+    if (($s['whatsapp_enabled'] ?? '1') !== '0') {
+        $wa = preg_replace('/\D+/', '', (string)($s['whatsapp_number'] ?? '')) ?: '';
+        if ($wa !== '') {
+            $lines[] = 'WhatsApp support: +' . $wa
+                . (!empty($s['whatsapp_label']) ? (' (' . stAiChatPlain((string)$s['whatsapp_label'], 60) . ')') : '');
+        }
+    }
+
+    // About / mission / values (public About page)
+    $aboutBits = [];
+    if (!empty($s['about_mission_h2'])) $aboutBits[] = 'Heading: ' . stAiChatPlain((string)$s['about_mission_h2'], 120);
+    if (!empty($s['about_mission_p1'])) $aboutBits[] = stAiChatPlain((string)$s['about_mission_p1'], 500);
+    if (!empty($s['about_mission_p2'])) $aboutBits[] = stAiChatPlain((string)$s['about_mission_p2'], 500);
+    if (!empty($s['about_vision_quote'])) $aboutBits[] = 'Vision: ' . stAiChatPlain((string)$s['about_vision_quote'], 300);
+    for ($i = 1; $i <= 4; $i++) {
+        $vt = trim((string)($s["about_val{$i}_title"] ?? ''));
+        $vd = trim((string)($s["about_val{$i}_desc"] ?? ''));
+        if ($vt === '' && $vd === '') continue;
+        $aboutBits[] = 'Value — ' . stAiChatPlain($vt, 80) . ': ' . stAiChatPlain($vd, 220);
+    }
+    if ($aboutBits) {
+        $lines[] = '';
+        $lines[] = 'ABOUT (public):';
+        foreach ($aboutBits as $b) $lines[] = $b;
+    }
+
+    // CEO message only when published on the public About page
+    if (($s['ceo_active'] ?? '') === '1' || ($s['ceo_active'] ?? '') === 'true') {
+        $ceoName = stAiChatPlain((string)($s['ceo_name'] ?? ''), 80);
+        if ($ceoName !== '') {
+            $lines[] = '';
+            $lines[] = 'LEADERSHIP (public About page):';
+            $lines[] = 'CEO / leader: ' . $ceoName
+                . (!empty($s['ceo_title']) ? (' — ' . stAiChatPlain((string)$s['ceo_title'], 80)) : '');
+            if (!empty($s['ceo_message'])) {
+                $lines[] = 'Public message: ' . stAiChatPlain((string)$s['ceo_message'], 600);
+            }
+        }
+    }
+
+    // Public trust / impact stats (counts only — no CRM org dump)
+    if (function_exists('siteTrustStats')) {
+        try {
+            $stats = siteTrustStats();
+            if (is_array($stats)) {
+                $lines[] = '';
+                $lines[] = 'PUBLIC IMPACT STATS:';
+                if (!empty($stats['client_display'])) {
+                    $lines[] = '- ' . $stats['client_display'] . ' ' . ($stats['coop_label'] ?? 'Clients');
+                }
+                if (!empty($stats['partners_value'])) {
+                    $lines[] = '- ' . $stats['partners_value'] . ' ' . ($stats['partners_label'] ?? 'Partners');
+                }
+                if (!empty($stats['provinces_value'])) {
+                    $lines[] = '- ' . $stats['provinces_value'] . ' ' . ($stats['provinces_label'] ?? 'Provinces');
+                }
+            }
+        } catch (\Throwable $e) { /* optional */ }
+    }
 
     try {
         $products = query(
-            "SELECT name, tagline, summary, badge, price_from, features, highlights
-             FROM products WHERE active=1 ORDER BY position, id LIMIT 20"
+            "SELECT name, slug, tagline, summary, description, badge, category, price_from, features, highlights
+             FROM products WHERE active=1 ORDER BY position, id LIMIT 24"
         );
         if ($products) {
             $lines[] = '';
-            $lines[] = 'PRODUCTS (public catalog):';
+            $lines[] = 'PRODUCTS (public catalog — detail pages exist for each slug):';
             foreach ($products as $p) {
-                $price = !empty($p['price_from']) ? ('NPR ' . number_format((float)$p['price_from'], 0)) : 'Contact for price';
-                $feats = json_decode($p['features'] ?? '[]', true) ?: [];
-                $highs = json_decode($p['highlights'] ?? '[]', true) ?: [];
-                $bits = array_slice(array_filter(array_merge($highs, $feats)), 0, 8);
-                $lines[] = '- ' . $p['name']
+                $price = (!empty($p['price_from']) && (float)$p['price_from'] > 0)
+                    ? ('NPR ' . number_format((float)$p['price_from'], 0) . '+')
+                    : 'Contact for price';
+                $feats = stAiChatJsonList($p['features'] ?? '', 16);
+                $highs = stAiChatJsonList($p['highlights'] ?? '', 12);
+                $bits = array_values(array_unique(array_merge($highs, $feats)));
+                $bits = array_slice($bits, 0, 16);
+                $lines[] = '- ' . ($p['name'] ?? '')
                     . (!empty($p['badge']) ? ' [' . $p['badge'] . ']' : '')
-                    . ': ' . trim((string)($p['tagline'] ?: $p['summary'] ?: ''))
-                    . ' | From: ' . $price
-                    . ($bits ? (' | Features: ' . implode('; ', $bits)) : '');
+                    . (!empty($p['category']) ? ' | Category: ' . $p['category'] : '')
+                    . (!empty($p['slug']) ? ' | Page: product-detail.php?slug=' . $p['slug'] : '');
+                if (!empty($p['tagline'])) $lines[] = '  Tagline: ' . stAiChatPlain((string)$p['tagline'], 200);
+                $sum = stAiChatPlain((string)($p['summary'] ?? ''), 400);
+                if ($sum !== '') $lines[] = '  Summary: ' . $sum;
+                $desc = stAiChatPlain((string)($p['description'] ?? ''), 900);
+                if ($desc !== '' && $desc !== $sum) $lines[] = '  Details: ' . $desc;
+                $lines[] = '  Pricing from: ' . $price;
+                if ($bits) $lines[] = '  Features: ' . implode('; ', $bits);
             }
         }
     } catch (\Throwable $e) { /* optional */ }
 
+    // Public optional add-ons (Products page)
+    if (function_exists('resolveProductsAddons')) {
+        try {
+            $addons = resolveProductsAddons($s);
+            if (is_array($addons) && $addons) {
+                $lines[] = '';
+                $lines[] = 'OPTIONAL ADD-ONS (public Products page):';
+                foreach (array_slice($addons, 0, 20) as $ad) {
+                    if (!is_array($ad)) continue;
+                    $n = stAiChatPlain((string)($ad['title'] ?? $ad['name'] ?? ''), 100);
+                    if ($n === '') continue;
+                    $pr = stAiChatPlain((string)($ad['price'] ?? ''), 60);
+                    $ds = stAiChatPlain((string)($ad['desc'] ?? ''), 220);
+                    $lines[] = '- ' . $n . ($pr !== '' ? (' — ' . $pr) : '') . ($ds !== '' ? (': ' . $ds) : '');
+                }
+            }
+        } catch (\Throwable $e) { /* optional */ }
+    }
+
     try {
         $services = query(
-            "SELECT title AS name, tagline, summary, badge, price_from, features, highlights
-             FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
+            "SELECT title AS name, slug, tagline, summary, description, badge, price_from, features, highlights
+             FROM services WHERE active=1 ORDER BY position, id LIMIT 24"
         );
         if ($services) {
             $lines[] = '';
             $lines[] = 'SERVICES (public catalog):';
             foreach ($services as $sv) {
                 $price = (!empty($sv['price_from']) && (float)$sv['price_from'] > 0)
-                    ? ('NPR ' . number_format((float)$sv['price_from'], 0))
+                    ? ('NPR ' . number_format((float)$sv['price_from'], 0) . '+')
                     : 'Contact for quote';
-                $feats = [];
-                if (!empty($sv['features'])) {
-                    $decoded = json_decode($sv['features'], true);
-                    $feats = is_array($decoded)
-                        ? $decoded
-                        : array_filter(array_map('trim', explode(',', (string)$sv['features'])));
-                }
-                $highs = json_decode($sv['highlights'] ?? '[]', true) ?: [];
-                $bits = array_slice(array_filter(array_merge($highs, $feats)), 0, 8);
-                $lines[] = '- ' . $sv['name']
+                $feats = stAiChatJsonList($sv['features'] ?? '', 16);
+                $highs = stAiChatJsonList($sv['highlights'] ?? '', 12);
+                $bits = array_slice(array_values(array_unique(array_merge($highs, $feats))), 0, 16);
+                $lines[] = '- ' . ($sv['name'] ?? '')
                     . (!empty($sv['badge']) ? ' [' . $sv['badge'] . ']' : '')
-                    . ': ' . trim((string)($sv['tagline'] ?: $sv['summary'] ?: ''))
-                    . ' | From: ' . $price
-                    . ($bits ? (' | Features: ' . implode('; ', $bits)) : '');
+                    . (!empty($sv['slug']) ? ' | Page: service-detail.php?slug=' . $sv['slug'] : '');
+                if (!empty($sv['tagline'])) $lines[] = '  Tagline: ' . stAiChatPlain((string)$sv['tagline'], 200);
+                $sum = stAiChatPlain((string)($sv['summary'] ?? ''), 400);
+                if ($sum !== '') $lines[] = '  Summary: ' . $sum;
+                $desc = stAiChatPlain((string)($sv['description'] ?? ''), 900);
+                if ($desc !== '' && $desc !== $sum) $lines[] = '  Details: ' . $desc;
+                $lines[] = '  Pricing from: ' . $price;
+                if ($bits) $lines[] = '  Features: ' . implode('; ', $bits);
             }
         }
     } catch (\Throwable $e) { /* optional */ }
 
     try {
         $plans = query(
-            "SELECT name, tag, price_label, period, features FROM pricing_plans WHERE active=1 ORDER BY position, id LIMIT 12"
+            "SELECT name, tag, price_label, period, features FROM pricing_plans WHERE active=1 ORDER BY position, id LIMIT 16"
         );
         if ($plans) {
             $lines[] = '';
             $lines[] = 'PRICING PLANS (public):';
             foreach ($plans as $pl) {
-                $feats = json_decode($pl['features'] ?? '[]', true) ?: [];
-                $lines[] = '- ' . $pl['name']
+                $feats = stAiChatJsonList($pl['features'] ?? '', 14);
+                $lines[] = '- ' . ($pl['name'] ?? '')
                     . (!empty($pl['tag']) ? ' (' . $pl['tag'] . ')' : '')
-                    . ': ' . ($pl['price_label'] ?? '') . ' ' . ($pl['period'] ?? '')
-                    . ($feats ? (' | Includes: ' . implode('; ', array_slice($feats, 0, 10))) : '');
+                    . ': ' . trim(($pl['price_label'] ?? '') . ' ' . ($pl['period'] ?? ''))
+                    . ($feats ? (' | Includes: ' . implode('; ', $feats)) : '');
             }
         }
     } catch (\Throwable $e) { /* optional */ }
 
     try {
-        $faqs = query("SELECT question, answer FROM faqs WHERE active=1 ORDER BY position, id LIMIT 15");
+        $partners = query(
+            "SELECT name, type, district FROM partners WHERE active=1 ORDER BY position ASC, id ASC LIMIT 60"
+        );
+        if ($partners) {
+            $lines[] = '';
+            $lines[] = 'PARTNERS / CLIENTS (public Partners page — names only):';
+            foreach ($partners as $pt) {
+                $lines[] = '- ' . ($pt['name'] ?? '')
+                    . (!empty($pt['type']) ? ' (' . $pt['type'] . ')' : '')
+                    . (!empty($pt['district']) ? ' — ' . $pt['district'] : '');
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $portfolio = query(
+            "SELECT title, client_name, category, excerpt, description, result_metric
+             FROM portfolio WHERE active=1 ORDER BY position ASC, id DESC LIMIT 16"
+        );
+        if ($portfolio) {
+            $lines[] = '';
+            $lines[] = 'PORTFOLIO / CASE STUDIES (public):';
+            foreach ($portfolio as $pf) {
+                $lines[] = '- ' . ($pf['title'] ?? '')
+                    . (!empty($pf['client_name']) ? ' | Client: ' . $pf['client_name'] : '')
+                    . (!empty($pf['category']) ? ' | ' . $pf['category'] : '');
+                $ex = stAiChatPlain((string)(($pf['excerpt'] ?? '') ?: ($pf['description'] ?? '')), 350);
+                if ($ex !== '') $lines[] = '  ' . $ex;
+                if (!empty($pf['result_metric'])) {
+                    $lines[] = '  Result: ' . stAiChatPlain((string)$pf['result_metric'], 120);
+                }
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $team = query(
+            "SELECT name, role, bio, is_leadership FROM team_members WHERE active=1
+             ORDER BY is_leadership DESC, position LIMIT 20"
+        );
+        if ($team) {
+            $lines[] = '';
+            $lines[] = 'TEAM (public About page — no private emails):';
+            foreach ($team as $tm) {
+                $lines[] = '- ' . ($tm['name'] ?? '')
+                    . (!empty($tm['role']) ? ' — ' . $tm['role'] : '')
+                    . (!empty($tm['is_leadership']) ? ' [leadership]' : '');
+                $bio = stAiChatPlain((string)($tm['bio'] ?? ''), 220);
+                if ($bio !== '') $lines[] = '  ' . $bio;
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $news = query(
+            "SELECT title, slug, excerpt, category, published_at FROM news
+             WHERE published=1 AND active=1 ORDER BY published_at DESC LIMIT 10"
+        );
+        if ($news) {
+            $lines[] = '';
+            $lines[] = 'NEWS / UPDATES (public):';
+            foreach ($news as $n) {
+                $lines[] = '- ' . ($n['title'] ?? '')
+                    . (!empty($n['category']) ? ' [' . $n['category'] . ']' : '')
+                    . (!empty($n['published_at']) ? ' (' . substr((string)$n['published_at'], 0, 10) . ')' : '');
+                $ex = stAiChatPlain((string)($n['excerpt'] ?? ''), 280);
+                if ($ex !== '') $lines[] = '  ' . $ex;
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $jobs = query(
+            "SELECT title, department, location, type, experience, salary_range, short_desc, deadline
+             FROM job_listings WHERE active=1 ORDER BY position, id DESC LIMIT 12"
+        );
+        if ($jobs) {
+            $open = [];
+            foreach ($jobs as $j) {
+                if (!empty($j['deadline']) && strtotime((string)$j['deadline']) < strtotime('today')) {
+                    continue; // expired — not shown publicly
+                }
+                $open[] = $j;
+            }
+            if ($open) {
+                $lines[] = '';
+                $lines[] = 'OPEN CAREERS (public Careers page — not applications):';
+                foreach ($open as $j) {
+                    $lines[] = '- ' . ($j['title'] ?? '')
+                        . (!empty($j['department']) ? ' | ' . $j['department'] : '')
+                        . (!empty($j['location']) ? ' | ' . $j['location'] : '')
+                        . (!empty($j['type']) ? ' | ' . $j['type'] : '');
+                    if (!empty($j['experience'])) $lines[] = '  Experience: ' . stAiChatPlain((string)$j['experience'], 120);
+                    if (!empty($j['salary_range'])) $lines[] = '  Salary: ' . stAiChatPlain((string)$j['salary_range'], 80);
+                    $sd = stAiChatPlain((string)($j['short_desc'] ?? ''), 280);
+                    if ($sd !== '') $lines[] = '  ' . $sd;
+                    if (!empty($j['deadline'])) $lines[] = '  Apply by: ' . $j['deadline'];
+                }
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $faqs = query(
+            "SELECT category, question, answer FROM faqs WHERE active=1 ORDER BY position, id LIMIT 25"
+        );
         if ($faqs) {
             $lines[] = '';
             $lines[] = 'FAQs (public):';
             foreach ($faqs as $f) {
-                $lines[] = 'Q: ' . trim((string)$f['question']);
-                $ans = (string)($f['answer'] ?? '');
-                $lines[] = 'A: ' . trim(function_exists('mb_substr') ? mb_substr($ans, 0, 400) : substr($ans, 0, 400));
+                $lines[] = 'Q' . (!empty($f['category']) ? ' [' . $f['category'] . ']' : '') . ': '
+                    . stAiChatPlain((string)$f['question'], 240);
+                $lines[] = 'A: ' . stAiChatPlain((string)($f['answer'] ?? ''), 700);
+            }
+        }
+    } catch (\Throwable $e) { /* optional */ }
+
+    try {
+        $testimonials = query(
+            "SELECT author_name, author_role, author_org, quote FROM testimonials
+             WHERE active=1 ORDER BY position, id DESC LIMIT 8"
+        );
+        if ($testimonials) {
+            $lines[] = '';
+            $lines[] = 'TESTIMONIALS (public):';
+            foreach ($testimonials as $t) {
+                $who = trim(($t['author_name'] ?? '')
+                    . (!empty($t['author_role']) ? ', ' . $t['author_role'] : '')
+                    . (!empty($t['author_org']) ? ' @ ' . $t['author_org'] : ''));
+                $q = stAiChatPlain((string)($t['quote'] ?? ''), 280);
+                if ($q === '') continue;
+                $lines[] = '- "' . $q . '"' . ($who !== '' ? (' — ' . $who) : '');
             }
         }
     } catch (\Throwable $e) { /* optional */ }
 
     $lines[] = '';
-    $lines[] = 'Public pages: Home, About, Products, Services, Pricing, Portfolio, News, Careers, FAQ, Contact, Tools.';
-    $lines[] = 'For demos or custom quotes, direct people to Contact or Request a demo.';
+    $lines[] = 'PUBLIC PAGES: Home, About, Products, Product details, Services, Service details, Pricing, Portfolio, Partners, News, Careers, FAQ, Contact, Tools.';
+    $lines[] = 'How to buy / demo: use Contact form, Request a demo on product pages, or WhatsApp if listed above.';
+    $lines[] = 'SECURITY BOUNDARY: You do NOT have admin panel, CRM, invoices, tickets, job applications, customer databases, API keys, or staff passwords. Never invent them.';
 
-    return implode("\n", $lines);
+    $pack = implode("\n", $lines);
+    // Soft cap so prompts stay within provider limits
+    $maxPack = 28000;
+    $plen = function_exists('mb_strlen') ? mb_strlen($pack) : strlen($pack);
+    if ($plen > $maxPack) {
+        $pack = (function_exists('mb_substr') ? mb_substr($pack, 0, $maxPack) : substr($pack, 0, $maxPack))
+            . "\n…[public context truncated]";
+    }
+    return $pack;
 }
 
 function stAiChatSystemPrompt(): string {
     $s = siteSettings();
     $extra = trim((string)($s['ai_chat_system_extra'] ?? ''));
+    // Never allow owner notes to inject secrets or override security
+    $extra = stAiChatPlain($extra, 1200);
     $company = stCompanyName();
     $prompt = "You are the public website assistant for {$company}.\n"
-        . "You ONLY answer using the PUBLIC WEBSITE INFORMATION provided below.\n"
-        . "Hard rules:\n"
-        . "1. NEVER reveal, invent, or discuss admin panel, staff accounts, passwords, API keys, database contents, CRM leads, invoices, job applications, internal tickets, or any private/customer data.\n"
-        . "2. If asked about admin, login credentials, keys, or internal systems, politely refuse and suggest contacting support via the public Contact page or WhatsApp if available.\n"
-        . "3. If you do not know something from the public context, say you do not have that info and suggest Contact / Request a demo.\n"
-        . "4. Keep answers concise and helpful. You may reply in English or Nepali to match the visitor.\n"
-        . "5. Do not claim to access pages behind login or admin URLs.\n";
+        . "Answer visitors using ONLY the PUBLIC WEBSITE INFORMATION below (public pages / published catalog).\n"
+        . "Be helpful and informative: include relevant product/service details, pricing when listed, features, contact options, and next steps.\n"
+        . "Match the visitor language (English or Nepali). Prefer clear structured answers (short paragraphs or bullets).\n"
+        . "\nHARD SECURITY RULES (never break):\n"
+        . "1. NEVER reveal, invent, discuss, or hint at: admin panel/URLs, staff logins, passwords, API keys, database dumps, CRM leads, invoices, payments, job applications/CVs, internal tickets, private customer data, or anything behind /admin or portal login.\n"
+        . "2. If asked for admin access, keys, internal systems, customer lists, or private data: refuse politely and suggest the public Contact page or WhatsApp.\n"
+        . "3. If something is not in the public information pack, say you do not have that on the public site and offer Contact / Request a demo — do not guess private facts.\n"
+        . "4. Do not claim you can open admin, change settings, or access private files.\n"
+        . "5. Public leadership/CEO info may be shared ONLY if present in the public pack below.\n";
     if ($extra !== '') {
-        $prompt .= "\nAdditional public guidance from the site owner:\n" . $extra . "\n";
+        $prompt .= "\nAdditional public guidance from the site owner (still subject to security rules):\n" . $extra . "\n";
     }
     $prompt .= "\n--- PUBLIC WEBSITE INFORMATION ---\n" . stAiChatPublicContext();
     return $prompt;
 }
 
 /**
- * Call the configured AI provider. Returns reply text or throws RuntimeException.
- *
- * @param list<array{role:string,content:string}> $history User/assistant turns (no system)
+ * Prefer the admin-selected provider, but correct obvious key mismatches
+ * (Gemini keys are AIza…; OpenAI/DeepSeek keys are typically sk-…).
  */
+function stAiChatResolveProvider(string $apiKey): string {
+    $provider = stAiChatProvider();
+    $key = trim($apiKey);
+    if ($key !== '' && str_starts_with($key, 'AIza')) {
+        return 'gemini';
+    }
+    if ($provider === 'gemini' && $key !== '' && str_starts_with($key, 'sk-')) {
+        // Likely OpenAI/DeepSeek key saved while Gemini was selected
+        return 'openai';
+    }
+    return $provider;
+}
+
 function stAiChatComplete(array $history): string {
     if (!stAiChatEnabled()) {
         throw new \RuntimeException('AI chat is not configured.');
     }
     $s = siteSettings();
     $apiKey = trim((string)($s['ai_chat_api_key'] ?? ''));
-    $provider = stAiChatProvider();
+    $provider = stAiChatResolveProvider($apiKey);
     $system = stAiChatSystemPrompt();
 
     $clean = [];
@@ -736,14 +1007,46 @@ function stAiChatCallOpenAiCompat(string $url, string $apiKey, string $model, st
         'model'       => $model,
         'messages'    => $messages,
         'temperature' => 0.4,
-        'max_tokens'  => 800,
+        'max_tokens'  => 1200,
     ]);
     $text = trim((string)($data['choices'][0]['message']['content'] ?? ''));
     if ($text === '') throw new \RuntimeException('Empty AI reply.');
     return $text;
 }
 
+/**
+ * Call Gemini with current Flash models. gemini-2.0-flash was shut down 2026-06-01.
+ *
+ * @param list<array{role:string,content:string}> $history
+ */
 function stAiChatCallGemini(string $apiKey, string $system, array $history): string {
+    // Prefer stable Flash → cheaper Flash-Lite fallbacks if a model ID is unavailable
+    $models = ['gemini-3.5-flash', 'gemini-2.5-flash', 'gemini-2.5-flash-lite'];
+    $last = null;
+    foreach ($models as $model) {
+        try {
+            return stAiChatCallGeminiModel($apiKey, $system, $history, $model);
+        } catch (\RuntimeException $e) {
+            $last = $e;
+            $msg = strtolower($e->getMessage());
+            // Retry next model only when this model is missing / unavailable
+            if (
+                !str_contains($msg, 'not found')
+                && !str_contains($msg, 'not supported')
+                && !str_contains($msg, 'is not found')
+                && !str_contains($msg, '404')
+            ) {
+                throw $e;
+            }
+        }
+    }
+    throw $last ?: new \RuntimeException('Gemini request failed.');
+}
+
+/**
+ * @param list<array{role:string,content:string}> $history
+ */
+function stAiChatCallGeminiModel(string $apiKey, string $system, array $history, string $model): string {
     $contents = [];
     foreach ($history as $m) {
         $contents[] = [
@@ -751,7 +1054,9 @@ function stAiChatCallGemini(string $apiKey, string $system, array $history): str
             'parts' => [['text' => $m['content']]],
         ];
     }
-    $url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' . rawurlencode($apiKey);
+    $url = 'https://generativelanguage.googleapis.com/v1beta/models/'
+        . rawurlencode($model)
+        . ':generateContent?key=' . rawurlencode($apiKey);
     $data = stAiChatHttpJson($url, [
         'Content-Type: application/json',
     ], [
@@ -759,11 +1064,30 @@ function stAiChatCallGemini(string $apiKey, string $system, array $history): str
         'contents'          => $contents,
         'generationConfig'  => [
             'temperature'     => 0.4,
-            'maxOutputTokens' => 800,
+            'maxOutputTokens' => 1200,
         ],
     ]);
-    $text = trim((string)($data['candidates'][0]['content']['parts'][0]['text'] ?? ''));
-    if ($text === '') throw new \RuntimeException('Empty AI reply.');
+
+    if (!empty($data['promptFeedback']['blockReason'])) {
+        throw new \RuntimeException('AI blocked the request (' . $data['promptFeedback']['blockReason'] . ').');
+    }
+
+    $parts = $data['candidates'][0]['content']['parts'] ?? [];
+    $chunks = [];
+    if (is_array($parts)) {
+        foreach ($parts as $part) {
+            if (!is_array($part)) continue;
+            // Skip internal "thought" parts from thinking models
+            if (!empty($part['thought'])) continue;
+            $t = trim((string)($part['text'] ?? ''));
+            if ($t !== '') $chunks[] = $t;
+        }
+    }
+    $text = trim(implode("\n", $chunks));
+    if ($text === '') {
+        $finish = (string)($data['candidates'][0]['finishReason'] ?? '');
+        throw new \RuntimeException('Empty AI reply' . ($finish !== '' ? ' (' . $finish . ')' : '') . '.');
+    }
     return $text;
 }
 
