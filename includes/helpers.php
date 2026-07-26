@@ -182,11 +182,19 @@ function siteTrustStats(?array $settings = null): array {
     ];
 }
 
-/** True when a public stat label is about clients / cooperatives (live count applies). */
+/** True when a public stat label means client HEADCOUNT (not retention / years / etc.). */
 function siteTrustLabelIsClientCount(string $label): bool {
     $l = mb_strtolower(trim($label));
     if ($l === '') return false;
-    return (bool)preg_match('/client|cooperative|coop|ग्राहक|सहकारी/', $l);
+    // Never overwrite metrics that only mention "client" incidentally
+    if (preg_match('/retention|rate|satisfaction|uptime|response|year|experience|product|ticket|sla|nps|churn|revenue/', $l)) {
+        return false;
+    }
+    // Headcount-style labels only
+    return (bool)preg_match(
+        '/^(happy\s+)?clients?(?:\s+served)?$|^(cooperative\s+)?clients?$|clients?\s+served|cooperatives?\s+(served|trust)|सहकारी|ग्राहक/',
+        $l
+    );
 }
 
 /**

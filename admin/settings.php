@@ -772,7 +772,7 @@ $tabs = [
 
             <!-- Hero Stats -->
             <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Stats (4 boxes below headline)</div>
-            <p class="caption-meta" style="margin-top:0;">Any stat whose <strong>label</strong> mentions Clients / Cooperatives is auto-filled from the live Cooperative Clients count (DB + offset) so Home, About, Portfolio and Partners stay in sync.</p>
+            <p class="caption-meta" style="margin-top:0;">Only boxes whose label is clearly a <strong>client headcount</strong> (e.g. “Happy Clients”, “Clients served”) use the live DB count. Labels like “Client Retention Rate” or “Years of Experience” keep the value you type below.</p>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <?php
               $defaultStats = [
@@ -782,15 +782,18 @@ $tabs = [
               for ($i = 1; $i <= 4; $i++): [$dv,$dl] = $defaultStats[$i-1]; ?>
               <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
                 <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Stat <?=$i?></div>
-                <input type="text" name="stat_<?=$i?>_value" class="form-input" value="<?= e(sv($s,"stat_{$i}_value")) ?>" placeholder="<?=e($dv)?>">
-                <?php biI($s,"stat_{$i}_label","Label",$dl,'') ?>
+                <div>
+                  <label class="form-label">Value (number / text shown big)</label>
+                  <input type="text" name="stat_<?=$i?>_value" class="form-input" value="<?= e(sv($s,"stat_{$i}_value")) ?>" placeholder="<?=e($dv)?>">
+                </div>
+                <?php biI($s,"stat_{$i}_label","Label (text under the number — not a number)",$dl,'') ?>
               </div>
               <?php endfor; ?>
             </div>
             <hr style="border:none;border-top:1px solid var(--border);margin:.75rem 0;">
             <!-- Secondary stats (Cooperative Clients row) -->
             <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Cooperative Clients Section Stats (single source)</div>
-            <p class="caption-meta" style="margin-top:0;">Used on Home trust strip, Partners page, Portfolio, CTAs, and any stats-bar box labeled Clients/Cooperatives.</p>
+            <p class="caption-meta" style="margin-top:0;">Used on Home trust strip, Partners, Portfolio, CTAs. <strong>Label = text</strong> (e.g. Cooperative Clients). <strong>Value / Offset = numbers</strong>.</p>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
                 <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Cooperative Clients</div>
@@ -799,29 +802,29 @@ $tabs = [
                   <input type="number" name="client_count_offset" class="form-input" value="<?= e(sv($s,'client_count_offset') ?: '300') ?>" placeholder="300" min="0" style="max-width:120px;">
                 </div>
                 <div>
-                  <label class="form-label">Label (default: Cooperative Clients)</label>
+                  <label class="form-label">Label text (not a number)</label>
                   <input type="text" name="stat_coop_clients_label" class="form-input" value="<?= e(sv($s,'stat_coop_clients_label')) ?>" placeholder="Cooperative Clients">
                 </div>
               </div>
               <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
                 <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Technology Partners</div>
                 <div>
-                  <label class="form-label">Value (default: 15+)</label>
+                  <label class="form-label">Value (e.g. 15+)</label>
                   <input type="text" name="stat_partners_value" class="form-input" value="<?= e(sv($s,'stat_partners_value')) ?>" placeholder="15+">
                 </div>
                 <div>
-                  <label class="form-label">Label (default: Technology Partners)</label>
+                  <label class="form-label">Label text (not a number)</label>
                   <input type="text" name="stat_partners_label" class="form-input" value="<?= e(sv($s,'stat_partners_label')) ?>" placeholder="Technology Partners">
                 </div>
               </div>
               <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
                 <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Provinces Covered</div>
                 <div>
-                  <label class="form-label">Value (default: 7)</label>
+                  <label class="form-label">Value (e.g. 7)</label>
                   <input type="text" name="stat_provinces_value" class="form-input" value="<?= e(sv($s,'stat_provinces_value')) ?>" placeholder="7">
                 </div>
                 <div>
-                  <label class="form-label">Label (default: Provinces Covered)</label>
+                  <label class="form-label">Label text (not a number)</label>
                   <input type="text" name="stat_provinces_label" class="form-input" value="<?= e(sv($s,'stat_provinces_label')) ?>" placeholder="Provinces Covered">
                 </div>
               </div>
