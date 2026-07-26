@@ -83,7 +83,7 @@ unset($__planIcons);
 
     <div class="price-card__head">
       <div class="price-card__icon">
-        <i data-lucide="<?= e($plan['icon']) ?>" class="ic-18"></i>
+        <i data-lucide="<?= e($plan['icon']) ?>"></i>
       </div>
       <div>
         <div class="price-card__name"><?= e($plan['name']) ?></div>
@@ -111,8 +111,8 @@ unset($__planIcons);
     <ul class="price-card__features">
       <?php foreach ($plan['features'] as $f): ?>
       <li>
-        <i data-lucide="check" class="ic-13"></i>
-        <?= e($f) ?>
+        <i data-lucide="check"></i>
+        <span><?= e($f) ?></span>
       </li>
       <?php endforeach; ?>
     </ul>

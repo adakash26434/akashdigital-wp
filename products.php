@@ -111,17 +111,19 @@ ob_start(); ?>
       <div class="st-card product-card">
         <div class="product-card__head">
           <div class="product-card__head-top">
-            <div class="icon-box product-card__icon <?= e($p['box']) ?>">
-              <i data-lucide="<?= e($p['icon']) ?>" class="ic-18" style="color:#fff;"></i>
+            <div class="icon-box product-card__icon <?= e($p['box']) ?>" aria-hidden="true">
+              <i data-lucide="<?= e($p['icon']) ?>"></i>
+            </div>
+            <div class="product-card__head-copy">
+              <h2 class="product-card__title"><?= e($p['name']) ?></h2>
+              <?php if (!empty($p['tagline'])): ?>
+              <p class="product-card__tagline"><?= e($p['tagline']) ?></p>
+              <?php endif; ?>
             </div>
             <?php if (!empty($p['badge'])): ?>
             <span class="product-card__badge"><?= e($p['badge']) ?></span>
             <?php endif; ?>
           </div>
-          <h2 class="product-card__title"><?= e($p['name']) ?></h2>
-          <?php if (!empty($p['tagline'])): ?>
-          <p class="product-card__tagline"><?= e($p['tagline']) ?></p>
-          <?php endif; ?>
         </div>
 
         <div class="product-card__price-strip <?= $isIncluded ? 'product-card__price-strip--included' : '' ?>">
@@ -139,26 +141,26 @@ ob_start(); ?>
           <ul class="product-card__features">
             <?php foreach ($p['highlights'] as $h): ?>
             <li>
-              <i data-lucide="check" class="ic-13"></i>
-              <?= e($h) ?>
+              <i data-lucide="check"></i>
+              <span><?= e($h) ?></span>
             </li>
             <?php endforeach; ?>
           </ul>
           <?php endif; ?>
           <?php if (!empty($p['features'])): ?>
-          <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-top:0.5rem;">
+          <div class="product-card__chips">
             <?php foreach (array_slice($p['features'],0,6) as $f): ?>
-            <span style="font-size:0.6875rem;font-weight:500;padding:0.2rem 0.5rem;border-radius:9999px;background:var(--muted);color:var(--muted-foreground);white-space:nowrap;"><?= e($f) ?></span>
+            <span class="product-card__chip"><?= e($f) ?></span>
             <?php endforeach; ?>
           </div>
           <?php endif; ?>
-          <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
-            <a href="<?= url('contact.php') ?>?product=<?= urlencode($p['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
+          <div class="product-card__actions">
+            <a href="<?= url('contact.php') ?>?product=<?= urlencode($p['name']) ?>" class="btn btn-outline btn-md">
               <?= e(isNepali() ? __('hero_cta_demo') : 'Request a demo') ?>
-              <i data-lucide="arrow-right" class="ic-14"></i>
+              <i data-lucide="arrow-right"></i>
             </a>
             <?php if (!empty($productsFromDb) && !empty($p['slug'])): ?>
-            <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
+            <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-ghost btn-md" style="color:var(--primary);">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
             </a>
             <?php endif; ?>
@@ -191,7 +193,7 @@ ob_start(); ?>
       ?>
       <<?= $cardTag ?><?= $cardHref ?> class="feature-card text-center"<?= $cardExtra ?>>
         <div class="feature-card__icon" style="margin-inline:auto;">
-          <i data-lucide="<?= e($addon['icon']) ?>" class="ic-18" style="color:var(--primary);"></i>
+          <i data-lucide="<?= e($addon['icon']) ?>"></i>
         </div>
         <div style="font-family:var(--font-display);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;font-size:var(--text-sm);"><?= e($addon['title']) ?></div>
         <?php if (!empty($addon['desc'])): ?>

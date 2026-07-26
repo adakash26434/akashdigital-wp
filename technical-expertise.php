@@ -66,13 +66,11 @@ include 'includes/page-hero.php';
              onmouseout="this.style.transform='';this.style.boxShadow=''">
 
           <!-- Icon -->
-          <div style="width:3.5rem;height:3.5rem;border-radius:var(--radius);background:var(--primary-light);display:grid;place-items:center;margin-bottom:.25rem;">
+          <div class="tech-card__icon">
             <?php if (!empty($t['icon_url'])): ?>
-            <img src="<?= e($t['icon_url']) ?>" alt="<?= e($t['name']) ?>"
-                 style="width:2rem;height:2rem;object-fit:contain;" loading="lazy">
+            <img src="<?= e($t['icon_url']) ?>" alt="<?= e($t['name']) ?>" loading="lazy">
             <?php else: ?>
-            <i data-lucide="<?= e($t['lucide_icon'] ?? 'cpu') ?>"
-               style="width:22px;height:22px;color:var(--primary);"></i>
+            <i data-lucide="<?= e($t['lucide_icon'] ?? 'cpu') ?>"></i>
             <?php endif; ?>
           </div>
 

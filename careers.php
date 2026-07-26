@@ -136,7 +136,7 @@ ob_start(); ?>
       foreach ($perks as [$icon,$title,$desc]):?>
       <div class="feature-card">
         <div class="feature-card__icon">
-          <i data-lucide="<?= e($icon) ?>" class="ic-18" style="color:var(--primary);"></i>
+          <i data-lucide="<?= e($icon) ?>"></i>
         </div>
         <h3><?= e($title) ?></h3>
         <p><?= e($desc) ?></p>

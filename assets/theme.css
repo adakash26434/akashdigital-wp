@@ -480,14 +480,26 @@ html.dark .glass {
   color: var(--muted-foreground);
 }
 .feature-card__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: var(--radius-lg);
   background: var(--primary-light);
   margin-bottom: 1rem;
+  line-height: 0;
+  flex-shrink: 0;
+}
+.feature-card__icon [data-lucide],
+.feature-card__icon svg {
+  width: 1.125rem !important;
+  height: 1.125rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: 0 !important;
+  display: block;
+  color: var(--primary);
+  stroke-width: 2;
 }
 .scroll-mt-nav { scroll-margin-top: 5rem; }
 .feature-card:hover {
@@ -557,6 +569,37 @@ html.dark .glass {
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-glow);
   flex-shrink: 0;
+  line-height: 0;
+}
+.icon-box [data-lucide],
+.icon-box svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  vertical-align: 0 !important;
+  display: block;
+  stroke-width: 2;
+  color: #fff;
+}
+.icon-box-sm {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-lg);
+}
+.icon-box-sm [data-lucide],
+.icon-box-sm svg {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+.icon-box-lg {
+  width: 3.75rem;
+  height: 3.75rem;
+}
+.icon-box-lg [data-lucide],
+.icon-box-lg svg {
+  width: 1.5rem !important;
+  height: 1.5rem !important;
 }
 .icon-box-blue    { background: linear-gradient(135deg, #2563eb, #4f46e5); }
 .icon-box-green   { background: linear-gradient(135deg, #10b981, #059669); }

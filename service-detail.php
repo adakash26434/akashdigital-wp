@@ -109,8 +109,8 @@ require_once 'includes/header.php';
     <div style="display:grid;grid-template-columns:1fr 360px;gap:3.5rem;align-items:start;" class="product-hero-grid">
       <div>
         <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
-          <div style="width:3.5rem;height:3.5rem;border-radius:1rem;background:var(--gradient-primary);display:grid;place-items:center;box-shadow:var(--shadow-glow);">
-            <i data-lucide="<?= e($service['lucide_icon'] ?: 'layers') ?>" style="width:1.5rem;height:1.5rem;color:#fff;"></i>
+          <div class="icon-box icon-box-lg icon-box-blue" style="background:var(--gradient-primary);">
+            <i data-lucide="<?= e($service['lucide_icon'] ?: 'layers') ?>"></i>
           </div>
           <?php if (!empty($service['badge'])): ?>
           <span class="badge badge-primary"><?= e($service['badge']) ?></span>
@@ -183,8 +183,8 @@ require_once 'includes/header.php';
       <?php foreach ($related as $r): ?>
       <a href="<?= url('service-detail.php?slug='.urlencode($r['slug'])) ?>" class="st-card st-card-link">
         <div style="display:flex;align-items:center;gap:0.875rem;margin-bottom:0.75rem;">
-          <div style="width:2.5rem;height:2.5rem;border-radius:0.625rem;background:var(--gradient-primary);display:grid;place-items:center;">
-            <i data-lucide="<?= e($r['lucide_icon'] ?? 'layers') ?>" style="width:1rem;height:1rem;color:#fff;"></i>
+          <div class="icon-box icon-box-sm" style="background:var(--gradient-primary);box-shadow:none;">
+            <i data-lucide="<?= e($r['lucide_icon'] ?? 'layers') ?>"></i>
           </div>
           <h3 style="font-family:var(--font-display);font-size:var(--text-md);font-weight:700;color:var(--foreground);"><?= e($r['name']) ?></h3>
         </div>

@@ -23,17 +23,36 @@ $__svcDefaults = [
 ];
 
 $services = [];
+$servicesFromDb = false;
 try {
-    $rows = query(
-        "SELECT id, title AS name, slug, tagline, summary, badge,
-                COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
-                icon_color, highlights, features, price_from, active,
-                screenshot_url AS demo_screenshot_url
-         FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
-    );
+    $rows = [];
+    try {
+        $rows = query(
+            "SELECT id, title AS name, slug, tagline, summary, badge,
+                    COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
+                    icon_color, highlights, features, price_from, active,
+                    screenshot_url AS demo_screenshot_url
+             FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
+        );
+    } catch (\Throwable $e1) {
+        try {
+            $rows = query(
+                "SELECT id, title AS name, slug, tagline, summary, badge,
+                        COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
+                        icon_color, highlights, features, price_from, active
+                 FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
+            );
+        } catch (\Throwable $e2) {
+            $rows = query(
+                "SELECT id, title AS name, slug, badge,
+                        COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
+                        icon_color, highlights, features, price_from, active
+                 FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
+            );
+        }
+    }
     foreach ($rows as $r) {
         $highs = json_decode($r['highlights'] ?? '[]', true) ?: [];
-        // Features → pill chips (separate from highlights)
         $chips = [];
         if (!empty($r['features'])) {
             $decoded = json_decode($r['features'], true);
@@ -43,9 +62,9 @@ try {
                 $chips = array_values(array_filter(array_map('trim', explode(',', $r['features']))));
             }
         }
-        // Fallback: if no highlights, use chips (up to 4) as highlights
         if (empty($highs) && !empty($chips)) {
             $highs = array_slice($chips, 0, 4);
+            $chips = array_slice($chips, 4);
         }
         $price     = 'Contact us';
         $priceNote = '';
@@ -57,7 +76,7 @@ try {
         if ($isIncluded) { $price = 'Included'; $priceNote = 'with any plan'; }
         $color = strtolower($r['icon_color'] ?? 'blue');
         $services[] = [
-            'slug'           => $r['slug'],
+            'slug'           => $r['slug'] ?? '',
             'box'            => $__colorMap[$color] ?? 'icon-box-blue',
             'badge'          => $r['badge'] ?? '',
             'name'           => $r['name'],
@@ -65,9 +84,9 @@ try {
             'summary'        => $r['summary'] ?? '',
             'price'          => $price,
             'price_note'     => $priceNote,
-            'icon'           => $r['lucide_icon'] ?: 'layers',
+            'icon'           => ($r['lucide_icon'] ?? '') ?: 'layers',
             'highlights'     => $highs,
-            'chips'          => $chips,
+            'chips'          => array_slice($chips, 0, 6),
             'screenshot_url' => $r['demo_screenshot_url'] ?? '',
         ];
     }
@@ -80,6 +99,21 @@ if (empty($services)) {
     $servicesFromDb = true;
 }
 
+$trustBanner = cms(
+    $__s,
+    'services_trust_banner',
+    isNepali()
+        ? 'निःशुल्क परामर्श · नेपालभरि अन-साइट सपोर्ट · वार्षिक योजनामा छुट'
+        : 'Free consultation · On-site support across Nepal · Discounts on annual plans'
+);
+$priceFootnote = cms(
+    $__s,
+    'services_price_footnote',
+    isNepali()
+        ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा छुट ·'
+        : 'All prices in NPR · One-time setup fee applies · Discounts available on annual plans ·'
+);
+
 include 'includes/header.php';
 ?>
 
@@ -89,10 +123,10 @@ $heroEyebrowIcon = 'layers';
 $heroTitle       = __('services_hero_title');
 $heroSubtitle    = __('services_hero_sub');
 ob_start(); ?>
-<a href="<?= url('contact.php') ?>" class="btn btn-primary btn-lg">
-  <i data-lucide="calendar" class="ic-16"></i>
-  <?= __('cta_talk_expert') ?>
-</a>
+<div class="section-eyebrow section-eyebrow-primary">
+  <i data-lucide="shield-check" class="ic-11"></i>
+  <?= e($trustBanner) ?>
+</div>
 <?php $heroActions = ob_get_clean(); include 'includes/page-hero.php'; ?>
 
 <section class="st-section">
@@ -104,17 +138,19 @@ ob_start(); ?>
       <div class="st-card product-card">
         <div class="product-card__head">
           <div class="product-card__head-top">
-            <div class="icon-box product-card__icon <?= e($svc['box']) ?>">
-              <i data-lucide="<?= e($svc['icon']) ?>" class="ic-18" style="color:#fff;"></i>
+            <div class="icon-box product-card__icon <?= e($svc['box']) ?>" aria-hidden="true">
+              <i data-lucide="<?= e($svc['icon']) ?>"></i>
+            </div>
+            <div class="product-card__head-copy">
+              <h2 class="product-card__title"><?= e($svc['name']) ?></h2>
+              <?php if (!empty($svc['tagline'])): ?>
+              <p class="product-card__tagline"><?= e($svc['tagline']) ?></p>
+              <?php endif; ?>
             </div>
             <?php if (!empty($svc['badge'])): ?>
             <span class="product-card__badge"><?= e($svc['badge']) ?></span>
             <?php endif; ?>
           </div>
-          <h2 class="product-card__title"><?= e($svc['name']) ?></h2>
-          <?php if (!empty($svc['tagline'])): ?>
-          <p class="product-card__tagline"><?= e($svc['tagline']) ?></p>
-          <?php endif; ?>
         </div>
 
         <div class="product-card__price-strip <?= $isIncluded ? 'product-card__price-strip--included' : '' ?>">
@@ -129,44 +165,43 @@ ob_start(); ?>
           <p class="product-card__summary"><?= e($svc['summary']) ?></p>
           <?php endif; ?>
 
+          <?php if (!empty($svc['highlights'])): ?>
+          <ul class="product-card__features">
+            <?php foreach ($svc['highlights'] as $h): ?>
+            <li>
+              <i data-lucide="check"></i>
+              <span><?= e($h) ?></span>
+            </li>
+            <?php endforeach; ?>
+          </ul>
+          <?php endif; ?>
+
           <?php if (!empty($svc['chips'])): ?>
-          <div style="display:flex;flex-wrap:wrap;gap:0.3rem;margin-bottom:0.75rem;">
+          <div class="product-card__chips">
             <?php foreach ($svc['chips'] as $chip): ?>
-            <span style="display:inline-flex;align-items:center;gap:0.25rem;padding:0.2rem 0.6rem;border-radius:9999px;background:var(--primary-light);color:var(--primary);font-size:0.7rem;font-weight:600;border:1px solid var(--primary-light);border-color:color-mix(in srgb,var(--primary) 20%,transparent)">
-              <i data-lucide="check" style="width:10px;height:10px;flex-shrink:0;"></i>
+            <span class="product-card__chip product-card__chip--accent">
+              <i data-lucide="check"></i>
               <?= e($chip) ?>
             </span>
             <?php endforeach; ?>
           </div>
           <?php endif; ?>
 
-          <?php if (!empty($svc['highlights'])): ?>
-          <ul class="product-card__features">
-            <?php foreach ($svc['highlights'] as $h): ?>
-            <li>
-              <i data-lucide="check" class="ic-13"></i>
-              <?= e($h) ?>
-            </li>
-            <?php endforeach; ?>
-          </ul>
-          <?php endif; ?>
-
           <?php if (!empty($svc['screenshot_url'])): ?>
-          <div style="margin-bottom:0.875rem;border-radius:0.625rem;overflow:hidden;border:1px solid var(--border);background:var(--muted);">
+          <div class="product-card__shot">
             <img src="<?= e($svc['screenshot_url']) ?>"
                  alt="<?= e($svc['name']) ?> screenshot"
-                 loading="lazy"
-                 style="width:100%;display:block;max-height:180px;object-fit:cover;">
+                 loading="lazy">
           </div>
           <?php endif; ?>
 
-          <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.25rem;">
-            <a href="<?= url('contact.php') ?>?service=<?= urlencode($svc['name']) ?>" class="btn btn-outline btn-md" style="width:100%;justify-content:center;">
+          <div class="product-card__actions">
+            <a href="<?= url('contact.php') ?>?service=<?= urlencode($svc['name']) ?>" class="btn btn-outline btn-md">
               <?= e(__('services_get_quote')) ?>
-              <i data-lucide="arrow-right" class="ic-14"></i>
+              <i data-lucide="arrow-right"></i>
             </a>
             <?php if (!empty($servicesFromDb) && !empty($svc['slug'])): ?>
-            <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-ghost btn-md" style="width:100%;justify-content:center;color:var(--primary);">
+            <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-ghost btn-md" style="color:var(--primary);">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
             </a>
             <?php endif; ?>
@@ -177,7 +212,7 @@ ob_start(); ?>
     </div>
 
     <p class="text-center text-muted" style="margin-top:1.75rem;font-size:var(--text-sm);">
-      <?= e(cms($__s, 'services_price_footnote', isNepali() ? 'सबै मूल्य NPR मा · एकपटक सेटअप शुल्क लाग्छ · वार्षिक योजनामा छुट ·' : 'All prices in NPR · One-time setup fee applies · Discounts available on annual plans ·')) ?>
+      <?= e($priceFootnote) ?>
       <a href="<?= url('contact.php') ?>" class="text-primary"><?= e(isNepali() ? 'विशेष उद्धरण माग्नुस' : 'Request a custom quote') ?></a>
     </p>
   </div>
@@ -186,11 +221,11 @@ ob_start(); ?>
 <!-- Why choose us -->
 <section class="st-section st-section--tinted">
   <div class="container">
-    <div class="animate-fade-up section-head">
-      <div class="section-eyebrow mb-1"><?= e(cms($__s,'services_section_eyebrow','Why choose us')) ?></div>
-      <h2 class="h-display"><?= e(cms($__s,'services_why_title',__('services_why_label'))) ?></h2>
+    <div class="animate-fade-up section-head section-head-tight">
+      <div class="section-eyebrow mb-3q"><?= e(cms($__s,'services_section_eyebrow','Why choose us')) ?></div>
+      <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(cms($__s,'services_why_title',__('services_why_label'))) ?></h2>
       <?php $__whySub = cms($__s,'services_why_subtitle',''); if ($__whySub): ?>
-      <p class="section-sub"><?= e($__whySub) ?></p>
+      <p class="section-sub" style="margin-top:0.5rem;"><?= e($__whySub) ?></p>
       <?php endif; ?>
     </div>
     <?php
@@ -212,14 +247,14 @@ ob_start(); ?>
       ];
     }
     ?>
-    <div class="why-grid stagger-children" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem;">
+    <div class="why-grid stagger-children">
       <?php foreach ($__whyItems as [$icon,$t,$d]): ?>
       <div class="feature-card text-center">
-        <div class="feature-card__icon" style="margin-inline:auto;">
-          <i data-lucide="<?= e($icon) ?>" class="ic-18" style="color:var(--primary);"></i>
+        <div class="feature-card__icon">
+          <i data-lucide="<?= e($icon) ?>"></i>
         </div>
         <div style="font-family:var(--font-display);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;font-size:var(--text-base);"><?= e($t) ?></div>
-        <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin:0;"><?= e($d) ?></p>
+        <p style="font-size:var(--text-sm);color:var(--muted-foreground);margin:0;line-height:1.55;"><?= e($d) ?></p>
       </div>
       <?php endforeach; ?>
     </div>
@@ -227,10 +262,10 @@ ob_start(); ?>
 </section>
 
 <?php
-$ctaTitle    = cms($__s, 'services_cta_title',    __('cta_title'));
-$ctaSubtitle = cms($__s, 'services_cta_subtitle', __('cta_sub'));
-$ctaPrimary  = ['label' => __('cta_primary'),   'url' => url('contact.php'), 'icon' => 'calendar'];
-$ctaSecondary= ['label' => __('cta_secondary'),  'url' => url('pricing.php'), 'icon' => 'tag'];
+$ctaTitle    = cms($__s, 'services_cta_title',    isNepali() ? 'कुन सेवा सही हो निश्चित छैन?' : 'Not sure which service fits?');
+$ctaSubtitle = cms($__s, 'services_cta_subtitle', isNepali() ? 'निःशुल्क परामर्श बुक गर्नुस — हामी तपाईंको व्यवसायका लागि सही समाधान चयन गर्न मद्दत गर्छौं।' : "Book a free consultation — we'll map the right service mix for your business.");
+$ctaPrimary  = ['label' => isNepali() ? 'निःशुल्क परामर्श बुक गर्नुस' : 'Schedule a free consultation', 'url' => url('contact.php'), 'icon' => 'calendar'];
+$ctaSecondary= ['label' => isNepali() ? 'मूल्य योजना हेर्नुस' : 'See pricing plans', 'url' => url('pricing.php'), 'icon' => 'tag'];
 include 'includes/cta-banner.php';
 ?>
 

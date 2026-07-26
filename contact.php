@@ -189,21 +189,21 @@ ob_start(); ?>
         <div class="st-card" style="padding:1.75rem;">
           <h3 style="font-family:var(--font-display);font-weight:700;font-size:var(--text-md);color:var(--foreground);margin-bottom:1.25rem;">Contact information</h3>
           <div class="info-row">
-            <div class="info-icon"><i data-lucide="phone" class="ic-16-p"></i></div>
+            <div class="info-icon"><i data-lucide="phone"></i></div>
             <div>
               <div style="font-size:var(--text-xs);font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.175rem;">Phone</div>
               <div style="font-size:var(--text-base);color:var(--foreground);font-weight:500;"><?= e(stContactPhone()) ?></div>
             </div>
           </div>
           <div class="info-row">
-            <div class="info-icon"><i data-lucide="mail" class="ic-16-p"></i></div>
+            <div class="info-icon"><i data-lucide="mail"></i></div>
             <div>
               <div style="font-size:var(--text-xs);font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.175rem;">Email</div>
               <div style="font-size:var(--text-base);color:var(--foreground);font-weight:500;"><?= e(stContactEmail()) ?></div>
             </div>
           </div>
           <div class="info-row">
-            <div class="info-icon"><i data-lucide="map-pin" class="ic-16-p"></i></div>
+            <div class="info-icon"><i data-lucide="map-pin"></i></div>
             <div>
               <div style="font-size:var(--text-xs);font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.175rem;">Address</div>
               <div style="font-size:var(--text-base);color:var(--foreground);font-weight:500;line-height:1.5;"><?= e(stAddress()) ?></div>

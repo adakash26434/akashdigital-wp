@@ -546,9 +546,9 @@ include 'includes/stats-bar.php';
         <div style="position:absolute;top:-2rem;right:1.5rem;width:8rem;height:8rem;border-radius:9999px;background:radial-gradient(circle,rgba(37,99,235,.35),transparent);filter:blur(16px);pointer-events:none;"></div>
         <?php endif; ?>
         <div style="position:relative;display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
-          <div class="icon-box icon-box-<?= e($iconColor) ?>" style="width:2.75rem;height:2.75rem;border-radius:.875rem;flex-shrink:0;">
+          <div class="icon-box icon-box-sm icon-box-<?= e($iconColor) ?>">
             <?php if(!empty($prod['lucide_icon'])): ?>
-              <i data-lucide="<?= e($prod['lucide_icon']) ?>" style="width:18px;height:18px;color:#fff;"></i>
+              <i data-lucide="<?= e($prod['lucide_icon']) ?>"></i>
             <?php else: ?>
               <span style="font-size:1.25rem;line-height:1;"><?= e($prod['icon'] ?? '📦') ?></span>
             <?php endif; ?>
@@ -633,8 +633,8 @@ include 'includes/stats-bar.php';
           <!-- Active left accent bar -->
           <span class="prod-accent" style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0;background:var(--primary);opacity:0;transition:opacity .15s;"></span>
           <!-- Icon -->
-          <div class="icon-box icon-box-<?= e($tColor) ?>" style="width:2.25rem;height:2.25rem;border-radius:.625rem;flex-shrink:0;transition:opacity .15s;">
-            <i data-lucide="<?= e($tIcon) ?>" style="width:15px;height:15px;color:#fff;pointer-events:none;"></i>
+          <div class="icon-box icon-box-sm icon-box-<?= e($tColor) ?>">
+            <i data-lucide="<?= e($tIcon) ?>"></i>
           </div>
           <span style="flex:1;font-size:var(--text-sm);font-weight:600;color:var(--foreground);line-height:1.35;"><?= e($tLabel) ?></span>
           <i data-lucide="chevron-right" class="prod-chevron" style="width:15px;height:15px;color:var(--muted-foreground);flex-shrink:0;transition:transform .2s,color .15s;pointer-events:none;"></i>
@@ -675,8 +675,8 @@ include 'includes/stats-bar.php';
             </div>
             <div style="background:var(--card);padding:1.75rem 2rem;">
               <div style="display:flex;align-items:center;gap:.875rem;margin-bottom:1.375rem;">
-                <div class="icon-box icon-box-<?= e($tColor) ?>" style="width:3rem;height:3rem;border-radius:1rem;flex-shrink:0;">
-                  <i data-lucide="<?= e($tIcon) ?>" style="width:20px;height:20px;color:#fff;"></i>
+                <div class="icon-box icon-box-<?= e($tColor) ?>">
+                  <i data-lucide="<?= e($tIcon) ?>"></i>
                 </div>
                 <div>
                   <h3 style="font-family:var(--font-display);font-weight:800;color:var(--foreground);margin:0 0 .2rem;"><?= e($prod['name']) ?></h3>
@@ -784,9 +784,9 @@ function sTab(slug){
       <?php foreach($processSteps as $i=>[$icon,$title,$desc]): ?>
       <div class="pi" style="text-align:center;padding:1.75rem 1.25rem;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-2xl);">
         <?php if($i<3): ?><div class="proc-con"></div><?php endif; ?>
-        <div style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:3.5rem;height:3.5rem;border-radius:9999px;background:var(--primary-light);border:2px solid rgba(37,99,235,.2);margin-bottom:1.25rem;">
-          <i data-lucide="<?= e($icon) ?>" style="width:20px;height:20px;color:var(--primary);"></i>
-          <span style="position:absolute;top:-6px;right:-6px;width:1.375rem;height:1.375rem;border-radius:9999px;background:var(--primary);color:#fff;font-size:var(--text-2xs);font-weight:800;display:grid;place-items:center;font-family:var(--font-display);"><?= $i+1 ?></span>
+        <div class="proc-step-icon">
+          <i data-lucide="<?= e($icon) ?>"></i>
+          <span class="proc-step-num"><?= $i+1 ?></span>
         </div>
         <h3 style="font-family:var(--font-display);font-weight:700;color:var(--foreground);margin-bottom:.625rem;font-size:var(--text-sm);"><?= e($title) ?></h3>
         <p style="font-size:var(--text-xs);color:var(--muted-foreground);line-height:1.65;margin:0 auto;"><?= e($desc) ?></p>

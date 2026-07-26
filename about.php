@@ -117,7 +117,7 @@ include 'includes/page-hero.php';
       <?php foreach ($values as [$icon,$t,$d]): ?>
       <div class="feature-card">
         <div class="feature-card__icon">
-          <i data-lucide="<?= $icon ?>" class="ic-18" style="color:var(--primary);"></i>
+          <i data-lucide="<?= $icon ?>"></i>
         </div>
         <h3><?= e($t) ?></h3>
         <p><?= e($d) ?></p>
