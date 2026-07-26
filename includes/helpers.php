@@ -169,14 +169,28 @@ function siteTrustStats(?array $settings = null): array {
         $marquee = array_slice($marquee, 0, 40);
     }
 
+    $coopLabel = trim((string)($s['stat_coop_clients_label'] ?? ''));
+    $partnersLabel = trim((string)($s['stat_partners_label'] ?? ''));
+    $provincesLabel = trim((string)($s['stat_provinces_label'] ?? ''));
+    // Guard: admins sometimes put numbers in Label fields by mistake
+    if ($coopLabel === '' || preg_match('/^[\d.,+\s%]+$/u', $coopLabel)) {
+        $coopLabel = 'Cooperative Clients';
+    }
+    if ($partnersLabel === '' || preg_match('/^[\d.,+\s%]+$/u', $partnersLabel)) {
+        $partnersLabel = 'Technology Partners';
+    }
+    if ($provincesLabel === '' || preg_match('/^[\d.,+\s%]+$/u', $provincesLabel)) {
+        $provincesLabel = 'Provinces Covered';
+    }
+
     return [
         'client_count'    => $clientCount,
         'client_display'  => $clientCount . '+',
-        'coop_label'      => trim((string)($s['stat_coop_clients_label'] ?? '')) ?: 'Cooperative Clients',
+        'coop_label'      => $coopLabel,
         'partners_value'  => trim((string)($s['stat_partners_value'] ?? '')) ?: '15+',
-        'partners_label'  => trim((string)($s['stat_partners_label'] ?? '')) ?: 'Technology Partners',
+        'partners_label'  => $partnersLabel,
         'provinces_value' => trim((string)($s['stat_provinces_value'] ?? '')) ?: '7',
-        'provinces_label' => trim((string)($s['stat_provinces_label'] ?? '')) ?: 'Provinces Covered',
+        'provinces_label' => $provincesLabel,
         'marquee_items'   => $marquee,
         'unique_orgs'     => $unique,
     ];

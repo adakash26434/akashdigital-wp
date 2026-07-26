@@ -49,26 +49,60 @@ include 'includes/page-hero.php';
 <?php include 'includes/stats-bar.php'; ?>
 
 <?php
-// Same centered Logo → Name → Address scroll as Home / Partners
+// Same partners proof strip + Logo → Name → Address scroll as Home
 $__aboutTrust = siteTrustStats($__s);
 if (!empty($__aboutTrust['marquee_items'])):
 ?>
-<section class="st-section" style="padding-top:0;">
+<section class="st-section trust-partners" style="padding-top:0.5rem;">
   <div class="container">
-    <div class="section-head section-head-tight" style="margin-bottom:1.25rem;">
+    <div class="section-head section-head-tight trust-partners__head">
       <div class="section-eyebrow section-eyebrow-green mb-3q">
         <i data-lucide="building-2" class="ic-11"></i>
         <?= e(isNepali() ? 'हाम्रा साझेदार' : 'Our Partners') ?>
       </div>
-      <h2 class="h-display section-title" style="margin-bottom:0;">
+      <h2 class="h-display section-title" style="margin-bottom:0.65rem;">
         <?= isNepali()
           ? 'नेपालभरका अग्रणी <span class="tg">संस्थाहरूको</span> भरोसा'
           : 'Trusted by leading <span class="tg">institutions</span> across Nepal' ?>
       </h2>
+      <p class="trust-partners__lede">
+        <?= e(isNepali()
+          ? 'सहकारी, पार्टनर र प्रदेशभरि फैलिएको हाम्रो सञ्जाल — एउटै प्लेटफर्ममा।'
+          : 'Cooperatives, technology partners, and coverage across Nepal — one trusted local network.') ?>
+      </p>
     </div>
+
+    <div class="trust-proof">
+      <?php
+      $__trustCards = [
+        [$__aboutTrust['client_display'], $__aboutTrust['coop_label'], 'building-2', isNepali() ? 'लाइभ क्लाइन्ट गणना' : 'Live client count'],
+        [$__aboutTrust['partners_value'], $__aboutTrust['partners_label'], 'handshake', isNepali() ? 'प्रविधि साझेदार' : 'Product & delivery partners'],
+        [$__aboutTrust['provinces_value'], $__aboutTrust['provinces_label'], 'map-pin', isNepali() ? 'नेपालभर पहुँच' : 'Nationwide reach'],
+      ];
+      foreach ($__trustCards as [$n, $l, $ic, $hint]):
+        preg_match('/^([\d,.]+)/', (string)$n, $mm);
+        $nNum = $mm[1] ?? $n;
+        $nSuf = $nNum !== '' ? ltrim(substr((string)$n, strlen((string)$nNum))) : '';
+      ?>
+      <div class="trust-proof__card">
+        <div class="trust-proof__icon" aria-hidden="true">
+          <i data-lucide="<?= e($ic) ?>"></i>
+        </div>
+        <div class="trust-proof__body">
+          <div class="trust-proof__value">
+            <span><?= e($nNum) ?></span><?php if ($nSuf !== ''): ?><span class="trust-proof__suf"><?= e($nSuf) ?></span><?php endif; ?>
+          </div>
+          <div class="trust-proof__label"><?= e($l) ?></div>
+          <div class="trust-proof__hint"><?= e($hint) ?></div>
+        </div>
+      </div>
+      <?php endforeach; unset($__trustCards, $n, $l, $ic, $hint, $nNum, $nSuf, $mm); ?>
+    </div>
+
     <?php
       $logoMarqueeItems = $__aboutTrust['marquee_items'];
       $logoMarqueeSpeed = 55;
+      $logoMarqueePad = false;
       include 'includes/logo-marquee.php';
     ?>
   </div>

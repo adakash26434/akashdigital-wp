@@ -389,63 +389,59 @@ include 'includes/stats-bar.php';
 ?>
 
 <!-- ══════════════════════════════════════════════
-  § 3 — CLIENT LOGO MARQUEE
+  § 3 — TRUSTED PARTNERS (proof strip + logo marquee)
 ══════════════════════════════════════════════ -->
 <?php if($__logoClients): ?>
-<section class="band-tinted" style="overflow:hidden;">
-
-  <!-- Partner stat cards — same style as stats-bar -->
-  <div class="st-stats" style="padding:2rem 0 1rem;">
-    <div class="container">
-      <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
-        <?php foreach ([
-          [$__trust['client_display'], $__trust['coop_label'], 'building-2'],
-          [$__trust['partners_value'], $__trust['partners_label'], 'layers'],
-          [$__trust['provinces_value'], $__trust['provinces_label'], 'map-pin'],
-        ] as [$n, $l, $ic]):
-          preg_match('/^([\d,.]+)/', $n, $mm);
-          $nNum = $mm[1] ?? $n;
-          $nSuf = $nNum ? ltrim(substr($n, strlen($nNum))) : '';
-        ?>
-        <div class="st-stat">
-          <div class="st-stat__icon-wrap">
-            <i data-lucide="<?= e($ic) ?>" class="st-stat__icon"></i>
-          </div>
-          <div class="st-stat__value">
-            <span><?= e($nNum) ?></span><?php if ($nSuf): ?><span class="st-stat__accent"><?= e($nSuf) ?></span><?php endif; ?>
-          </div>
-          <div class="st-stat__label"><?= e($l) ?></div>
-        </div>
-        <?php endforeach; ?>
-      </div>
-    </div>
-  </div>
-
-  <!-- Marquee section -->
-  <div class="container" style="padding-top:1.5rem;">
-    <style>
-    @keyframes live-pulse {
-      0%,100%{box-shadow:0 0 0 2px rgba(34,197,94,.25);}
-      50%{box-shadow:0 0 0 4px rgba(34,197,94,.12);}
-    }
-    </style>
-
-    <!-- Section header -->
-    <div class="animate-fade-up section-head">
+<section class="band-tinted trust-partners" style="overflow:hidden;">
+  <div class="container">
+    <div class="animate-fade-up section-head section-head-tight trust-partners__head">
       <div class="section-eyebrow section-eyebrow-green mb-card">
         <i data-lucide="building-2" class="ic-11"></i>
         <?= e(cms($__s,'home_trust_eyebrow') ?: (isNepali() ? 'हाम्रा साझेदार' : 'Our Partners')) ?>
       </div>
-      <h2 class="section-title">
+      <h2 class="section-title" style="margin-bottom:0.65rem;">
         <?= cms($__s,'home_trust_title') ?: (isNepali()
           ? 'नेपालभरका अग्रणी <span class="tg">संस्थाहरूको</span> भरोसा'
           : 'Trusted by leading <span class="tg">institutions</span> across Nepal') ?>
       </h2>
+      <p class="trust-partners__lede">
+        <?= e(cms($__s,'home_trust_sub') ?: (isNepali()
+          ? 'सहकारी, पार्टनर र प्रदेशभरि फैलिएको हाम्रो सञ्जाल — एउटै प्लेटफर्ममा।'
+          : 'Cooperatives, technology partners, and coverage across Nepal — one trusted local network.')) ?>
+      </p>
+    </div>
+
+    <div class="trust-proof animate-fade-up">
+      <?php
+      $__trustCards = [
+        [$__trust['client_display'], $__trust['coop_label'], 'building-2', isNepali() ? 'लाइभ क्लाइन्ट गणना' : 'Live client count'],
+        [$__trust['partners_value'], $__trust['partners_label'], 'handshake', isNepali() ? 'प्रविधि साझेदार' : 'Product & delivery partners'],
+        [$__trust['provinces_value'], $__trust['provinces_label'], 'map-pin', isNepali() ? 'नेपालभर पहुँच' : 'Nationwide reach'],
+      ];
+      foreach ($__trustCards as [$n, $l, $ic, $hint]):
+        preg_match('/^([\d,.]+)/', (string)$n, $mm);
+        $nNum = $mm[1] ?? $n;
+        $nSuf = $nNum !== '' ? ltrim(substr((string)$n, strlen((string)$nNum))) : '';
+      ?>
+      <div class="trust-proof__card">
+        <div class="trust-proof__icon" aria-hidden="true">
+          <i data-lucide="<?= e($ic) ?>"></i>
+        </div>
+        <div class="trust-proof__body">
+          <div class="trust-proof__value">
+            <span><?= e($nNum) ?></span><?php if ($nSuf !== ''): ?><span class="trust-proof__suf"><?= e($nSuf) ?></span><?php endif; ?>
+          </div>
+          <div class="trust-proof__label"><?= e($l) ?></div>
+          <div class="trust-proof__hint"><?= e($hint) ?></div>
+        </div>
+      </div>
+      <?php endforeach; unset($__trustCards, $n, $l, $ic, $hint, $nNum, $nSuf, $mm); ?>
     </div>
 
     <?php
     $logoMarqueeItems = $__logoClients;
     $logoMarqueeSpeed = 55;
+    $logoMarqueePad = false;
     include 'includes/logo-marquee.php';
     ?>
   </div>
