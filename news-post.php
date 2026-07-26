@@ -52,7 +52,14 @@ try {
 
 $pageTitle = $post['title'] . ' — ' . stSiteName() . ' Blog';
 $pageDesc  = $post['excerpt'] ?? '';
-$ogImage    = !empty($post['image_url']) ? url($post['image_url']) : null;
+$coverImg  = trim((string)($post['cover_url'] ?? $post['image_url'] ?? ''));
+$ogImage   = $coverImg !== '' ? (preg_match('#^https?://#i', $coverImg) ? $coverImg : url($coverImg)) : null;
+$sourceUrl = trim((string)($post['source_url'] ?? ''));
+$sourceName = trim((string)($post['source_name'] ?? ''));
+if ($sourceName === '' && $sourceUrl !== '') {
+    $host = parse_url($sourceUrl, PHP_URL_HOST);
+    $sourceName = $host ? preg_replace('/^www\./i', '', $host) : 'News portal';
+}
 require_once 'includes/header.php';
 ?>
 
@@ -76,6 +83,25 @@ require_once 'includes/header.php';
     <?php if (!empty($post['excerpt'])): ?>
     <p style="font-size:var(--text-md);color:var(--muted-foreground);line-height:1.7;margin-bottom:1.5rem;"><?= e($post['excerpt']) ?></p>
     <?php endif; ?>
+
+    <?php if ($sourceUrl !== ''): ?>
+    <a href="<?= e($sourceUrl) ?>" target="_blank" rel="noopener noreferrer"
+       style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1.25rem;padding:0.875rem 1rem;border-radius:0.875rem;border:1px solid color-mix(in srgb, var(--primary) 30%, var(--border));background:color-mix(in srgb, var(--primary) 7%, var(--card));text-decoration:none;">
+      <div style="display:flex;align-items:center;gap:0.75rem;min-width:0;">
+        <span style="width:2.25rem;height:2.25rem;border-radius:9999px;background:var(--primary);color:#fff;display:grid;place-items:center;flex-shrink:0;">
+          <i data-lucide="newspaper" style="width:14px;height:14px;"></i>
+        </span>
+        <div style="min-width:0;">
+          <div style="font-size:0.6875rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;color:var(--primary);">Originally published on</div>
+          <div style="font-size:var(--text-sm);font-weight:700;color:var(--foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?= e($sourceName) ?></div>
+        </div>
+      </div>
+      <span style="display:inline-flex;align-items:center;gap:0.35rem;font-size:var(--text-sm);font-weight:700;color:var(--primary);flex-shrink:0;">
+        Read full article <i data-lucide="external-link" style="width:14px;height:14px;"></i>
+      </span>
+    </a>
+    <?php endif; ?>
+
     <div style="display:flex;align-items:center;gap:1.25rem;flex-wrap:wrap;padding-top:1.25rem;border-top:1px solid var(--border);">
       <div style="display:flex;align-items:center;gap:0.625rem;">
         <span class="avatar avatar-sm" style="background:var(--gradient-primary);color:#fff;"><?= strtoupper(substr($post['author_name'] ?? 'S', 0, 1)) ?></span>
@@ -86,7 +112,7 @@ require_once 'includes/header.php';
       </div>
       <div style="width:1px;height:1.5rem;background:var(--border);"></div>
       <div style="font-size:var(--text-sm);color:var(--muted-foreground);">
-         <?= date('F j, Y', strtotime($post['published_at'])) ?>
+         <?= !empty($post['published_at']) ? date('F j, Y', strtotime($post['published_at'])) : '' ?>
       </div>
       <?php if (!empty($post['read_time'])): ?>
       <div style="font-size:var(--text-sm);color:var(--muted-foreground);">⏱ <?= e($post['read_time']) ?> min read</div>
@@ -94,21 +120,14 @@ require_once 'includes/header.php';
       <?php if (!empty($post['views'])): ?>
       <div style="font-size:var(--text-sm);color:var(--muted-foreground);"> <?= number_format((int)$post['views']) ?> views</div>
       <?php endif; ?>
-      <?php if (!empty($post['source_url'])): ?>
-      <a href="<?= e($post['source_url']) ?>" target="_blank" rel="noopener noreferrer" 
-         style="display:inline-flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);font-weight:600;color:var(--primary);text-decoration:none;padding:0.25rem 0.625rem;border:1px solid var(--primary);border-radius:9999px;transition:all 0.2s;">
-        <i data-lucide="external-link" style="width:13px;height:13px;"></i>
-        Read Full Article
-      </a>
-      <?php endif; ?>
     </div>
   </div>
 </section>
 
-<?php if (!empty($post['image_url'])): ?>
+<?php if ($coverImg !== ''): ?>
 <div style="padding:2rem 1.5rem;background:var(--background);">
   <div class="container" style="max-width:52rem;">
-    <img src="<?= e($post['image_url']) ?>" alt="<?= e($post['title']) ?>"
+    <img src="<?= e($coverImg) ?>" alt="<?= e($post['title']) ?>"
          loading="lazy" decoding="async"
          style="width:100%;border-radius:1.25rem;object-fit:cover;max-height:480px;box-shadow:var(--shadow-elevated);">
   </div>
@@ -118,10 +137,12 @@ require_once 'includes/header.php';
 <!-- Article Body -->
 <article style="padding:2.5rem 1.5rem 4rem;">
   <div class="container" style="max-width:52rem;">
+    <?php
+      $rawContent = trim((string)($post['content'] ?? ''));
+      if ($rawContent !== ''):
+    ?>
     <div class="prose" style="text-align:justify;line-height:1.8;">
-      <?php 
-      $rawContent = $post['content'] ?? '';
-      // If content has HTML tags, render as HTML; otherwise escape and add line breaks
+      <?php
       if (preg_match('/<[a-z][\s\S]*>/i', $rawContent)) {
         echo $rawContent;
       } else {
@@ -129,6 +150,14 @@ require_once 'includes/header.php';
       }
       ?>
     </div>
+    <?php elseif ($sourceUrl !== ''): ?>
+    <div style="padding:1.5rem;border-radius:1rem;border:1px dashed var(--border);background:var(--card);text-align:center;">
+      <p style="margin:0 0 1rem;color:var(--muted-foreground);">Full story is on the news portal.</p>
+      <a href="<?= e($sourceUrl) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+        Open on <?= e($sourceName) ?> ↗
+      </a>
+    </div>
+    <?php endif; ?>
 
     <!-- Tags footer -->
     <?php if (!empty($tags)): ?>
@@ -137,6 +166,14 @@ require_once 'includes/header.php';
       <?php foreach ($tags as $tag):?>
       <span style="padding:0.25rem 0.75rem;border-radius:9999px;border:1px solid var(--border);font-size:var(--text-xs);color:var(--muted-foreground);background:var(--background);"><?= e($tag) ?></span>
       <?php endforeach;?>
+    </div>
+    <?php endif; ?>
+
+    <?php if ($sourceUrl !== '' && $rawContent !== ''): ?>
+    <div style="margin-top:2rem;">
+      <a href="<?= e($sourceUrl) ?>" target="_blank" rel="noopener noreferrer" class="btn btn-outline">
+        Read original on <?= e($sourceName) ?> ↗
+      </a>
     </div>
     <?php endif; ?>
 

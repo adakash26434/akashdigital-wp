@@ -11,7 +11,7 @@ try {
     $news = query(
         "SELECT id, title, slug, excerpt, category, read_time,
                 COALESCE(cover_url, image_url) AS cover,
-                author_name, published_at, source_url
+                author_name, published_at, source_url, source_name
          FROM news
          WHERE published=1 AND active=1 AND published_at <= NOW()
          ORDER BY published_at DESC
@@ -351,7 +351,10 @@ include 'includes/page-hero.php';
             <?php if (!empty($featured['published_at'])): ?>
             <span><?= date('M j, Y', strtotime($featured['published_at'])) ?></span>
             <?php endif; ?>
-            <?php if (!empty($featured['read_time'])): ?>
+            <?php if (!empty($featured['source_url'])): ?>
+            <span>·</span>
+            <span><?= e($featured['source_name'] ?: 'Press coverage') ?></span>
+            <?php elseif (!empty($featured['read_time'])): ?>
             <span>·</span>
             <span><?= e($featured['read_time']) ?> min read</span>
             <?php endif; ?>

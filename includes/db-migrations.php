@@ -875,4 +875,11 @@ function runDbMigrations() {
         dbEnsureFlexibleStringColumn('crm_followups', 'type', "VARCHAR(30) NOT NULL DEFAULT 'call'");
         dbEnsureFlexibleStringColumn('activity_log', 'type', "VARCHAR(50) NOT NULL");
     } catch (\Throwable $e) { error_log('[db-migrations] M35: ' . $e->getMessage()); }
+
+    try {
+        // Migration 36: news — optional portal / press name for external coverage links
+        dbEnsureColumns('news', [
+            'source_name' => "VARCHAR(120) NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M36: ' . $e->getMessage()); }
 }
