@@ -13,6 +13,7 @@ $categories = array_values(array_unique(array_filter(array_column($items, 'categ
 sort($categories);
 
 $__s = siteSettings();
+$__trust = siteTrustStats($__s);
 
 require_once 'includes/header.php';
 ?>
@@ -30,8 +31,8 @@ include 'includes/page-hero.php';
     <div class="portfolio-stats__grid">
       <?php foreach ([
         [count($items) ? count($items) . '+' : '50+', isNepali() ? 'परियोजनाहरू पूरा' : 'Projects delivered'],
-        [$__s['stat_2_value'] ?? '650+', isNepali() ? 'ग्राहकहरू' : 'Clients served'],
-        ['7', isNepali() ? 'प्रदेशहरूमा' : 'Provinces covered'],
+        [$__trust['client_display'], isNepali() ? 'ग्राहकहरू' : 'Clients served'],
+        [$__trust['provinces_value'], isNepali() ? 'प्रदेशहरूमा' : 'Provinces covered'],
         ['99%', isNepali() ? 'ग्राहक सन्तुष्टि' : 'Client satisfaction'],
       ] as [$n, $l]): ?>
       <div class="portfolio-stats__item">

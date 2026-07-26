@@ -296,23 +296,30 @@ ob_start(); ?>
 // Fetch channel partners marked to show on contact page
 $channelPartners = [];
 try { 
-    // Try with show_on_contact filter first
     $channelPartners = query(
-        "SELECT name, email, phone, address, district 
+        "SELECT name, logo_url, email, phone, address, district 
          FROM partners 
          WHERE type='channel' AND active=1 AND show_on_contact=1 
          ORDER BY position, name"
     ); 
 } catch (\Throwable $e) {
-    // Fallback if column doesn't exist yet
     try {
         $channelPartners = query(
-            "SELECT name, email, phone, address, district 
+            "SELECT name, logo_url, email, phone, address, district 
              FROM partners 
              WHERE type='channel' AND active=1 
              ORDER BY position, name"
         );
-    } catch (\Throwable $e2) {}
+    } catch (\Throwable $e2) {
+        try {
+            $channelPartners = query(
+                "SELECT name, email, phone, address, district 
+                 FROM partners 
+                 WHERE type='channel' AND active=1 
+                 ORDER BY position, name"
+            );
+        } catch (\Throwable $e3) {}
+    }
 }
 
 if (!empty($channelPartners)): ?>
@@ -327,41 +334,66 @@ if (!empty($channelPartners)): ?>
       <h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:800;color:var(--foreground);margin-bottom:0.5rem;">Connect with Our Partners</h2>
       <p style="font-size:var(--text-sm);color:var(--muted-foreground);max-width:36rem;margin:0 auto;">Our trusted channel partners across Nepal can help you get started with our software solutions.</p>
     </div>
-    
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1rem;">
+
+    <?php if (count($channelPartners) >= 2): ?>
+    <?php
+      $logoMarqueeItems = $channelPartners;
+      $logoMarqueeSpeed = max(24, count($channelPartners) * 3);
+      $logoMarqueePad = false;
+      include 'includes/logo-marquee.php';
+    ?>
+    <?php else: ?>
+    <div class="ptn-static">
       <?php foreach ($channelPartners as $partner): ?>
-      <div class="st-card" style="padding:1.25rem;">
-        <div style="display:flex;align-items:flex-start;gap:0.875rem;">
-          <div style="width:2.5rem;height:2.5rem;border-radius:0.625rem;background:var(--primary-soft);display:grid;place-items:center;flex-shrink:0;">
-            <i data-lucide="user" style="width:1.125rem;height:1.125rem;color:var(--primary);"></i>
-          </div>
-          <div style="flex:1;min-width:0;">
-            <h3 style="font-family:var(--font-display);font-size:var(--text-base);font-weight:700;color:var(--foreground);margin-bottom:0.375rem;"><?= e($partner['name']) ?></h3>
-            <?php if (!empty($partner['district'])): ?>
-            <div style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-xs);color:var(--muted-foreground);margin-bottom:0.5rem;">
-              <i data-lucide="map-pin" style="width:11px;height:11px;"></i>
-              <?= e($partner['district']) ?>
-            </div>
-            <?php endif; ?>
-            <div style="display:flex;flex-direction:column;gap:0.375rem;">
-              <?php if (!empty($partner['phone'])): ?>
-              <a href="tel:<?= e($partner['phone']) ?>" style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);color:var(--foreground);text-decoration:none;font-weight:500;">
-                <i data-lucide="phone" style="width:13px;height:13px;color:var(--primary);"></i>
-                <?= e($partner['phone']) ?>
-              </a>
-              <?php endif; ?>
-              <?php if (!empty($partner['email'])): ?>
-              <a href="mailto:<?= e($partner['email']) ?>" style="display:flex;align-items:center;gap:0.375rem;font-size:var(--text-sm);color:var(--primary);text-decoration:none;">
-                <i data-lucide="mail" style="width:13px;height:13px;"></i>
-                <?= e($partner['email']) ?>
-              </a>
-              <?php endif; ?>
-            </div>
-          </div>
+      <div class="st-marq-card">
+        <?php if (!empty($partner['logo_url'])): ?>
+        <img src="<?= e($partner['logo_url']) ?>" alt="<?= e($partner['name']) ?>" loading="lazy" decoding="async" class="st-marq-card__logo">
+        <?php else: ?>
+        <div class="st-marq-card__icon" aria-hidden="true">
+          <i data-lucide="handshake" style="width:1.125rem;height:1.125rem;color:var(--primary);"></i>
+        </div>
+        <?php endif; ?>
+        <div class="st-marq-card__body">
+          <div class="st-marq-card__name"><?= e($partner['name']) ?></div>
+          <?php if (!empty($partner['district'])): ?>
+          <div class="st-marq-card__loc"><i data-lucide="map-pin" class="ic-11"></i><?= e($partner['district']) ?></div>
+          <?php endif; ?>
         </div>
       </div>
       <?php endforeach; ?>
     </div>
+    <?php endif; ?>
+
+    <?php
+    // Contact details under cards (phone / email) — centered list when present
+    $__hasContact = false;
+    foreach ($channelPartners as $p) {
+      if (!empty($p['phone']) || !empty($p['email'])) { $__hasContact = true; break; }
+    }
+    if ($__hasContact):
+    ?>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:0.75rem;margin-top:1.25rem;">
+      <?php foreach ($channelPartners as $partner):
+        if (empty($partner['phone']) && empty($partner['email'])) continue;
+      ?>
+      <div class="st-card" style="padding:0.875rem 1rem;text-align:center;">
+        <div style="font-weight:700;font-size:var(--text-sm);margin-bottom:0.35rem;"><?= e($partner['name']) ?></div>
+        <?php if (!empty($partner['phone'])): ?>
+        <a href="tel:<?= e($partner['phone']) ?>" style="display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;font-size:var(--text-sm);color:var(--foreground);text-decoration:none;font-weight:500;">
+          <i data-lucide="phone" style="width:13px;height:13px;color:var(--primary);"></i><?= e($partner['phone']) ?>
+        </a>
+        <?php endif; ?>
+        <?php if (!empty($partner['email'])): ?>
+        <div style="margin-top:0.25rem;">
+          <a href="mailto:<?= e($partner['email']) ?>" style="display:inline-flex;align-items:center;justify-content:center;gap:0.35rem;font-size:var(--text-sm);color:var(--primary);text-decoration:none;">
+            <i data-lucide="mail" style="width:13px;height:13px;"></i><?= e($partner['email']) ?>
+          </a>
+        </div>
+        <?php endif; ?>
+      </div>
+      <?php endforeach; ?>
+    </div>
+    <?php endif; unset($__hasContact); ?>
   </div>
 </section>
 <?php endif; ?>

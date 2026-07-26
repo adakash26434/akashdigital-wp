@@ -14,7 +14,7 @@ if (!$faqs) {
   $faqAddress = e($__s['address'] ?? 'Nepal');
   $faqs = [
     ['category'=>'General','question'=>'What is ' . $faqCompany . '?','answer'=> $faqCompany . ' is a software company based in ' . $faqAddress . ', providing IT solutions and software services including web development, document management, HR & payroll, IT support and more.'],
-    ['category'=>'General','question'=>'How many clients use your software?','answer'=>'Over 120 clients across Nepal — from small businesses to larger organizations. We are proud of our long-term relationships and strong client retention.'],
+    ['category'=>'General','question'=>'How many clients use your software?','answer'=>'Over ' . siteTrustStats($__s)['client_display'] . ' clients across Nepal — from small businesses to larger organizations. We are proud of our long-term relationships and strong client retention.'],
     ['category'=>'Products','question'=>'Are your software solutions locally supported?','answer'=>'Yes. All our software comes with local support from our team in ' . $faqAddress . '. We provide training, on-site visits and remote assistance to ensure your business runs smoothly.'],
     ['category'=>'Products','question'=>'Does the system support Nepali calendar (BS)?','answer'=>'Absolutely. Every module — savings, loans, reports, payslips — is fully Nepali calendar (Bikram Sambat) native. Dates, receipts and statements all print in BS.'],
     ['category'=>'Pricing','question'=>'What is included in the Starter plan?','answer'=>'The Starter plan includes Core Banking for up to 500 members, a web portal with notice board and downloads, email + ticket support, monthly backups and one staff training session. Setup fees apply separately.'],
@@ -118,7 +118,7 @@ include 'includes/page-hero.php';
 
 <?php
 $ctaTitle = __('cta_title');
-$ctaSubtitle = __('cta_sub');
+$ctaSubtitle = siteTrustCtaSubtitle($__s);
 $ctaPrimary = ['label' => __('cta_demo'), 'url' => url('contact.php'), 'icon' => 'calendar'];
 $ctaSecondary = ['label' => isNepali() ? __('cta_pricing') : 'View pricing', 'url' => url('pricing.php'), 'icon' => 'tag'];
 include 'includes/cta-banner.php';

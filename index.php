@@ -14,30 +14,6 @@ $pageDesc  = 'IT Solutions & Software Services. Reliable, locally supported tech
 
 $testimonials = [];
 try { $testimonials = query("SELECT * FROM testimonials WHERE active=1 ORDER BY position LIMIT 6"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
-$__logoClients = [];
-
-// Get ALL active clients from CRM (single source of truth) - case insensitive
-try { $__logoClients = query("SELECT org_name, logo_url, district, province FROM clients WHERE LOWER(TRIM(status)) = 'active' AND TRIM(org_name) IS NOT NULL AND TRIM(org_name) != '' ORDER BY org_name ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
-
-// Also include client-type partners
-try { $partnerClients = query("SELECT name AS org_name, logo_url, district, '' AS province FROM partners ORDER BY position ASC, id ASC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
-
-// Count total clients for stat display (actual DB count + 300)
-$__clientCount = count($__logoClients) + count($partnerClients) + 300;
-// Merge and deduplicate by org_name
-$seen = [];
-foreach ($partnerClients as $pc) {
-    $key = strtolower($pc['org_name'] ?? '');
-    if (!isset($seen[$key])) {
-        $seen[$key] = true;
-        $__logoClients[] = $pc;
-    }
-}
-// Shuffle for visual variety (limit to 40 for performance)
-if (count($__logoClients) > 40) {
-    shuffle($__logoClients);
-    $__logoClients = array_slice($__logoClients, 0, 40);
-}
 
 $newsItems = [];
 try { $newsItems = query("SELECT id, title, slug, excerpt, category, author_name, published_at, COALESCE(cover_url, image_url) AS cover FROM news WHERE published=1 AND active=1 ORDER BY published_at DESC LIMIT 4"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -58,8 +34,10 @@ try {
 
 // ── Site settings (CMS-driven homepage content) ──────────────────
 $__s = siteSettings();
-// Recompute client count using the admin-configurable offset (default 300)
-$__clientCount = count($__logoClients) + count($partnerClients) + (int)(($__s['client_count_offset'] ?? '') !== '' ? $__s['client_count_offset'] : 300);
+// Trust strip stats + logo list — single source (also used by partners.php)
+$__trust = siteTrustStats($__s);
+$__logoClients = $__trust['marquee_items'];
+$__clientCount = $__trust['client_count'];
 
 // Stats bar — admin-editable, fallback to defaults
 // Stat #2 (Happy Clients) uses actual count from clients + partners DB
@@ -190,8 +168,11 @@ $_heroBg    = trim($__s['hero_bg'] ?? '') ?: '#0a1023';
 
 // Badge text
 $_badge1 = cms($__s, 'hero_badge1_text') ?: (isNepali() ? '🇳🇵 नेपालमा बनेको' : '🇳🇵 Built for Nepal');
-// Badge 2: Dynamic client count (DB count + 300)
-$_badge2 = $__clientCount . '+ ' . (isNepali() ? 'सहकारीहरूको विश्वास' : 'Cooperatives Trust');
+// Badge 2: admin text if set, else live client count (same as trust strip)
+$_badge2 = cms($__s, 'hero_badge2_text');
+if ($_badge2 === '') {
+  $_badge2 = $__trust['client_display'] . ' ' . (isNepali() ? 'सहकारीहरूको विश्वास' : 'Cooperatives Trust');
+}
 
 // CTA
 $_ctaHref  = trim($__s['homepage_cta_url'] ?? '') ?: url('contact.php');
@@ -407,6 +388,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 ══════════════════════════════════════════════ -->
 <?php
 $statsBarAnimate = true;
+$statsBarItems   = $stats; // already uses live client count for Happy Clients
 include 'includes/stats-bar.php';
 ?>
 
@@ -421,9 +403,9 @@ include 'includes/stats-bar.php';
     <div class="container">
       <div class="st-stats__grid" style="grid-template-columns:repeat(3,1fr);">
         <?php foreach ([
-          [$__clientCount . '+', ($__s['stat_coop_clients_label'] ?? '') ?: 'Cooperative Clients', 'building-2'],
-          [($__s['stat_partners_value'] ?? '') ?: '15+', ($__s['stat_partners_label'] ?? '') ?: 'Technology Partners', 'layers'],
-          [($__s['stat_provinces_value'] ?? '') ?: '7', ($__s['stat_provinces_label'] ?? '') ?: 'Provinces Covered', 'map-pin'],
+          [$__trust['client_display'], $__trust['coop_label'], 'building-2'],
+          [$__trust['partners_value'], $__trust['partners_label'], 'layers'],
+          [$__trust['provinces_value'], $__trust['provinces_label'], 'map-pin'],
         ] as [$n, $l, $ic]):
           preg_match('/^([\d,.]+)/', $n, $mm);
           $nNum = $mm[1] ?? $n;
@@ -465,44 +447,11 @@ include 'includes/stats-bar.php';
       </h2>
     </div>
 
-    <style>
-    .st-marq-card{flex-shrink:0;display:flex;align-items:center;gap:.625rem;background:var(--card);border:1px solid var(--border);border-radius:.875rem;padding:.625rem .875rem;box-shadow:0 1px 4px rgba(0,0,0,.05);transition:border-color .22s,box-shadow .22s,transform .18s;cursor:default;min-width:180px;max-width:240px;}
-    .st-marq-card:hover{border-color:rgba(79,70,229,.3);box-shadow:0 3px 14px rgba(79,70,229,.1);transform:translateY(-2px);}
-    .st-marq-card__logo{width:2.25rem;height:2.25rem;object-fit:contain;border-radius:.375rem;flex-shrink:0;filter:grayscale(.3);opacity:.85;transition:filter .25s,opacity .25s;}
-    .st-marq-card:hover .st-marq-card__logo{filter:grayscale(0);opacity:1;}
-    .st-marq-card__icon{width:2.25rem;height:2.25rem;border-radius:.5rem;background:color-mix(in srgb,var(--primary) 10%,transparent);display:grid;place-items:center;flex-shrink:0;}
-    .st-marq-card__body{display:flex;flex-direction:column;gap:.1rem;min-width:0;}
-    .st-marq-card__name{font-family:var(--font-display);font-weight:600;font-size:.8125rem;color:var(--foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;}
-    .st-marq-card__loc{font-size:.6875rem;color:var(--muted-foreground);white-space:nowrap;display:flex;align-items:center;gap:.2rem;line-height:1;}
-    </style>
-    <div class="marquee-wrap" style="padding-bottom:2.5rem;">
-      <div style="display:flex;gap:.75rem;align-items:stretch;width:max-content;animation:logo-sc 65s linear infinite;" onmouseover="this.style.animationPlayState='paused'" onmouseout="this.style.animationPlayState='running'">
-      <?php for($r=0;$r<2;$r++): foreach($__logoClients as $lc):
-        $_dist = trim($lc['district'] ?? '');
-        $_prov = (int)($lc['province'] ?? 0);
-        $_provLabel = $_prov > 0 ? 'Province ' . $_prov : '';
-        $loc = $_dist ?: $_provLabel;
-        if ($_dist && $_provLabel) $loc = $_dist . ', ' . $_provLabel;
-      ?>
-      <div class="st-marq-card">
-        <?php if (!empty($lc['logo_url'])): ?>
-        <img src="<?= e($lc['logo_url']) ?>" alt="<?= e($lc['org_name']) ?>" loading="lazy" decoding="async" class="st-marq-card__logo">
-        <?php else: ?>
-        <div class="st-marq-card__icon">
-          <i data-lucide="building-2" style="width:1rem;height:1rem;color:var(--primary);"></i>
-        </div>
-        <?php endif; ?>
-        <div class="st-marq-card__body">
-          <div class="st-marq-card__name"><?= e($lc['org_name']) ?></div>
-          <?php if ($loc): ?>
-          <div class="st-marq-card__loc">
-            <i data-lucide="map-pin" style="width:.6rem;height:.6rem;flex-shrink:0;"></i><?= e($loc) ?>
-          </div>
-          <?php endif; ?>
-        </div>
-      </div>
-      <?php endforeach; endfor; ?>
-    </div>
+    <?php
+    $logoMarqueeItems = $__logoClients;
+    $logoMarqueeSpeed = 55;
+    include 'includes/logo-marquee.php';
+    ?>
   </div>
 </section>
 <?php endif; ?>
@@ -933,7 +882,7 @@ function sTab(slug){
 $ctaEyebrow     = trim($__s['home_cta_eyebrow']??'') ?: (isNepali() ? 'तपाईं तयार हुँदा हामी पनि' : 'Ready when you are');
 $ctaEyebrowIcon = 'rocket';
 $ctaTitle       = __('cta_title');
-$ctaSubtitle    = __('cta_sub');
+$ctaSubtitle    = siteTrustCtaSubtitle($__s);
 $ctaPrimary     = ['label' => __('home_hero_book_demo'), 'url' => url('contact.php'), 'icon' => 'calendar'];
 $ctaSecondary   = ['label' => __('cta_see_pricing'), 'url' => url('pricing.php'), 'icon' => 'tag'];
 $ctaTrustPills  = [

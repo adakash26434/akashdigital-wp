@@ -171,6 +171,14 @@ if (!empty($_GET['edit'])) {
 </div>
 
 <div id="aft-list" <?=$afActive==='form'?'style="display:none"':''?>>
+  <div class="alert" style="background:var(--muted);border:1px solid var(--border);border-radius:0.75rem;padding:0.75rem 1rem;margin-bottom:0.875rem;font-size:0.8125rem;display:flex;gap:0.625rem;align-items:flex-start;">
+    <i data-lucide="tags" style="width:1rem;height:1rem;color:var(--primary);flex-shrink:0;margin-top:0.1rem;"></i>
+    <div>
+      <strong>Optional add-ons</strong> (Custom Reports, Data Migration, Training, Integration) prices are edited in
+      <a href="<?= url('admin/settings.php') ?>#products_page" class="text-primary" style="font-weight:700;">Settings → Products Page</a>
+      — change the <em>Card price (public)</em> field and Save.
+    </div>
+  </div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Products (<?=count($products)?>)</h2>
   </div>

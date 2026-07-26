@@ -67,7 +67,7 @@ return [
 
     // CTA
     'cta_title'   => 'Ready to start your digital journey?',
-    'cta_sub'     => 'Join 650+ happy clients already running on our digital platform. Talk to our experts about a solution tailored to your organisation.',
+    'cta_sub'     => 'Join happy clients already running on our digital platform. Talk to our experts about a solution tailored to your organisation.',
     'cta_demo'    => 'Book a free demo',
     'cta_pricing' => 'See pricing',
 
@@ -219,7 +219,7 @@ return [
     'trust_free_demo'      => 'Free demo included',
     'trust_onsite'         => 'On-site support across Nepal',
     'trust_setup_free'     => 'All plans include free setup consultation · Annual billing = 2 months free',
-    'trust_120_live'       => '650+ happy clients on our platform',
+    'trust_120_live'       => 'Happy clients on our platform',
     'trust_nrb_strip'      => 'BS Calendar · Full Audit Trail · Local Support',
     'trust_pop_badge'      => 'Most Popular',
     'trust_nepal_1'        => "Trusted IT partner in Nepal",
@@ -289,7 +289,7 @@ return [
 
     // ── Services page ──
     'services_get_quote'       => 'Get a quote',
-    'services_why_label'       => 'Why 650+ cooperatives chose us',
+    'services_why_label'       => 'Why cooperatives chose us',
 
     // ── Home page ──
     'home_pricing_link'        => 'See full pricing & feature comparison',

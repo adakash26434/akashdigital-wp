@@ -143,7 +143,7 @@ ob_start(); ?>
 
 <?php
 $ctaTitle = __('cta_title');
-$ctaSubtitle = __('cta_sub');
+$ctaSubtitle = siteTrustCtaSubtitle();
 $ctaPrimary = ['label' => __('cta_demo'), 'url' => url('contact.php'), 'icon' => 'calendar'];
 $ctaSecondary = ['label' => isNepali() ? __('nav_products') : 'View products', 'url' => url('products.php'), 'icon' => 'layers'];
 include 'includes/cta-banner.php';

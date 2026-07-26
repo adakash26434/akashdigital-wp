@@ -119,6 +119,87 @@ function siteSettings(bool $refresh = false): array {
     return $cache;
 } // यहाँ Bracket बन्द गरिएको छ
 
+/**
+ * Homepage trust strip — cooperative clients / partners / provinces.
+ * Single source for index.php, partners.php, and any other public surface.
+ * Client count = unique(active CRM clients ∪ partners table) + admin offset.
+ */
+function siteTrustStats(?array $settings = null): array {
+    $s = $settings ?? siteSettings();
+    $offsetRaw = $s['client_count_offset'] ?? '';
+    $offset = ($offsetRaw !== '' && $offsetRaw !== null) ? (int)$offsetRaw : 300;
+
+    $crm = [];
+    try {
+        $crm = query(
+            "SELECT org_name, logo_url, district, province FROM clients
+             WHERE LOWER(TRIM(status)) = 'active'
+               AND TRIM(org_name) IS NOT NULL AND TRIM(org_name) != ''
+             ORDER BY org_name ASC"
+        );
+    } catch (\Throwable $e) {
+        error_log('[helpers] siteTrustStats clients: ' . $e->getMessage());
+    }
+
+    $partners = [];
+    try {
+        $partners = query(
+            "SELECT name AS org_name, logo_url, district, '' AS province
+             FROM partners ORDER BY position ASC, id ASC"
+        );
+    } catch (\Throwable $e) {
+        error_log('[helpers] siteTrustStats partners: ' . $e->getMessage());
+    }
+
+    $seen = [];
+    $merged = [];
+    foreach (array_merge($crm, $partners) as $row) {
+        $key = strtolower(trim((string)($row['org_name'] ?? '')));
+        if ($key === '' || isset($seen[$key])) continue;
+        $seen[$key] = true;
+        $merged[] = $row;
+    }
+
+    $unique = count($merged);
+    $clientCount = $unique + $offset;
+
+    $marquee = $merged;
+    if (count($marquee) > 40) {
+        shuffle($marquee);
+        $marquee = array_slice($marquee, 0, 40);
+    }
+
+    return [
+        'client_count'    => $clientCount,
+        'client_display'  => $clientCount . '+',
+        'coop_label'      => trim((string)($s['stat_coop_clients_label'] ?? '')) ?: 'Cooperative Clients',
+        'partners_value'  => trim((string)($s['stat_partners_value'] ?? '')) ?: '15+',
+        'partners_label'  => trim((string)($s['stat_partners_label'] ?? '')) ?: 'Technology Partners',
+        'provinces_value' => trim((string)($s['stat_provinces_value'] ?? '')) ?: '7',
+        'provinces_label' => trim((string)($s['stat_provinces_label'] ?? '')) ?: 'Provinces Covered',
+        'marquee_items'   => $marquee,
+        'unique_orgs'     => $unique,
+    ];
+}
+
+/** True when a public stat label is about clients / cooperatives (live count applies). */
+function siteTrustLabelIsClientCount(string $label): bool {
+    $l = mb_strtolower(trim($label));
+    if ($l === '') return false;
+    return (bool)preg_match('/client|cooperative|coop|ग्राहक|सहकारी/', $l);
+}
+
+/**
+ * CTA subtitle with the same client count as the homepage trust strip.
+ */
+function siteTrustCtaSubtitle(?array $settings = null): string {
+    $t = siteTrustStats($settings);
+    if (function_exists('isNepali') && isNepali()) {
+        return $t['client_display'] . ' सहकारीहरू पहिले नै हाम्रो डिजिटल प्लेटफर्ममा चलिरहेका छन्। विशेषज्ञसँग कुरा गर्नुस।';
+    }
+    return 'Join ' . $t['client_display'] . ' happy clients already running on our digital platform. Talk to our experts about a solution tailored to your organisation.';
+}
+
 // ── Form helper functions — always available (not DB-dependent) ──────────────
 
 function formInput(string $label, string $name, mixed $value = '', array $opts = []): string {

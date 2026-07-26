@@ -772,7 +772,7 @@ $tabs = [
 
             <!-- Hero Stats -->
             <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Hero Stats (4 boxes below headline)</div>
-            <p class="caption-meta" style="margin-top:0;">Leave blank to use defaults (120+ Clients, 8 yrs, <2 hr, 99.9%)</p>
+            <p class="caption-meta" style="margin-top:0;">Any stat whose <strong>label</strong> mentions Clients / Cooperatives is auto-filled from the live Cooperative Clients count (DB + offset) so Home, About, Portfolio and Partners stay in sync.</p>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <?php
               $defaultStats = [
@@ -789,8 +789,8 @@ $tabs = [
             </div>
             <hr style="border:none;border-top:1px solid var(--border);margin:.75rem 0;">
             <!-- Secondary stats (Cooperative Clients row) -->
-            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Cooperative Clients Section Stats</div>
-            <p class="caption-meta" style="margin-top:0;">These appear in the clients/partners section below the hero. "Cooperative Clients" count = DB count + offset.</p>
+            <div style="font-size:0.75rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:.5rem;">Cooperative Clients Section Stats (single source)</div>
+            <p class="caption-meta" style="margin-top:0;">Used on Home trust strip, Partners page, Portfolio, CTAs, and any stats-bar box labeled Clients/Cooperatives.</p>
             <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;">
               <div style="background:var(--muted);border-radius:0.5rem;padding:0.75rem;display:flex;flex-direction:column;gap:0.5rem;">
                 <div style="font-size:0.6875rem;font-weight:700;color:var(--muted-foreground);text-transform:uppercase;">Cooperative Clients</div>
@@ -1640,11 +1640,15 @@ $tabs = [
 
         <hr style="border:none;border-top:1px solid var(--border);">
         <h3 class="h-eyebrow">Optional add-ons section</h3>
+        <p class="caption-meta" style="margin-top:-0.35rem;">
+          These cards appear on <a href="<?= url('products.php') ?>" class="text-primary" target="_blank" rel="noopener">products.php</a>
+          under “Optional add-ons”. <strong>Price is fully editable</strong> — type exactly what visitors should see (e.g. <code>from NPR 8,000</code> or <code>NPR 15,000/day</code>).
+        </p>
         <?php biI($s,'products_addons_eyebrow','Section eyebrow','Optional add-ons','वैकल्पिक एड-अनहरू') ?>
         <?php biI($s,'products_addons_title','Section title','Extend your platform','आफ्नो प्लेटफर्म विस्तार गर्नुस') ?>
 
         <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;flex-wrap:wrap;">
-          <p class="caption-meta" style="margin:0;">Link a card to a product/service to pull name, summary and price automatically. Overrides fill gaps only.</p>
+          <p class="caption-meta" style="margin:0;">Custom cards use the fields below. Linked product/service fills blank title/desc/price automatically.</p>
           <button type="button" class="btn btn-outline btn-sm" @click="addItem()"><?= icon('plus',14) ?> Add card</button>
         </div>
 
@@ -1653,9 +1657,10 @@ $tabs = [
             <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
               <label class="row-check" style="margin:0;">
                 <input type="checkbox" x-model="item.active">
-                <span>Visible</span>
+                <span>Visible on website</span>
               </label>
-              <div style="display:flex;gap:0.375rem;">
+              <div style="display:flex;gap:0.375rem;align-items:center;">
+                <span class="caption-meta" style="margin:0;" x-text="'Card ' + (idx+1)"></span>
                 <button type="button" class="btn btn-ghost btn-sm" @click="moveItem(idx,-1)" :disabled="idx===0">↑</button>
                 <button type="button" class="btn btn-ghost btn-sm" @click="moveItem(idx,1)" :disabled="idx===items.length-1">↓</button>
                 <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);" @click="removeItem(idx)"><?= icon('trash-2',14) ?></button>
@@ -1665,7 +1670,7 @@ $tabs = [
               <div>
                 <label class="form-label">Link type</label>
                 <select class="form-input" x-model="item.link_type" @change="if(item.link_type==='custom') item.link_id=0">
-                  <option value="custom">Custom (manual text)</option>
+                  <option value="custom">Custom (manual title / price)</option>
                   <option value="product">Product</option>
                   <option value="service">Service</option>
                 </select>
@@ -1689,30 +1694,39 @@ $tabs = [
                 </select>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:120px 1fr 1fr;gap:0.625rem;">
+            <div style="display:grid;grid-template-columns:110px 1fr;gap:0.625rem;">
               <div>
                 <label class="form-label">Icon</label>
                 <input type="text" class="form-input" x-model="item.icon" placeholder="puzzle">
               </div>
               <div>
-                <label class="form-label">Title override</label>
-                <input type="text" class="form-input" x-model="item.title" placeholder="Leave blank if linked">
-              </div>
-              <div>
-                <label class="form-label">Price override</label>
-                <input type="text" class="form-input" x-model="item.price" placeholder="from NPR 8,000">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-input" x-model="item.title" placeholder="Custom Reports">
               </div>
             </div>
             <div>
-              <label class="form-label">Description override</label>
-              <textarea class="form-input" rows="2" x-model="item.desc" placeholder="Leave blank if linked"></textarea>
+              <label class="form-label">Description</label>
+              <textarea class="form-input" rows="2" x-model="item.desc" placeholder="Short card description"></textarea>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;align-items:end;">
+              <div>
+                <label class="form-label">Card price <span style="color:var(--primary);font-weight:700;">(public)</span></label>
+                <input type="text" class="form-input" x-model="item.price" placeholder="from NPR 8,000" style="font-weight:700;color:var(--primary);">
+                <p class="caption-meta" style="margin:0.25rem 0 0;">Shown in blue under the card on the Products page.</p>
+              </div>
+              <div style="border:1px dashed var(--border);border-radius:0.75rem;padding:0.75rem 1rem;background:var(--muted);">
+                <div class="caption-meta" style="margin:0 0 0.35rem;">Live preview</div>
+                <div style="font-weight:700;font-size:0.875rem;color:var(--foreground);" x-text="item.title || 'Add-on title'"></div>
+                <div style="font-size:0.75rem;color:var(--muted-foreground);margin:0.2rem 0 0.4rem;line-height:1.4;" x-text="item.desc || 'Description…'"></div>
+                <div style="font-weight:800;font-size:0.875rem;color:var(--primary);" x-text="item.price || 'Set a price'"></div>
+              </div>
             </div>
           </div>
         </template>
 
         <div class="alert" style="background:var(--muted);border:1px solid var(--border);border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;color:var(--foreground);display:flex;gap:0.625rem;align-items:flex-start;">
           <?= icon('lightbulb',14,'color:var(--warning);flex-shrink:0;') ?>
-          <div>Detail page copy (description, features, highlights, screenshots) is edited per product in <a href="<?= url('admin/products.php') ?>" class="text-primary font-medium">Admin → Products</a>. Listing cards use “More details” → product detail page.</div>
+          <div>After editing prices, click <strong>Save Products Page</strong>. Refresh <a href="<?= url('products.php') ?>" class="text-primary" target="_blank" rel="noopener">products.php</a> to see changes.</div>
         </div>
         <button type="submit" class="btn btn-primary w-fit"><?= icon('save',15) ?> Save Products Page</button>
       </div>

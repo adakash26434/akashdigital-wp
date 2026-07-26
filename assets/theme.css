@@ -2789,7 +2789,134 @@ h1.lang-ne, h2.lang-ne, h3.lang-ne,
   border-color: var(--primary);
 }
 
-/* ── Client logo marquee items ──────────────────────────────────── */
+/* ── Client / partner logo marquee cards (Logo → Name → Address, centered) ── */
+@keyframes logo-sc {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.st-marq-track {
+  display: flex;
+  gap: 0.75rem;
+  align-items: stretch;
+  width: max-content;
+  animation: logo-sc 55s linear infinite;
+}
+.st-marq-track:hover { animation-play-state: paused; }
+.st-marq-card,
+.ptn-card {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 0.875rem;
+  padding: 0.875rem 1rem 1.125rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,.05);
+  transition: border-color .22s, box-shadow .22s, transform .18s;
+  cursor: default;
+  width: 11.5rem;
+  min-height: 8.25rem;
+  text-decoration: none;
+  color: inherit;
+}
+.st-marq-card:hover,
+.ptn-card:hover {
+  border-color: rgba(37,99,235,.28);
+  box-shadow: 0 3px 14px rgba(37,99,235,.1);
+  transform: translateY(-2px);
+}
+.st-marq-card__logo,
+.ptn-card__logo {
+  width: 2.75rem;
+  height: 2.75rem;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  filter: grayscale(.25);
+  opacity: .9;
+  transition: filter .25s, opacity .25s;
+  margin: 0 auto;
+  display: block;
+}
+.st-marq-card:hover .st-marq-card__logo,
+.ptn-card:hover .ptn-card__logo {
+  filter: grayscale(0);
+  opacity: 1;
+}
+.st-marq-card__icon,
+.ptn-avatar {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.625rem;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.st-marq-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 100%;
+  min-width: 0;
+}
+.st-marq-card__name,
+.ptn-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  color: var(--foreground);
+  line-height: 1.35;
+  text-align: center;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.st-marq-card__loc,
+.ptn-dist {
+  font-size: 0.6875rem;
+  color: var(--muted-foreground);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  line-height: 1.2;
+  text-align: center;
+  width: 100%;
+}
+.ptn-marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+}
+.ptn-track {
+  display: flex;
+  gap: 1rem;
+  width: max-content;
+  align-items: stretch;
+}
+.ptn-track.scroll {
+  animation: logo-sc 32s linear infinite;
+}
+.ptn-track.scroll:hover { animation-play-state: paused; }
+.ptn-static {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+/* ── Client logo marquee items (legacy pill style) ──────────────────────────────────── */
 .st-marq-logo {
   max-height: 2.75rem; max-width: 9rem; object-fit: contain;
   filter: grayscale(.5); opacity: .65;

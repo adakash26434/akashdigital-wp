@@ -48,6 +48,33 @@ include 'includes/page-hero.php';
 
 <?php include 'includes/stats-bar.php'; ?>
 
+<?php
+// Same centered Logo → Name → Address scroll as Home / Partners
+$__aboutTrust = siteTrustStats($__s);
+if (!empty($__aboutTrust['marquee_items'])):
+?>
+<section class="st-section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head section-head-tight" style="margin-bottom:1.25rem;">
+      <div class="section-eyebrow section-eyebrow-green mb-3q">
+        <i data-lucide="building-2" class="ic-11"></i>
+        <?= e(isNepali() ? 'हाम्रा साझेदार' : 'Our Partners') ?>
+      </div>
+      <h2 class="h-display section-title" style="margin-bottom:0;">
+        <?= isNepali()
+          ? 'नेपालभरका अग्रणी <span class="tg">संस्थाहरूको</span> भरोसा'
+          : 'Trusted by leading <span class="tg">institutions</span> across Nepal' ?>
+      </h2>
+    </div>
+    <?php
+      $logoMarqueeItems = $__aboutTrust['marquee_items'];
+      $logoMarqueeSpeed = 55;
+      include 'includes/logo-marquee.php';
+    ?>
+  </div>
+</section>
+<?php endif; unset($__aboutTrust); ?>
+
 <!-- ═══════ MISSION ═══════ -->
 <section id="mission" class="st-section scroll-mt-nav">
   <div class="container">

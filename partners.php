@@ -8,27 +8,26 @@ $pageDesc  = 'Our trusted partners, clients and affiliates — organisations we 
 
 // Get partners from partners table (try different active column values)
 $all = [];
-try { 
-    $all = query("SELECT * FROM partners ORDER BY position ASC, id DESC"); 
-} catch (\Throwable $e) { 
-    // If full query fails, try simpler query without order
+try {
+    $all = query("SELECT * FROM partners ORDER BY position ASC, id DESC");
+} catch (\Throwable $e) {
     try {
         $all = query("SELECT * FROM partners");
-    } catch (\Throwable $e2) { 
-        error_log('[' . basename(__FILE__) . '] partners query: ' . $e2->getMessage()); 
-    } 
+    } catch (\Throwable $e2) {
+        error_log('[' . basename(__FILE__) . '] partners query: ' . $e2->getMessage());
+    }
 }
 
 // Get clients from clients table for Clients section
 $dbClients = [];
 try {
     $dbClients = query(
-        "SELECT id, org_name, logo_url, district, status FROM clients 
+        "SELECT id, org_name, logo_url, district, status FROM clients
          WHERE TRIM(org_name) != '' AND TRIM(org_name) IS NOT NULL
          ORDER BY org_name ASC"
     );
-} catch (\Throwable $e) { 
-    error_log('[' . basename(__FILE__) . '] clients query: ' . $e->getMessage()); 
+} catch (\Throwable $e) {
+    error_log('[' . basename(__FILE__) . '] clients query: ' . $e->getMessage());
 }
 
 // Build clients array with type='client'
@@ -42,11 +41,33 @@ foreach ($dbClients as $c) {
         'url'       => '',
     ];
 }
+// Also include partners marked as client type (same pool as homepage marquee)
+foreach ($all as $p) {
+    if (($p['type'] ?? '') !== 'client') continue;
+    $clientsAsPartners[] = [
+        'type'     => 'client',
+        'name'     => $p['name'] ?? '',
+        'logo_url' => $p['logo_url'] ?? '',
+        'district' => $p['district'] ?? '',
+        'url'      => $p['url'] ?? '',
+    ];
+}
+// Deduplicate clients by name
+$__seenClients = [];
+$__dedupedClients = [];
+foreach ($clientsAsPartners as $c) {
+    $k = strtolower(trim((string)($c['name'] ?? '')));
+    if ($k === '' || isset($__seenClients[$k])) continue;
+    $__seenClients[$k] = true;
+    $__dedupedClients[] = $c;
+}
+$clientsAsPartners = $__dedupedClients;
+unset($__seenClients, $__dedupedClients);
 
 $groups = ['client','partner','channel','solution','investor'];
 $grouped = [];
 
-// Clients section: only from DB (clients table)
+// Clients section: CRM clients + partners type=client
 $grouped['client'] = $clientsAsPartners;
 
 // Other groups: from partners table
@@ -58,10 +79,8 @@ foreach (['partner','channel','solution','investor'] as $g) {
 $labels = ['client'=>'Clients','partner'=>'Technology Partners','channel'=>'Channel Partners','solution'=>'Solution Partners','investor'=>'Investors'];
 
 $__s = siteSettings();
-$clientCount = count($clientsAsPartners);
-$partnerCount = count($grouped['partner'] ?? []);
-// Add 300 to client count for display (DB count + 300)
-$displayClientCount = $clientCount + 300;
+// Same trust numbers as homepage (single source)
+$__trust = siteTrustStats($__s);
 
 require_once 'includes/header.php';
 ?>
@@ -78,9 +97,9 @@ include 'includes/page-hero.php';
   <div class="container">
     <div class="partner-stats__grid">
       <?php foreach ([
-        [$displayClientCount . '+', 'Cooperative clients'],
-        ['15+', 'Technology partners'],
-        ['7', 'Provinces covered'],
+        [$__trust['client_display'], $__trust['coop_label']],
+        [$__trust['partners_value'], $__trust['partners_label']],
+        [$__trust['provinces_value'], $__trust['provinces_label']],
       ] as [$n, $l]): ?>
       <div class="partner-stats__item">
         <div class="partner-stats__value"><?= e($n) ?></div>
@@ -99,78 +118,51 @@ include 'includes/page-hero.php';
       <p style="margin:0;">Partner directory coming soon.</p>
     </div>
     <?php else: ?>
-      <style>
-        @keyframes ptn-scroll { 0% { transform:translateX(0) } 100% { transform:translateX(-50%) } }
-        .ptn-marquee { overflow:hidden; mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent); -webkit-mask-image:linear-gradient(to right,transparent,black 6%,black 94%,transparent); }
-        .ptn-track { display:flex; gap:1rem; width:max-content; }
-        .ptn-track.scroll { animation:ptn-scroll 35s linear infinite; }
-        .ptn-track.scroll:hover { animation-play-state:paused; }
-        .ptn-card { flex-shrink:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.5rem; padding:1rem 1.125rem; border-radius:var(--radius-lg,0.75rem); background:var(--card); border:1px solid var(--border); min-width:140px; max-width:190px; text-decoration:none; transition:box-shadow .18s,border-color .18s; }
-        .ptn-card:hover { border-color:var(--primary-light,#bfdbfe); box-shadow:0 4px 18px rgba(59,130,246,.12); }
-        .ptn-avatar { width:2.75rem; height:2.75rem; border-radius:var(--radius); background:var(--primary-light,#dbeafe); display:grid; place-items:center; font-size:1.125rem; font-weight:700; color:var(--primary); flex-shrink:0; }
-        .ptn-name { font-size:.8125rem; font-weight:600; color:var(--foreground); text-align:center; line-height:1.3; }
-        .ptn-dist { font-size:.6875rem; color:var(--muted-foreground); display:flex; align-items:center; gap:.2rem; }
-      </style>
-
       <?php foreach ($groups as $g):
-        if (empty($grouped[$g])) continue;  // Hide empty group sections
+        if (empty($grouped[$g])) continue;
         $items   = $grouped[$g];
         $label   = $labels[$g];
-        $scroll  = count($items) > 5;   // marquee when >5 items
-        $speed   = max(20, count($items) * 3); // speed scales with count
-        // Clients section: show DB count + 300
-        $badgeCount = ($g === 'client') ? (count($items) + 300) : count($items);
+        $scroll  = count($items) >= 2; // scroll whenever there is a row to move
+        $speed   = max(22, count($items) * 2.8);
+        $badgeCount = count($items);
       ?>
       <div class="partner-group" style="margin-bottom:2.5rem;">
         <div class="partner-group__head">
           <h2 class="partner-group__title"><?= e($label) ?></h2>
           <div class="partner-group__line"></div>
-          <span class="badge badge-primary"><?= $badgeCount ?></span>
+          <span class="badge badge-primary"><?= (int)$badgeCount ?></span>
         </div>
 
         <?php if ($scroll): ?>
-        <!-- Auto-scroll marquee (>5 items) -->
-        <div class="ptn-marquee">
-          <div class="ptn-track scroll" style="animation-duration:<?= $speed ?>s;">
-            <?php for ($__r = 0; $__r < 2; $__r++): foreach ($items as $p): ?>
-            <?php $tag = !empty($p['url']) ? 'a' : 'div'; ?>
-            <<?= $tag ?> <?= !empty($p['url']) ? 'href="'.e($p['url']).'" target="_blank" rel="noopener noreferrer"' : '' ?> class="ptn-card">
-              <?php if (!empty($p['logo_url'])): ?>
-              <img src="<?= e($p['logo_url']) ?>" alt="<?= e($p['name']) ?>" loading="lazy" decoding="async" style="height:2.25rem;width:auto;object-fit:contain;max-width:7rem;">
-              <?php else: ?>
-              <div class="ptn-avatar"><?= strtoupper(substr($p['name'],0,1)) ?></div>
-              <?php endif; ?>
-              <div class="ptn-name"><?= e($p['name']) ?></div>
-              <?php if (!empty($p['district'])): ?>
-              <div class="ptn-dist"><i data-lucide="map-pin" class="ic-11"></i><?= e($p['district']) ?></div>
-              <?php endif; ?>
-            </<?= $tag ?>>
-            <?php endforeach; endfor; unset($__r); ?>
-          </div>
-        </div>
-
+        <?php
+          $logoMarqueeItems = $items;
+          $logoMarqueeSpeed = $speed;
+          $logoMarqueePad   = false;
+          include 'includes/logo-marquee.php';
+        ?>
         <?php else: ?>
-        <!-- Static grid (≤5 items) -->
-        <div style="display:flex;flex-wrap:wrap;gap:1rem;">
+        <div class="ptn-static">
           <?php foreach ($items as $p): ?>
           <?php $tag = !empty($p['url']) ? 'a' : 'div'; ?>
-          <<?= $tag ?> <?= !empty($p['url']) ? 'href="'.e($p['url']).'" target="_blank" rel="noopener noreferrer"' : '' ?> class="ptn-card">
+          <<?= $tag ?> <?= !empty($p['url']) ? 'href="'.e($p['url']).'" target="_blank" rel="noopener noreferrer"' : '' ?> class="st-marq-card">
             <?php if (!empty($p['logo_url'])): ?>
-            <img src="<?= e($p['logo_url']) ?>" alt="<?= e($p['name']) ?>" loading="lazy" decoding="async" style="height:2.25rem;width:auto;object-fit:contain;max-width:7rem;">
+            <img src="<?= e($p['logo_url']) ?>" alt="<?= e($p['name']) ?>" loading="lazy" decoding="async" class="st-marq-card__logo">
             <?php else: ?>
-            <div class="ptn-avatar"><?= strtoupper(substr($p['name'],0,1)) ?></div>
+            <div class="st-marq-card__icon" aria-hidden="true"><?= strtoupper(substr((string)$p['name'],0,1)) ?></div>
             <?php endif; ?>
-            <div class="ptn-name"><?= e($p['name']) ?></div>
-            <?php if (!empty($p['district'])): ?>
-            <div class="ptn-dist"><i data-lucide="map-pin" class="ic-11"></i><?= e($p['district']) ?></div>
-            <?php endif; ?>
+            <div class="st-marq-card__body">
+              <div class="st-marq-card__name"><?= e($p['name']) ?></div>
+              <?php if (!empty($p['district'])): ?>
+              <div class="st-marq-card__loc"><i data-lucide="map-pin" class="ic-11"></i><?= e($p['district']) ?></div>
+              <?php endif; ?>
+            </div>
           </<?= $tag ?>>
           <?php endforeach; ?>
         </div>
         <?php endif; ?>
 
       </div>
-      <?php endforeach; unset($items,$label,$scroll,$speed,$tag); ?>
+      <?php endforeach; unset($items,$label,$scroll,$speed,$tag,$badgeCount); ?>
     <?php endif; ?>
 
   </div>

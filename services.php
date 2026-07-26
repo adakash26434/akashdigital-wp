@@ -7,6 +7,7 @@ $pageTitle = 'Services — ' . stSiteName();
 $pageDesc  = 'IT services and software solutions — Cloud, SMS, Domain, Security Audit and more.';
 
 $__s = siteSettings();
+$__trust = siteTrustStats($__s);
 
 $__colorMap = [
   'blue'  =>'icon-box-blue',  'teal'  =>'icon-box-teal',  'purple'=>'icon-box-purple',
@@ -223,7 +224,7 @@ ob_start(); ?>
   <div class="container">
     <div class="animate-fade-up section-head section-head-tight">
       <div class="section-eyebrow mb-3q"><?= e(cms($__s,'services_section_eyebrow','Why choose us')) ?></div>
-      <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(cms($__s,'services_why_title',__('services_why_label'))) ?></h2>
+      <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(cms($__s,'services_why_title', isNepali() ? ('किन ' . $__trust['client_display'] . ' सहकारीले हामीलाई रोजे') : ('Why ' . $__trust['client_display'] . ' cooperatives chose us'))) ?></h2>
       <?php $__whySub = cms($__s,'services_why_subtitle',''); if ($__whySub): ?>
       <p class="section-sub" style="margin-top:0.5rem;"><?= e($__whySub) ?></p>
       <?php endif; ?>

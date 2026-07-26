@@ -27,6 +27,20 @@ if (empty($statsBarItems)) {
     unset($__i, $v, $l, $_def);
 }
 
+// Single source: any "clients / cooperatives" stat uses homepage trust count
+if (function_exists('siteTrustStats') && function_exists('siteTrustLabelIsClientCount') && !empty($statsBarItems)) {
+    try {
+        $__trustBar = siteTrustStats(isset($__s) && is_array($__s) ? $__s : null);
+        foreach ($statsBarItems as $__i => $__row) {
+            if (!is_array($__row) || !isset($__row[1])) continue;
+            if (siteTrustLabelIsClientCount((string)$__row[1])) {
+                $statsBarItems[$__i][0] = $__trustBar['client_display'];
+            }
+        }
+        unset($__trustBar, $__i, $__row);
+    } catch (\Throwable $e) { /* keep configured values */ }
+}
+
 // Default icons per position if not set
 $_statIcons = ['building-2', 'map-pin', 'zap', 'shield-check'];
 
