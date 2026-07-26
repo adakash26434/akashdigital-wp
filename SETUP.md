@@ -1,75 +1,65 @@
-# 🛠️ Site Setup Guide
+# Site Setup Guide
 
-## Step 1 — Clone from GitHub
+## Step 1 — Clone
 
 ```bash
-git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
-cd akashdigital-wp-main-2zip
+git clone https://github.com/adakash26434/akashdigital-wp.git
+cd akashdigital-wp
 ```
 
-## Step 2 — Create Production Config
+## Step 2 — Production config
 
-Create `config-production.php` in project root:
+Preferred path (same folder as `includes/config.php`):
+
+```bash
+cp includes/config-production.php.example includes/config-production.php
+```
+
+Legacy root path also works (`includes/config.php` loads either):
 
 ```bash
 cp config-production.php.example config-production.php
 ```
 
-Edit `config-production.php` and fill in:
-- DB credentials
-- SESSION_SECRET
-- APP_SECRET
+Edit the file and set:
+- `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS`
+- `SITE_URL`
+- `APP_SECRET_KEY` (keep existing live key; changing it resets sessions)
 
-## Step 3 — Generate Security Keys
+Generate a new key only for a fresh install:
 
 ```bash
 php -r "echo bin2hex(random_bytes(32));"
 ```
 
-Run twice for two keys:
-- First output → `SESSION_SECRET`
-- Second output → `APP_SECRET`
+## Step 3 — Database
 
-## Step 4 — Database Setup
+1. Create MySQL database + user in cPanel  
+2. Import `database.sql` via phpMyAdmin  
 
-### cPanel MySQL:
-1. Create MySQL Database
-2. Create Database User
-3. Import `database.sql` via phpMyAdmin
+Schema upgrades also run automatically on admin / homepage load (`includes/db-migrations.php`).
 
-```php
-define('DB_DRIVER', 'mysql');
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'your_db_name');
-define('DB_USER', 'your_db_user');
-define('DB_PASS', 'your_password');
-```
-
-### Local Dev (SQLite):
-No setup needed - auto-creates on first run.
-
-## Step 5 — Set Permissions
+## Step 4 — Permissions
 
 ```bash
-chmod 755 uploads/ storage/
-find uploads/ storage/ -type f -exec chmod 644 {} \;
+chmod 755 uploads/
+find uploads/ -type f -exec chmod 644 {} \;
 ```
 
-## Step 6 — Superadmin (Optional)
+## Step 5 — Superadmin (optional)
 
-Set as cPanel PHP Environment Variables:
+cPanel PHP environment variables:
 
 | Variable | Value |
 |---|---|
 | `SUPERADMIN_EMAIL` | admin@yourdomain.com |
 | `SUPERADMIN_PASS_HASH` | bcrypt hash |
 
-Generate hash:
 ```bash
 php -r "echo password_hash('YourPassword', PASSWORD_BCRYPT, ['cost'=>12]).PHP_EOL;"
 ```
 
-## Done! ✅
+## Done
 
-- Website: `https://yourdomain.com`
+- Site: `https://yourdomain.com`
 - Admin: `https://yourdomain.com/admin/`

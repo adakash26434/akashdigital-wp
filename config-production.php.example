@@ -1,27 +1,26 @@
 <?php
 /**
- * PRODUCTION CONFIGURATION — DO NOT COMMIT TO GITHUB!
+ * PRODUCTION SECRETS — copy to config-production.php and fill in values.
  *
- * Copy this file to config-production.php and fill in your credentials.
- * config-production.php is gitignored and will NOT be pushed to GitHub.
+ * Preferred location (matches deploy scripts):
+ *   cp includes/config-production.php.example includes/config-production.php
  *
- * Generate a strong APP_SECRET_KEY:
- *   php -r "echo bin2hex(random_bytes(32));"
+ * Also supported (legacy / root fallback loaded by includes/config.php):
+ *   cp config-production.php.example config-production.php
+ *
+ * NEVER commit the real config-production.php to GitHub.
  */
 
-// ── Database Credentials ──────────────────────────────
 define('DB_HOST',    'localhost');
-define('DB_NAME',    'your_database_name');
-define('DB_USER',    'your_database_user');
-define('DB_PASS',    'YOUR_PASSWORD_HERE');
+define('DB_NAME',    'YOUR_CPANEL_DATABASE_NAME');
+define('DB_USER',    'YOUR_CPANEL_DATABASE_USER');
+define('DB_PASS',    'YOUR_CPANEL_DATABASE_PASSWORD');
 define('DB_CHARSET', 'utf8mb4');
 
-// ── Site URL ───────────────────────────────────────────
-define('SITE_URL', 'https://yourdomain.com');
+define('SITE_URL', 'https://aakashdigital.com.np');
 
-// ── Secret Key (generate a unique one per deployment) ──
-// php -r "echo bin2hex(random_bytes(32));"
-define('APP_SECRET_KEY', 'PASTE_YOUR_GENERATED_KEY_HERE');
+// Keep the same key you already use on live — do NOT change unless you want all sessions reset.
+// Generate new: php -r "echo bin2hex(random_bytes(32));"
+define('APP_SECRET_KEY', 'PASTE_YOUR_EXISTING_SECRET_KEY_HERE');
 
-// ── Environment ────────────────────────────────────────
 define('APP_ENV', 'production');

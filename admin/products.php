@@ -52,15 +52,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $error = 'Product name is required.'; }
         else {
             try {
+                $fullParams = [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$tab_label?:null];
                 if ($id) {
-                    execute("UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,home_bg_css=?,demo_screenshot_url=?,tab_label=?,updated_at=NOW() WHERE id=?",
-                        [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$tab_label?:null,$id]);
-                    $success = 'Product updated.';
+                    $attempts = [
+                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,home_bg_css=?,demo_screenshot_url=?,tab_label=?,updated_at=NOW() WHERE id=?",
+                         array_merge($fullParams, [$id])],
+                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,updated_at=NOW() WHERE id=?",
+                         [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$id]],
+                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                         [$name,$slug,$tagline,$summary,$desc,$icon,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$id]],
+                        ["UPDATE products SET name=?,slug=?,icon=?,badge=?,price_from=?,category=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                         [$name,$slug,$icon,$badge?:null,$price,$category?:null,$position,$active,$id]],
+                    ];
                 } else {
-                    execute("INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,home_bg_css,demo_screenshot_url,tab_label,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$tab_label?:null]);
-                    $success = 'Product created.';
+                    $attempts = [
+                        ["INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,home_bg_css,demo_screenshot_url,tab_label,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         $fullParams],
+                        ["INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark]],
+                        ["INSERT INTO products (name,slug,tagline,summary,description,icon,badge,price_from,category,features,highlights,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$slug,$tagline,$summary,$desc,$icon,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active]],
+                        ["INSERT INTO products (name,slug,icon,badge,price_from,category,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$slug,$icon,$badge?:null,$price,$category?:null,$position,$active]],
+                    ];
                 }
+                $saved = false; $lastErr = null;
+                foreach ($attempts as [$sql, $params]) {
+                    try { execute($sql, $params); $saved = true; break; }
+                    catch (\Throwable $fe) { $lastErr = $fe; }
+                }
+                if (!$saved) throw $lastErr ?? new \RuntimeException('Save failed');
+                $success = $id ? 'Product updated.' : 'Product created.';
             } catch(\Throwable $e) { $error = 'Save failed: ' . $e->getMessage(); }
         }
     }

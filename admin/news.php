@@ -53,12 +53,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             try {
                 if ($id) {
-                    execute("UPDATE news SET title=?,slug=?,excerpt=?,content=?,cover_url=?,author_name=?,category=?,tags=?,read_time=?,featured=?,published=?,published_at=?,active=?,source_url=?,updated_at=NOW() WHERE id=?",
-                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url,$id]);
+                    try {
+                        execute("UPDATE news SET title=?,slug=?,excerpt=?,content=?,cover_url=?,author_name=?,category=?,tags=?,read_time=?,featured=?,published=?,published_at=?,active=?,source_url=?,updated_at=NOW() WHERE id=?",
+                            [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url,$id]);
+                    } catch (\Throwable $fe) {
+                        execute("UPDATE news SET title=?,slug=?,excerpt=?,content=?,cover_url=?,author_name=?,category=?,tags=?,read_time=?,featured=?,published=?,published_at=?,active=?,updated_at=NOW() WHERE id=?",
+                            [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$id]);
+                    }
                     $success = 'Post updated.';
                 } else {
-                    execute("INSERT INTO news (title,slug,excerpt,content,cover_url,author_name,category,tags,read_time,featured,published,published_at,active,source_url,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url]);
+                    try {
+                        execute("INSERT INTO news (title,slug,excerpt,content,cover_url,author_name,category,tags,read_time,featured,published,published_at,active,source_url,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active,$source_url]);
+                    } catch (\Throwable $fe) {
+                        execute("INSERT INTO news (title,slug,excerpt,content,cover_url,author_name,category,tags,read_time,featured,published,published_at,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$title,$slug,$excerpt,$content,$cover_url?:null,$author_name,$category,$tags,$read_time,$featured,$published,$published_at,$active]);
+                    }
                     $success = 'Post created.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: ' . $e->getMessage(); }

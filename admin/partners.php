@@ -30,18 +30,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
-                // First ensure the show_on_contact column exists
-                try {
-                    execute("ALTER TABLE partners ADD COLUMN IF NOT EXISTS show_on_contact TINYINT NOT NULL DEFAULT 0 AFTER position");
-                } catch(\Throwable $e) { /* Column might already exist */ }
-                
+                // Ensure optional columns exist on older live schemas
+                foreach ([
+                    'email'           => 'ALTER TABLE partners ADD COLUMN email VARCHAR(255) NULL',
+                    'phone'           => 'ALTER TABLE partners ADD COLUMN phone VARCHAR(50) NULL',
+                    'address'         => 'ALTER TABLE partners ADD COLUMN address TEXT NULL',
+                    'district'        => 'ALTER TABLE partners ADD COLUMN district VARCHAR(100) NULL',
+                    'show_on_contact' => 'ALTER TABLE partners ADD COLUMN show_on_contact TINYINT NOT NULL DEFAULT 0',
+                ] as $col => $sql) {
+                    try {
+                        if (!dbColumnExists('partners', $col)) execute($sql);
+                    } catch (\Throwable $eCol) { /* already exists or no ALTER privilege */ }
+                }
+
                 if ($id) {
-                    execute("UPDATE partners SET name=?,logo_url=?,url=?,email=?,phone=?,address=?,type=?,district=?,position=?,active=?,show_on_contact=?,updated_at=NOW() WHERE id=?",
-                        [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$show_on_contact,$id]);
+                    $attempts = [
+                        ["UPDATE partners SET name=?,logo_url=?,url=?,email=?,phone=?,address=?,type=?,district=?,position=?,active=?,show_on_contact=?,updated_at=NOW() WHERE id=?",
+                         [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$show_on_contact,$id]],
+                        ["UPDATE partners SET name=?,logo_url=?,url=?,email=?,phone=?,address=?,type=?,district=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                         [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$id]],
+                        ["UPDATE partners SET name=?,logo_url=?,url=?,type=?,district=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                         [$name,$logo_url?:null,$url?:null,$type,$district?:null,$position,$active,$id]],
+                        ["UPDATE partners SET name=?,logo_url=?,url=?,type=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                         [$name,$logo_url?:null,$url?:null,$type,$position,$active,$id]],
+                        ["UPDATE partners SET name=?,logo_url=?,url=?,type=?,position=?,active=? WHERE id=?",
+                         [$name,$logo_url?:null,$url?:null,$type,$position,$active,$id]],
+                    ];
+                    $saved = false; $lastErr = null;
+                    foreach ($attempts as [$sql, $params]) {
+                        try { execute($sql, $params); $saved = true; break; }
+                        catch (\Throwable $fe) { $lastErr = $fe; }
+                    }
+                    if (!$saved) throw $lastErr ?? new \RuntimeException('Update failed');
                     $success = 'Partner updated.';
                 } else {
-                    execute("INSERT INTO partners (name,logo_url,url,email,phone,address,type,district,position,active,show_on_contact,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                        [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$show_on_contact]);
+                    $attempts = [
+                        ["INSERT INTO partners (name,logo_url,url,email,phone,address,type,district,position,active,show_on_contact,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active,$show_on_contact]],
+                        ["INSERT INTO partners (name,logo_url,url,email,phone,address,type,district,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$logo_url?:null,$url?:null,$email?:null,$phone?:null,$address?:null,$type,$district?:null,$position,$active]],
+                        ["INSERT INTO partners (name,logo_url,url,type,district,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$logo_url?:null,$url?:null,$type,$district?:null,$position,$active]],
+                        ["INSERT INTO partners (name,logo_url,url,type,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,NOW(),NOW())",
+                         [$name,$logo_url?:null,$url?:null,$type,$position,$active]],
+                        ["INSERT INTO partners (name,logo_url,url,type,position,active) VALUES (?,?,?,?,?,?)",
+                         [$name,$logo_url?:null,$url?:null,$type,$position,$active]],
+                    ];
+                    $saved = false; $lastErr = null;
+                    foreach ($attempts as [$sql, $params]) {
+                        try { execute($sql, $params); $saved = true; break; }
+                        catch (\Throwable $fe) { $lastErr = $fe; }
+                    }
+                    if (!$saved) throw $lastErr ?? new \RuntimeException('Insert failed');
                     $success = 'Partner added.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
@@ -50,10 +90,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $items = [];
-try { $items = query("SELECT id,name,logo_url,url,email,phone,address,type,district,active,position FROM partners ORDER BY type,position,name"); }
-catch(\Throwable $e) { 
-    try { $items = query("SELECT id,name,logo_url,url,type FROM partners ORDER BY type,position,name"); }
-    catch(\Throwable $e2) { $error = 'partners table not found. Run database.sql.'; }
+try {
+    $items = query("SELECT id,name,logo_url,url,email,phone,address,type,district,active,position,show_on_contact FROM partners ORDER BY type,position,name");
+} catch (\Throwable $e) {
+    try {
+        $items = query("SELECT id,name,logo_url,url,email,phone,address,type,district,active,position FROM partners ORDER BY type,position,name");
+    } catch (\Throwable $e2) {
+        try {
+            $items = query("SELECT id,name,logo_url,url,type,district,active,position FROM partners ORDER BY type,position,name");
+        } catch (\Throwable $e3) {
+            try {
+                $items = query("SELECT id,name,logo_url,url,type,active,position FROM partners ORDER BY type,position,name");
+            } catch (\Throwable $e4) {
+                try {
+                    $items = query("SELECT id,name,logo_url,url,type FROM partners ORDER BY type,name");
+                } catch (\Throwable $e5) {
+                    $error = 'partners table not found. Run database.sql.';
+                }
+            }
+        }
+    }
 }
 
 $editing = null;

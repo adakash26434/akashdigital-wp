@@ -2,8 +2,8 @@
 
 **A modern, production-ready PHP application** for cooperatives and tech companies. Features complete content management, client portal, and dynamic configuration.
 
-- **Tech Stack:** PHP 7.4+, MySQL/MariaDB, SQLite, Tailwind CSS, Alpine.js
-- **Deployment:** cPanel/Shared Hosting, Replit
+- **Tech Stack:** PHP 8.x (compatible with 7.4+ patterns), MySQL/MariaDB, SQLite, Tailwind CSS, Alpine.js
+- **Deployment:** cPanel / shared hosting
 - **License:** Private
 - **Status:** Production Ready ✅
 
@@ -29,34 +29,27 @@
 ```bash
 # 1. Create MySQL database in cPanel
 # 2. Git™ Version Control → Clone repository
-git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
+git clone https://github.com/adakash26434/akashdigital-wp.git
 
 # 3. Import database.sql via phpMyAdmin
-# 4. Create config-production.php with credentials:
-#    - DB_HOST, DB_NAME, DB_USER, DB_PASS
-#    - SESSION_SECRET, APP_SECRET (generate with: php -r "echo bin2hex(random_bytes(32));")
-# 5. chmod 755 uploads/ storage/
+# 4. Prefer: cp includes/config-production.php.example includes/config-production.php
+#    Fill DB_*, SITE_URL, APP_SECRET_KEY (keep existing live secret)
+#    Root config-production.php also works as a fallback
+# 5. chmod 755 uploads/
 # 6. Visit: {SITE_URL}/admin/
 ```
 
 ### Local Development
 
 ```bash
-git clone https://github.com/adakash26434/akashdigital-wp-main-2zip.git
-cd akashdigital-wp-main-2zip
+git clone https://github.com/adakash26434/akashdigital-wp.git
+cd akashdigital-wp
 
 # Create includes/dev-config.php with local settings
 # Database auto-initializes on first access (SQLite)
 
 # Start local server
-php -S localhost:5000
-```
-
-### Replit
-
-```bash
-# Use .replit config for auto-deployment
-replit clone https://github.com/adakash26434/akashdigital-wp-main-2zip
+php -S localhost:5000 router.php
 ```
 
 ---
@@ -87,32 +80,35 @@ project/
 │   ├── admin-layout.php   # Admin template
 │   └── footer.php         # Footer component
 ├── lang/                  # Translations (Nepali/English)
-├── public/                # Public API endpoints
+├── public/                # Public assets (robots, favicon, og image)
 ├── uploads/               # User uploads (NOT in git)
-├── storage/               # Cache, logs (NOT in git)
 ├── database.sql           # MySQL schema for cPanel
-└── README.md              # This file
+└── SETUP.md               # Short setup guide
 ```
 
 ---
 
 ## 🔧 Configuration
 
-### Production (config-production.php)
+### Production (`includes/config-production.php`)
 
-Create `config-production.php` in root directory — **never commit to git**:
+Preferred: copy the example next to `config.php` — **never commit secrets**:
+
+```bash
+cp includes/config-production.php.example includes/config-production.php
+```
+
+Root `config-production.php` is still supported as a fallback.
 
 ```php
 <?php
-// Database
 define('DB_HOST', 'localhost');
 define('DB_NAME', 'your_database');
 define('DB_USER', 'your_username');
 define('DB_PASS', 'your_password');
-
-// Security (generate with: php -r "echo bin2hex(random_bytes(32));")
-define('SESSION_SECRET', 'your_64_char_hex_secret');
-define('APP_SECRET', 'your_64_char_hex_secret');
+define('SITE_URL', 'https://yourdomain.com');
+define('APP_SECRET_KEY', 'your_64_char_hex_secret'); // php -r "echo bin2hex(random_bytes(32));"
+define('APP_ENV', 'production');
 ```
 
 ### Local Development (includes/dev-config.php)
@@ -121,25 +117,17 @@ Create `includes/dev-config.php` locally — **never commit to git**:
 
 ```php
 <?php
-// SQLite for local dev (no setup needed)
 define('DB_DRIVER', 'sqlite');
 define('DB_SQLITE_PATH', __DIR__ . '/../data/dev.sqlite');
-
-// Or MySQL
-// define('DB_HOST', 'localhost');
-// define('DB_NAME', 'dev_db');
-// define('DB_USER', 'root');
-// define('DB_PASS', 'password');
-
-define('SESSION_SECRET', 'dev_secret_change_in_production');
-define('APP_SECRET', 'dev_app_secret_change_in_production');
+define('APP_SECRET_KEY', 'dev_secret_change_in_production');
+define('APP_ENV', 'development');
 ```
 
 ### Uploads Directory
 
 ```bash
-chmod 755 uploads/ storage/
-find uploads/ storage/ -type f -exec chmod 644 {} \;
+chmod 755 uploads/
+find uploads/ -type f -exec chmod 644 {} \;
 ```
 
 ---
@@ -300,8 +288,8 @@ Ensure includes/ files are included: require_once __DIR__ . '/includes/db.php';
 
 ### "Permission denied" on uploads
 ```
-chmod 755 uploads/ storage/cache/ storage/logs/
-find uploads/ storage/ -type f -exec chmod 644 {} \;
+chmod 755 uploads/
+find uploads/ -type f -exec chmod 644 {} \;
 ```
 
 ### "Can't connect to MySQL socket"

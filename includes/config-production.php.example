@@ -1,8 +1,14 @@
 <?php
 /**
  * PRODUCTION SECRETS — copy to config-production.php and fill in values.
- * Location: includes/config-production.php (same folder as config.php)
- * NEVER commit config-production.php to GitHub.
+ *
+ * Preferred location (matches deploy scripts):
+ *   cp includes/config-production.php.example includes/config-production.php
+ *
+ * Also supported (legacy / root fallback loaded by includes/config.php):
+ *   cp config-production.php.example config-production.php
+ *
+ * NEVER commit the real config-production.php to GitHub.
  */
 
 define('DB_HOST',    'localhost');

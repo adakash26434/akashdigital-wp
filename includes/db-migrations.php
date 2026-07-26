@@ -15,22 +15,52 @@ function dbTableExists(string $table): bool {
         $r = queryOne("SELECT name FROM sqlite_master WHERE type='table' AND name=?", [$table]);
         return (bool)$r;
     }
-    $r = query("SHOW TABLES LIKE ?", [$table]);
-    return !empty($r);
+    // information_schema works with native PDO prepares; SHOW TABLES LIKE ? often does not
+    $r = queryOne(
+        "SELECT 1 AS ok FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? LIMIT 1",
+        [$table]
+    );
+    return (bool)$r;
 }
 
 /** Check whether a column exists in a table (MySQL or SQLite) */
 function dbColumnExists(string $table, string $column): bool {
     if (!dbTableExists($table)) return false;
     if (defined('DB_DRIVER') && DB_DRIVER === 'sqlite') {
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) return false;
         $cols = query("PRAGMA table_info(" . $table . ")");
         foreach ($cols as $c) {
             if (($c['name'] ?? '') === $column) return true;
         }
         return false;
     }
-    $r = query("SHOW COLUMNS FROM `$table` LIKE ?", [$column]);
-    return !empty($r);
+    // information_schema works with native PDO prepares; SHOW COLUMNS LIKE ? often does not
+    $r = queryOne(
+        "SELECT 1 AS ok FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ? LIMIT 1",
+        [$table, $column]
+    );
+    return (bool)$r;
+}
+
+/**
+ * Add missing columns one-by-one (safe on older live MySQL / SQLite).
+ * $cols = ['column_name' => 'VARCHAR(255) NULL', ...]
+ */
+function dbEnsureColumns(string $table, array $cols): void {
+    if (!dbTableExists($table) || !preg_match('/^[a-zA-Z0-9_]+$/', $table)) return;
+    foreach ($cols as $col => $definition) {
+        if (!is_string($col) || !preg_match('/^[a-zA-Z0-9_]+$/', $col)) continue;
+        try {
+            if (!dbColumnExists($table, $col)) {
+                execute("ALTER TABLE `$table` ADD COLUMN `$col` $definition");
+            }
+        } catch (\Throwable $e) {
+            $msg = $e->getMessage();
+            if (stripos($msg, 'duplicate') === false) {
+                error_log("[db-migrations] ensure {$table}.{$col}: " . $msg);
+            }
+        }
+    }
 }
 
 function runDbMigrations() {
@@ -88,11 +118,24 @@ function runDbMigrations() {
     } catch (\Throwable $e) { error_log('[db-migrations] M3: ' . $e->getMessage()); }
 
     try {
-        // Migration 4: Add email, phone, address columns to partners table
-        if (!dbColumnExists('partners', 'email')) {
-            execute("ALTER TABLE partners ADD COLUMN email VARCHAR(255) NULL");
-            execute("ALTER TABLE partners ADD COLUMN phone VARCHAR(50) NULL");
-            execute("ALTER TABLE partners ADD COLUMN address TEXT NULL");
+        // Migration 4: Add contact/location columns to partners (live DBs often predate these)
+        if (dbTableExists('partners')) {
+            $partnerCols = [
+                'email'           => 'ALTER TABLE partners ADD COLUMN email VARCHAR(255) NULL',
+                'phone'           => 'ALTER TABLE partners ADD COLUMN phone VARCHAR(50) NULL',
+                'address'         => 'ALTER TABLE partners ADD COLUMN address TEXT NULL',
+                'district'        => 'ALTER TABLE partners ADD COLUMN district VARCHAR(100) NULL',
+                'show_on_contact' => 'ALTER TABLE partners ADD COLUMN show_on_contact TINYINT NOT NULL DEFAULT 0',
+            ];
+            foreach ($partnerCols as $col => $sql) {
+                try {
+                    if (!dbColumnExists('partners', $col)) {
+                        execute($sql);
+                    }
+                } catch (\Throwable $eCol) {
+                    error_log('[db-migrations] M4 ' . $col . ': ' . $eCol->getMessage());
+                }
+            }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M4: ' . $e->getMessage()); }
 
@@ -380,7 +423,7 @@ function runDbMigrations() {
     try {
         // Migration 19: Add installation_cost column
         if (!dbColumnExists('clients', 'installation_cost')) {
-            execute("ALTER TABLE clients ADD COLUMN installation_cost REAL DEFAULT NULL AFTER integration_charge");
+            execute("ALTER TABLE clients ADD COLUMN installation_cost DECIMAL(12,2) DEFAULT NULL");
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M19: ' . $e->getMessage()); }
 
@@ -416,4 +459,366 @@ function runDbMigrations() {
             }
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M22: ' . $e->getMessage()); }
+
+    // ── M23+: Live-safe column/table backfills (older production schemas) ──
+
+    try {
+        // Migration 23: products — home cards, lucide, demo screenshot, content fields
+        dbEnsureColumns('products', [
+            'tagline'             => "VARCHAR(255) NULL",
+            'summary'             => "TEXT NULL",
+            'description'         => "LONGTEXT NULL",
+            'icon'                => "VARCHAR(100) DEFAULT 'box'",
+            'lucide_icon'         => "VARCHAR(100) DEFAULT 'package'",
+            'icon_color'          => "VARCHAR(50) DEFAULT 'blue'",
+            'badge'               => "VARCHAR(50) NULL",
+            'category'            => "VARCHAR(100) NULL",
+            'highlights'          => "TEXT NULL",
+            'features'            => "TEXT NULL",
+            'price_from'          => "DECIMAL(12,2) NULL",
+            'show_on_home'        => "TINYINT NOT NULL DEFAULT 0",
+            'home_position'       => "INT NOT NULL DEFAULT 0",
+            'home_card_wide'      => "TINYINT NOT NULL DEFAULT 0",
+            'home_card_dark'      => "TINYINT NOT NULL DEFAULT 0",
+            'home_bg_css'         => "TEXT NULL",
+            'demo_screenshot_url' => "VARCHAR(500) NULL",
+            'tab_label'           => "VARCHAR(100) NULL",
+            'position'            => "INT NOT NULL DEFAULT 0",
+            'active'              => "TINYINT NOT NULL DEFAULT 1",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M23: ' . $e->getMessage()); }
+
+    try {
+        // Migration 24: services — detail page + listing fields
+        dbEnsureColumns('services', [
+            'tagline'        => "VARCHAR(255) DEFAULT ''",
+            'summary'        => "TEXT NULL",
+            'description'    => "LONGTEXT NULL",
+            'icon'           => "VARCHAR(100) DEFAULT 'settings'",
+            'lucide_icon'    => "VARCHAR(100) DEFAULT 'layers'",
+            'icon_color'     => "VARCHAR(50) DEFAULT 'blue'",
+            'badge'          => "VARCHAR(50) DEFAULT ''",
+            'price_from'     => "DECIMAL(12,2) NULL",
+            'highlights'     => "TEXT NULL",
+            'features'       => "TEXT NULL",
+            'screenshot_url' => "VARCHAR(500) NULL",
+            'position'       => "INT NOT NULL DEFAULT 0",
+            'active'         => "TINYINT NOT NULL DEFAULT 1",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M24: ' . $e->getMessage()); }
+
+    try {
+        // Migration 25: news — source_url + common CMS fields
+        dbEnsureColumns('news', [
+            'excerpt'      => "TEXT NULL",
+            'content'      => "LONGTEXT NULL",
+            'image_url'    => "VARCHAR(500) NULL",
+            'cover_url'    => "VARCHAR(500) NULL",
+            'author_name'  => "VARCHAR(100) DEFAULT 'Company'",
+            'author_title' => "VARCHAR(100) DEFAULT 'Team'",
+            'read_time'    => "INT NULL",
+            'category'     => "VARCHAR(100) DEFAULT 'News'",
+            'tags'         => "TEXT NULL",
+            'featured'     => "TINYINT NOT NULL DEFAULT 0",
+            'active'       => "TINYINT NOT NULL DEFAULT 1",
+            'published'    => "TINYINT NOT NULL DEFAULT 0",
+            'published_at' => "DATETIME NULL",
+            'views'        => "INT NOT NULL DEFAULT 0",
+            'source_url'   => "VARCHAR(500) NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M25: ' . $e->getMessage()); }
+
+    try {
+        // Migration 26: team_members contact/leadership fields
+        dbEnsureColumns('team_members', [
+            'bio'           => "TEXT NULL",
+            'photo_url'     => "VARCHAR(500) NULL",
+            'email'         => "VARCHAR(255) NULL",
+            'linkedin_url'  => "VARCHAR(500) NULL",
+            'is_leadership' => "TINYINT NOT NULL DEFAULT 0",
+            'category'      => "VARCHAR(50) NOT NULL DEFAULT 'management'",
+            'active'        => "TINYINT NOT NULL DEFAULT 1",
+            'position'      => "INT NOT NULL DEFAULT 0",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M26: ' . $e->getMessage()); }
+
+    try {
+        // Migration 27: clients — geo, billing, sale, product fields used by client-form
+        dbEnsureColumns('clients', [
+            'logo_url'             => "VARCHAR(500) NULL",
+            'contact_name'         => "VARCHAR(255) NULL",
+            'contact_email'        => "VARCHAR(255) NULL",
+            'contact_phone'        => "VARCHAR(30) NULL",
+            'billing_email'        => "VARCHAR(255) NULL",
+            'client_code'          => "VARCHAR(50) NULL",
+            'user_id'              => "INT NULL",
+            'claimed_at'           => "DATETIME NULL",
+            'product'              => "TEXT NULL",
+            'cbs_use'              => "TINYINT NOT NULL DEFAULT 1",
+            'integration'          => "VARCHAR(255) NULL",
+            'integration_charge'   => "DECIMAL(12,2) NULL",
+            'installation_cost'    => "DECIMAL(12,2) NULL",
+            'district'             => "VARCHAR(100) NULL",
+            'province'             => "VARCHAR(100) NULL",
+            'local_govt'           => "VARCHAR(100) NULL",
+            'ward_no'              => "VARCHAR(10) NULL",
+            'address'              => "TEXT NULL",
+            'pan_no'               => "VARCHAR(20) NULL",
+            'reg_no'               => "VARCHAR(50) NULL",
+            'established_year'     => "SMALLINT NULL",
+            'total_members'        => "INT NULL",
+            'total_branches'       => "INT NULL",
+            'website'              => "VARCHAR(255) NULL",
+            'notes'                => "TEXT NULL",
+            'status'               => "VARCHAR(30) NOT NULL DEFAULT 'active'",
+            'head_office_amc'      => "DECIMAL(12,2) NULL",
+            'branch_office_amc'    => "DECIMAL(12,2) NULL",
+            'cloud_charge_ho'      => "DECIMAL(12,2) NULL",
+            'cloud_charge_branch'  => "DECIMAL(12,2) NULL",
+            'custom_charge_type'   => "VARCHAR(50) NULL",
+            'custom_charge_value'  => "DECIMAL(12,2) NULL",
+            'agreement_date'       => "DATE NULL",
+            'installation_date'    => "DATE NULL",
+            'num_branches'         => "INT NOT NULL DEFAULT 1",
+            'cloud_gb'             => "DECIMAL(10,2) NULL",
+            'sale_type'            => "VARCHAR(30) NOT NULL DEFAULT 'office_sale'",
+            'channel_partner_id'   => "INT NULL",
+            'sale_date'            => "DATE NULL",
+            'sale_by'              => "INT NULL",
+            'assigned_by'          => "INT NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M27: ' . $e->getMessage()); }
+
+    try {
+        // Migration 28: invoices money columns + invoice_items table
+        dbEnsureColumns('invoices', [
+            'user_id'             => "INT NULL",
+            'billing_period_from' => "DATE NULL",
+            'billing_period_to'   => "DATE NULL",
+            'subtotal'            => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'tax_rate'            => "DECIMAL(5,2) NOT NULL DEFAULT 0",
+            'tax_amount'          => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'discount_amount'     => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'total_amount'        => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'currency'            => "VARCHAR(3) DEFAULT 'NPR'",
+            'amount_paid'         => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'amount_due'          => "DECIMAL(12,2) NOT NULL DEFAULT 0",
+            'due_date'            => "DATE NULL",
+            'status'              => "VARCHAR(30) NOT NULL DEFAULT 'draft'",
+            'notes'               => "TEXT NULL",
+            'terms'               => "TEXT NULL",
+            'attachment_url'      => "VARCHAR(500) NULL",
+            'attachment_name'     => "VARCHAR(255) NULL",
+            'paid_at'             => "DATETIME NULL",
+            'created_by'          => "INT NULL",
+        ]);
+        if (!dbTableExists('invoice_items')) {
+            if (defined('DB_DRIVER') && DB_DRIVER === 'sqlite') {
+                execute("CREATE TABLE IF NOT EXISTS invoice_items (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    invoice_id INTEGER NOT NULL,
+                    description TEXT NOT NULL,
+                    item_type TEXT NOT NULL DEFAULT 'other',
+                    quantity REAL NOT NULL DEFAULT 1,
+                    unit_price REAL NOT NULL DEFAULT 0,
+                    total_price REAL NOT NULL DEFAULT 0,
+                    effective_date TEXT NULL,
+                    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+                )");
+            } else {
+                execute("CREATE TABLE IF NOT EXISTS invoice_items (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    invoice_id INT NOT NULL,
+                    description VARCHAR(500) NOT NULL,
+                    item_type VARCHAR(50) NOT NULL DEFAULT 'other',
+                    quantity DECIMAL(10,2) NOT NULL DEFAULT 1.00,
+                    unit_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+                    total_price DECIMAL(12,2) NOT NULL DEFAULT 0.00,
+                    effective_date DATE NULL,
+                    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    INDEX idx_invoice (invoice_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M28: ' . $e->getMessage()); }
+
+    try {
+        // Migration 29: CRM client satellite tables — align columns used by admin code
+        dbEnsureColumns('client_agreements', [
+            'notes'            => "TEXT NULL",
+            'approval_notes'   => "TEXT NULL",
+            'document_url'     => "VARCHAR(500) NULL",
+            'document_name'    => "VARCHAR(255) NULL",
+            'effective_date'   => "DATE NULL",
+            'expiry_date'      => "DATE NULL",
+            'amount'           => "DECIMAL(12,2) DEFAULT 0",
+            'status'           => "VARCHAR(20) DEFAULT 'pending'",
+            'approved_by'      => "INT NULL",
+            'approved_at'      => "DATETIME NULL",
+            'sale_by'          => "INT NULL",
+            'sale_type'        => "VARCHAR(30) NULL",
+            'channel_partner_id' => "INT NULL",
+            'created_by'       => "INT NULL",
+            'uploaded_by'      => "VARCHAR(20) DEFAULT 'admin'",
+        ]);
+        dbEnsureColumns('client_documents', [
+            'document_type'    => "VARCHAR(50) DEFAULT 'other'",
+            'doc_type'         => "VARCHAR(50) NULL",
+            'title'            => "VARCHAR(255) NULL",
+            'document_name'    => "VARCHAR(255) NULL",
+            'document_url'     => "VARCHAR(500) NULL",
+            'expiry_date'      => "DATE NULL",
+            'status'           => "VARCHAR(30) NOT NULL DEFAULT 'pending'",
+            'notes'            => "TEXT NULL",
+            'rejection_reason' => "TEXT NULL",
+            'approved_by'      => "INT NULL",
+            'approved_at'      => "DATETIME NULL",
+            'verified'         => "TINYINT NOT NULL DEFAULT 0",
+            'verified_by'      => "INT NULL",
+            'verified_at'      => "DATETIME NULL",
+            'created_by'       => "INT NULL",
+        ]);
+        dbEnsureColumns('client_charge_history', [
+            'amount'          => "DECIMAL(12,2) NULL",
+            'description'     => "TEXT NULL",
+            'old_value'       => "DECIMAL(12,2) NULL",
+            'new_value'       => "DECIMAL(12,2) NULL",
+            'effective_date'  => "DATE NULL",
+            'reason'          => "VARCHAR(255) NULL",
+            'changed_by'      => "INT NULL",
+            'created_by'      => "INT NULL",
+            'invoice_id'      => "INT NULL",
+        ]);
+        dbEnsureColumns('client_termination', [
+            'termination_type' => "VARCHAR(50) NULL",
+            'termination_date' => "DATE NULL",
+            'terminated_at'    => "DATETIME NULL",
+            'reason'           => "TEXT NULL",
+            'remarks'          => "TEXT NULL",
+            'document_url'     => "VARCHAR(500) NULL",
+            'terminated_by'    => "INT NULL",
+            'final_amount'     => "DECIMAL(12,2) DEFAULT 0",
+            'settled'          => "TINYINT NOT NULL DEFAULT 0",
+            'settled_by'       => "INT NULL",
+            'settled_at'       => "DATETIME NULL",
+            'approved_by'      => "INT NULL",
+            'approved_at'      => "DATETIME NULL",
+            'created_by'       => "INT NULL",
+        ]);
+        if (!dbTableExists('client_status_history')) {
+            if (defined('DB_DRIVER') && DB_DRIVER === 'sqlite') {
+                execute("CREATE TABLE IF NOT EXISTS client_status_history (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    client_id INTEGER NOT NULL,
+                    old_status TEXT NULL,
+                    new_status TEXT NOT NULL,
+                    changed_at TEXT NOT NULL DEFAULT (datetime('now')),
+                    changed_by INTEGER NULL,
+                    reason TEXT NULL
+                )");
+            } else {
+                execute("CREATE TABLE IF NOT EXISTS client_status_history (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    client_id INT NOT NULL,
+                    old_status VARCHAR(30) NULL,
+                    new_status VARCHAR(30) NOT NULL,
+                    changed_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                    changed_by INT NULL,
+                    reason VARCHAR(255) NULL,
+                    INDEX idx_client (client_id)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+            }
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M29: ' . $e->getMessage()); }
+
+    try {
+        // Migration 30: license activation fields on client_subscriptions (used by includes/license.php)
+        dbEnsureColumns('client_subscriptions', [
+            'license_key'       => "VARCHAR(255) NULL",
+            'deployment_type'   => "VARCHAR(50) NULL",
+            'branches'          => "INT NOT NULL DEFAULT 1",
+            'members_limit'     => "INT NULL",
+            'max_users'         => "INT NULL",
+            'amount'            => "DECIMAL(12,2) NULL",
+            'billing_cycle'     => "VARCHAR(30) DEFAULT 'monthly'",
+            'status'            => "VARCHAR(30) NOT NULL DEFAULT 'active'",
+            'activation_status' => "VARCHAR(30) NOT NULL DEFAULT 'inactive'",
+            'hardware_id'       => "VARCHAR(255) NULL",
+            'activated_at'      => "DATETIME NULL",
+            'last_seen_at'      => "DATETIME NULL",
+            'starts_at'         => "DATE NULL",
+            'expires_at'        => "DATE NULL",
+            'next_renewal'      => "DATE NULL",
+            'notes'             => "TEXT NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M30: ' . $e->getMessage()); }
+
+    try {
+        // Migration 31: users 2FA columns
+        dbEnsureColumns('users', [
+            'client_code'      => "VARCHAR(50) NULL",
+            'phone'            => "VARCHAR(20) NULL",
+            'org_name'         => "VARCHAR(255) NULL",
+            'district'         => "VARCHAR(100) NULL",
+            'bio'              => "TEXT NULL",
+            'avatar_url'       => "VARCHAR(500) NULL",
+            'theme_pref'       => "VARCHAR(20) NOT NULL DEFAULT 'dark'",
+            'totp_secret'      => "VARCHAR(255) NULL",
+            'totp_enabled'     => "TINYINT NOT NULL DEFAULT 0",
+            'totp_backup_code' => "VARCHAR(20) NULL",
+            'require_2fa'      => "TINYINT NOT NULL DEFAULT 0",
+            'last_login_at'    => "DATETIME NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M31: ' . $e->getMessage()); }
+
+    try {
+        // Migration 32: portfolio — admin form uses summary/tags/url (schema also has excerpt)
+        dbEnsureColumns('portfolio', [
+            'client_name'   => "VARCHAR(255) NULL",
+            'category'      => "VARCHAR(100) NULL",
+            'excerpt'       => "TEXT NULL",
+            'summary'       => "TEXT NULL",
+            'description'   => "LONGTEXT NULL",
+            'image_url'     => "VARCHAR(500) NULL",
+            'result_metric' => "VARCHAR(255) NULL",
+            'tags'          => "TEXT NULL",
+            'url'           => "VARCHAR(500) NULL",
+            'featured'      => "TINYINT NOT NULL DEFAULT 0",
+            'active'        => "TINYINT NOT NULL DEFAULT 1",
+            'position'      => "INT NOT NULL DEFAULT 0",
+            'published_at'  => "DATETIME NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M32: ' . $e->getMessage()); }
+
+    try {
+        // Migration 33: demo_requests — support both live column name variants
+        dbEnsureColumns('demo_requests', [
+            'product'        => "VARCHAR(255) NULL",
+            'product_name'   => "VARCHAR(255) NULL",
+            'org_name'       => "VARCHAR(255) NULL",
+            'contact_name'   => "VARCHAR(255) NULL",
+            'email'          => "VARCHAR(255) NULL",
+            'contact_email'  => "VARCHAR(255) NULL",
+            'phone'          => "VARCHAR(50) NULL",
+            'contact_phone'  => "VARCHAR(50) NULL",
+            'message'        => "TEXT NULL",
+            'status'         => "VARCHAR(30) NOT NULL DEFAULT 'new'",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M33: ' . $e->getMessage()); }
+
+    try {
+        // Migration 34: pricing_plans fields used by admin/pricing.php
+        dbEnsureColumns('pricing_plans', [
+            'tag'         => "VARCHAR(100) NULL",
+            'price_label' => "VARCHAR(100) NULL",
+            'period'      => "VARCHAR(50) NULL",
+            'cta_label'   => "VARCHAR(100) NULL",
+            'cta_url'     => "VARCHAR(500) NULL",
+            'is_popular'  => "TINYINT NOT NULL DEFAULT 0",
+            'features'    => "TEXT NULL",
+            'product_id'  => "INT NULL",
+            'active'      => "TINYINT NOT NULL DEFAULT 1",
+            'position'    => "INT NOT NULL DEFAULT 0",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M34: ' . $e->getMessage()); }
 }
