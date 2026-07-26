@@ -831,14 +831,14 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  /* Keep price strips on one horizontal line across the row */
-  min-height: 8.75rem;
+  min-height: 9.5rem;
   box-sizing: border-box;
 }
 .product-card__head-top {
   display: flex;
-  align-items: flex-start;
-  gap: 0.875rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 0;
 }
 .product-card__icon {
@@ -864,25 +864,22 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   color: #fff;
 }
 .product-card__head-copy {
-  flex: 1;
-  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  padding-top: 0.125rem; /* optical align with icon top */
+  gap: 0.35rem;
+  min-width: 0;
 }
 .product-card__badge {
   font-size: var(--text-2xs);
   font-weight: 700;
-  padding: 0.15rem 0.625rem;
+  padding: 0.2rem 0.625rem;
   border-radius: 9999px;
   background: var(--primary-light);
   color: var(--primary);
   letter-spacing: 0.04em;
   white-space: nowrap;
-  align-self: flex-start;
   flex-shrink: 0;
-  margin-top: 0.2rem;
+  margin: 0;
 }
 .product-card__title {
   font-family: var(--font-display);

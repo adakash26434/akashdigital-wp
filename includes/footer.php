@@ -9,7 +9,7 @@ try {
 }
 ?>
 </main><!-- /#main-content -->
-<footer style="background:var(--footer-bg,var(--primary-dark,#0f172a));color:#f1f5f9;margin-top:3rem;">
+<footer style="background:var(--footer-bg);color:var(--footer-fg);margin-top:3rem;">
 
   <!-- Main footer columns (#footer-cols rule in assets/css/pages.css) -->
   <div class="container" style="padding-top:2.75rem;padding-bottom:2.75rem;">
@@ -17,7 +17,7 @@ try {
 
       <!-- Brand col -->
       <div>
-        <a href="<?= url('index.php') ?>" style="display:inline-flex;align-items:center;gap:0.625rem;font-family:var(--font-display);font-weight:800;font-size:var(--text-md);color:#f1f5f9;text-decoration:none;margin-bottom:1.125rem;">
+        <a href="<?= url('index.php') ?>" style="display:inline-flex;align-items:center;gap:0.625rem;font-family:var(--font-display);font-weight:800;font-size:var(--text-md);color:var(--footer-fg-strong);text-decoration:none;margin-bottom:1.125rem;">
           <?php if (!empty($__s['logo_url'])): ?>
             <img src="<?= e($__s['logo_url']) ?>" loading="lazy" alt="<?= e($__s['site_name']) ?>" style="height:2rem;width:auto;max-width:11rem;object-fit:contain;border-radius:0;">
           <?php else: ?>
@@ -25,14 +25,14 @@ try {
             <?= e($__s['site_name'] ?? stSiteName()) ?>
           <?php endif; ?>
         </a>
-        <p style="color:rgba(241,245,249,0.5);font-size:var(--text-sm);line-height:1.75;max-width:21rem;margin:0 0 1.5rem;">
+        <p class="footer-brand-text">
           <?= e(function_exists('cms') ? cms($__s, 'footer_tagline', 'Trusted software & IT solutions partner.') : ($__s['footer_tagline'] ?? 'Trusted software & IT solutions partner.')) ?>
         </p>
         
         <!-- Address from site settings -->
         <?php if (!empty($__s['address'])): ?>
-        <div style="display:flex;align-items:flex-start;gap:0.5rem;color:rgba(241,245,249,0.5);font-size:var(--text-sm);margin-bottom:1rem;">
-          <i data-lucide="map-pin" style="width:13px;height:13px;color:#60a5fa;flex-shrink:0;margin-top:0.125rem;"></i>
+        <div class="footer-meta-row">
+          <i data-lucide="map-pin"></i>
           <span><?= e($__s['address']) ?></span>
         </div>
         <?php endif; ?>
@@ -42,13 +42,13 @@ try {
         <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.625rem;">
           <?php if (!empty($__s['contact_phone'])): ?>
           <div class="nav-meta">
-            <i data-lucide="phone" style="width:13px;height:13px;color:#60a5fa;flex-shrink:0;"></i>
+            <i data-lucide="phone"></i>
             <?= e($__s['contact_phone']) ?>
           </div>
           <?php endif; ?>
           <?php if (!empty($__s['contact_email'])): ?>
           <div class="nav-meta">
-            <i data-lucide="mail" style="width:13px;height:13px;color:#60a5fa;flex-shrink:0;"></i>
+            <i data-lucide="mail"></i>
             <?= e($__s['contact_email']) ?>
           </div>
           <?php endif; ?>
@@ -135,9 +135,9 @@ try {
   </div>
 
   <!-- Bottom bar -->
-  <div style="border-top:1px solid rgba(241,245,249,0.07);">
+  <div class="footer-bottom-bar">
     <div class="container" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
-      <p style="font-size:var(--text-xs);color:rgba(241,245,249,0.35);margin:0;">
+      <p>
         <?php
           $__copyTpl = trim((string)($__s['copyright_text'] ?? ''));
           if ($__copyTpl === '' && function_exists('cms')) {
@@ -153,16 +153,16 @@ try {
               echo sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME));
           }
         ?>
-        | Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer" style="color:rgba(241,245,249,0.5);text-decoration:none;">Aakash Adhikari</a>
+        | Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer">Aakash Adhikari</a>
       </p>
       <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
-        <a href="<?= url('privacy.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">गोपनीयता</a>
-        <span style="color:rgba(241,245,249,0.2);">•</span>
-        <a href="<?= url('terms.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">सेवाका सर्त</a>
-        <span style="color:rgba(241,245,249,0.2);">•</span>
-        <a href="<?= url('cookie-policy.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">कुकी नीति</a>
-        <span style="color:rgba(241,245,249,0.2);">•</span>
-        <a href="<?= url('sitemap.php') ?>" class="footer-link" style="font-size:var(--text-xs);color:rgba(241,245,249,0.4);text-decoration:none;white-space:nowrap;">Sitemap</a>
+        <a href="<?= url('privacy.php') ?>" class="footer-link">गोपनीयता</a>
+        <span class="footer-dot">•</span>
+        <a href="<?= url('terms.php') ?>" class="footer-link">सेवाका सर्त</a>
+        <span class="footer-dot">•</span>
+        <a href="<?= url('cookie-policy.php') ?>" class="footer-link">कुकी नीति</a>
+        <span class="footer-dot">•</span>
+        <a href="<?= url('sitemap.php') ?>" class="footer-link">Sitemap</a>
       </div>
     </div>
   </div>

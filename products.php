@@ -114,14 +114,14 @@ ob_start(); ?>
             <div class="icon-box product-card__icon <?= e($p['box']) ?>" aria-hidden="true">
               <i data-lucide="<?= e($p['icon']) ?>"></i>
             </div>
-            <div class="product-card__head-copy">
-              <h2 class="product-card__title"><?= e($p['name']) ?></h2>
-              <?php if (!empty($p['tagline'])): ?>
-              <p class="product-card__tagline"><?= e($p['tagline']) ?></p>
-              <?php endif; ?>
-            </div>
             <?php if (!empty($p['badge'])): ?>
             <span class="product-card__badge"><?= e($p['badge']) ?></span>
+            <?php endif; ?>
+          </div>
+          <div class="product-card__head-copy">
+            <h2 class="product-card__title"><?= e($p['name']) ?></h2>
+            <?php if (!empty($p['tagline'])): ?>
+            <p class="product-card__tagline"><?= e($p['tagline']) ?></p>
             <?php endif; ?>
           </div>
         </div>

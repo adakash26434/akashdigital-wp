@@ -141,14 +141,14 @@ ob_start(); ?>
             <div class="icon-box product-card__icon <?= e($svc['box']) ?>" aria-hidden="true">
               <i data-lucide="<?= e($svc['icon']) ?>"></i>
             </div>
-            <div class="product-card__head-copy">
-              <h2 class="product-card__title"><?= e($svc['name']) ?></h2>
-              <?php if (!empty($svc['tagline'])): ?>
-              <p class="product-card__tagline"><?= e($svc['tagline']) ?></p>
-              <?php endif; ?>
-            </div>
             <?php if (!empty($svc['badge'])): ?>
             <span class="product-card__badge"><?= e($svc['badge']) ?></span>
+            <?php endif; ?>
+          </div>
+          <div class="product-card__head-copy">
+            <h2 class="product-card__title"><?= e($svc['name']) ?></h2>
+            <?php if (!empty($svc['tagline'])): ?>
+            <p class="product-card__tagline"><?= e($svc['tagline']) ?></p>
             <?php endif; ?>
           </div>
         </div>

@@ -8,7 +8,8 @@ $companyLinks = [
   ['href' => 'about.php#vision',     'key' => 'nav_vision',     'icon' => 'eye'],
   ['href' => 'about.php#leadership', 'key' => 'nav_leadership', 'icon' => 'badge-check'],
   ['href' => 'about.php#team',       'key' => 'nav_team',       'icon' => 'users'],
-  ['href' => 'careers.php',            'key' => 'nav_career',           'icon' => 'briefcase', 'badge' => 'NEW', 'badge_until' => '2026-08-22'],
+  // NEW / count only when there is at least one open vacancy
+  ['href' => 'careers.php',            'key' => 'nav_career',           'icon' => 'briefcase', 'badge' => 'NEW', 'badge_if' => 'open_jobs', 'badge_mode' => 'count'],
   ['href' => 'partners.php',           'key' => 'nav_solution_partners', 'icon' => 'handshake'],
   ['href' => 'technical-expertise.php','key' => 'nav_tech_expertise',    'icon' => 'cpu'],
 ];
@@ -21,7 +22,8 @@ $navLinks = [
 $moreLinks = [
   ['href' => 'portfolio.php', 'key' => 'nav_portfolio', 'icon' => 'layout-grid'],
   ['href' => 'gallery.php',   'key' => 'nav_gallery',   'icon' => 'image'],
-  ['href' => 'news.php',      'key' => 'nav_news',      'icon' => 'newspaper'],
+  // NEW only when a post was published in the last 14 days
+  ['href' => 'news.php',      'key' => 'nav_news',      'icon' => 'newspaper', 'badge' => 'NEW', 'badge_if' => 'recent_news', 'badge_days' => 14],
   ['href' => 'kb.php',        'key' => 'nav_kb',        'icon' => 'book-open', 'label_en' => 'Knowledge Base', 'label_ne' => 'सहयोग केन्द्र'],
   ['href' => 'faq.php',       'key' => 'nav_faq',       'icon' => 'help-circle'],
 ];
@@ -92,6 +94,7 @@ if (!isset($__s)) $__s = siteSettings();
           <div class="st-dd-caret" style="left:1.125rem;"></div>
           <?php foreach ($companyLinks as $ci => $cl):
             $cActive = $__currentPath === $cl['href'];
+            $cBadge  = navBadgeText($cl);
             if ($ci === 5): /* divider before Careers */ ?>
           <div class="st-dd-sep"></div>
           <?php endif; ?>
@@ -100,8 +103,8 @@ if (!isset($__s)) $__s = siteSettings();
              class="st-dd-item <?= $cActive ? 'active' : '' ?>">
             <i data-lucide="<?= $cl['icon'] ?>" class="st-dd-icon" aria-hidden="true"></i>
             <span class="st-dd-label"><?= e(__($cl['key'])) ?></span>
-            <?php if (navShowBadge($cl)): ?>
-            <span class="st-nav-badge"><?= e($cl['badge']) ?></span>
+            <?php if ($cBadge !== null): ?>
+            <span class="st-nav-badge"><?= e($cBadge) ?></span>
             <?php endif; ?>
           </a>
           <?php endforeach; ?>
@@ -116,12 +119,16 @@ if (!isset($__s)) $__s = siteSettings();
           aria-label="More pages"
           class="nav-pill <?= $moreActive ? 'active' : '' ?>">
           <?= __('nav_more') ?>
+          <?php if (navHasChildBadge($moreLinks)): ?>
+          <span class="st-nav-badge st-nav-badge--pill">NEW</span>
+          <?php endif; ?>
           <svg id="st-chevron-more" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chev"><polyline points="6 9 12 15 18 9"></polyline></svg>
         </button>
         <div id="st-dd-more" class="st-dropdown" x-cloak x-show="moreOpen" x-transition style="right:0;">
           <div class="st-dd-caret" style="right:1.125rem;"></div>
           <?php foreach ($moreLinks as $ml):
             $mActive = $__currentPath === $ml['href'];
+            $mBadge  = navBadgeText($ml);
           ?>
           <a href="<?= url($ml['href']) ?>"
              <?= $mActive ? 'aria-current="page"' : '' ?>
@@ -129,7 +136,10 @@ if (!isset($__s)) $__s = siteSettings();
             <?php if (!empty($ml['icon'])): ?>
             <i data-lucide="<?= $ml['icon'] ?>" class="st-dd-icon" aria-hidden="true"></i>
             <?php endif; ?>
-            <?= e(__($ml['key'])) ?>
+            <span class="st-dd-label"><?= e(__($ml['key'])) ?></span>
+            <?php if ($mBadge !== null): ?>
+            <span class="st-nav-badge"><?= e($mBadge) ?></span>
+            <?php endif; ?>
           </a>
           <?php endforeach; ?>
         </div>
@@ -237,6 +247,7 @@ if (!isset($__s)) $__s = siteSettings();
       $mobileLinks = array_merge($navLinks, $companyLinks, $moreLinks);
       foreach ($mobileLinks as $l):
         $lActive = $__currentPath === $l['href'];
+        $lBadge  = navBadgeText($l);
       ?>
       <li>
         <a href="<?= url($l['href']) ?>" <?= $lActive ? 'aria-current="page"' : '' ?>
@@ -246,8 +257,8 @@ if (!isset($__s)) $__s = siteSettings();
             <i data-lucide="<?= $l['icon'] ?>" style="width:15px;height:15px;opacity:0.5;flex-shrink:0;" aria-hidden="true"></i>
             <?php endif; ?>
             <?= e(__($l['key'])) ?>
-            <?php if (navShowBadge($l)): ?>
-            <span class="st-nav-badge"><?= e($l['badge']) ?></span>
+            <?php if ($lBadge !== null): ?>
+            <span class="st-nav-badge"><?= e($lBadge) ?></span>
             <?php endif; ?>
           </span>
           <i data-lucide="chevron-right" style="width:13px;height:13px;opacity:0.3;flex-shrink:0;" aria-hidden="true"></i>

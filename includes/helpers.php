@@ -718,12 +718,102 @@ function socialShareLinks(string $url, string $title, ?string $message = null): 
     ];
 }
 
-/** Whether a nav link should show its badge (optional badge_until YYYY-MM-DD). */
+/** Count currently open job listings (cached per request). */
+function navOpenJobCount(): int {
+    static $cached = null;
+    if ($cached !== null) return $cached;
+    $cached = 0;
+    $today = date('Y-m-d');
+    try {
+        $row = queryOne(
+            "SELECT COUNT(*) AS c FROM job_listings
+             WHERE active=1
+               AND (deadline IS NULL OR deadline='' OR deadline >= ?)
+               AND (starts_at IS NULL OR starts_at='' OR starts_at <= ?)",
+            [$today, $today]
+        );
+        $cached = (int)($row['c'] ?? 0);
+    } catch (\Throwable $e) {
+        try {
+            $row = queryOne("SELECT COUNT(*) AS c FROM job_listings WHERE active=1");
+            $cached = (int)($row['c'] ?? 0);
+        } catch (\Throwable $e2) {
+            $cached = 0;
+        }
+    }
+    return $cached;
+}
+
+/** Count news posts published in the last N days (cached). */
+function navRecentNewsCount(int $days = 14): int {
+    static $cache = [];
+    $days = max(1, $days);
+    if (isset($cache[$days])) return $cache[$days];
+    $cache[$days] = 0;
+    $since = date('Y-m-d H:i:s', time() - ($days * 86400));
+    try {
+        $row = queryOne(
+            "SELECT COUNT(*) AS c FROM news
+             WHERE active=1 AND published=1
+               AND COALESCE(published_at, created_at) >= ?",
+            [$since]
+        );
+        $cache[$days] = (int)($row['c'] ?? 0);
+    } catch (\Throwable $e) {
+        try {
+            $row = queryOne(
+                "SELECT COUNT(*) AS c FROM news WHERE published=1 AND published_at >= ?",
+                [$since]
+            );
+            $cache[$days] = (int)($row['c'] ?? 0);
+        } catch (\Throwable $e2) {
+            $cache[$days] = 0;
+        }
+    }
+    return $cache[$days];
+}
+
+/**
+ * Badge text for a nav link, or null if it should not show.
+ *
+ * Link keys:
+ * - badge: static label (e.g. NEW)
+ * - badge_until: YYYY-MM-DD — hide after this date
+ * - badge_if: open_jobs | recent_news — require live content
+ * - badge_mode: count | label — for open_jobs/recent_news, show number or static badge
+ * - badge_days: for recent_news window (default 14)
+ */
+function navBadgeText(array $link): ?string {
+    $until = $link['badge_until'] ?? null;
+    if (!empty($until)) {
+        $ts = strtotime((string)$until . ' 23:59:59');
+        if ($ts === false || $ts < time()) return null;
+    }
+
+    $cond = $link['badge_if'] ?? null;
+    $mode = $link['badge_mode'] ?? 'label';
+    $label = trim((string)($link['badge'] ?? 'NEW'));
+
+    if ($cond === 'open_jobs') {
+        $n = navOpenJobCount();
+        if ($n < 1) return null;
+        return $mode === 'count' ? (string)$n : ($label !== '' ? $label : 'NEW');
+    }
+
+    if ($cond === 'recent_news') {
+        $n = navRecentNewsCount((int)($link['badge_days'] ?? 14));
+        if ($n < 1) return null;
+        return $mode === 'count' ? (string)$n : ($label !== '' ? $label : 'NEW');
+    }
+
+    // Static badge (optional expiry already checked)
+    if ($label === '' || empty($link['badge'])) return null;
+    return $label;
+}
+
+/** Whether a nav link should show its badge. */
 function navShowBadge(array $link): bool {
-    if (empty($link['badge'])) return false;
-    if (empty($link['badge_until'])) return true;
-    $until = strtotime((string)$link['badge_until'] . ' 23:59:59');
-    return $until !== false && $until >= time();
+    return navBadgeText($link) !== null;
 }
 
 /** True if any link in a nav group has an active badge. */
