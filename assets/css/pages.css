@@ -1357,11 +1357,18 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   gap: 1.15rem;
   max-width: 1080px;
   margin: 0 auto;
+  justify-content: center;
+  justify-items: stretch;
 }
 @media (min-width: 720px) {
   .quote-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.35rem;
+  }
+  /* Single message: keep one centered column (not left half of a 2-col grid) */
+  .quote-card-grid--solo,
+  .quote-card-grid:has(> .quote-card:only-child) {
+    grid-template-columns: minmax(0, 36rem);
   }
 }
 .quote-card {

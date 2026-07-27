@@ -226,7 +226,11 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       <div class="section-eyebrow section-eyebrow-primary mb-3q"><?= e(__('about_leadership_eyebrow')) ?></div>
       <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(__('about_leadership_title')) ?></h2>
     </div>
-    <div class="quote-card-grid stagger-children">
+    <?php
+      $__quoteCount = (int)($__chairMsg && ($__ls['chairman_active'] ?? '1'))
+          + (int)($__ceoMsg && ($__ls['ceo_active'] ?? '1'));
+    ?>
+    <div class="quote-card-grid stagger-children<?= $__quoteCount === 1 ? ' quote-card-grid--solo' : '' ?>">
 
       <?php if ($__chairMsg && ($__ls['chairman_active'] ?? '1')): ?>
       <div class="st-card quote-card">
