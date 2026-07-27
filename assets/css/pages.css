@@ -1452,6 +1452,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 
 /* ── Team org chart (post-based hierarchy) ── */
 .team-org {
+  --team-org-line: var(--primary);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1461,53 +1462,94 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__stem {
   width: 2px;
-  height: 1.35rem;
-  background: var(--border);
-  background: color-mix(in srgb, var(--primary) 35%, var(--border));
-  border-radius: 2px;
+  height: 1.15rem;
+  background: var(--team-org-line);
+  border-radius: 1px;
   flex-shrink: 0;
+  opacity: 0.85;
+  margin-bottom: -1px;
 }
 .team-org__row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  align-items: stretch;
-  gap: 1.25rem;
+  align-items: flex-start;
+  gap: 1.15rem 1.25rem;
   width: 100%;
   position: relative;
-  padding-top: 0.75rem;
-}
-.team-org__row:not(:first-child)::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 12%;
-  right: 12%;
-  height: 2px;
-  background: var(--border);
-  background: color-mix(in srgb, var(--primary) 28%, var(--border));
-  border-radius: 2px;
-}
-@media (max-width: 640px) {
-  .team-org__row:not(:first-child)::before {
-    left: 8%;
-    right: 8%;
-  }
 }
 .team-org__row--solo {
   max-width: 20rem;
 }
 .team-org__row--apex .team-card--lead {
-  width: min(100%, 15rem);
+  width: min(100%, 14.5rem);
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 .team-org__row--apex .team-card__photo--lg,
 .team-org__row--apex .team-card__avatar--lg {
-  width: 7rem;
-  height: 7rem;
+  width: 6.5rem;
+  height: 6.5rem;
 }
 .team-card--apex::before {
   height: 3px;
+}
+
+/* Each person cell — vertical stubs meet card top accent */
+.team-org__node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.team-org__twig {
+  display: block;
+  width: 2px;
+  height: 0.95rem;
+  background: var(--team-org-line);
+  opacity: 0.85;
+  flex-shrink: 0;
+  border-radius: 1px 1px 0 0;
+  margin-bottom: -1px; /* kiss the card top accent */
+}
+/* When parent row has a next tier, draw a short exit line from the row center via stem only */
+
+/*
+ * Horizontal rail across a branch row:
+ * first/last nodes draw half-lines from center; middle nodes draw full width.
+ * Combined with .team-org__twig this looks like a proper org tree.
+ */
+.team-org__row--branch .team-org__node::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  height: 2px;
+  background: var(--team-org-line);
+  opacity: 0.85;
+  z-index: 0;
+}
+.team-org__row--branch .team-org__node:first-child:not(:only-child)::before {
+  left: 50%;
+  right: 0;
+  width: auto;
+}
+.team-org__row--branch .team-org__node:last-child:not(:only-child)::before {
+  left: 0;
+  right: 50%;
+  width: auto;
+}
+.team-org__row--branch .team-org__node:not(:first-child):not(:last-child)::before {
+  left: 0;
+  right: 0;
+  width: auto;
+}
+.team-org__row--branch .team-org__node:only-child::before {
+  display: none;
+}
+.team-org__row--branch .team-org__twig {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── Team cards ── */
@@ -1529,17 +1571,19 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   text-align: center;
 }
 .team-card--lead {
-  width: min(100%, 13.5rem);
+  width: min(100%, 13.25rem);
   position: relative;
   overflow: hidden;
   margin: 0 auto;
+  padding: 1.05rem 1rem 1rem;
 }
 .team-card--lead::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 3px;
   background: var(--gradient-primary);
+  z-index: 1;
 }
 .team-card__photo {
   width: 4rem;

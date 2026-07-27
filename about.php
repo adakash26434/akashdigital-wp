@@ -289,18 +289,25 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       echo '<div class="team-org">';
       foreach ($tierKeys as $i => $tier) {
           $peopleInRow = $rows[$tier];
-          if ($i > 0) {
+          $solo = count($peopleInRow) === 1;
+          $apex = ((int)$tier === 1) || ($i === 0 && $solo);
+          $hasParent = $i > 0;
+
+          if ($hasParent) {
               echo '<div class="team-org__stem" aria-hidden="true"></div>';
           }
-          $solo = count($peopleInRow) === 1;
-          // Apex styling: explicit chart level 1, or first row when it is a single person
-          $apex = ((int)$tier === 1) || ($i === 0 && $solo);
+
           $rowCls = 'team-org__row'
               . ($solo ? ' team-org__row--solo' : '')
-              . ($apex ? ' team-org__row--apex' : '');
+              . ($apex ? ' team-org__row--apex' : '')
+              . ($hasParent ? ' team-org__row--branch' : ' team-org__row--root');
           echo '<div class="' . e($rowCls) . '">';
           foreach ($peopleInRow as $m) {
               $cardCls = 'st-card team-card team-card--lead' . ($apex && $solo ? ' team-card--apex' : '');
+              echo '<div class="team-org__node">';
+              if ($hasParent) {
+                  echo '<span class="team-org__twig" aria-hidden="true"></span>';
+              }
               echo '<div class="' . e($cardCls) . '">';
               if (!empty($m['photo_url'])) {
                   echo '<img src="' . e($m['photo_url']) . '" alt="' . e($m['name']) . '" loading="lazy" decoding="async" class="team-card__photo team-card__photo--lg">';
@@ -318,9 +325,10 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
                   echo '<a href="' . e($m['linkedin_url']) . '" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="st-social-btn st-social-linkedin" style="margin-top:0.5rem;">';
                   echo '<i data-lucide="linkedin" class="ic-13"></i></a>';
               }
-              echo '</div>';
+              echo '</div>'; // card
+              echo '</div>'; // node
           }
-          echo '</div>';
+          echo '</div>'; // row
       }
       echo '</div>';
   };
