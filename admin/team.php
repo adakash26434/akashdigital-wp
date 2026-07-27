@@ -123,9 +123,15 @@ if (!empty($_GET['edit'])) {
 
   <?php
   // Group by is_leadership + category for better display
-  $leads_board = array_filter($team, fn($m)=>!empty($m['is_leadership']) && ($m['category'] ?? '') === 'board');
-  $leads_mgmt = array_filter($team, fn($m)=>!empty($m['is_leadership']) && ($m['category'] ?? 'management') === 'management');
-  $members = array_filter($team, fn($m)=>empty($m['is_leadership']));
+  $leads_board = array_filter($team, static function ($m) {
+      if (empty($m['is_leadership'])) return false;
+      return strtolower(trim((string)($m['category'] ?? ''))) === 'board';
+  });
+  $leads_mgmt = array_filter($team, static function ($m) {
+      if (empty($m['is_leadership'])) return false;
+      return strtolower(trim((string)($m['category'] ?? 'management'))) !== 'board';
+  });
+  $members = array_filter($team, static fn($m) => empty($m['is_leadership']));
   ?>
 
   <?php if(!empty($leads_board)):?>
@@ -185,7 +191,7 @@ if (!empty($_GET['edit'])) {
     <div class="flex-1-min">
       <div style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">
         <span class="fw-strong"><?=e($m['name'])?></span>
-        <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;">MANAGEMENT</span>
+        <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;">TOP MGMT</span>
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
       <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
@@ -288,7 +294,7 @@ if (!empty($_GET['edit'])) {
             <span>Leadership (Board / Top Management)</span>
           </label>
           <label class="row-check">
-            <input type="checkbox" name="active" value="1" <?=(!empty($editing['active']))?'checked':''?>>
+            <input type="checkbox" name="active" value="1" <?=($editing ? !empty($editing['active']) : true)?'checked':''?>>
             <span>Active / Visible</span>
           </label>
         </div>

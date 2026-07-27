@@ -1420,6 +1420,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .team-org__stem {
   width: 2px;
   height: 1.35rem;
+  background: var(--border);
   background: color-mix(in srgb, var(--primary) 35%, var(--border));
   border-radius: 2px;
   flex-shrink: 0;
@@ -1441,6 +1442,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   left: 12%;
   right: 12%;
   height: 2px;
+  background: var(--border);
   background: color-mix(in srgb, var(--primary) 28%, var(--border));
   border-radius: 2px;
 }

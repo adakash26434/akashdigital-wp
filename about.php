@@ -268,22 +268,32 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
   </div>
 </section>
 <?php if ($team):
-  $__board = array_values(array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? '') === 'board'));
-  $__mgmt = array_values(array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? 'management') === 'management'));
-  $__members = array_values(array_filter($team, fn($m) => empty($m['is_leadership'])));
+  $__board = array_values(array_filter($team, static function ($m) {
+      if (empty($m['is_leadership'])) return false;
+      $cat = strtolower(trim((string)($m['category'] ?? 'management')));
+      return $cat === 'board';
+  }));
+  $__mgmt = array_values(array_filter($team, static function ($m) {
+      if (empty($m['is_leadership'])) return false;
+      $cat = strtolower(trim((string)($m['category'] ?? 'management')));
+      // Empty / unknown category → treat as top management (avoid orphaned leaders)
+      return $cat !== 'board';
+  }));
+  $__members = array_values(array_filter($team, static fn($m) => empty($m['is_leadership'])));
 
   /** Render leadership group as a post-based org chart (apex alone, then rows below). */
   $__renderTeamOrg = static function (array $people) {
       if (!$people) return;
       $rows = function_exists('teamOrgChartRows') ? teamOrgChartRows($people) : [1 => $people];
       $tierKeys = array_keys($rows);
-      echo '<div class="team-org" role="list">';
+      echo '<div class="team-org">';
       foreach ($tierKeys as $i => $tier) {
           $peopleInRow = $rows[$tier];
           if ($i > 0) {
               echo '<div class="team-org__stem" aria-hidden="true"></div>';
           }
           $solo = count($peopleInRow) === 1;
+          // Apex styling: explicit chart level 1, or first row when it is a single person
           $apex = ((int)$tier === 1) || ($i === 0 && $solo);
           $rowCls = 'team-org__row'
               . ($solo ? ' team-org__row--solo' : '')
@@ -291,13 +301,15 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
           echo '<div class="' . e($rowCls) . '">';
           foreach ($peopleInRow as $m) {
               $cardCls = 'st-card team-card team-card--lead' . ($apex && $solo ? ' team-card--apex' : '');
-              echo '<div class="' . e($cardCls) . '" role="listitem">';
+              echo '<div class="' . e($cardCls) . '">';
               if (!empty($m['photo_url'])) {
                   echo '<img src="' . e($m['photo_url']) . '" alt="' . e($m['name']) . '" loading="lazy" decoding="async" class="team-card__photo team-card__photo--lg">';
               } else {
-                  echo '<div class="team-card__avatar team-card__avatar--lg">' . e(strtoupper(substr((string)$m['name'], 0, 1))) . '</div>';
+                  $initial = strtoupper(substr(trim((string)($m['name'] ?? '?')), 0, 1));
+                  if ($initial === '') $initial = '?';
+                  echo '<div class="team-card__avatar team-card__avatar--lg">' . e($initial) . '</div>';
               }
-              echo '<h3 class="team-card__name">' . e($m['name']) . '</h3>';
+              echo '<h3 class="team-card__name">' . e($m['name'] ?? '') . '</h3>';
               echo '<p class="team-card__role">' . e($m['role'] ?? '') . '</p>';
               if (!empty($m['bio'])) {
                   echo '<p class="team-card__bio">' . e($m['bio']) . '</p>';

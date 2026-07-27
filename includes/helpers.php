@@ -512,12 +512,15 @@ function teamOrgRank(array $member): int {
     $role = function_exists('mb_strtolower')
         ? mb_strtolower(trim((string)($member['role'] ?? '')))
         : strtolower(trim((string)($member['role'] ?? '')));
+    if ($role === '') {
+        return 3;
+    }
 
-    // Apex — typically alone on the first row
-    if (preg_match('/chair\s*man|chair\s*person|\bchair\b|अध्यक्ष|president/u', $role)) {
+    // Apex — typically alone on the first row (Chairman before generic Director)
+    if (preg_match('/chair\s*man|chair\s*person|\bchair\b|अध्यक्ष|\bpresident\b/u', $role)) {
         return 1;
     }
-    if (preg_match('/\bceo\b|chief\s+executive|managing\s+director|\bmd\b|founder|प्रमुख\s*कार्यकारी/u', $role)) {
+    if (preg_match('/\bceo\b|chief\s+executive|managing\s+director|\bmd\b|\bfounder\b|प्रमुख\s*कार्यकारी/u', $role)) {
         return 1;
     }
     // Second tier
