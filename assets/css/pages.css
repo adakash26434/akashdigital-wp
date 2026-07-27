@@ -1473,22 +1473,22 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.75rem;
+  gap: 2rem 2.25rem;
   width: 100%;
   position: relative;
 }
 .team-org__row--solo {
-  max-width: 22rem;
+  max-width: 24rem;
 }
-.team-org__row--apex .team-card--lead {
-  width: min(100%, 16rem);
+.team-org__row--apex .st-card.team-card--lead {
+  width: min(100%, 18rem);
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 .team-org__row--apex .team-card__photo--lg,
 .team-org__row--apex .team-card__avatar--lg {
-  width: 6.25rem;
-  height: 6.25rem;
-  margin-bottom: 0.65rem;
+  width: 5.5rem;
+  height: 5.5rem;
+  margin-bottom: 0.45rem;
 }
 
 /* Node + top-mid vertical line into each child card */
@@ -1559,12 +1559,13 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   padding: 1.25rem;
   text-align: center;
 }
-.team-card--lead {
-  width: min(100%, 16rem);
+/* Must beat .st-card { padding: 1.5rem } later in this file */
+.st-card.team-card--lead {
+  width: min(100%, 18rem);
   position: relative;
   overflow: hidden;
   margin: 0 auto;
-  padding: 1rem 1.15rem 0.95rem;
+  padding: 0.8rem 1.35rem 0.7rem;
   text-align: center;
 }
 .team-card--lead::before {
@@ -1576,24 +1577,27 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__row--branch .team-card__photo--lg,
 .team-org__row--branch .team-card__avatar--lg {
-  width: 5rem;
-  height: 5rem;
-  margin-bottom: 0.55rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  margin-bottom: 0.4rem;
 }
 .team-org .team-card__bio {
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 0.35rem;
-  line-height: 1.45;
+  margin-bottom: 0.2rem;
+  line-height: 1.35;
 }
 .team-org .team-card__name {
   font-size: 0.95rem;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.1rem;
 }
 .team-org .team-card__role {
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.25rem;
+}
+.team-org .st-social-btn {
+  margin-top: 0.25rem !important;
 }
 .team-card__photo {
   width: 4rem;
@@ -1992,6 +1996,11 @@ html.dark .st-dropdown {
   box-shadow: var(--shadow-md);
   border-color: rgba(37, 99, 235, 0.25);
   transform: translateY(-1px);
+}
+/* Org-chart lead cards: keep wide/short after .st-card padding above */
+.st-card.team-card--lead {
+  width: min(100%, 18rem);
+  padding: 0.8rem 1.35rem 0.7rem;
 }
 
 /* ── Stat cards ──────────────────────────────────────────────── */
