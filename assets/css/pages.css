@@ -1454,7 +1454,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .team-org {
   --team-org-line: var(--primary);
   --team-org-n: 1;
-  --team-card-w: 13.25rem;
+  --team-card-w: 14.5rem;
   --team-org-gap: 2.25rem;
   display: flex;
   flex-direction: column;
@@ -1509,9 +1509,9 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__row--apex .team-card__photo--lg,
 .team-org__row--apex .team-card__avatar--lg {
-  width: 5.75rem;
-  height: 5.75rem;
-  margin-bottom: 0.55rem;
+  width: 6.5rem;
+  height: 6.5rem;
+  margin-bottom: 0.6rem;
 }
 
 /* Node + top-mid vertical line into each child card */
@@ -1561,7 +1561,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 /* Phone: wrap cleanly, drop sibling rail */
 @media (max-width: 860px) {
   .team-org {
-    --team-card-w: min(14rem, 42vw);
+    --team-card-w: min(15rem, 44vw);
     --team-org-gap: 1rem;
   }
   .team-org__row,
@@ -1603,7 +1603,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   position: relative;
   overflow: hidden;
   margin: 0 auto;
-  padding: 1.15rem 0.9rem 1.1rem;
+  padding: 1.2rem 1rem 1.15rem;
   text-align: center;
 }
 .team-card--lead::before {
@@ -1615,8 +1615,8 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__row--branch .team-card__photo--lg,
 .team-org__row--branch .team-card__avatar--lg {
-  width: 5rem;
-  height: 5rem;
+  width: 5.75rem;
+  height: 5.75rem;
   margin-bottom: 0.55rem;
 }
 .team-org .team-card__bio {
@@ -2041,7 +2041,7 @@ html.dark .st-dropdown {
 .st-card.team-card--lead {
   width: 100%;
   max-width: none;
-  padding: 1.15rem 0.9rem 1.1rem;
+  padding: 1.2rem 1rem 1.15rem;
 }
 /* Apex card: tiny bottom stub so the stem meets the card */
 .team-org__row--apex .st-card.team-card--lead::after {
