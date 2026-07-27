@@ -1462,19 +1462,18 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__stem {
   width: 2px;
-  height: 1.15rem;
+  height: 1.35rem;
   background: var(--team-org-line);
   border-radius: 1px;
   flex-shrink: 0;
-  opacity: 0.85;
-  margin-bottom: -1px;
+  opacity: 0.9;
 }
 .team-org__row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   align-items: flex-start;
-  gap: 1.15rem 1.25rem;
+  gap: 1.5rem;
   width: 100%;
   position: relative;
 }
@@ -1482,51 +1481,40 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   max-width: 20rem;
 }
 .team-org__row--apex .team-card--lead {
-  width: min(100%, 14.5rem);
+  width: min(100%, 15rem);
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 .team-org__row--apex .team-card__photo--lg,
 .team-org__row--apex .team-card__avatar--lg {
-  width: 6.5rem;
-  height: 6.5rem;
-}
-.team-card--apex::before {
-  height: 3px;
+  width: 7rem;
+  height: 7rem;
 }
 
-/* Each person cell — vertical stubs meet card top accent */
+/* Node: vertical line only into card top-mid (spacing unchanged from original cards) */
 .team-org__node {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 0 1 auto;
-  min-width: 0;
+  flex: 0 0 auto;
 }
 .team-org__twig {
   display: block;
   width: 2px;
-  height: 0.95rem;
+  height: 1rem;
   background: var(--team-org-line);
-  opacity: 0.85;
+  opacity: 0.9;
   flex-shrink: 0;
-  border-radius: 1px 1px 0 0;
-  margin-bottom: -1px; /* kiss the card top accent */
 }
-/* When parent row has a next tier, draw a short exit line from the row center via stem only */
 
-/*
- * Horizontal rail across a branch row:
- * first/last nodes draw half-lines from center; middle nodes draw full width.
- * Combined with .team-org__twig this looks like a proper org tree.
- */
+/* Horizontal rail between siblings — line only, not card chrome */
 .team-org__row--branch .team-org__node::before {
   content: "";
   position: absolute;
   top: 0;
   height: 2px;
   background: var(--team-org-line);
-  opacity: 0.85;
+  opacity: 0.9;
   z-index: 0;
 }
 .team-org__row--branch .team-org__node:first-child:not(:only-child)::before {
@@ -1571,19 +1559,17 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   text-align: center;
 }
 .team-card--lead {
-  width: min(100%, 13.25rem);
+  width: min(100%, 13.5rem);
   position: relative;
   overflow: hidden;
   margin: 0 auto;
-  padding: 1.05rem 1rem 1rem;
 }
 .team-card--lead::before {
   content: "";
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 3px;
+  height: 2px;
   background: var(--gradient-primary);
-  z-index: 1;
 }
 .team-card__photo {
   width: 4rem;
