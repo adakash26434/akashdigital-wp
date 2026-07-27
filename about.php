@@ -297,11 +297,13 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
               echo '<div class="team-org__stem" aria-hidden="true"></div>';
           }
 
+          $n = count($peopleInRow);
           $rowCls = 'team-org__row'
               . ($solo ? ' team-org__row--solo' : '')
               . ($apex ? ' team-org__row--apex' : '')
-              . ($hasParent ? ' team-org__row--branch' : ' team-org__row--root');
-          echo '<div class="' . e($rowCls) . '">';
+              . ($hasParent ? ' team-org__row--branch' : ' team-org__row--root')
+              . ' team-org__row--n' . $n;
+          echo '<div class="' . e($rowCls) . '" style="--team-org-n:' . (int)$n . '">';
           foreach ($peopleInRow as $m) {
               $cardCls = 'st-card team-card team-card--lead' . ($apex && $solo ? ' team-card--apex' : '');
               echo '<div class="team-org__node">';
