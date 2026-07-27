@@ -1454,6 +1454,8 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .team-org {
   --team-org-line: var(--primary);
   --team-org-n: 1;
+  --team-card-w: 15.25rem;
+  --team-org-gap: 1.65rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1463,43 +1465,45 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__stem {
   width: 2px;
-  height: 1.15rem;
+  height: 1.25rem;
   background: var(--team-org-line);
-  border-radius: 1px;
+  border-radius: 0;
   flex-shrink: 0;
-  opacity: 0.9;
+  margin-top: -1px;
+  margin-bottom: -1px; /* overlap parent bottom + child rail */
+  position: relative;
+  z-index: 1;
 }
-/* Spread siblings across the container — avoid center-cluster + empty sides */
+/* Comfortable spacing — closer than full-bleed, not center-cramped */
 .team-org__row {
   display: flex;
   flex-wrap: nowrap;
   justify-content: center;
   align-items: flex-start;
-  gap: clamp(1.25rem, 2.5vw, 2.75rem);
-  width: min(100%, 72rem);
+  gap: var(--team-org-gap);
+  width: max-content;
+  max-width: 100%;
   margin-inline: auto;
   position: relative;
 }
 .team-org__row--solo,
 .team-org__row--apex {
-  width: min(100%, 17rem);
+  width: var(--team-card-w);
   gap: 0;
 }
 .team-org__row--n2 {
-  width: min(100%, 44rem);
-  justify-content: space-between;
-  gap: clamp(2rem, 5vw, 4rem);
+  --team-org-gap: 2.25rem;
 }
-.team-org__row--n3,
+.team-org__row--n3 {
+  --team-org-gap: 1.75rem;
+}
 .team-org__row--n4,
 .team-org__row--n5 {
-  width: 100%;
-  max-width: 72rem;
-  justify-content: space-between;
-  gap: clamp(1.25rem, 2.2vw, 2.5rem);
+  --team-org-gap: 1.5rem;
 }
 .team-org__row--apex .st-card.team-card--lead {
-  width: min(100%, 16rem);
+  width: 100%;
+  max-width: none;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
 }
 .team-org__row--apex .team-card__photo--lg,
@@ -1515,48 +1519,50 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   display: flex;
   flex-direction: column;
   align-items: center;
-  flex: 1 1 0;
-  min-width: 0;
+  flex: 0 0 auto;
+  width: var(--team-card-w);
+  gap: 0;
 }
 .team-org__row--solo .team-org__node,
 .team-org__row--apex .team-org__node {
-  flex: 0 0 auto;
-  max-width: none;
   width: 100%;
 }
 .team-org__twig {
   display: block;
   width: 2px;
-  height: 0.9rem;
+  height: 1rem;
   background: var(--team-org-line);
-  opacity: 0.9;
   flex-shrink: 0;
+  margin-bottom: -1px; /* overlap card top border */
+  position: relative;
+  z-index: 2;
 }
 
-/* One continuous horizontal rail from first card mid → last card mid */
+/* Continuous rail: first card mid → last card mid (fixed card width) */
 .team-org__row--branch::before {
   content: "";
   position: absolute;
   top: 0;
-  left: calc(100% / (2 * var(--team-org-n, 2)));
-  right: calc(100% / (2 * var(--team-org-n, 2)));
+  left: calc(var(--team-card-w) / 2);
+  right: calc(var(--team-card-w) / 2);
   height: 2px;
   background: var(--team-org-line);
-  opacity: 0.9;
   z-index: 0;
   pointer-events: none;
 }
-.team-org__row--branch.team-org__row--n1::before,
-.team-org__row--branch .team-org__node::before {
+.team-org__row--branch.team-org__row--n1::before {
   display: none;
 }
 .team-org__row--branch .team-org__twig {
-  position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Phone: wrap cleanly, drop sibling rail */
 @media (max-width: 860px) {
+  .team-org {
+    --team-card-w: min(14rem, 42vw);
+    --team-org-gap: 1rem;
+  }
   .team-org__row,
   .team-org__row--n2,
   .team-org__row--n3,
@@ -1565,11 +1571,6 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
     flex-wrap: wrap;
     width: 100%;
     justify-content: center;
-    gap: 1rem;
-  }
-  .team-org__node {
-    flex: 0 1 14rem;
-    max-width: 15rem;
   }
   .team-org__row--branch::before {
     display: none;
@@ -1597,7 +1598,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 /* Must beat .st-card { padding: 1.5rem } later in this file */
 .st-card.team-card--lead {
   width: 100%;
-  max-width: 16.5rem;
+  max-width: none;
   position: relative;
   overflow: hidden;
   margin: 0 auto;
@@ -2036,8 +2037,20 @@ html.dark .st-dropdown {
 /* Org-chart lead cards: keep wide/short after .st-card padding above */
 .st-card.team-card--lead {
   width: 100%;
-  max-width: 16.5rem;
+  max-width: none;
   padding: 0.75rem 1.15rem 0.65rem;
+}
+/* Apex card: tiny bottom stub so the stem meets the card */
+.team-org__row--apex .st-card.team-card--lead::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 2px;
+  background: var(--team-org-line, var(--primary));
+  z-index: 2;
 }
 
 /* ── Stat cards ──────────────────────────────────────────────── */
