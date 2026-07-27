@@ -158,7 +158,11 @@ if (!empty($_GET['edit'])) {
         <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--primary-soft);color:var(--primary-fg);font-weight:700;">BOARD</span>
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
-      <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+      <div class="fs-sm-mt"><?=e($m['role']??'—')?>
+        <?php if (function_exists('teamOrgRank')): ?>
+          <span style="margin-left:0.35rem;font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--muted);color:var(--muted-foreground);font-weight:700;">ROW <?= (int)teamOrgRank($m) ?></span>
+        <?php endif; ?>
+      </div>
       <?php if(!empty($m['bio'])):?>
       <div class="fs-2xs-mt" style="color:var(--muted-foreground);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?=e($m['bio'])?>"><?=e(truncate($m['bio'],60))?></div>
       <?php endif;?>
@@ -194,7 +198,11 @@ if (!empty($_GET['edit'])) {
         <span style="font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--warning-soft);color:var(--warning-fg);font-weight:700;">TOP MGMT</span>
         <?php if(!$m['active']):?><span style="font-size:0.5625rem;color:var(--muted-foreground);">inactive</span><?php endif;?>
       </div>
-      <div class="fs-sm-mt"><?=e($m['role']??'—')?></div>
+      <div class="fs-sm-mt"><?=e($m['role']??'—')?>
+        <?php if (function_exists('teamOrgRank')): ?>
+          <span style="margin-left:0.35rem;font-size:0.5625rem;padding:0.1rem 0.35rem;border-radius:9999px;background:var(--muted);color:var(--muted-foreground);font-weight:700;">ROW <?= (int)teamOrgRank($m) ?></span>
+        <?php endif; ?>
+      </div>
       <?php if(!empty($m['bio'])):?>
       <div class="fs-2xs-mt" style="color:var(--muted-foreground);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="<?=e($m['bio'])?>"><?=e(truncate($m['bio'],60))?></div>
       <?php endif;?>
@@ -301,26 +309,46 @@ if (!empty($_GET['edit'])) {
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
         <div>
-          <label class="form-label">Team Category</label>
+          <label class="form-label">Group on About page</label>
           <select name="category" class="form-input">
             <option value="management" <?=($editing['category']??'management')==='management'?'selected':''?>>Top Management Team</option>
             <option value="board" <?=($editing['category']??'management')==='board'?'selected':''?>>Board of Directors</option>
           </select>
-          <span class="form-hint">Which group on the About page.</span>
+          <span class="form-hint">Board र Top Management छुट्टाछुट्टै section मा देखिन्छ।</span>
         </div>
         <div>
-          <label class="form-label">Chart level</label>
-          <?php $__tier = (int)($editing['org_tier'] ?? 0); ?>
-          <select name="org_tier" class="form-input">
-            <option value="0" <?=$__tier===0?'selected':''?>>Auto (from job title)</option>
-            <option value="1" <?=$__tier===1?'selected':''?>>Level 1 — top alone (Chairman / CEO)</option>
-            <option value="2" <?=$__tier===2?'selected':''?>>Level 2 — row below</option>
-            <option value="3" <?=$__tier===3?'selected':''?>>Level 3</option>
-            <option value="4" <?=$__tier===4?'selected':''?>>Level 4</option>
-            <option value="5" <?=$__tier===5?'selected':''?>>Level 5</option>
+          <label class="form-label">Photo row on chart</label>
+          <?php
+            $__tier = (int)($editing['org_tier'] ?? 0);
+            $__autoPreview = '';
+            if ($editing && function_exists('teamOrgRank')) {
+              $probe = $editing;
+              $probe['org_tier'] = 0; // preview what Auto would pick
+              $__autoPreview = (int)teamOrgRank($probe);
+            }
+          ?>
+          <select name="org_tier" class="form-input" id="team-org-tier">
+            <option value="0" <?=$__tier===0?'selected':''?>>Auto — job title बाट<?= $__autoPreview ? ' (अहिले row '.$__autoPreview.')' : '' ?></option>
+            <option value="1" <?=$__tier===1?'selected':''?>>Row 1 — माथि एक्लै (Chairman / CEO)</option>
+            <option value="2" <?=$__tier===2?'selected':''?>>Row 2 — त्यसको तल (Director / Manager)</option>
+            <option value="3" <?=$__tier===3?'selected':''?>>Row 3 — अझ तल</option>
+            <option value="4" <?=$__tier===4?'selected':''?>>Row 4</option>
+            <option value="5" <?=$__tier===5?'selected':''?>>Row 5</option>
           </select>
-          <span class="form-hint">Same level = same row. Level 1 sits centered on top.</span>
+          <span class="form-hint">एउटै row number = एउटै लाइनमा photo। प्रायः <strong>Auto</strong> नै काफी छ।</span>
         </div>
+      </div>
+
+      <div style="padding:0.75rem 0.875rem;border:1px dashed var(--border);border-radius:0.75rem;background:var(--muted);font-size:0.75rem;color:var(--muted-foreground);line-height:1.55;">
+        <div style="font-weight:700;color:var(--foreground);margin-bottom:0.35rem;">Chart कसरी बस्छ (example)</div>
+        <div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre;color:var(--foreground);font-size:0.6875rem;line-height:1.4;">
+    [ Row 1 — Chairman / CEO ]
+              |
+    [ Row 2 — Director ] [ Row 2 — Director ]
+              |
+         [ Row 3 — … ]
+        </div>
+        <div style="margin-top:0.5rem;">Title मा Chairman / CEO / Director / Manager लेखे Auto ले row तय गर्छ। मिलेन भने माथिबाट Row manually चुन्नुहोस्।</div>
       </div>
       <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update Member':'Add Member'?></button>
       <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>
