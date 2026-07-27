@@ -1455,7 +1455,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   --team-org-line: var(--primary);
   --team-org-n: 1;
   --team-card-w: 13.25rem;
-  --team-org-gap: 1.75rem;
+  --team-org-gap: 2.25rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1492,14 +1492,14 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   gap: 0;
 }
 .team-org__row--n2 {
-  --team-org-gap: 2.25rem;
+  --team-org-gap: 3rem;
 }
 .team-org__row--n3 {
-  --team-org-gap: 1.75rem;
+  --team-org-gap: 2.5rem;
 }
 .team-org__row--n4,
 .team-org__row--n5 {
-  --team-org-gap: 1.5rem;
+  --team-org-gap: 2rem;
 }
 .team-org__row--apex .st-card.team-card--lead {
   width: 100%;
