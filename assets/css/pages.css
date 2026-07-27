@@ -1454,8 +1454,8 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .team-org {
   --team-org-line: var(--primary);
   --team-org-n: 1;
-  --team-card-w: 15.25rem;
-  --team-org-gap: 1.65rem;
+  --team-card-w: 13.25rem;
+  --team-org-gap: 1.75rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1508,9 +1508,9 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__row--apex .team-card__photo--lg,
 .team-org__row--apex .team-card__avatar--lg {
-  width: 5.25rem;
-  height: 5.25rem;
-  margin-bottom: 0.4rem;
+  width: 5.75rem;
+  height: 5.75rem;
+  margin-bottom: 0.55rem;
 }
 
 /* Node + top-mid vertical line into each child card */
@@ -1602,7 +1602,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   position: relative;
   overflow: hidden;
   margin: 0 auto;
-  padding: 0.75rem 1.15rem 0.65rem;
+  padding: 1.15rem 0.9rem 1.1rem;
   text-align: center;
 }
 .team-card--lead::before {
@@ -1614,24 +1614,26 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 .team-org__row--branch .team-card__photo--lg,
 .team-org__row--branch .team-card__avatar--lg {
-  width: 4.5rem;
-  height: 4.5rem;
-  margin-bottom: 0.4rem;
+  width: 5rem;
+  height: 5rem;
+  margin-bottom: 0.55rem;
 }
 .team-org .team-card__bio {
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 0.2rem;
-  line-height: 1.35;
+  margin-bottom: 0.35rem;
+  line-height: 1.4;
+  min-height: 2.8em;
 }
 .team-org .team-card__name {
   font-size: 0.95rem;
-  margin-bottom: 0.1rem;
+  margin-bottom: 0.2rem;
+  line-height: 1.35;
 }
 .team-org .team-card__role {
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.4rem;
 }
 .team-org .st-social-btn {
   margin-top: 0.25rem !important;
@@ -2038,7 +2040,7 @@ html.dark .st-dropdown {
 .st-card.team-card--lead {
   width: 100%;
   max-width: none;
-  padding: 0.75rem 1.15rem 0.65rem;
+  padding: 1.15rem 0.9rem 1.1rem;
 }
 /* Apex card: tiny bottom stub so the stem meets the card */
 .team-org__row--apex .st-card.team-card--lead::after {
