@@ -6,6 +6,7 @@ require_once '../includes/admin-layout.php';
 // MySQL 5.7 doesn't allow TEXT DEFAULT, so the original migration may have
 // silently failed. Try to add the column here if it's still missing.
 $__tmHasCategory = false;
+$__tmHasOrgTier = false;
 try {
     $__tmHasCategory = dbColumnExists('team_members', 'category');
     if (!$__tmHasCategory) {
@@ -13,6 +14,14 @@ try {
         $__tmHasCategory = true;
     }
 } catch (\Throwable $__e) { error_log('[team.php] category column: ' . $__e->getMessage()); }
+
+try {
+    $__tmHasOrgTier = dbColumnExists('team_members', 'org_tier');
+    if (!$__tmHasOrgTier) {
+        execute("ALTER TABLE team_members ADD COLUMN org_tier TINYINT NULL DEFAULT 0");
+        $__tmHasOrgTier = true;
+    }
+} catch (\Throwable $__e) { error_log('[team.php] org_tier column: ' . $__e->getMessage()); }
 
 $success = $error = '';
 
@@ -36,12 +45,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $category     = in_array($_POST['category'] ?? 'management', ['board','management']) ? $_POST['category'] : 'management';
         $active       = isset($_POST['active']) ? 1 : 0;
         $position     = (int)($_POST['position'] ?? 0);
+        $org_tier     = (int)($_POST['org_tier'] ?? 0);
+        if ($org_tier < 0 || $org_tier > 5) $org_tier = 0;
 
         if (!$name) { $error = 'Name is required.'; }
         else {
             try {
-                if ($__tmHasCategory) {
-                    // Full query including category column
+                if ($__tmHasCategory && $__tmHasOrgTier) {
+                    if ($id) {
+                        execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,category=?,active=?,position=?,org_tier=?,updated_at=NOW() WHERE id=?",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position,$org_tier,$id]);
+                    } else {
+                        execute("INSERT INTO team_members (name,role,bio,photo_url,email,linkedin_url,is_leadership,category,active,position,org_tier,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position,$org_tier]);
+                    }
+                } elseif ($__tmHasCategory) {
                     if ($id) {
                         execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,category=?,active=?,position=?,updated_at=NOW() WHERE id=?",
                             [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position,$id]);
@@ -50,7 +68,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$category,$active,$position]);
                     }
                 } else {
-                    // Fallback: category column unavailable — save without it
                     if ($id) {
                         execute("UPDATE team_members SET name=?,role=?,bio=?,photo_url=?,email=?,linkedin_url=?,is_leadership=?,active=?,position=?,updated_at=NOW() WHERE id=?",
                             [$name,$role,$bio,$photo_url?:null,$email?:null,$linkedin_url?:null,$is_lead,$active,$position,$id]);
@@ -66,10 +83,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $team = [];
-try { $team = query("SELECT id,name,role,photo_url,is_leadership,category,active,position FROM team_members ORDER BY is_leadership DESC, category, position ASC, name ASC"); }
-catch(\Throwable $e) { 
-    try { $team = query("SELECT id,name,role,photo_url,is_leadership,active,position FROM team_members ORDER BY position,name"); }
-    catch(\Throwable $e2) { $error = 'team_members table not found. Run database.sql.'; }
+try { $team = query("SELECT id,name,role,photo_url,is_leadership,category,active,position,org_tier FROM team_members ORDER BY is_leadership DESC, category, position ASC, name ASC"); }
+catch(\Throwable $e) {
+    try { $team = query("SELECT id,name,role,photo_url,is_leadership,category,active,position FROM team_members ORDER BY is_leadership DESC, category, position ASC, name ASC"); }
+    catch(\Throwable $e2) {
+        try { $team = query("SELECT id,name,role,photo_url,is_leadership,active,position FROM team_members ORDER BY position,name"); }
+        catch(\Throwable $e3) { $error = 'team_members table not found. Run database.sql.'; }
+    }
 }
 
 $editing = null;
@@ -148,7 +168,7 @@ if (!empty($_GET['edit'])) {
   <div style="margin-bottom:0.5rem;margin-top:1rem;font-size:0.6875rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted-foreground);">
     <span style="display:inline-flex;align-items:center;gap:0.375rem;">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      Management Team
+      Top Management Team
       <span style="background:var(--warning-soft);color:var(--warning-fg);padding:0.1rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($leads_mgmt)?></span>
     </span>
   </div>
@@ -259,13 +279,13 @@ if (!empty($_GET['edit'])) {
       </div>
       <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:start;">
         <div>
-          <label class="form-label">Position</label>
+          <label class="form-label">Sort #</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
         </div>
         <div style="padding-top:0.625rem;">
           <label class="row-check" style="margin-bottom:0.375rem;">
             <input type="checkbox" name="is_leadership" value="1" <?=(!empty($editing['is_leadership']))?'checked':''?>>
-            <span>Leadership team</span>
+            <span>Leadership (Board / Top Management)</span>
           </label>
           <label class="row-check">
             <input type="checkbox" name="active" value="1" <?=(!empty($editing['active']))?'checked':''?>>
@@ -273,13 +293,28 @@ if (!empty($_GET['edit'])) {
           </label>
         </div>
       </div>
-      <div>
-        <label class="form-label">Team Category</label>
-        <select name="category" class="form-input">
-          <option value="management" <?=($editing['category']??'management')==='management'?'selected':''?>>Management Team</option>
-          <option value="board" <?=($editing['category']??'management')==='board'?'selected':''?>>Board Members</option>
-        </select>
-        <span class="form-hint">Classify team member for display purposes.</span>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div>
+          <label class="form-label">Team Category</label>
+          <select name="category" class="form-input">
+            <option value="management" <?=($editing['category']??'management')==='management'?'selected':''?>>Top Management Team</option>
+            <option value="board" <?=($editing['category']??'management')==='board'?'selected':''?>>Board of Directors</option>
+          </select>
+          <span class="form-hint">Which group on the About page.</span>
+        </div>
+        <div>
+          <label class="form-label">Chart level</label>
+          <?php $__tier = (int)($editing['org_tier'] ?? 0); ?>
+          <select name="org_tier" class="form-input">
+            <option value="0" <?=$__tier===0?'selected':''?>>Auto (from job title)</option>
+            <option value="1" <?=$__tier===1?'selected':''?>>Level 1 — top alone (Chairman / CEO)</option>
+            <option value="2" <?=$__tier===2?'selected':''?>>Level 2 — row below</option>
+            <option value="3" <?=$__tier===3?'selected':''?>>Level 3</option>
+            <option value="4" <?=$__tier===4?'selected':''?>>Level 4</option>
+            <option value="5" <?=$__tier===5?'selected':''?>>Level 5</option>
+          </select>
+          <span class="form-hint">Same level = same row. Level 1 sits centered on top.</span>
+        </div>
       </div>
       <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update Member':'Add Member'?></button>
       <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>

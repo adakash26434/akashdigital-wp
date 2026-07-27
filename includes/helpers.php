@@ -499,6 +499,63 @@ function stWhatsAppUrl(?array $user = null, ?string $pageHint = null): string {
     return 'https://wa.me/' . $num . '?text=' . rawurlencode($text);
 }
 
+/**
+ * Org-chart rank for a team member (1 = top row / apex).
+ * Manual org_tier (1–5) wins; otherwise inferred from role title.
+ */
+function teamOrgRank(array $member): int {
+    $manual = (int)($member['org_tier'] ?? 0);
+    if ($manual >= 1 && $manual <= 5) {
+        return $manual;
+    }
+
+    $role = function_exists('mb_strtolower')
+        ? mb_strtolower(trim((string)($member['role'] ?? '')))
+        : strtolower(trim((string)($member['role'] ?? '')));
+
+    // Apex — typically alone on the first row
+    if (preg_match('/chair\s*man|chair\s*person|\bchair\b|अध्यक्ष|president/u', $role)) {
+        return 1;
+    }
+    if (preg_match('/\bceo\b|chief\s+executive|managing\s+director|\bmd\b|founder|प्रमुख\s*कार्यकारी/u', $role)) {
+        return 1;
+    }
+    // Second tier
+    if (preg_match('/deputy|vice[\s-]?chair|co[\s-]?ceo|\bcfo\b|\bcto\b|\bcoo\b|chief\s+/u', $role)) {
+        return 2;
+    }
+    if (preg_match('/\bdirector\b|\bmanager\b|head\s+of|\blead\b|निर्देशक|प्रबन्धक/u', $role)) {
+        return 2;
+    }
+    return 3;
+}
+
+/**
+ * Group members into org-chart rows (tier => members), sorted by tier then position.
+ *
+ * @param list<array> $members
+ * @return array<int, list<array>>
+ */
+function teamOrgChartRows(array $members): array {
+    $members = array_values($members);
+    usort($members, static function ($a, $b) {
+        $ra = teamOrgRank($a);
+        $rb = teamOrgRank($b);
+        if ($ra !== $rb) return $ra <=> $rb;
+        $pa = (int)($a['position'] ?? 0);
+        $pb = (int)($b['position'] ?? 0);
+        if ($pa !== $pb) return $pa <=> $pb;
+        return strcasecmp((string)($a['name'] ?? ''), (string)($b['name'] ?? ''));
+    });
+
+    $rows = [];
+    foreach ($members as $m) {
+        $rows[teamOrgRank($m)][] = $m;
+    }
+    ksort($rows, SORT_NUMERIC);
+    return $rows;
+}
+
 /** Whether the public AI assistant float is enabled and has a usable key. */
 function stAiChatEnabled(): bool {
     $s = siteSettings();

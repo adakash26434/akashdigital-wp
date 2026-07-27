@@ -882,4 +882,11 @@ function runDbMigrations() {
             'source_name' => "VARCHAR(120) NULL",
         ]);
     } catch (\Throwable $e) { error_log('[db-migrations] M36: ' . $e->getMessage()); }
+
+    try {
+        // Migration 37: team org-chart level (1 = top alone, 2+, null/0 = auto from role)
+        dbEnsureColumns('team_members', [
+            'org_tier' => "TINYINT NULL DEFAULT 0",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M37: ' . $e->getMessage()); }
 }

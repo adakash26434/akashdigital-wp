@@ -1408,6 +1408,64 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   margin: 0;
 }
 
+/* ── Team org chart (post-based hierarchy) ── */
+.team-org {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+.team-org__stem {
+  width: 2px;
+  height: 1.35rem;
+  background: color-mix(in srgb, var(--primary) 35%, var(--border));
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+.team-org__row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: stretch;
+  gap: 1.25rem;
+  width: 100%;
+  position: relative;
+  padding-top: 0.75rem;
+}
+.team-org__row:not(:first-child)::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12%;
+  right: 12%;
+  height: 2px;
+  background: color-mix(in srgb, var(--primary) 28%, var(--border));
+  border-radius: 2px;
+}
+@media (max-width: 640px) {
+  .team-org__row:not(:first-child)::before {
+    left: 8%;
+    right: 8%;
+  }
+}
+.team-org__row--solo {
+  max-width: 20rem;
+}
+.team-org__row--apex .team-card--lead {
+  width: min(100%, 15rem);
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+.team-org__row--apex .team-card__photo--lg,
+.team-org__row--apex .team-card__avatar--lg {
+  width: 7rem;
+  height: 7rem;
+}
+.team-card--apex::before {
+  height: 3px;
+}
+
 /* ── Team cards ── */
 .team-leaders {
   display: flex;

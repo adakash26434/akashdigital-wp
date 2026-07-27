@@ -13,7 +13,7 @@ $__ls = [];
 try { $rows = query("SELECT setting_key,setting_val FROM site_settings WHERE setting_key IN ('chairman_name','chairman_title','chairman_photo','chairman_message','chairman_active','ceo_name','ceo_title','ceo_photo','ceo_message','ceo_active')"); foreach($rows as $r) $__ls[$r['setting_key']] = $r['setting_val']; } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
 $team = [];
-try { $team = query("SELECT * FROM team_members WHERE active=1 ORDER BY is_leadership DESC, position LIMIT 16"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+try { $team = query("SELECT * FROM team_members WHERE active=1 ORDER BY is_leadership DESC, position LIMIT 40"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
 // About page content — editable from Admin → Settings → About Page
 // __as(): icon/slug fields (no bilingual needed); cms() for display text
@@ -268,9 +268,50 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
   </div>
 </section>
 <?php if ($team):
-  $__board = array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? '') === 'board');
-  $__mgmt = array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? 'management') === 'management');
-  $__members = array_filter($team, fn($m) => empty($m['is_leadership']));
+  $__board = array_values(array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? '') === 'board'));
+  $__mgmt = array_values(array_filter($team, fn($m) => !empty($m['is_leadership']) && ($m['category'] ?? 'management') === 'management'));
+  $__members = array_values(array_filter($team, fn($m) => empty($m['is_leadership'])));
+
+  /** Render leadership group as a post-based org chart (apex alone, then rows below). */
+  $__renderTeamOrg = static function (array $people) {
+      if (!$people) return;
+      $rows = function_exists('teamOrgChartRows') ? teamOrgChartRows($people) : [1 => $people];
+      $tierKeys = array_keys($rows);
+      echo '<div class="team-org" role="list">';
+      foreach ($tierKeys as $i => $tier) {
+          $peopleInRow = $rows[$tier];
+          if ($i > 0) {
+              echo '<div class="team-org__stem" aria-hidden="true"></div>';
+          }
+          $solo = count($peopleInRow) === 1;
+          $apex = ((int)$tier === 1) || ($i === 0 && $solo);
+          $rowCls = 'team-org__row'
+              . ($solo ? ' team-org__row--solo' : '')
+              . ($apex ? ' team-org__row--apex' : '');
+          echo '<div class="' . e($rowCls) . '">';
+          foreach ($peopleInRow as $m) {
+              $cardCls = 'st-card team-card team-card--lead' . ($apex && $solo ? ' team-card--apex' : '');
+              echo '<div class="' . e($cardCls) . '" role="listitem">';
+              if (!empty($m['photo_url'])) {
+                  echo '<img src="' . e($m['photo_url']) . '" alt="' . e($m['name']) . '" loading="lazy" decoding="async" class="team-card__photo team-card__photo--lg">';
+              } else {
+                  echo '<div class="team-card__avatar team-card__avatar--lg">' . e(strtoupper(substr((string)$m['name'], 0, 1))) . '</div>';
+              }
+              echo '<h3 class="team-card__name">' . e($m['name']) . '</h3>';
+              echo '<p class="team-card__role">' . e($m['role'] ?? '') . '</p>';
+              if (!empty($m['bio'])) {
+                  echo '<p class="team-card__bio">' . e($m['bio']) . '</p>';
+              }
+              if (!empty($m['linkedin_url'])) {
+                  echo '<a href="' . e($m['linkedin_url']) . '" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="st-social-btn st-social-linkedin" style="margin-top:0.5rem;">';
+                  echo '<i data-lucide="linkedin" class="ic-13"></i></a>';
+              }
+              echo '</div>';
+          }
+          echo '</div>';
+      }
+      echo '</div>';
+  };
 ?>
 <section id="team" class="st-section scroll-mt-nav">
   <div class="container">
@@ -285,62 +326,22 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;background:var(--primary-soft);border-radius:9999px;font-size:var(--text-xs);font-weight:700;color:var(--primary);margin-bottom:1.5rem;">
         <i data-lucide="shield" style="width:12px;height:12px;"></i>
         Board of Directors
-        <span style="background:var(--primary);color:#fff;padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($__board)?></span>
+        <span style="background:var(--primary);color:#fff;padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?= count($__board) ?></span>
       </div>
     </div>
-    <div class="team-leaders stagger-children">
-      <?php foreach ($__board as $m): ?>
-      <div class="st-card team-card team-card--lead">
-        <?php if (!empty($m['photo_url'])): ?>
-        <img src="<?= e($m['photo_url']) ?>" alt="<?= e($m['name']) ?>" loading="lazy" decoding="async" class="team-card__photo team-card__photo--lg">
-        <?php else: ?>
-        <div class="team-card__avatar team-card__avatar--lg"><?= strtoupper(substr($m['name'],0,1)) ?></div>
-        <?php endif; ?>
-        <h3 class="team-card__name"><?= e($m['name']) ?></h3>
-        <p class="team-card__role"><?= e($m['role']??'') ?></p>
-        <?php if (!empty($m['bio'])): ?>
-        <p class="team-card__bio"><?= e($m['bio']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($m['linkedin_url'])): ?>
-        <a href="<?= e($m['linkedin_url']) ?>" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="st-social-btn st-social-linkedin" style="margin-top:0.5rem;">
-          <i data-lucide="linkedin" class="ic-13"></i>
-        </a>
-        <?php endif; ?>
-      </div>
-      <?php endforeach; ?>
-    </div>
+    <?php $__renderTeamOrg($__board); ?>
     <?php endif; ?>
 
     <?php if ($__mgmt): ?>
-    <!-- Management Team -->
+    <!-- Top Management Team -->
     <div style="margin-top:<?= $__board ? '3rem' : '0' ?>;margin-bottom:1rem;">
       <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;background:var(--success-soft);border-radius:9999px;font-size:var(--text-xs);font-weight:700;color:var(--success-fg);margin-bottom:1.5rem;">
         <i data-lucide="briefcase" style="width:12px;height:12px;"></i>
-        Management Team
-        <span style="background:var(--success);color:#fff;padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($__mgmt)?></span>
+        Top Management Team
+        <span style="background:var(--success);color:#fff;padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?= count($__mgmt) ?></span>
       </div>
     </div>
-    <div class="team-leaders stagger-children">
-      <?php foreach ($__mgmt as $m): ?>
-      <div class="st-card team-card team-card--lead">
-        <?php if (!empty($m['photo_url'])): ?>
-        <img src="<?= e($m['photo_url']) ?>" alt="<?= e($m['name']) ?>" loading="lazy" decoding="async" class="team-card__photo team-card__photo--lg">
-        <?php else: ?>
-        <div class="team-card__avatar team-card__avatar--lg"><?= strtoupper(substr($m['name'],0,1)) ?></div>
-        <?php endif; ?>
-        <h3 class="team-card__name"><?= e($m['name']) ?></h3>
-        <p class="team-card__role"><?= e($m['role']??'') ?></p>
-        <?php if (!empty($m['bio'])): ?>
-        <p class="team-card__bio"><?= e($m['bio']) ?></p>
-        <?php endif; ?>
-        <?php if (!empty($m['linkedin_url'])): ?>
-        <a href="<?= e($m['linkedin_url']) ?>" target="_blank" rel="noopener noreferrer" title="LinkedIn" class="st-social-btn st-social-linkedin" style="margin-top:0.5rem;">
-          <i data-lucide="linkedin" class="ic-13"></i>
-        </a>
-        <?php endif; ?>
-      </div>
-      <?php endforeach; ?>
-    </div>
+    <?php $__renderTeamOrg($__mgmt); ?>
     <?php endif; ?>
 
     <?php if ($__members): ?>
@@ -349,7 +350,7 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       <div style="display:inline-flex;align-items:center;gap:0.5rem;padding:0.25rem 0.75rem;background:var(--muted);border-radius:9999px;font-size:var(--text-xs);font-weight:700;color:var(--muted-foreground);margin-bottom:1.5rem;">
         <i data-lucide="users" style="width:12px;height:12px;"></i>
         Our Team
-        <span style="background:var(--muted-foreground);color:var(--background);padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?=count($__members)?></span>
+        <span style="background:var(--muted-foreground);color:var(--background);padding:0.05rem 0.4rem;border-radius:9999px;font-size:0.625rem;"><?= count($__members) ?></span>
       </div>
     </div>
     <div class="team-grid stagger-children">
