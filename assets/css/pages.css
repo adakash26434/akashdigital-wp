@@ -1492,10 +1492,11 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   gap: 0;
 }
 .team-org__row--n2 {
-  --team-org-gap: 3rem;
+  /* Match the older comfortable 2-card spread under apex */
+  --team-org-gap: 5.5rem;
 }
 .team-org__row--n3 {
-  --team-org-gap: 2.5rem;
+  --team-org-gap: 2.75rem;
 }
 .team-org__row--n4,
 .team-org__row--n5 {
