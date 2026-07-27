@@ -226,7 +226,7 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
       <div class="section-eyebrow section-eyebrow-primary mb-3q"><?= e(__('about_leadership_eyebrow')) ?></div>
       <h2 class="h-display section-title" style="margin-bottom:0;"><?= e(__('about_leadership_title')) ?></h2>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem;max-width:920px;margin:0 auto;" class="stagger-children">
+    <div class="quote-card-grid stagger-children">
 
       <?php if ($__chairMsg && ($__ls['chairman_active'] ?? '1')): ?>
       <div class="st-card quote-card">
@@ -237,7 +237,7 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
           <?php else: ?>
           <div class="quote-card__avatar"><?= strtoupper(substr($__ls['chairman_name'] ?? 'C', 0, 1)) ?></div>
           <?php endif; ?>
-          <div>
+          <div class="quote-card__who">
             <div class="quote-card__name"><?= e($__ls['chairman_name'] ?? 'Chairman') ?></div>
             <div class="quote-card__role"><?= e($__ls['chairman_title'] ?? 'Chairman') ?></div>
           </div>
@@ -255,7 +255,7 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
           <?php else: ?>
           <div class="quote-card__avatar"><?= strtoupper(substr($__ls['ceo_name'] ?? 'C', 0, 1)) ?></div>
           <?php endif; ?>
-          <div>
+          <div class="quote-card__who">
             <div class="quote-card__name"><?= e($__ls['ceo_name'] ?? 'CEO') ?></div>
             <div class="quote-card__role"><?= e($__ls['ceo_title'] ?? 'Chief Executive Officer') ?></div>
           </div>

@@ -1351,33 +1351,60 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .mockup-dot { width: 0.5rem; height: 0.5rem; border-radius: 9999px; display: block; }
 
 /* ── Quote / leadership cards ── */
+.quote-card-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+  max-width: 1080px;
+  margin: 0 auto;
+}
+@media (min-width: 720px) {
+  .quote-card-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.35rem;
+  }
+}
 .quote-card {
-  padding: 1.5rem;
+  padding: 1.25rem 1.35rem 1.2rem;
   position: relative;
   overflow: hidden;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 0;
 }
 .quote-card__accent {
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 3px;
   background: var(--gradient-primary);
 }
 .quote-card__header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.875rem;
-  margin-bottom: 1rem;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-bottom: 0.7rem;
+  width: 100%;
+}
+.quote-card__who {
+  text-align: center;
 }
 .quote-card__photo,
 .quote-card__avatar {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3.75rem;
+  height: 3.75rem;
   border-radius: 9999px;
   flex-shrink: 0;
+  margin: 0 auto;
 }
 .quote-card__photo {
   object-fit: cover;
-  border: 2px solid var(--primary);
+  border: 2.5px solid var(--primary);
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 .quote-card__avatar {
   background: var(--gradient-primary);
@@ -1393,19 +1420,34 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   font-size: var(--text-md);
   font-weight: 800;
   color: var(--foreground);
+  line-height: 1.25;
 }
 .quote-card__role {
   font-size: var(--text-sm);
   color: var(--primary);
   font-weight: 600;
-  margin-top: 0.125rem;
+  margin-top: 0.12rem;
 }
 .quote-card__text {
-  font-size: var(--text-sm);
-  line-height: 1.75;
+  font-size: 0.875rem;
+  line-height: 1.6;
   color: var(--muted-foreground);
   font-style: italic;
   margin: 0;
+  text-align: center;
+  max-width: 34rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (min-width: 720px) {
+  .quote-card {
+    padding: 1.15rem 1.5rem 1.1rem;
+  }
+  .quote-card__text {
+    -webkit-line-clamp: 3;
+  }
 }
 
 /* ── Team org chart (post-based hierarchy) ── */
