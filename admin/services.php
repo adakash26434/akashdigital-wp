@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             array_map('trim', explode("\n", $_POST['highlights'] ?? ''))
         )));
 
-        // Screenshot upload
+        // Screenshot upload (slot 1 — listing + detail primary)
         $screenshotUrl = trim($_POST['screenshot_url'] ?? '');
         if (!empty($_FILES['screenshot_file']['tmp_name'])) {
             $_sf = $_FILES['screenshot_file'];
@@ -59,6 +59,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
+        // Detail-only second image (slot 2)
+        $screenshotUrl2 = trim($_POST['screenshot_url_2'] ?? '');
+        if (!$error && !empty($_FILES['screenshot_file_2']['tmp_name'])) {
+            $_sf2 = $_FILES['screenshot_file_2'];
+            $allowedImgMime = ['image/jpeg','image/png','image/webp','image/gif'];
+            $_fi2 = finfo_open(FILEINFO_MIME_TYPE);
+            $_rm2 = finfo_file($_fi2, $_sf2['tmp_name']);
+            finfo_close($_fi2);
+            $mimeExtMap = ['image/jpeg'=>'jpg','image/png'=>'png','image/webp'=>'webp','image/gif'=>'gif'];
+            if (in_array($_rm2, $allowedImgMime, true) && $_sf2['size'] < 5*1024*1024) {
+                $ext2   = $mimeExtMap[$_rm2];
+                $fname2 = 'svc2_' . ($id ?: time()) . '_' . time() . '.' . $ext2;
+                if (move_uploaded_file($_sf2['tmp_name'], $uploadDir . $fname2)) {
+                    $screenshotUrl2 = SITE_URL . '/uploads/services/' . $fname2;
+                }
+            } else {
+                $error = 'Second image must be PNG/JPG/WebP under 5 MB.';
+            }
+        }
+
+        $galleryUrls = stSanitizeDetailGalleryInput([$screenshotUrl, $screenshotUrl2]);
+        $screenshotUrl = $galleryUrls[0] ?? null;
+        $screenshotsJson = !empty($galleryUrls) ? json_encode($galleryUrls) : null;
+
         if (!$title) { $error = 'Title is required.'; }
         elseif (!$error) {
             try {
@@ -66,8 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     // Try full update first (with description), then without description, then minimal
                     try {
                         execute(
-                            "UPDATE services SET title=?,slug=?,tagline=?,summary=?,description=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,position=?,active=?,updated_at=NOW() WHERE id=?",
-                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active,$id]
+                            "UPDATE services SET title=?,slug=?,tagline=?,summary=?,description=?,badge=?,price_from=?,lucide_icon=?,icon_color=?,features=?,highlights=?,screenshot_url=?,screenshots=?,position=?,active=?,updated_at=NOW() WHERE id=?",
+                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$screenshotsJson?:null,$position,$active,$id]
                         );
                     } catch(\Throwable $fe) {
                         try {
@@ -86,8 +110,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 } else {
                     try {
                         execute(
-                            "INSERT INTO services (title,slug,tagline,summary,description,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
-                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$position,$active]
+                            "INSERT INTO services (title,slug,tagline,summary,description,badge,price_from,lucide_icon,icon_color,features,highlights,screenshot_url,screenshots,position,active,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                            [$title,$slug,$tagline,$summary,$description,$badge,$price_from,$lucide_icon,$icon_color,$features,$highlights,$screenshotUrl?:null,$screenshotsJson?:null,$position,$active]
                         );
                     } catch(\Throwable $fe) {
                         try {
@@ -136,6 +160,12 @@ $editing = null;
 if (!empty($_GET['edit'])) {
     try { $editing = queryOne("SELECT * FROM services WHERE id=?", [(int)$_GET['edit']]); }
     catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+    if ($editing) {
+        $editing['gallery_slots'] = stDetailGalleryImages(
+            $editing['screenshots'] ?? null,
+            $editing['screenshot_url'] ?? null
+        );
+    }
 }
 
 $COLORS = ['blue','green','purple','amber','teal','rose','orange','indigo','gray'];
@@ -214,9 +244,13 @@ $ICONS_JSON = json_encode($ICONS);
 </div><!-- /aft-list -->
 
 <script>var _svcIcons=<?= $ICONS_JSON ?>;</script>
+<?php
+$__svcSlot1 = $editing['gallery_slots'][0] ?? ($editing['screenshot_url'] ?? '');
+$__svcSlot2 = $editing['gallery_slots'][1] ?? '';
+?>
 <div id="aft-form" style="<?=$afActive==='list'?'display:none':'display:block'?>">
   <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;"
-       x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($editing['screenshot_url'] ?? ''), ENT_QUOTES) ?>)">
+       x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($__svcSlot1), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($__svcSlot2), ENT_QUOTES) ?>)">
 
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:0.75rem;flex-wrap:wrap;">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'✏ Edit Service':'➕ New Service'?></h3>
@@ -248,6 +282,7 @@ $ICONS_JSON = json_encode($ICONS);
       <input type="hidden" name="lucide_icon" x-model="icon">
       <input type="hidden" name="features"    x-model="chipsJoined">
       <input type="hidden" name="screenshot_url" x-model="imgUrl">
+      <input type="hidden" name="screenshot_url_2" x-model="img2Url">
 
       <!-- ══ TAB: BASIC ══ -->
       <div x-show="tab==='basic'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
@@ -416,35 +451,68 @@ $ICONS_JSON = json_encode($ICONS);
           </div>
         </div>
 
-        <!-- Screenshot upload -->
-        <div>
-          <label class="form-label">Screenshot / Image <span class="caption-meta">(listing card + More details page)</span></label>
-          <div @dragover.prevent="imgDrag=true" @dragleave="imgDrag=false" @drop.prevent="onDrop($event)"
-               :style="imgDrag?'border-color:var(--primary);background:var(--primary-light);':''"
-               style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"
-               @click="$refs.fileInput.click()">
-            <template x-if="!imgPreview">
-              <div>
-                <i data-lucide="image" style="width:24px;height:24px;color:var(--muted-foreground);margin-bottom:0.35rem;"></i>
-                <p style="font-size:0.8rem;color:var(--muted-foreground);margin:0;">Click or drag PNG/JPG/WebP</p>
-                <p class="caption-meta">Max 5 MB · 1200×630 recommended</p>
-              </div>
-            </template>
-            <template x-if="imgPreview">
-              <div>
-                <img alt="Image" :src="imgPreview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
-                <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
-              </div>
-            </template>
+        <!-- Detail page images -->
+        <div style="display:grid;gap:1rem;">
+          <div>
+            <label class="form-label">Image 1 — primary <span class="caption-meta">(listing card + detail sidebar)</span></label>
+            <div @dragover.prevent="imgDrag=true" @dragleave="imgDrag=false" @drop.prevent="onDrop($event)"
+                 :style="imgDrag?'border-color:var(--primary);background:var(--primary-light);':''"
+                 style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"
+                 @click="$refs.fileInput.click()">
+              <template x-if="!imgPreview">
+                <div>
+                  <i data-lucide="image" style="width:24px;height:24px;color:var(--muted-foreground);margin-bottom:0.35rem;"></i>
+                  <p style="font-size:0.8rem;color:var(--muted-foreground);margin:0;">Click or drag PNG/JPG/WebP</p>
+                  <p class="caption-meta">Max 5 MB</p>
+                </div>
+              </template>
+              <template x-if="imgPreview">
+                <div>
+                  <img alt="Primary image" :src="imgPreview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
+                  <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
+                </div>
+              </template>
+            </div>
+            <input type="file" name="screenshot_file" accept="image/png,image/jpeg,image/gif,image/webp"
+                   x-ref="fileInput" class="hidden" @change="onFileChange($event)">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+              <span style="font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;">URL:</span>
+              <input type="text" x-model="imgUrl" @input="imgPreview=imgUrl.trim()||''"
+                     class="form-input" style="flex:1;" placeholder="https://…">
+              <button x-show="imgPreview" type="button" @click="imgPreview='';imgUrl=''"
+                      style="padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);background:none;font-size:0.75rem;cursor:pointer;color:var(--danger-fg);white-space:nowrap;">Remove</button>
+            </div>
           </div>
-          <input type="file" name="screenshot_file" accept="image/png,image/jpeg,image/gif,image/webp"
-                 x-ref="fileInput" class="hidden" @change="onFileChange($event)">
-          <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
-            <span style="font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;">URL:</span>
-            <input type="text" x-model="imgUrl" @input="imgPreview=imgUrl.trim()||''"
-                   class="form-input" style="flex:1;" placeholder="https://…">
-            <button x-show="imgPreview" type="button" @click="imgPreview='';imgUrl=''"
-                    style="padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);background:none;font-size:0.75rem;cursor:pointer;color:var(--danger-fg);white-space:nowrap;">Remove</button>
+
+          <div>
+            <label class="form-label">Image 2 — optional <span class="caption-meta">(detail gallery only)</span></label>
+            <div @dragover.prevent="img2Drag=true" @dragleave="img2Drag=false" @drop.prevent="onDrop2($event)"
+                 :style="img2Drag?'border-color:var(--primary);background:var(--primary-light);':''"
+                 style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"
+                 @click="$refs.fileInput2.click()">
+              <template x-if="!img2Preview">
+                <div>
+                  <i data-lucide="image-plus" style="width:24px;height:24px;color:var(--muted-foreground);margin-bottom:0.35rem;"></i>
+                  <p style="font-size:0.8rem;color:var(--muted-foreground);margin:0;">Add a second detail image</p>
+                  <p class="caption-meta">Max 5 MB</p>
+                </div>
+              </template>
+              <template x-if="img2Preview">
+                <div>
+                  <img alt="Second image" :src="img2Preview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
+                  <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
+                </div>
+              </template>
+            </div>
+            <input type="file" name="screenshot_file_2" accept="image/png,image/jpeg,image/gif,image/webp"
+                   x-ref="fileInput2" class="hidden" @change="onFileChange2($event)">
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
+              <span style="font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;">URL:</span>
+              <input type="text" x-model="img2Url" @input="img2Preview=img2Url.trim()||''"
+                     class="form-input" style="flex:1;" placeholder="https://…">
+              <button x-show="img2Preview" type="button" @click="img2Preview='';img2Url=''"
+                      style="padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);background:none;font-size:0.75rem;cursor:pointer;color:var(--danger-fg);white-space:nowrap;">Remove</button>
+            </div>
           </div>
         </div>
       </div><!-- /appearance -->
@@ -458,7 +526,7 @@ $ICONS_JSON = json_encode($ICONS);
 </div>
 
 <script>
-function svcForm(initIcon, allIcons, rawChips, existingImg) {
+function svcForm(initIcon, allIcons, rawChips, existingImg, existingImg2) {
   return {
     tab: 'basic',
 
@@ -489,7 +557,7 @@ function svcForm(initIcon, allIcons, rawChips, existingImg) {
       inp.value = '';
     },
 
-    // Image
+    // Image slot 1
     imgUrl: existingImg || '',
     imgPreview: existingImg || '',
     imgDrag: false,
@@ -508,9 +576,27 @@ function svcForm(initIcon, allIcons, rawChips, existingImg) {
       r.readAsDataURL(f);
     },
 
+    // Image slot 2
+    img2Url: existingImg2 || '',
+    img2Preview: existingImg2 || '',
+    img2Drag: false,
+    onFileChange2(e) {
+      const f = e.target.files[0]; if (!f) return;
+      const r = new FileReader();
+      r.onload = ev => { this.img2Preview = ev.target.result; this.img2Url = ''; };
+      r.readAsDataURL(f);
+    },
+    onDrop2(e) {
+      this.img2Drag = false;
+      const f = e.dataTransfer.files[0];
+      if (!f || !f.type.startsWith('image/')) return;
+      this.$refs.fileInput2.files = e.dataTransfer.files;
+      const r = new FileReader(); r.onload = ev => { this.img2Preview = ev.target.result; this.img2Url = ''; };
+      r.readAsDataURL(f);
+    },
+
     init() {
       this.$nextTick(() => { if (window.lucide) lucide.createIcons(); });
-      // Re-render icons whenever picker opens
       this.$watch('pickerOpen', v => { if (v) this.$nextTick(() => { if (window.lucide) lucide.createIcons(); }); });
     },
   };

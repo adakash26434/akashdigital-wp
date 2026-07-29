@@ -43,13 +43,10 @@ if (!empty($product['tech_stack'])) {
     $tech_stack = json_decode($product['tech_stack'], true) ?: [];
 }
 
-$screenshots = [];
-if (!empty($product['screenshots'])) {
-    $screenshots = json_decode($product['screenshots'], true) ?: [];
-}
-if (empty($screenshots) && !empty($product['demo_screenshot_url'])) {
-    $screenshots = [$product['demo_screenshot_url']];
-}
+$screenshots = stDetailGalleryImages(
+    $product['screenshots'] ?? null,
+    $product['demo_screenshot_url'] ?? null
+);
 
 $lucideIcon = trim((string)($product['lucide_icon'] ?? '')) ?: 'package';
 
@@ -260,23 +257,11 @@ require_once 'includes/header.php';
   </div>
 </section>
 
-<?php if (!empty($screenshots)): ?>
-<section class="section" style="background:var(--background);">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:2rem;">
-      <span class="section-eyebrow">Screenshots</span>
-      <h2 class="section-title">See It in Action</h2>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:1rem;">
-      <?php foreach ($screenshots as $sc): ?>
-      <div style="border-radius:0.875rem;overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-soft);">
-        <img src="<?= e($sc) ?>" alt="<?= e($product['name']) ?> screenshot" loading="lazy" decoding="async" style="width:100%;display:block;">
-      </div>
-      <?php endforeach; ?>
-    </div>
-  </div>
-</section>
-<?php endif; ?>
+<?php if (!empty($screenshots)):
+  $detailGalleryImages = $screenshots;
+  $detailGalleryTitle = $product['name'] ?? '';
+  include __DIR__ . '/includes/detail-gallery.php';
+endif; ?>
 
 <?php if (!empty($modules)): ?>
 <section class="section" style="background:var(--card);border-top:1px solid var(--border);">

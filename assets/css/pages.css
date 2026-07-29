@@ -3158,3 +3158,54 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* ── Product / service detail galleries ───────────────────────── */
+.detail-gallery {
+  background: var(--background);
+}
+.detail-gallery__head {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.detail-gallery__sub {
+  margin: 0.5rem auto 0;
+  max-width: 40rem;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+}
+.detail-gallery__grid {
+  display: grid;
+  gap: 1rem;
+  align-items: start;
+}
+.detail-gallery__grid--solo {
+  max-width: 52rem;
+  margin: 0 auto;
+  grid-template-columns: 1fr;
+}
+.detail-gallery__grid--duo {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: 72rem;
+  margin: 0 auto;
+}
+.detail-gallery__item {
+  margin: 0;
+  border-radius: 0.875rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-soft);
+  background: var(--card);
+}
+.detail-gallery__item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: var(--card);
+}
+@media (max-width: 768px) {
+  .detail-gallery__grid--duo {
+    grid-template-columns: 1fr;
+  }
+}

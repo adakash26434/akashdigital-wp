@@ -12,7 +12,7 @@ try {
     $service = queryOne(
         "SELECT id, title AS name, slug, tagline, summary, description, badge, price_from,
                 COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
-                icon_color, highlights, features, screenshot_url, active
+                icon_color, highlights, features, screenshot_url, screenshots, active
          FROM services WHERE slug=? AND active=1",
         [$slug]
     );
@@ -68,6 +68,11 @@ $highlights = json_decode($service['highlights'] ?? '[]', true) ?: [];
 if (empty($highlights) && !empty($features)) {
     $highlights = array_slice($features, 0, 6);
 }
+
+$screenshots = stDetailGalleryImages(
+    $service['screenshots'] ?? null,
+    $service['screenshot_url'] ?? null
+);
 
 $related = [];
 try {
@@ -174,6 +179,12 @@ require_once 'includes/header.php';
     </div>
   </div>
 </section>
+
+<?php if (!empty($screenshots)):
+  $detailGalleryImages = $screenshots;
+  $detailGalleryTitle = $service['name'] ?? '';
+  include __DIR__ . '/includes/detail-gallery.php';
+endif; ?>
 
 <?php if (!empty($related)): ?>
 <section class="section" style="background:var(--card);border-top:1px solid var(--border);">

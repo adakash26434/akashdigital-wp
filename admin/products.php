@@ -47,16 +47,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $home_card_dark = isset($_POST['home_card_dark']) ? 1 : 0;
         $home_bg_css  = trim($_POST['home_bg_css']   ?? '');
         $demo_ss_url  = trim($_POST['demo_screenshot_url'] ?? '');
+        $screenshot2  = trim($_POST['screenshot_url_2'] ?? '');
+        $galleryUrls  = stSanitizeDetailGalleryInput([$demo_ss_url, $screenshot2]);
+        $demo_ss_url  = $galleryUrls[0] ?? null;
+        $screenshots  = !empty($galleryUrls) ? json_encode($galleryUrls) : null;
         $tab_label    = trim($_POST['tab_label']     ?? '');
 
         if (!$name) { $error = 'Product name is required.'; }
         else {
             try {
-                $fullParams = [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$tab_label?:null];
+                $fullParams = [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$screenshots?:null,$tab_label?:null];
                 if ($id) {
                     $attempts = [
-                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,home_bg_css=?,demo_screenshot_url=?,tab_label=?,updated_at=NOW() WHERE id=?",
+                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,home_bg_css=?,demo_screenshot_url=?,screenshots=?,tab_label=?,updated_at=NOW() WHERE id=?",
                          array_merge($fullParams, [$id])],
+                        ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,home_bg_css=?,demo_screenshot_url=?,tab_label=?,updated_at=NOW() WHERE id=?",
+                         [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$home_bg_css?:null,$demo_ss_url?:null,$tab_label?:null,$id]],
                         ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,lucide_icon=?,icon_color=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,show_on_home=?,home_position=?,home_card_wide=?,home_card_dark=?,updated_at=NOW() WHERE id=?",
                          [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark,$id]],
                         ["UPDATE products SET name=?,slug=?,tagline=?,summary=?,description=?,icon=?,badge=?,price_from=?,category=?,features=?,highlights=?,position=?,active=?,updated_at=NOW() WHERE id=?",
@@ -66,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ];
                 } else {
                     $attempts = [
-                        ["INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,home_bg_css,demo_screenshot_url,tab_label,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
+                        ["INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,home_bg_css,demo_screenshot_url,screenshots,tab_label,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
                          $fullParams],
                         ["INSERT INTO products (name,slug,tagline,summary,description,icon,lucide_icon,icon_color,badge,price_from,category,features,highlights,position,active,show_on_home,home_position,home_card_wide,home_card_dark,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,NOW(),NOW())",
                          [$name,$slug,$tagline,$summary,$desc,$icon,$lucide_icon,$icon_color,$badge?:null,$price,$category?:null,$features,$highlights,$position,$active,$show_on_home,$home_position,$home_card_wide,$home_card_dark]],
@@ -115,6 +121,10 @@ if (!empty($_GET['edit'])) {
         foreach (['features','highlights','modules'] as $f) {
             if (!empty($editing[$f])) $editing[$f.'_text'] = implode("\n", json_decode($editing[$f],true) ?? []);
         }
+        $editing['gallery_slots'] = stDetailGalleryImages(
+            $editing['screenshots'] ?? null,
+            $editing['demo_screenshot_url'] ?? null
+        );
     }
 } elseif ($isNew) {
     // Check if demo product already exists
@@ -459,23 +469,60 @@ if (!empty($_GET['edit'])) {
         </div>
         <div>
           <label class="form-label">
-            Demo Screenshot
-            <span style="color:var(--muted-foreground);font-weight:400;"> — homepage “See it in action” + More details gallery</span>
+            Detail page images
+            <span style="color:var(--muted-foreground);font-weight:400;"> — up to 2 images shown on More details</span>
           </label>
-          <input type="url" name="demo_screenshot_url" id="dss_url_<?=($editing['id']??'new')?>" class="form-input"
-                 value="<?=e($editing['demo_screenshot_url']??'')?>" placeholder="https://… or upload below">
-          <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
-            <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--muted);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">
-              <i data-lucide="upload" class="ic-13"></i> Upload image
-              <input type="file" id="dss_file_<?=($editing['id']??'new')?>" accept="image/*" style="display:none" onchange="stAdminUpload(this,'dss_url_<?=($editing['id']??'new')?>','dss_prev_<?=($editing['id']??'new')?>')">
-            </label>
-            <span id="dss_prev_<?=($editing['id']??'new')?>" class="fs-xs-mt"></span>
+          <?php
+            $__prodSlots = $editing['gallery_slots'] ?? stDetailGalleryImages(null, $editing['demo_screenshot_url'] ?? null);
+            $__prodSlot1 = $__prodSlots[0] ?? '';
+            $__prodSlot2 = $__prodSlots[1] ?? '';
+            $__prodKey = $editing['id'] ?? 'new';
+          ?>
+          <div style="display:grid;gap:1rem;">
+            <div style="padding:0.875rem;border:1px solid var(--border);border-radius:0.75rem;background:var(--muted);">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--foreground);margin-bottom:0.5rem;">Image 1 — primary</div>
+              <div style="font-size:0.7rem;color:var(--muted-foreground);margin-bottom:0.5rem;">Homepage preview, listing cards, and detail gallery</div>
+              <input type="url" name="demo_screenshot_url" id="dss_url_<?=$__prodKey?>" class="form-input"
+                     value="<?=e($__prodSlot1)?>" placeholder="https://… or upload below">
+              <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
+                <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">
+                  <i data-lucide="upload" class="ic-13"></i> Upload
+                  <input type="file" id="dss_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="stAdminUpload(this,'dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>')">
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem;" onclick="stClearGallerySlot('dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>','dss_preview_<?=$__prodKey?>')">Remove</button>
+                <span id="dss_prev_<?=$__prodKey?>" class="fs-xs-mt"></span>
+              </div>
+              <?php if ($__prodSlot1 !== ''): ?>
+              <div id="dss_preview_<?=$__prodKey?>" style="margin-top:0.5rem;border-radius:0.5rem;overflow:hidden;border:1px solid var(--border);max-height:8rem;">
+                <img src="<?=e($__prodSlot1)?>" alt="Primary preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">
+              </div>
+              <?php else: ?>
+              <div id="dss_preview_<?=$__prodKey?>" style="display:none;"></div>
+              <?php endif; ?>
+            </div>
+
+            <div style="padding:0.875rem;border:1px solid var(--border);border-radius:0.75rem;background:var(--muted);">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--foreground);margin-bottom:0.5rem;">Image 2 — optional</div>
+              <div style="font-size:0.7rem;color:var(--muted-foreground);margin-bottom:0.5rem;">Second image on the detail page gallery only</div>
+              <input type="url" name="screenshot_url_2" id="dss2_url_<?=$__prodKey?>" class="form-input"
+                     value="<?=e($__prodSlot2)?>" placeholder="https://… or upload below">
+              <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
+                <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">
+                  <i data-lucide="upload" class="ic-13"></i> Upload
+                  <input type="file" id="dss2_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="stAdminUpload(this,'dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">
+                </label>
+                <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem;" onclick="stClearGallerySlot('dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">Remove</button>
+                <span id="dss2_prev_<?=$__prodKey?>" class="fs-xs-mt"></span>
+              </div>
+              <?php if ($__prodSlot2 !== ''): ?>
+              <div id="dss2_preview_<?=$__prodKey?>" style="margin-top:0.5rem;border-radius:0.5rem;overflow:hidden;border:1px solid var(--border);max-height:8rem;">
+                <img src="<?=e($__prodSlot2)?>" alt="Second preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">
+              </div>
+              <?php else: ?>
+              <div id="dss2_preview_<?=$__prodKey?>" style="display:none;"></div>
+              <?php endif; ?>
+            </div>
           </div>
-          <?php if(!empty($editing['demo_screenshot_url'])): ?>
-          <div style="margin-top:0.5rem;border-radius:0.5rem;overflow:hidden;border:1px solid var(--border);max-height:8rem;">
-            <img src="<?=e($editing['demo_screenshot_url'])?>" alt="Preview" style="width:100%;object-fit:cover;object-position:top;max-height:8rem;">
-          </div>
-          <?php endif; ?>
         </div>
       </div>
 
@@ -644,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function() {
   updatePreview();
 });
 
-function stAdminUpload(input, urlFieldId, prevId) {
+function stAdminUpload(input, urlFieldId, prevId, previewBoxId) {
   var file = input.files[0];
   if (!file) return;
   var fd = new FormData();
@@ -657,11 +704,30 @@ function stAdminUpload(input, urlFieldId, prevId) {
       if (data.ok) {
         document.getElementById(urlFieldId).value = data.url;
         if (prev) prev.textContent = 'Uploaded: ' + data.name;
+        if (previewBoxId) {
+          var box = document.getElementById(previewBoxId);
+          if (box) {
+            box.style.display = 'block';
+            box.innerHTML = '<img src="' + data.url + '" alt="Preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">';
+          }
+        }
       } else {
         if (prev) prev.textContent = 'Error: ' + (data.error || 'Upload failed');
       }
     })
     .catch(function(){ if(prev) prev.textContent = 'Upload failed.'; });
+}
+
+function stClearGallerySlot(urlFieldId, prevId, previewBoxId) {
+  var urlField = document.getElementById(urlFieldId);
+  if (urlField) urlField.value = '';
+  var prev = document.getElementById(prevId);
+  if (prev) prev.textContent = '';
+  var box = document.getElementById(previewBoxId);
+  if (box) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+  }
 }
 
 // Initialize on page load

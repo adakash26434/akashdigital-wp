@@ -1470,6 +1470,46 @@ function icon(string $name, int $size = 16, string $style = ''): string {
  * @param string $url
  * @return string|false
  */
+/** Sanitize up to N admin-submitted gallery image URLs. */
+function stSanitizeDetailGalleryInput(array $urls, int $max = 2): array {
+    $clean = [];
+    foreach ($urls as $url) {
+        $url = trim((string)$url);
+        if ($url === '') {
+            continue;
+        }
+        $normalized = normalizeImageUrl($url);
+        if ($normalized === false || $normalized === '') {
+            continue;
+        }
+        $clean[] = $normalized;
+        if (count($clean) >= $max) {
+            break;
+        }
+    }
+    return array_values(array_unique($clean));
+}
+
+/** Build gallery URLs from JSON column with legacy primary-image fallback. */
+function stDetailGalleryImages(?string $screenshotsJson, ?string $primaryUrl = null, int $max = 2): array {
+    $urls = [];
+    if ($screenshotsJson !== null && trim($screenshotsJson) !== '') {
+        $decoded = json_decode($screenshotsJson, true);
+        if (is_array($decoded)) {
+            foreach ($decoded as $url) {
+                $url = trim((string)$url);
+                if ($url !== '') {
+                    $urls[] = $url;
+                }
+            }
+        }
+    }
+    if ($urls === [] && $primaryUrl !== null && trim($primaryUrl) !== '') {
+        $urls[] = trim($primaryUrl);
+    }
+    return stSanitizeDetailGalleryInput($urls, $max);
+}
+
 function normalizeImageUrl(string $url) {
     $url = trim($url);
     if ($url === '') return '';

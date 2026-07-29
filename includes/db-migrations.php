@@ -889,4 +889,14 @@ function runDbMigrations() {
             'org_tier' => "TINYINT NULL DEFAULT 0",
         ]);
     } catch (\Throwable $e) { error_log('[db-migrations] M37: ' . $e->getMessage()); }
+
+    try {
+        // Migration 38: products + services — optional JSON gallery (max 2 URLs on detail pages)
+        dbEnsureColumns('products', [
+            'screenshots' => "TEXT NULL",
+        ]);
+        dbEnsureColumns('services', [
+            'screenshots' => "TEXT NULL",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M38: ' . $e->getMessage()); }
 }
