@@ -75,18 +75,18 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.625rem;">
     <?php if(empty($items)):?>
-    <div style="grid-column:1/-1;border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No gallery images yet.</div>
+    <div style="grid-column:1/-1;border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No gallery images yet. Use the <strong>+ NEW</strong> tab to add one.</div>
     <?php else: $sn=1; foreach($items as $img):?>
     <div style="position:relative;border-radius:0.75rem;overflow:hidden;border:1px solid var(--border);<?=!$img['active']?'opacity:0.5;':''?>" class="group">
       <span style="position:absolute;top:0.375rem;left:0.375rem;z-index:2;width:1.5rem;height:1.5rem;border-radius:0.375rem;background:rgba(0,0,0,0.55);color:#fff;font-size:0.625rem;font-weight:700;display:flex;align-items:center;justify-content:center;"><?=$sn++?></span>
       <div style="height:120px;background:var(--muted);">
         <img src="<?=e($img['image_url'])?>" loading="lazy" alt="<?=e($img['title']??'')?>" style="width:100%;height:100%;object-fit:cover;display:block;">
       </div>
-      <div style="position:absolute;inset:0;background:rgba(0,0,0,0.55);opacity:0;transition:opacity 0.15s;display:flex;align-items:center;justify-content:center;gap:0.375rem;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0'">
-        <a href="?edit=<?=$img['id']?>" style="padding:.25rem .4375rem;border-radius:0.375rem;background:#fff;color:#1e293b;text-decoration:none;" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;display:block;"></i></a>
+      <div style="position:absolute;top:0.375rem;right:0.375rem;z-index:2;display:flex;align-items:center;gap:0.25rem;">
+        <a href="?edit=<?=$img['id']?>" style="padding:.25rem .4375rem;border-radius:0.375rem;background:rgba(255,255,255,0.95);color:#1e293b;text-decoration:none;box-shadow:0 1px 2px rgba(0,0,0,.15);" aria-label="Edit" title="Edit"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;display:block;"></i></a>
         <form method="POST" class="inline" onsubmit="return confirm('Delete?')">
           <?=csrfField()?><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="<?=$img['id']?>">
-          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);" aria-label="Delete" onclick="return confirm('Delete this image?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+          <button type="submit" class="btn btn-sm" style="background:var(--danger-soft);color:var(--danger-fg);box-shadow:0 1px 2px rgba(0,0,0,.15);" aria-label="Delete" onclick="return confirm('Delete this image?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
         </form>
       </div>
       <?php if($img['title']):?><div style="padding:0.375rem 0.5rem;font-size:0.6875rem;color:var(--muted-foreground);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><?=e($img['title'])?></div><?php endif;?>

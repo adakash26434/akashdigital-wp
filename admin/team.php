@@ -248,7 +248,7 @@ if (!empty($_GET['edit'])) {
   </div>
   <?php endforeach; endif;?>
 
-  <?php if(empty($team)):?><div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No team members yet.</div><?php endif;?>
+  <?php if(empty($team)):?><div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No team members yet. Use the <strong>+ NEW</strong> tab to add one.</div><?php endif;?>
 </div>
 </div><!-- /aft-list -->
 

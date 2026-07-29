@@ -101,8 +101,7 @@ $ROLE_CFG = [
   <div style="display:flex;flex-direction:column;gap:0.875rem;">
     <?php if(empty($staff)):?>
     <div class="af-empty">
-      <div style="font-size:2.5rem;margin-bottom:0.75rem;"></div>
-      <p>No staff found. Add your first team member using the form.</p>
+      <p>No staff found. Use the <strong>+ ADD MEMBER</strong> tab to add one.</p>
     </div>
     <?php endif;?>
     <?php foreach($staff as $s):

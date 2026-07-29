@@ -94,29 +94,29 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
         <input type="hidden" name="action" value="profile">
 
         <div>
-          <label class="form-label">Full Name <span class="text-danger-token">*</span></label>
-          <input type="text" name="display_name" required class="form-input" value="<?= e($__user['display_name'] ?? '') ?>">
+          <label class="form-label" for="profile-display-name">Full Name <span class="text-danger-token">*</span></label>
+          <input type="text" id="profile-display-name" name="display_name" required class="form-input" value="<?= e($__user['display_name'] ?? '') ?>">
         </div>
 
         <div>
-          <label class="form-label">Email Address</label>
-          <input type="email" class="form-input" value="<?= e($__user['email']) ?>" disabled style="opacity:0.6;cursor:not-allowed;" title="Email cannot be changed. Contact support.">
+          <label class="form-label" for="profile-email">Email Address</label>
+          <input type="email" id="profile-email" class="form-input" value="<?= e($__user['email']) ?>" disabled style="opacity:0.6;cursor:not-allowed;" title="Email cannot be changed. Contact support.">
           <p style="font-size:0.6875rem;color:var(--muted-foreground);margin-top:0.2rem;">Contact support to change email.</p>
         </div>
 
         <div>
-          <label class="form-label">Phone Number</label>
-          <input type="tel" name="phone" class="form-input" value="<?= e($__user['phone'] ?? '') ?>" placeholder="+977 98X-XXX-XXXX">
+          <label class="form-label" for="profile-phone">Phone Number</label>
+          <input type="tel" id="profile-phone" name="phone" class="form-input" value="<?= e($__user['phone'] ?? '') ?>" placeholder="+977 98X-XXX-XXXX">
         </div>
 
         <div>
-          <label class="form-label">Organization / Cooperative Name</label>
-          <input type="text" name="org_name" class="form-input" value="<?= e($__user['org_name'] ?? '') ?>" placeholder="e.g. Himalayan Saving Co-op">
+          <label class="form-label" for="profile-org">Organization / Cooperative Name</label>
+          <input type="text" id="profile-org" name="org_name" class="form-input" value="<?= e($__user['org_name'] ?? '') ?>" placeholder="e.g. Himalayan Saving Co-op">
         </div>
 
         <div>
-          <label class="form-label">District</label>
-          <select name="district" class="form-input">
+          <label class="form-label" for="profile-district">District</label>
+          <select id="profile-district" name="district" class="form-input">
             <option value="">Select district</option>
             <?php foreach ($DISTRICTS as $d): ?>
             <option value="<?= e($d) ?>" <?= ($__user['district']??'')===$d?'selected':'' ?>><?= e($d) ?></option>
@@ -137,16 +137,16 @@ $DISTRICTS = ['Achham','Arghakhanchi','Baglung','Baitadi','Bajhang','Bajura','Ba
         <?= csrfField() ?>
         <input type="hidden" name="action" value="password">
         <div>
-          <label class="form-label">Current Password</label>
-          <input type="password" name="current_password" required class="form-input" placeholder="Enter current password">
+          <label class="form-label" for="pwd-current">Current Password</label>
+          <input type="password" id="pwd-current" name="current_password" required class="form-input" placeholder="Enter current password" autocomplete="current-password">
         </div>
         <div>
-          <label class="form-label">New Password</label>
-          <input type="password" name="new_password" required minlength="8" class="form-input" placeholder="Min. 8 characters">
+          <label class="form-label" for="pwd-new">New Password</label>
+          <input type="password" id="pwd-new" name="new_password" required minlength="8" class="form-input" placeholder="Min. 8 characters" autocomplete="new-password">
         </div>
         <div>
-          <label class="form-label">Confirm New Password</label>
-          <input type="password" name="confirm_password" required class="form-input" placeholder="Repeat new password">
+          <label class="form-label" for="pwd-confirm">Confirm New Password</label>
+          <input type="password" id="pwd-confirm" name="confirm_password" required class="form-input" placeholder="Repeat new password" autocomplete="new-password">
         </div>
         <button type="submit" class="btn btn-outline w-100">Change Password</button>
       </form>

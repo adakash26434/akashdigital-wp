@@ -81,7 +81,7 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
   <div class="af-empty" style="border:2px dashed var(--border);border-radius:var(--radius-lg);">
     <i data-lucide="help-circle" class="af-empty-icon"></i>
     <div class="af-empty-title">No FAQs yet</div>
-    <div class="af-empty-sub">Add your first FAQ to help customers find answers.</div>
+    <div class="af-empty-sub">Use the <strong>+ NEW</strong> tab to add your first FAQ.</div>
   </div>
   <?php else: foreach($byCat as $cat => $items):?>
   <div class="mb-1-25">

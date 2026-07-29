@@ -88,13 +88,11 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
 <div>
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;">
     <h2 class="h-eyebrow-flat"> All Announcements (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ New</a>
   </div>
 
   <?php if(empty($items)):?>
   <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">
-    <div style="font-size:3rem;margin-bottom:0.75rem;"></div>
-    <p>No announcements yet. Create one to display banners or popups on your public site.</p>
+    <p>No announcements yet. Use the <strong>+ NEW</strong> tab to display banners or popups on your public site.</p>
   </div>
   <?php else:?>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">

@@ -99,7 +99,7 @@ function statusBadgeStatus(string $s): string {
 <div class="af-page-tabs">
   <button onclick="stTab('comp-list')" id="stab-comp-list" class="af-page-tab <?=$afActive==='comp-list'?'active':''?>">
     <i data-lucide="server" style="width:13px;height:13px;"></i> Components
-    <span class="af-tab-badge"><?=count($components)?></span>
+    <span class="af-badge"><?=count($components)?></span>
   </button>
   <button onclick="stTab('comp-form')" id="stab-comp-form" class="af-page-tab <?=$afActive==='comp-form'?'active':''?>">
     <i data-lucide="<?=$editComp?'pencil':'plus-circle'?>" style="width:13px;height:13px;"></i>
@@ -107,7 +107,7 @@ function statusBadgeStatus(string $s): string {
   </button>
   <button onclick="stTab('inc-list')" id="stab-inc-list" class="af-page-tab <?=$afActive==='inc-list'?'active':''?>">
     <i data-lucide="alert-triangle" style="width:13px;height:13px;"></i> Incidents
-    <span class="af-tab-badge"><?=count($incidents)?></span>
+    <span class="af-badge"><?=count($incidents)?></span>
   </button>
   <button onclick="stTab('inc-form')" id="stab-inc-form" class="af-page-tab <?=$afActive==='inc-form'?'active':''?>">
     <i data-lucide="plus-circle" style="width:13px;height:13px;"></i> + Incident
@@ -128,10 +128,7 @@ function stTab(id) {
 <div id="st-comp-list" style="<?=$afActive==='comp-list'?'':'display:none'?>">
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat">System Components (<?=count($components)?>)</h2>
-    <div style="display:flex;gap:.5rem;align-items:center;">
-      <a href="<?=url('status.php')?>" target="_blank" class="btn btn-ghost btn-sm">View public page ↗</a>
-      <button onclick="stTab('comp-form')" class="btn btn-primary btn-sm">+ Add Component</button>
-    </div>
+    <a href="<?=url('status.php')?>" target="_blank" class="btn btn-ghost btn-sm">View public page ↗</a>
   </div>
 
   <div class="st-card ov-hidden">
@@ -235,7 +232,6 @@ function stTab(id) {
       <span style="margin-left:.5rem;font-size:.75rem;color:var(--danger-fg);font-weight:600;"><?=count($openIncidents)?> open</span>
       <?php endif;?>
     </h2>
-    <button onclick="stTab('inc-form')" class="btn btn-primary btn-sm">+ New Incident</button>
   </div>
 
   <?php if($openIncidents):?>

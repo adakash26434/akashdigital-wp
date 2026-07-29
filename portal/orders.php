@@ -104,7 +104,6 @@ if ($active_count > 0):?>
 
 <!-- No orders — show available products -->
 <div style="border:2px dashed var(--border);border-radius:1rem;padding:2.5rem;text-align:center;color:var(--muted-foreground);margin-bottom:2rem;">
-  <div style="font-size:3rem;margin-bottom:0.75rem;"></div>
   <h3 style="font-weight:700;font-size:1rem;color:var(--foreground);margin-bottom:0.5rem;">No orders yet</h3>
   <p style="font-size:0.875rem;margin-bottom:1.25rem;">Your purchased licenses will appear here. Browse our products or contact sales to get started.</p>
   <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;">

@@ -89,7 +89,7 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.875rem;">
     <?php if(empty($items)):?>
-    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);grid-column:1/-1;">No portfolio items yet.</div>
+    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);grid-column:1/-1;">No portfolio items yet. Use the <strong>+ NEW</strong> tab to add one.</div>
     <?php else: foreach($items as $p):?>
     <div class="st-card" style="overflow:hidden;<?=!$p['active']?'opacity:0.55;':''?>">
       <?php if(!empty($p['image_url'])):?>

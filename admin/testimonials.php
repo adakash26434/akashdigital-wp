@@ -84,7 +84,7 @@ catch (\Throwable $e) {
   </div>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
     <?php if(empty($items)):?>
-    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No testimonials yet.</div>
+    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No testimonials yet. Use the <strong>+ NEW</strong> tab to add one.</div>
     <?php else: $sn=1; foreach($items as $t):?>
     <div class="st-card" style="padding:0.875rem 1.25rem;display:flex;align-items:center;gap:0.75rem;<?=!$t['active']?'opacity:0.55;':''?>">
       <span style="width:1.75rem;height:1.75rem;border-radius:0.375rem;background:var(--primary-light);color:var(--primary);font-size:0.6875rem;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><?=$sn++?></span>

@@ -211,7 +211,7 @@ $ICONS_JSON = json_encode($ICONS);
     <div class="af-empty" style="border:2px dashed var(--border);border-radius:var(--radius-lg);">
       <i data-lucide="layers" class="af-empty-icon"></i>
       <div class="af-empty-title">No services yet</div>
-      <div class="af-empty-sub">Add your first service to display on the website.</div>
+      <div class="af-empty-sub">Use the <strong>+ NEW</strong> tab to add your first service.</div>
     </div>
     <?php else: foreach($services as $s):?>
     <div class="af-list-item <?=!$s['active']?'is-inactive':''?>">

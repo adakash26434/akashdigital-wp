@@ -209,7 +209,8 @@ $is_new = isset($_GET['new']);
 
   <form method="POST" enctype="multipart/form-data" class="col-1">
     <?= csrfField() ?>
-    <textarea name="body" required minlength="1" maxlength="8000" class="form-input" rows="5"
+    <label class="form-label" for="reply-body">Your reply</label>
+    <textarea id="reply-body" name="body" required minlength="1" maxlength="8000" class="form-input" rows="5"
               placeholder="Type your reply here..."></textarea>
 
     <!-- File upload zone -->
