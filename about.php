@@ -247,6 +247,10 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
           </div>
         </div>
         <p class="quote-card__text"><?= nl2br(e($__chairMsg)) ?></p>
+        <a href="<?= url('leadership-message.php?from=chairman') ?>" class="quote-card__more">
+          <?= e(isNepali() ? 'पूरा सन्देश पढ्नुहोस्' : 'Read full message') ?>
+          <i data-lucide="arrow-right" aria-hidden="true"></i>
+        </a>
       </div>
       <?php endif; ?>
 
@@ -265,6 +269,10 @@ $__ls['ceo_title']      = $__ls['ceo_title']      ?? 'CEO & Co-founder';
           </div>
         </div>
         <p class="quote-card__text"><?= nl2br(e($__ceoMsg)) ?></p>
+        <a href="<?= url('leadership-message.php?from=ceo') ?>" class="quote-card__more">
+          <?= e(isNepali() ? 'पूरा सन्देश पढ्नुहोस्' : 'Read full message') ?>
+          <i data-lucide="arrow-right" aria-hidden="true"></i>
+        </a>
       </div>
       <?php endif; ?>
 
