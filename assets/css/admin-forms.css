@@ -63,6 +63,12 @@
   gap: 0.75rem;
 }
 
+.form-grid-meta {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 5.5rem) minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
 /* ── Inline form group ───────────────────────────────── */
 .form-group {
   display: flex;
@@ -603,7 +609,8 @@
     overflow-y: visible !important;
   }
   .form-grid-2,
-  .form-grid-3 {
+  .form-grid-3,
+  .form-grid-meta {
     grid-template-columns: 1fr !important;
   }
 }

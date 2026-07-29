@@ -65,7 +65,7 @@ include 'includes/page-hero.php';
     <?php else: ?>
     <div class="portfolio-grid stagger-children">
       <?php foreach ($items as $item): ?>
-      <div class="st-card portfolio-card" x-show="filter==='' || filter==='<?= e($item['category'] ?? '') ?>'" x-cloak>
+      <div class="st-card portfolio-card" x-show="filter==='' || filter==='<?= e($item['category'] ?? '') ?>'">
         <?php if (!empty($item['image_url'])): ?>
         <div class="portfolio-card__media">
           <img src="<?= e($item['image_url']) ?>" loading="lazy" decoding="async" alt="<?= e($item['title']) ?>">

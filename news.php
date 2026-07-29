@@ -382,7 +382,7 @@ include 'includes/page-hero.php';
               <?php endif; ?>
             </div>
           </div>
-          <a href="<?= url('news-post.php?slug=' . urlencode($post['slug'])) ?>" class="side-link"></a>
+          <a href="<?= url('news-post.php?slug=' . urlencode($post['slug'])) ?>" class="side-link" aria-label="<?= e($post['title']) ?>"></a>
         </div>
         <?php endforeach; ?>
       </div>

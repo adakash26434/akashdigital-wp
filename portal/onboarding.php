@@ -42,9 +42,14 @@ $step      = max(1, min(5, (int)($_GET['step'] ?? $progress['current_step'] ?? 1
 $savedData = $progress['data'] ? json_decode($progress['data'], true) : [];
 $flash     = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    verifyCsrf();
-    $action = $_POST['action'] ?? 'next';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' || (($_GET['action'] ?? '') === 'skip')) {
+    if (($_GET['action'] ?? '') === 'skip' && $_SERVER['REQUEST_METHOD'] !== 'POST') {
+        // Allow the Skip link (GET) while still protecting POST wizard steps with CSRF.
+        $action = 'skip';
+    } else {
+        verifyCsrf();
+        $action = $_POST['action'] ?? 'next';
+    }
     // Merge any submitted fields into saved data
     $payload = $_POST['data'] ?? [];
     if (is_array($payload)) {

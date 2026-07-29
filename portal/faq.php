@@ -126,7 +126,7 @@ $categories = query("SELECT DISTINCT category FROM faqs WHERE active=1 AND categ
           <span><?= e($faq['question']) ?></span>
           <span style="font-size:1.125rem;color:var(--primary);flex-shrink:0;margin-left:1rem;transition:transform 0.2s;" :style="open?'transform:rotate(45deg)':''">+</span>
         </button>
-        <div x-show="open" x-transition style="padding:0 1.25rem 1.25rem;font-size:0.9375rem;line-height:1.7;color:var(--muted-foreground);">
+        <div x-cloak x-show="open" x-transition style="padding:0 1.25rem 1.25rem;font-size:0.9375rem;line-height:1.7;color:var(--muted-foreground);">
           <?= nl2br(e($faq['answer'])) ?>
         </div>
       </div>

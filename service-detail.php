@@ -165,7 +165,7 @@ require_once 'includes/header.php';
 
       <div>
         <div class="st-card" style="padding:1.5rem;position:sticky;top:5rem;">
-          <?php if (!empty($service['screenshot_url'])): ?>
+          <?php if (!empty($service['screenshot_url']) && empty($screenshots)): ?>
           <div style="border-radius:0.75rem;overflow:hidden;border:1px solid var(--border);margin-bottom:1.25rem;background:var(--muted);">
             <img src="<?= e($service['screenshot_url']) ?>" alt="<?= e($service['name']) ?>" loading="lazy" style="width:100%;display:block;max-height:220px;object-fit:cover;">
           </div>

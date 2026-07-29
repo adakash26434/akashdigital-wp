@@ -156,9 +156,12 @@ if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $edi
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
 <div class="st-card p-tile">
-  <h3 class="h-eyebrow-tight">
-    <?=$editing ? 'Edit Plan: '.e($editing['name']) : 'New Plan'?>
-  </h3>
+  <div class="af-editor-header">
+    <h3 class="h-eyebrow-tight" style="margin:0;">
+      <?=$editing ? 'Edit Plan: '.e($editing['name']) : 'New Plan'?>
+    </h3>
+    <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+  </div>
   <form method="POST" class="col-1-tight">
     <?=csrfField()?>
     <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
@@ -172,7 +175,7 @@ if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $edi
       <label class="form-label">Tag / Subtitle</label>
       <input type="text" name="tag" class="form-input" placeholder="Most popular · multi-branch" value="<?=e($editing['tag']??'')?>">
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;">
+    <div class="form-grid-2" style="gap:0.625rem;">
       <div>
         <label class="form-label">Price *</label>
         <input type="text" name="price_label" class="form-input" required placeholder="NPR 12,999 or Custom" value="<?=e($editing['price_label']??'')?>">
@@ -182,7 +185,7 @@ if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $edi
         <input type="text" name="period" class="form-input" placeholder="/ month" value="<?=e($editing['period']??'/ month')?>">
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;">
+    <div class="form-grid-2" style="gap:0.625rem;">
       <div>
         <label class="form-label">Button Label</label>
         <input type="text" name="cta_label" class="form-input" placeholder="Get started" value="<?=e($editing['cta_label']??'Get started')?>">

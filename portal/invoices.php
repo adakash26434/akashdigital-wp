@@ -90,7 +90,7 @@ $ORDER_STATUS = [
           </td>
           <td style="padding:0.875rem 1rem;color:var(--foreground);"><?= e($s['plan_name'] ?? '—') ?></td>
           <td style="padding:0.875rem 1rem;color:var(--muted-foreground);white-space:nowrap;">
-            <?= $s['started_at'] ? date('M j, Y', strtotime($s['started_at'])) : '—' ?>
+            <?= !empty($s['starts_at']) ? date('M j, Y', strtotime($s['starts_at'])) : '—' ?>
           </td>
           <td style="padding:0.875rem 1rem;white-space:nowrap;">
             <?php if($s['expires_at']): ?>

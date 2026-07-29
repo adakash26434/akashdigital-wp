@@ -193,7 +193,7 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
         require __DIR__ . '/../includes/admin-img-upload.php';
       ?>
 
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
+      <div class="form-grid-meta" style="gap:0.5rem;align-items:end;">
         <div>
           <label class="form-label">Position</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">

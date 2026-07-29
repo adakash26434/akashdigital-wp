@@ -124,7 +124,10 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"><?=$editing?' Edit':' New Portfolio Item'?></h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Portfolio Item':'New Portfolio Item'?></h3>
+      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+    </div>
     <form method="POST" class="col-1-tight">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
@@ -138,7 +141,7 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
         <label class="form-label">Slug (URL)</label>
         <input type="text" name="slug" maxlength="100" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+      <div class="form-grid-2" style="gap:0.5rem;">
         <div>
           <label class="form-label">Client Name</label>
           <input type="text" name="client_name" maxlength="100" class="form-input" value="<?=e($editing['client_name']??'')?>" placeholder="Client name">

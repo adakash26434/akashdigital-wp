@@ -199,7 +199,10 @@ $ROLE_CFG = [
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"> Add Staff Member</h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;">Add Staff Member</h3>
+      <a href="?" class="btn btn-ghost btn-sm">Cancel</a>
+    </div>
     <form method="POST" class="col-1">
       <?=csrfField()?>
       <input type="hidden" name="action" value="add_staff">

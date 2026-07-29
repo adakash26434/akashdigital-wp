@@ -148,9 +148,12 @@ if (isset($_GET['edit'])) {
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-      <h3 class="h-eyebrow-tight">
-        <?= $edit ? 'Edit Banner' : (isset($_GET['new']) ? 'Create Banner' : 'Banner Form') ?>
-      </h3>
+      <div class="af-editor-header">
+        <h3 class="h-eyebrow-tight" style="margin:0;">
+          <?= $edit ? 'Edit Banner' : (isset($_GET['new']) ? 'Create Banner' : 'Banner Form') ?>
+        </h3>
+        <?php if ($edit): ?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif; ?>
+      </div>
       <form method="POST" class="col-1-tight">
         <?= csrfField() ?>
         <input type="hidden" name="action" value="save">
@@ -166,7 +169,7 @@ if (isset($_GET['edit'])) {
           <textarea name="subtitle" class="form-input" rows="2" placeholder="Supporting text..." maxlength="300"><?= e($edit['subtitle'] ?? '') ?></textarea>
           <span class="form-hint">Optional. Up to 300 characters. Add descriptive text below the title.</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div class="form-grid-2" style="gap:0.75rem;">
           <div>
             <label class="form-label">Style</label>
             <select name="banner_style" class="form-input">

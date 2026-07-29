@@ -99,7 +99,10 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"><?=$editing?' Edit Image':' Add Image'?></h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Image':'Add Image'?></h3>
+      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+    </div>
     <form method="POST" class="col-1-tight">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">

@@ -1,21 +1,28 @@
 <?php
-$pageTitle = 'Ticket';
-require_once '../includes/portal-layout.php';
+require_once '../includes/config.php';
+require_once '../includes/db.php';
+require_once '../includes/auth.php';
+require_once '../includes/helpers.php';
+requireLogin();
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) { header('Location: ' . url('portal/tickets.php')); exit; }
 
+$__preUser = currentUser();
 $ticket = null;
-try { $ticket = queryOne("SELECT * FROM tickets WHERE id=? AND user_id=?", [$id, $__user['id']]); }
+try { $ticket = queryOne("SELECT * FROM tickets WHERE id=? AND user_id=?", [$id, $__preUser['id']]); }
 catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
+
+$pageTitle = $ticket
+    ? ('Ticket #' . $ticket['number'] . ' — ' . $ticket['subject'])
+    : 'Ticket';
+require_once '../includes/portal-layout.php';
 
 if (!$ticket) {
     echo '<div class="alert alert-error">Ticket not found or you don\'t have access.</div>';
     echo '<a href="'.url('portal/tickets.php').'" class="btn btn-outline btn-sm mt-1">← Back to tickets</a>';
     require_once '../includes/portal-layout-end.php'; exit;
 }
-
-$pageTitle = 'Ticket #' . $ticket['number'] . ' — ' . $ticket['subject'];
 
 $success = '';
 $error   = '';
@@ -32,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($_FILES['attachment']['name']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
                 $file     = $_FILES['attachment'];
                 $allowed  = ['image/jpeg','image/png','image/webp','image/gif','application/pdf'];
-                $maxBytes = 8 * 1024 * 1024; // 8 MB limit
+                $maxBytes = 5 * 1024 * 1024; // 5 MB — match new-ticket form
                 if (in_array($file['type'], $allowed, true) && $file['size'] <= $maxBytes) {
                     $ext  = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
                     $safe = bin2hex(random_bytes(12)) . '.' . $ext;
@@ -207,7 +214,7 @@ $is_new = isset($_GET['new']);
 
     <!-- File upload zone -->
     <div>
-      <label class="form-label fs-sm2">Attach File <span style="font-weight:400;color:var(--muted-foreground);">(optional · JPG, PNG, PDF · max 8 MB)</span></label>
+      <label class="form-label fs-sm2">Attach File <span style="font-weight:400;color:var(--muted-foreground);">(optional · JPG, PNG, PDF · max 5 MB)</span></label>
       <div id="reply-drop-zone"
            style="border:2px dashed var(--border);border-radius:0.75rem;padding:1rem;text-align:center;cursor:pointer;transition:all 0.15s;background:var(--muted);"
            onclick="document.getElementById('reply-file').click()"

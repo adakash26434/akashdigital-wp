@@ -3,6 +3,7 @@ $pageTitle = 'My Overview';
 require_once '../includes/portal-layout.php';
 
 $tickets = [];
+$counts = ['open'=>0,'in_progress'=>0,'replied'=>0,'resolved'=>0,'closed'=>0];
 try {
     $tickets = query(
         "SELECT id, number, subject, status, priority, last_message_at, created_at
@@ -11,11 +12,23 @@ try {
     );
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 
-$counts = ['open'=>0,'in_progress'=>0,'replied'=>0,'resolved'=>0,'closed'=>0];
-foreach ($tickets as $t) {
-    $s = $t['status'] ?? 'open';
-    if (isset($counts[$s])) $counts[$s]++;
+try {
+    $countRows = query(
+        "SELECT status, COUNT(*) AS c FROM tickets WHERE user_id=? GROUP BY status",
+        [$__user['id']]
+    );
+    foreach ($countRows as $row) {
+        $s = $row['status'] ?? '';
+        if (isset($counts[$s])) $counts[$s] = (int)$row['c'];
+    }
+} catch (\Throwable $e) {
+    foreach ($tickets as $t) {
+        $s = $t['status'] ?? 'open';
+        if (isset($counts[$s])) $counts[$s]++;
+    }
 }
+
+$totalTicketCount = array_sum($counts);
 
 $STATUS_COLORS = [
     'open'        => ['var(--danger-soft)','var(--danger-fg)','Open'],
@@ -129,7 +142,7 @@ try {
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:1rem;margin-bottom:2rem;">
   <a href="<?= url('portal/tickets.php') ?>" style="text-decoration:none;display:block;padding:1.25rem;border-radius:1rem;border:1px solid var(--border);background:var(--card);text-align:center;transition:box-shadow 0.2s;"
      onmouseover="this.style.boxShadow='var(--shadow-elevated)'" onmouseout="this.style.boxShadow='none'">
-    <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--primary);"><?= count($tickets) ?></div>
+    <div style="font-family:var(--font-display);font-size:2rem;font-weight:800;color:var(--primary);"><?= (int)$totalTicketCount ?></div>
     <div class="caption-meta">Total Tickets</div>
   </a>
   <?php
@@ -204,7 +217,7 @@ try {
       <?php
       $chargeTypes = [
         'head_office_amc' => 'Head Office AMC',
-        'branch_office_ammc' => 'Branch Office AMC',
+        'branch_office_amc' => 'Branch Office AMC',
         'cloud_charge_ho' => 'Cloud (HO)',
         'cloud_charge_branch' => 'Cloud (Branch)',
       ];

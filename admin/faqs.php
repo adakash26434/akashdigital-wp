@@ -114,7 +114,10 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"><?=$editing?' Edit FAQ':' New FAQ'?></h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit FAQ':'New FAQ'?></h3>
+      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+    </div>
     <form method="POST" class="col-1-tight">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
@@ -136,7 +139,7 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
         <label class="form-label">Answer <span class="text-danger-token">*</span></label>
         <textarea name="answer" required class="form-input fs-sm-r" rows="5"><?=e($editing['answer']??'')?></textarea>
       </div>
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
+      <div class="form-grid-meta" style="gap:0.5rem;align-items:end;">
         <div>
           <label class="form-label">Position</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">

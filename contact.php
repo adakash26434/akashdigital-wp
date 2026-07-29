@@ -5,8 +5,8 @@ require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
 require_once 'includes/mailer.php';
 $__s = siteSettings();
-$pageTitle = 'Contact ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' — Get in Touch';
-$pageDesc  = 'Get in touch with ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' for a free demo, pricing quote or product enquiry. We respond within 2 business hours.';
+$pageTitle = 'Contact ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' — Get in Touch';
+$pageDesc  = 'Get in touch with ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' for a free demo, pricing quote or product enquiry. We respond within 2 business hours.';
 
 $success = $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

@@ -255,7 +255,10 @@ if (!empty($_GET['edit'])) {
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"><?=$editing?' Edit Member':' Add Member'?></h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Member':'Add Member'?></h3>
+      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+    </div>
     <form method="POST" class="col-1-tight">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
@@ -291,7 +294,7 @@ if (!empty($_GET['edit'])) {
         <input type="url" name="linkedin_url" class="form-input" value="<?=e($editing['linkedin_url']??'')?>" placeholder="https://linkedin.com/in/username">
         <span class="form-hint">Optional. LinkedIn profile link.</span>
       </div>
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:start;">
+      <div class="form-grid-meta" style="gap:0.5rem;align-items:start;">
         <div>
           <label class="form-label">Sort #</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
@@ -307,7 +310,7 @@ if (!empty($_GET['edit'])) {
           </label>
         </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div class="form-grid-2" style="gap:0.75rem;">
         <div>
           <label class="form-label">Group on About page</label>
           <select name="category" class="form-input">

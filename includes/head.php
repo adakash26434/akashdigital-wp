@@ -127,6 +127,9 @@ endif; ?>
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/daisyui.min.css')) ?>">
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/admin.css')) ?>">
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/admin-forms.css')) ?>">
+  <?php if ($__ctx === 'portal'): ?>
+  <link rel="stylesheet" href="<?= e($__asset('/assets/css/pages.css')) ?>">
+  <?php endif; ?>
   <link rel="stylesheet" href="<?= $__siteUrl ?>/assets/css/st-bs-datepicker.css">
   <script src="<?= $__siteUrl ?>/assets/js/st-bs-datepicker.js?v=1.3" defer></script>
 

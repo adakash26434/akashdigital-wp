@@ -1516,11 +1516,11 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .leadership-detail__message {
   margin: 1.5rem auto 0;
   max-width: 44rem;
-  color: var(--muted-foreground);
+  color: var(--foreground);
   font-size: var(--text-md);
-  font-style: italic;
+  font-style: normal;
   line-height: 1.85;
-  text-align: left;
+  text-align: center;
   white-space: pre-line;
 }
 .leadership-detail__back {
@@ -1638,8 +1638,8 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
   z-index: 2;
 }
 
-/* Phone: wrap cleanly, drop sibling rail */
-@media (max-width: 860px) {
+/* Phone + tablet: wrap cleanly, drop sibling rail */
+@media (max-width: 1100px) {
   .team-org {
     --team-card-w: min(15rem, 44vw);
     --team-org-gap: 1rem;
@@ -2294,6 +2294,38 @@ html.dark .st-dropdown {
 .prose-legal li { line-height:1.7; }
 .prose-legal a  { color:var(--primary); text-decoration:underline; }
 .prose-legal strong { color:var(--foreground); font-weight:600; }
+
+/* News / article body */
+.prose {
+  color: var(--foreground);
+  line-height: 1.8;
+  font-size: var(--text-md);
+}
+.prose > * + * { margin-top: 1rem; }
+.prose h2,
+.prose h3,
+.prose h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--foreground);
+  line-height: 1.35;
+  margin-top: 1.75rem;
+}
+.prose h2 { font-size: 1.375rem; }
+.prose h3 { font-size: 1.125rem; }
+.prose p,
+.prose li { color: var(--muted-foreground); }
+.prose ul,
+.prose ol { padding-left: 1.35rem; }
+.prose img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 0.75rem;
+  margin: 1.25rem 0;
+}
+.prose a { color: var(--primary); text-decoration: underline; }
+.prose strong { color: var(--foreground); font-weight: 600; }
 
 /* ══════════════════════════════════════════════════════════════
    GLOBAL PUBLIC PAGE RESPONSIVE — mobile-first fixes
@@ -3214,10 +3246,10 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
   display: block;
   width: 100%;
   height: auto;
-  min-height: 15rem;
+  min-height: 0;
   max-height: 34rem;
   object-fit: contain;
-  background: var(--card);
+  background: color-mix(in srgb, var(--muted) 55%, var(--card));
 }
 .detail-gallery__number,
 .detail-gallery__open {

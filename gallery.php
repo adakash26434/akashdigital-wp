@@ -4,8 +4,8 @@ require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
 $__s = siteSettings();
-$pageTitle = 'Gallery — ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company'));
-$pageDesc  = 'Photos from our office, events, and team activities at ' . e($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . '.';
+$pageTitle = 'Gallery — ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company'));
+$pageDesc  = 'Photos from our office, events, and team activities at ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . '.';
 
 $items = [];
 try { $items = query("SELECT * FROM gallery WHERE active=1 ORDER BY position ASC, id DESC"); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -67,16 +67,20 @@ include 'includes/page-hero.php';
     </div>
 
     <!-- Lightbox -->
-    <div x-show="lightbox" @keydown.escape.window="lightbox=null" @click.self="lightbox=null"
-         style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:1rem;"
-         x-cloak>
-      <button @click="prev()" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">‹</button>
+    <div x-show="lightbox" x-cloak
+         role="dialog" aria-modal="true" aria-label="Gallery image viewer"
+         @keydown.escape.window="lightbox=null" @click.self="lightbox=null"
+         style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:1rem;">
+      <button type="button" @click="prev()" aria-label="Previous image"
+              style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">‹</button>
       <div style="max-width:90vw;max-height:90vh;text-align:center;">
         <img :src="currentImg()" :alt="currentCaption()" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:0.75rem;" loading="lazy">
         <p x-text="currentCaption()" style="color:rgba(255,255,255,0.8);margin-top:0.75rem;font-size:var(--text-sm);"></p>
       </div>
-      <button @click="next()" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">›</button>
-      <button @click="lightbox=null" style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.12);border:none;color:#fff;width:2.5rem;height:2.5rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;"></button>
+      <button type="button" @click="next()" aria-label="Next image"
+              style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">›</button>
+      <button type="button" @click="lightbox=null" aria-label="Close gallery viewer"
+              style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.12);border:none;color:#fff;width:2.5rem;height:2.5rem;border-radius:50%;font-size:1.25rem;line-height:1;cursor:pointer;">×</button>
     </div>
 
     <?php endif; ?>

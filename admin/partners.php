@@ -224,7 +224,10 @@ sort($DISTRICTS);
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
   <div class="st-card p-tile">
-    <h3 class="h-eyebrow-tight"><?=$editing?' Edit':' Add Partner'?></h3>
+    <div class="af-editor-header">
+      <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Partner':'Add Partner'?></h3>
+      <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm">Cancel</a><?php endif;?>
+    </div>
     <form method="POST" class="col-1-tight" x-data="{type:'<?=e($editing['type']??'client')?>'}">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
@@ -294,7 +297,7 @@ sort($DISTRICTS);
           <?php endforeach;?>
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
+      <div class="form-grid-meta" style="gap:0.5rem;align-items:end;">
         <div>
           <label class="form-label">Position</label>
           <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
