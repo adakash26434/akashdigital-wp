@@ -133,11 +133,11 @@ require_once 'includes/header.php';
         <?php endif; ?>
 
         <?php if (!empty($highlights)): ?>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:2rem;">
+        <div class="detail-feature-grid detail-feature-grid--compact">
           <?php foreach ($highlights as $h): ?>
-          <div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--foreground);">
-            <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;margin-top:0.1rem;"></i>
-            <?= e($h) ?>
+          <div class="detail-feature">
+            <span class="detail-feature__check"><i data-lucide="check"></i></span>
+            <span><?= e($h) ?></span>
           </div>
           <?php endforeach; ?>
         </div>

@@ -452,67 +452,88 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
         </div>
 
         <!-- Detail page images -->
-        <div style="display:grid;gap:1rem;">
-          <div>
-            <label class="form-label">Image 1 — primary <span class="caption-meta">(listing card + detail sidebar)</span></label>
+        <div class="af-media-manager">
+          <div class="af-media-manager__intro">
+            <i data-lucide="images"></i>
+            <div>
+              <div class="af-media-manager__title">Detail page images</div>
+              <p class="af-media-manager__help">Add one primary image and an optional second view. Recommended: 1200×750 px, JPG/PNG/WebP, max 5 MB.</p>
+            </div>
+          </div>
+          <div class="af-media-slots">
+          <div class="af-media-slot">
+            <div class="af-media-slot__head">
+              <span class="af-media-slot__title">Image 1</span>
+              <span class="af-media-slot__badge">Primary</span>
+            </div>
+            <p class="af-media-slot__hint">Used on the service listing, detail sidebar, and gallery.</p>
             <div @dragover.prevent="imgDrag=true" @dragleave="imgDrag=false" @drop.prevent="onDrop($event)"
                  :style="imgDrag?'border-color:var(--primary);background:var(--primary-light);':''"
-                 style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"
+                 class="af-media-drop"
                  @click="$refs.fileInput.click()">
               <template x-if="!imgPreview">
-                <div>
-                  <i data-lucide="image" style="width:24px;height:24px;color:var(--muted-foreground);margin-bottom:0.35rem;"></i>
-                  <p style="font-size:0.8rem;color:var(--muted-foreground);margin:0;">Click or drag PNG/JPG/WebP</p>
-                  <p class="caption-meta">Max 5 MB</p>
+                <div class="af-media-drop__empty">
+                  <i data-lucide="image-plus"></i>
+                  <div>Choose or drop an image</div>
                 </div>
               </template>
               <template x-if="imgPreview">
                 <div>
-                  <img alt="Primary image" :src="imgPreview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
-                  <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
+                  <img alt="Primary image" :src="imgPreview">
                 </div>
               </template>
             </div>
             <input type="file" name="screenshot_file" accept="image/png,image/jpeg,image/gif,image/webp"
                    x-ref="fileInput" class="hidden" @change="onFileChange($event)">
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
-              <span style="font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;">URL:</span>
-              <input type="text" x-model="imgUrl" @input="imgPreview=imgUrl.trim()||''"
-                     class="form-input" style="flex:1;" placeholder="https://…">
-              <button x-show="imgPreview" type="button" @click="imgPreview='';imgUrl=''"
-                      style="padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);background:none;font-size:0.75rem;cursor:pointer;color:var(--danger-fg);white-space:nowrap;">Remove</button>
+            <div class="af-media-slot__actions">
+              <label class="af-media-upload" @click="$refs.fileInput.click()">
+                <i data-lucide="upload" class="ic-13"></i>
+                <span x-text="imgPreview ? 'Replace' : 'Upload'"></span>
+              </label>
+              <button x-show="imgPreview" type="button" class="af-media-remove" @click="imgPreview='';imgUrl='';$refs.fileInput.value=''">Remove</button>
             </div>
+            <details class="af-media-url">
+              <summary>Or paste an image URL</summary>
+              <input type="url" x-model="imgUrl" @input="imgPreview=imgUrl.trim()||''" class="form-input" placeholder="https://…">
+            </details>
           </div>
 
-          <div>
-            <label class="form-label">Image 2 — optional <span class="caption-meta">(detail gallery only)</span></label>
+          <div class="af-media-slot">
+            <div class="af-media-slot__head">
+              <span class="af-media-slot__title">Image 2</span>
+              <span class="af-media-slot__badge">Optional</span>
+            </div>
+            <p class="af-media-slot__hint">Adds another angle or screenshot to the detail gallery.</p>
             <div @dragover.prevent="img2Drag=true" @dragleave="img2Drag=false" @drop.prevent="onDrop2($event)"
                  :style="img2Drag?'border-color:var(--primary);background:var(--primary-light);':''"
-                 style="border:2px dashed var(--border);border-radius:0.75rem;padding:0.875rem;text-align:center;cursor:pointer;transition:all 0.15s;"
+                 class="af-media-drop"
                  @click="$refs.fileInput2.click()">
               <template x-if="!img2Preview">
-                <div>
-                  <i data-lucide="image-plus" style="width:24px;height:24px;color:var(--muted-foreground);margin-bottom:0.35rem;"></i>
-                  <p style="font-size:0.8rem;color:var(--muted-foreground);margin:0;">Add a second detail image</p>
-                  <p class="caption-meta">Max 5 MB</p>
+                <div class="af-media-drop__empty">
+                  <i data-lucide="image-plus"></i>
+                  <div>Add a second view</div>
                 </div>
               </template>
               <template x-if="img2Preview">
                 <div>
-                  <img alt="Second image" :src="img2Preview" style="max-height:130px;max-width:100%;border-radius:0.4rem;object-fit:contain;margin-bottom:0.35rem;">
-                  <p style="font-size:0.7rem;color:var(--muted-foreground);margin:0;">Click to replace</p>
+                  <img alt="Second image" :src="img2Preview">
                 </div>
               </template>
             </div>
             <input type="file" name="screenshot_file_2" accept="image/png,image/jpeg,image/gif,image/webp"
                    x-ref="fileInput2" class="hidden" @change="onFileChange2($event)">
-            <div style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;">
-              <span style="font-size:0.75rem;color:var(--muted-foreground);white-space:nowrap;">URL:</span>
-              <input type="text" x-model="img2Url" @input="img2Preview=img2Url.trim()||''"
-                     class="form-input" style="flex:1;" placeholder="https://…">
-              <button x-show="img2Preview" type="button" @click="img2Preview='';img2Url=''"
-                      style="padding:0.25rem 0.5rem;border-radius:0.375rem;border:1px solid var(--border);background:none;font-size:0.75rem;cursor:pointer;color:var(--danger-fg);white-space:nowrap;">Remove</button>
+            <div class="af-media-slot__actions">
+              <label class="af-media-upload" @click="$refs.fileInput2.click()">
+                <i data-lucide="upload" class="ic-13"></i>
+                <span x-text="img2Preview ? 'Replace' : 'Upload'"></span>
+              </label>
+              <button x-show="img2Preview" type="button" class="af-media-remove" @click="img2Preview='';img2Url='';$refs.fileInput2.value=''">Remove</button>
             </div>
+            <details class="af-media-url">
+              <summary>Or paste an image URL</summary>
+              <input type="url" x-model="img2Url" @input="img2Preview=img2Url.trim()||''" class="form-input" placeholder="https://…">
+            </details>
+          </div>
           </div>
         </div>
       </div><!-- /appearance -->

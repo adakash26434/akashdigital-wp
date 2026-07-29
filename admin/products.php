@@ -467,60 +467,79 @@ if (!empty($_GET['edit'])) {
           <label class="form-label">Card Background CSS <span style="color:var(--muted-foreground);font-weight:400;">(optional)</span></label>
           <input type="text" name="home_bg_css" class="form-input" value="<?=e($editing['home_bg_css']??'')?>" placeholder="background:linear-gradient(135deg,#0f172a,#1e3a8a)">
         </div>
-        <div>
-          <label class="form-label">
-            Detail page images
-            <span style="color:var(--muted-foreground);font-weight:400;"> — up to 2 images shown on More details</span>
-          </label>
+        <div class="af-media-manager">
           <?php
             $__prodSlots = $editing['gallery_slots'] ?? stDetailGalleryImages(null, $editing['demo_screenshot_url'] ?? null);
             $__prodSlot1 = $__prodSlots[0] ?? '';
             $__prodSlot2 = $__prodSlots[1] ?? '';
             $__prodKey = $editing['id'] ?? 'new';
           ?>
-          <div style="display:grid;gap:1rem;">
-            <div style="padding:0.875rem;border:1px solid var(--border);border-radius:0.75rem;background:var(--muted);">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--foreground);margin-bottom:0.5rem;">Image 1 — primary</div>
-              <div style="font-size:0.7rem;color:var(--muted-foreground);margin-bottom:0.5rem;">Homepage preview, listing cards, and detail gallery</div>
-              <input type="url" name="demo_screenshot_url" id="dss_url_<?=$__prodKey?>" class="form-input"
-                     value="<?=e($__prodSlot1)?>" placeholder="https://… or upload below">
-              <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
-                <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">
-                  <i data-lucide="upload" class="ic-13"></i> Upload
-                  <input type="file" id="dss_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="stAdminUpload(this,'dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>')">
+          <div class="af-media-manager__intro">
+            <i data-lucide="images"></i>
+            <div>
+              <div class="af-media-manager__title">Detail page images</div>
+              <p class="af-media-manager__help">Add one strong primary image and an optional second view. Recommended: 1200×750 px, JPG/PNG/WebP, max 5 MB.</p>
+            </div>
+          </div>
+          <div class="af-media-slots">
+            <div class="af-media-slot">
+              <div class="af-media-slot__head">
+                <span class="af-media-slot__title">Image 1</span>
+                <span class="af-media-slot__badge">Primary</span>
+              </div>
+              <p class="af-media-slot__hint">Used on homepage and as the first detail image.</p>
+              <label class="af-media-drop" for="dss_file_<?=$__prodKey?>">
+                <div id="dss_preview_<?=$__prodKey?>"<?= $__prodSlot1 === '' ? ' class="af-media-drop__empty"' : '' ?>>
+                  <?php if ($__prodSlot1 !== ''): ?>
+                  <img src="<?=e($__prodSlot1)?>" alt="Primary preview">
+                  <?php else: ?>
+                  <i data-lucide="image-plus"></i><div>Choose a primary image</div>
+                  <?php endif; ?>
+                </div>
+              </label>
+              <div class="af-media-slot__actions">
+                <label class="af-media-upload">
+                  <i data-lucide="upload" class="ic-13"></i> <?= $__prodSlot1 !== '' ? 'Replace' : 'Upload' ?>
+                  <input type="file" id="dss_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" hidden onchange="stAdminUpload(this,'dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>','dss_preview_<?=$__prodKey?>')">
                 </label>
-                <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem;" onclick="stClearGallerySlot('dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>','dss_preview_<?=$__prodKey?>')">Remove</button>
-                <span id="dss_prev_<?=$__prodKey?>" class="fs-xs-mt"></span>
+                <button type="button" class="af-media-remove" onclick="stClearGallerySlot('dss_url_<?=$__prodKey?>','dss_prev_<?=$__prodKey?>','dss_preview_<?=$__prodKey?>')">Remove</button>
+                <span id="dss_prev_<?=$__prodKey?>" class="af-media-status"></span>
               </div>
-              <?php if ($__prodSlot1 !== ''): ?>
-              <div id="dss_preview_<?=$__prodKey?>" style="margin-top:0.5rem;border-radius:0.5rem;overflow:hidden;border:1px solid var(--border);max-height:8rem;">
-                <img src="<?=e($__prodSlot1)?>" alt="Primary preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">
-              </div>
-              <?php else: ?>
-              <div id="dss_preview_<?=$__prodKey?>" style="display:none;"></div>
-              <?php endif; ?>
+              <details class="af-media-url">
+                <summary>Or paste an image URL</summary>
+                <input type="url" name="demo_screenshot_url" id="dss_url_<?=$__prodKey?>" class="form-input"
+                       value="<?=e($__prodSlot1)?>" placeholder="https://…" oninput="stPreviewGalleryUrl(this,'dss_preview_<?=$__prodKey?>')">
+              </details>
             </div>
 
-            <div style="padding:0.875rem;border:1px solid var(--border);border-radius:0.75rem;background:var(--muted);">
-              <div style="font-size:0.75rem;font-weight:700;color:var(--foreground);margin-bottom:0.5rem;">Image 2 — optional</div>
-              <div style="font-size:0.7rem;color:var(--muted-foreground);margin-bottom:0.5rem;">Second image on the detail page gallery only</div>
-              <input type="url" name="screenshot_url_2" id="dss2_url_<?=$__prodKey?>" class="form-input"
-                     value="<?=e($__prodSlot2)?>" placeholder="https://… or upload below">
-              <div style="margin-top:0.375rem;display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
-                <label style="display:inline-flex;align-items:center;gap:0.375rem;padding:0.3rem 0.75rem;border-radius:0.4rem;border:1px solid var(--border);background:var(--card);cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--muted-foreground);">
-                  <i data-lucide="upload" class="ic-13"></i> Upload
-                  <input type="file" id="dss2_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" style="display:none" onchange="stAdminUpload(this,'dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">
+            <div class="af-media-slot">
+              <div class="af-media-slot__head">
+                <span class="af-media-slot__title">Image 2</span>
+                <span class="af-media-slot__badge">Optional</span>
+              </div>
+              <p class="af-media-slot__hint">Adds another angle or screenshot to the detail gallery.</p>
+              <label class="af-media-drop" for="dss2_file_<?=$__prodKey?>">
+                <div id="dss2_preview_<?=$__prodKey?>"<?= $__prodSlot2 === '' ? ' class="af-media-drop__empty"' : '' ?>>
+                  <?php if ($__prodSlot2 !== ''): ?>
+                  <img src="<?=e($__prodSlot2)?>" alt="Second preview">
+                  <?php else: ?>
+                  <i data-lucide="image-plus"></i><div>Add a second view</div>
+                  <?php endif; ?>
+                </div>
+              </label>
+              <div class="af-media-slot__actions">
+                <label class="af-media-upload">
+                  <i data-lucide="upload" class="ic-13"></i> <?= $__prodSlot2 !== '' ? 'Replace' : 'Upload' ?>
+                  <input type="file" id="dss2_file_<?=$__prodKey?>" accept="image/png,image/jpeg,image/gif,image/webp" hidden onchange="stAdminUpload(this,'dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">
                 </label>
-                <button type="button" class="btn btn-ghost btn-sm" style="font-size:0.75rem;" onclick="stClearGallerySlot('dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">Remove</button>
-                <span id="dss2_prev_<?=$__prodKey?>" class="fs-xs-mt"></span>
+                <button type="button" class="af-media-remove" onclick="stClearGallerySlot('dss2_url_<?=$__prodKey?>','dss2_prev_<?=$__prodKey?>','dss2_preview_<?=$__prodKey?>')">Remove</button>
+                <span id="dss2_prev_<?=$__prodKey?>" class="af-media-status"></span>
               </div>
-              <?php if ($__prodSlot2 !== ''): ?>
-              <div id="dss2_preview_<?=$__prodKey?>" style="margin-top:0.5rem;border-radius:0.5rem;overflow:hidden;border:1px solid var(--border);max-height:8rem;">
-                <img src="<?=e($__prodSlot2)?>" alt="Second preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">
-              </div>
-              <?php else: ?>
-              <div id="dss2_preview_<?=$__prodKey?>" style="display:none;"></div>
-              <?php endif; ?>
+              <details class="af-media-url">
+                <summary>Or paste an image URL</summary>
+                <input type="url" name="screenshot_url_2" id="dss2_url_<?=$__prodKey?>" class="form-input"
+                       value="<?=e($__prodSlot2)?>" placeholder="https://…" oninput="stPreviewGalleryUrl(this,'dss2_preview_<?=$__prodKey?>')">
+              </details>
             </div>
           </div>
         </div>
@@ -694,9 +713,21 @@ document.addEventListener('DOMContentLoaded', function() {
 function stAdminUpload(input, urlFieldId, prevId, previewBoxId) {
   var file = input.files[0];
   if (!file) return;
+  var allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+  var prev = document.getElementById(prevId);
+  if (!allowed.includes(file.type)) {
+    if (prev) prev.textContent = 'Please choose JPG, PNG, WebP, or GIF.';
+    input.value = '';
+    return;
+  }
+  if (file.size > 5 * 1024 * 1024) {
+    if (prev) prev.textContent = 'Image is too large (max 5 MB).';
+    input.value = '';
+    return;
+  }
   var fd = new FormData();
   fd.append('file', file);
-  var prev = document.getElementById(prevId);
+  fd.append('gallery_image', '1');
   if (prev) prev.textContent = 'Uploading…';
   fetch('<?= url('api/admin-upload.php') ?>', { method:'POST', body:fd })
     .then(function(r){ return r.json(); })
@@ -708,7 +739,8 @@ function stAdminUpload(input, urlFieldId, prevId, previewBoxId) {
           var box = document.getElementById(previewBoxId);
           if (box) {
             box.style.display = 'block';
-            box.innerHTML = '<img src="' + data.url + '" alt="Preview" style="width:100%;object-fit:contain;object-position:top;max-height:8rem;background:var(--card);">';
+            box.classList.remove('af-media-drop__empty');
+            box.innerHTML = '<img src="' + data.url + '" alt="Preview">';
           }
         }
       } else {
@@ -725,9 +757,25 @@ function stClearGallerySlot(urlFieldId, prevId, previewBoxId) {
   if (prev) prev.textContent = '';
   var box = document.getElementById(previewBoxId);
   if (box) {
-    box.style.display = 'none';
-    box.innerHTML = '';
+    box.style.display = '';
+    box.classList.add('af-media-drop__empty');
+    box.innerHTML = '<i data-lucide="image-plus"></i><div>Choose an image</div>';
+    if (window.lucide) lucide.createIcons();
   }
+}
+
+function stPreviewGalleryUrl(input, previewBoxId) {
+  var box = document.getElementById(previewBoxId);
+  if (!box) return;
+  var value = input.value.trim();
+  if (!value) {
+    box.classList.add('af-media-drop__empty');
+    box.innerHTML = '<i data-lucide="image-plus"></i><div>Choose an image</div>';
+    if (window.lucide) lucide.createIcons();
+    return;
+  }
+  box.classList.remove('af-media-drop__empty');
+  box.innerHTML = '<img src="' + value.replace(/"/g, '&quot;') + '" alt="Preview">';
 }
 
 // Initialize on page load

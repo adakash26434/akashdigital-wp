@@ -42,10 +42,17 @@ $finfo    = finfo_open(FILEINFO_MIME_TYPE);
 $realMime = finfo_file($finfo, $file['tmp_name']);
 finfo_close($finfo);
 
-$allowed = ['image/jpeg','image/png','image/webp','image/gif','image/svg+xml'];
+$galleryImageOnly = ($_POST['gallery_image'] ?? '') === '1';
+$allowed = $galleryImageOnly
+    ? ['image/jpeg','image/png','image/webp','image/gif']
+    : ['image/jpeg','image/png','image/webp','image/gif','image/svg+xml'];
 if (!in_array($realMime, $allowed, true)) {
     http_response_code(422);
-    echo json_encode(['error' => 'Only JPEG, PNG, WEBP, GIF or SVG images are allowed.']);
+    echo json_encode([
+        'error' => $galleryImageOnly
+            ? 'Only JPEG, PNG, WEBP or GIF images are allowed.'
+            : 'Only JPEG, PNG, WEBP, GIF or SVG images are allowed.',
+    ]);
     exit;
 }
 
@@ -57,9 +64,17 @@ if (in_array($ext, $bad, true)) {
     exit;
 }
 
+$mimeExt = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'image/webp' => 'webp',
+    'image/gif' => 'gif',
+    'image/svg+xml' => 'svg',
+];
+
 // Save to uploads/content/
 // Organize uploads into year/month folders to keep directories manageable
-$safeName = bin2hex(random_bytes(10)) . '.' . ($ext ?: 'jpg');
+$safeName = bin2hex(random_bytes(10)) . '.' . ($mimeExt[$realMime] ?? 'jpg');
 $subdir = date('Y') . '/' . date('m');
 $dir  = rtrim(UPLOAD_DIR, '/') . '/content/' . $subdir . '/';
 if (!is_dir($dir)) mkdir($dir, 0755, true);

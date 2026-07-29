@@ -178,11 +178,11 @@ require_once 'includes/header.php';
         <?php endif; ?>
 
         <?php if (!empty($features)): ?>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;margin-bottom:2rem;">
+        <div class="detail-feature-grid detail-feature-grid--compact">
           <?php foreach (array_slice($features, 0, 8) as $f): ?>
-          <div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--foreground);">
-            <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;margin-top:0.1rem;"></i>
-            <?= e($f) ?>
+          <div class="detail-feature">
+            <span class="detail-feature__check"><i data-lucide="check"></i></span>
+            <span><?= e($f) ?></span>
           </div>
           <?php endforeach; ?>
         </div>
@@ -284,17 +284,18 @@ endif; ?>
 <?php endif; ?>
 
 <?php if (!empty($features) && count($features) > 8): ?>
-<section class="section">
-  <div class="container" style="max-width:64rem;">
-    <div style="text-align:center;margin-bottom:2.5rem;">
+<section class="section detail-features-section">
+  <div class="container detail-features-container">
+    <div class="detail-section-head">
       <span class="section-eyebrow">Full Feature List</span>
       <h2 class="section-title">Everything You Get</h2>
+      <p>Clear, practical capabilities included with <?= e($product['name']) ?>.</p>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.625rem;">
+    <div class="detail-feature-grid detail-feature-grid--full">
       <?php foreach ($features as $f): ?>
-      <div style="display:flex;align-items:flex-start;gap:0.5rem;font-size:var(--text-sm);color:var(--foreground);padding:0.5rem;">
-        <i data-lucide="check" class="ic-14" style="color:var(--secondary);flex-shrink:0;margin-top:0.1rem;"></i>
-        <?= e($f) ?>
+      <div class="detail-feature">
+        <span class="detail-feature__check"><i data-lucide="check"></i></span>
+        <span><?= e($f) ?></span>
       </div>
       <?php endforeach; ?>
     </div>
