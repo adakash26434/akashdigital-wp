@@ -15,7 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id       = (int)($_POST['id'] ?? 0);
         $name     = trim($_POST['name'] ?? '');
         $category = trim($_POST['category'] ?? 'General');
+        $description = trim($_POST['description'] ?? '');
         $icon_url = trim($_POST['icon_url'] ?? '');
+        $lucide_icon = trim($_POST['lucide_icon'] ?? '') ?: 'cpu';
         $position = (int)($_POST['position'] ?? 0);
         $active   = isset($_POST['active']) ? 1 : 0;
 
@@ -23,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         else {
             try {
                 if ($id) {
-                    execute("UPDATE tech_expertise SET name=?,category=?,icon_url=?,position=?,active=? WHERE id=?",
-                        [$name,$category,$icon_url?:null,$position,$active,$id]);
+                    execute("UPDATE tech_expertise SET name=?,category=?,description=?,icon_url=?,lucide_icon=?,position=?,active=? WHERE id=?",
+                        [$name,$category,$description?:null,$icon_url?:null,$lucide_icon,$position,$active,$id]);
                     $success = 'Tech entry updated.';
                 } else {
-                    execute("INSERT INTO tech_expertise (name,category,icon_url,position,active,created_at) VALUES (?,?,?,?,?,NOW())",
-                        [$name,$category,$icon_url?:null,$position,$active]);
+                    execute("INSERT INTO tech_expertise (name,category,description,icon_url,lucide_icon,position,active) VALUES (?,?,?,?,?,?,?)",
+                        [$name,$category,$description?:null,$icon_url?:null,$lucide_icon,$position,$active]);
                     $success = 'Tech entry added.';
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
@@ -139,19 +141,18 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
 </div><!-- /aft-list -->
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);">
+  <div class="st-card p-tile">
+    <div class="af-editor-header">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Tech Entry':'+ Add Technology'?></h3>
       <?php if($editing):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">✕ Cancel</a><?php endif;?>
     </div>
     
-    <form method="POST" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
+    <form method="POST">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
-      <!-- Scrollable content -->
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
+      <div class="af-editor-body">
 
       <div>
         <label class="form-label">Name <span class="text-danger-token">*</span></label>

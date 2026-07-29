@@ -249,12 +249,12 @@ $__svcSlot1 = $editing['gallery_slots'][0] ?? ($editing['screenshot_url'] ?? '')
 $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
 ?>
 <div id="aft-form" style="<?=$afActive==='list'?'display:none':'display:block'?>">
-  <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;"
+  <div class="st-card p-tile af-editor-wide"
        x-data="svcForm(<?= htmlspecialchars(json_encode($editing['lucide_icon'] ?? 'layers'), ENT_QUOTES) ?>, _svcIcons, <?= htmlspecialchars(json_encode($editing['features'] ?? ''), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($__svcSlot1), ENT_QUOTES) ?>, <?= htmlspecialchars(json_encode($__svcSlot2), ENT_QUOTES) ?>)">
 
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:0.75rem;flex-wrap:wrap;">
+    <div class="af-editor-header">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'✏ Edit Service':'➕ New Service'?></h3>
-      <div style="display:flex;gap:0.5rem;align-items:center;">
+      <div class="af-editor-header__actions">
         <?php if ($editing && !empty($editing['slug'])): ?>
         <a href="<?= url('service-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="font-size:0.75rem;">View detail page</a>
         <?php endif; ?>
@@ -275,7 +275,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
       </button>
     </div>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" @invalid.capture="tab='basic'">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
@@ -285,7 +285,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
       <input type="hidden" name="screenshot_url_2" x-model="img2Url">
 
       <!-- ══ TAB: BASIC ══ -->
-      <div x-show="tab==='basic'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
+      <div x-cloak x-show="tab==='basic'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
 
         <!-- Icon button + Title -->
         <div style="display:grid;grid-template-columns:auto 1fr;gap:0.625rem;align-items:end;">
@@ -339,7 +339,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
         </div>
 
         <!-- Slug + Tagline -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Slug</label>
             <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto-generated">
@@ -351,7 +351,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
         </div>
 
         <!-- Badge + Price -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Badge</label>
             <select name="badge" class="form-input">
@@ -382,7 +382,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
       </div><!-- /basic -->
 
       <!-- ══ TAB: CONTENT ══ -->
-      <div x-show="tab==='content'" style="display:flex;flex-direction:column;gap:0.75rem;padding-bottom:2rem;">
+      <div x-cloak x-show="tab==='content'" class="af-content-editor">
         <div class="alert" style="background:color-mix(in srgb,var(--primary) 8%,var(--card));border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;line-height:1.55;">
           These fields power the public <strong>More details</strong> page.
           Summary + highlights show on listing cards; description + chips enrich the detail page.
@@ -390,16 +390,16 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
           <div style="margin-top:0.5rem;"><a href="<?= url('service-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="text-primary font-medium">Preview detail page →</a></div>
           <?php endif; ?>
         </div>
-        <div>
+        <div class="af-content-field af-content-field--wide">
           <label class="form-label">Summary <span class="caption-meta">(listing card + detail hero)</span></label>
           <textarea name="summary" class="form-input" rows="3" placeholder="Describe what this service does…"><?=e($editing['summary']??'')?></textarea>
         </div>
-        <div>
+        <div class="af-content-field af-content-field--wide">
           <label class="form-label">Full Description <span class="caption-meta">(detail page — optional)</span></label>
           <textarea name="description" class="form-input" rows="4" placeholder="Longer detail text for the More details page…"><?=e($editing['description']??'')?></textarea>
         </div>
 
-        <div>
+        <div class="af-content-field">
           <label class="form-label">Highlights <span class="caption-meta">(one per line → ✓ bullets on card &amp; detail)</span></label>
           <textarea name="highlights" class="form-input" rows="5" placeholder="Member & KYC&#10;Savings & FD&#10;Loan Lifecycle&#10;NRB Reports"><?php
             $hArr = json_decode($editing['highlights']??'[]', true);
@@ -408,7 +408,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
         </div>
 
         <!-- Feature Chips tag input -->
-        <div>
+        <div class="af-content-field">
           <label class="form-label">Feature Chips <span class="caption-meta">(pills on listing + detail)</span></label>
           <div @click="$refs.chipField.focus()"
                style="min-height:2.5rem;padding:0.3rem 0.5rem;border:1px solid var(--border);border-radius:0.5rem;background:var(--background);display:flex;flex-wrap:wrap;gap:0.3rem;align-items:center;cursor:text;">
@@ -431,7 +431,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
       </div><!-- /content -->
 
       <!-- ══ TAB: APPEARANCE ══ -->
-      <div x-show="tab==='appearance'" style="display:flex;flex-direction:column;gap:0.875rem;padding-bottom:2rem;">
+      <div x-cloak x-show="tab==='appearance'" style="display:flex;flex-direction:column;gap:0.875rem;padding-bottom:2rem;">
 
         <!-- Color swatches -->
         <div>
@@ -483,10 +483,10 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
                 </div>
               </template>
             </div>
-            <input type="file" name="screenshot_file" accept="image/png,image/jpeg,image/gif,image/webp"
+            <input type="file" id="svc-image-primary" name="screenshot_file" accept="image/png,image/jpeg,image/gif,image/webp"
                    x-ref="fileInput" class="hidden" @change="onFileChange($event)">
             <div class="af-media-slot__actions">
-              <label class="af-media-upload" @click="$refs.fileInput.click()">
+              <label class="af-media-upload" for="svc-image-primary">
                 <i data-lucide="upload" class="ic-13"></i>
                 <span x-text="imgPreview ? 'Replace' : 'Upload'"></span>
               </label>
@@ -520,10 +520,10 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
                 </div>
               </template>
             </div>
-            <input type="file" name="screenshot_file_2" accept="image/png,image/jpeg,image/gif,image/webp"
+            <input type="file" id="svc-image-secondary" name="screenshot_file_2" accept="image/png,image/jpeg,image/gif,image/webp"
                    x-ref="fileInput2" class="hidden" @change="onFileChange2($event)">
             <div class="af-media-slot__actions">
-              <label class="af-media-upload" @click="$refs.fileInput2.click()">
+              <label class="af-media-upload" for="svc-image-secondary">
                 <i data-lucide="upload" class="ic-13"></i>
                 <span x-text="img2Preview ? 'Replace' : 'Upload'"></span>
               </label>
@@ -540,7 +540,7 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
 
       <!-- Save -->
       <div class="af-form-footer" style="margin-top:1rem;padding-top:0.875rem;border-top:1px solid var(--border);flex-shrink:0;">
-        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Service':'Add Service'?></button>
+        <button type="submit" class="btn btn-primary flex-1" @click="tab='basic'"><?=$editing?'Update Service':'Add Service'?></button>
       </div>
     </form>
   </div>
@@ -582,8 +582,31 @@ function svcForm(initIcon, allIcons, rawChips, existingImg, existingImg2) {
     imgUrl: existingImg || '',
     imgPreview: existingImg || '',
     imgDrag: false,
+    validImage(f) {
+      const allowed = ['image/jpeg','image/png','image/webp','image/gif'];
+      if (!allowed.includes(f.type)) {
+        alert('Please choose a JPG, PNG, WebP, or GIF image.');
+        return false;
+      }
+      if (f.size > 5 * 1024 * 1024) {
+        alert('Image is too large. Maximum size is 5 MB.');
+        return false;
+      }
+      return true;
+    },
+    attachDroppedFile(input, file) {
+      try {
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        input.files = transfer.files;
+        return input.files.length === 1;
+      } catch (error) {
+        return false;
+      }
+    },
     onFileChange(e) {
       const f = e.target.files[0]; if (!f) return;
+      if (!this.validImage(f)) { e.target.value = ''; return; }
       const r = new FileReader();
       r.onload = ev => { this.imgPreview = ev.target.result; this.imgUrl = ''; };
       r.readAsDataURL(f);
@@ -591,8 +614,11 @@ function svcForm(initIcon, allIcons, rawChips, existingImg, existingImg2) {
     onDrop(e) {
       this.imgDrag = false;
       const f = e.dataTransfer.files[0];
-      if (!f || !f.type.startsWith('image/')) return;
-      this.$refs.fileInput.files = e.dataTransfer.files;
+      if (!f || !this.validImage(f)) return;
+      if (!this.attachDroppedFile(this.$refs.fileInput, f)) {
+        alert('Drag-and-drop is not supported here. Please use the Upload button.');
+        return;
+      }
       const r = new FileReader(); r.onload = ev => { this.imgPreview = ev.target.result; this.imgUrl = ''; };
       r.readAsDataURL(f);
     },
@@ -603,6 +629,7 @@ function svcForm(initIcon, allIcons, rawChips, existingImg, existingImg2) {
     img2Drag: false,
     onFileChange2(e) {
       const f = e.target.files[0]; if (!f) return;
+      if (!this.validImage(f)) { e.target.value = ''; return; }
       const r = new FileReader();
       r.onload = ev => { this.img2Preview = ev.target.result; this.img2Url = ''; };
       r.readAsDataURL(f);
@@ -610,8 +637,11 @@ function svcForm(initIcon, allIcons, rawChips, existingImg, existingImg2) {
     onDrop2(e) {
       this.img2Drag = false;
       const f = e.dataTransfer.files[0];
-      if (!f || !f.type.startsWith('image/')) return;
-      this.$refs.fileInput2.files = e.dataTransfer.files;
+      if (!f || !this.validImage(f)) return;
+      if (!this.attachDroppedFile(this.$refs.fileInput2, f)) {
+        alert('Drag-and-drop is not supported here. Please use the Upload button.');
+        return;
+      }
       const r = new FileReader(); r.onload = ev => { this.img2Preview = ev.target.result; this.img2Url = ''; };
       r.readAsDataURL(f);
     },

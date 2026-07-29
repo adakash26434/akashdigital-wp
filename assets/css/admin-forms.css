@@ -243,12 +243,175 @@
 }
 
 /* ── Tab layout: full-width form ─────────────────────── */
+[x-cloak] {
+  display: none !important;
+}
+
 #aft-form .st-card.p-tile {
-  max-width: 720px;
+  max-width: 760px;
   width: 100%;
+  margin-inline: auto;
+  max-height: none !important;
+  overflow: visible !important;
+}
+#aft-form .st-card.p-tile.af-editor-wide {
+  max-width: 960px;
 }
 #aft-form .st-card.p-card-lg {
   max-width: none;
+}
+#aft-form .af-editor-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding-bottom: 0.875rem;
+  border-bottom: 1px solid var(--border);
+}
+#aft-form .af-editor-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+#aft-form .af-editor-body {
+  display: grid;
+  gap: 0.875rem;
+  min-width: 0;
+  overflow: visible;
+}
+#aft-form .af-tab-bar {
+  position: sticky;
+  top: 4.25rem;
+  z-index: 8;
+  margin-inline: -0.35rem;
+  padding: 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--card) 94%, transparent);
+  box-shadow: 0 4px 16px rgba(15,23,42,0.05);
+  backdrop-filter: blur(12px);
+}
+#aft-form .af-tab-btn {
+  flex: 1 1 0;
+  min-width: max-content;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.55rem;
+}
+#aft-form .af-tab-btn.active {
+  background: var(--primary-light);
+  box-shadow: none;
+}
+#aft-form .af-tab-pane {
+  padding: 0.5rem 0 1.25rem !important;
+}
+#aft-form textarea.form-input {
+  line-height: 1.55;
+  background: var(--background);
+}
+#aft-form textarea[name="summary"] {
+  min-height: 5rem;
+}
+#aft-form textarea[name="description"] {
+  min-height: 10rem;
+}
+#aft-form textarea[name="features"],
+#aft-form textarea[name="highlights"] {
+  min-height: 7rem;
+}
+#aft-form .af-content-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+  align-items: start;
+}
+#aft-form .af-tab-pane.af-content-editor {
+  display: none !important;
+}
+#aft-form .af-tab-pane.af-content-editor.active {
+  display: grid !important;
+}
+#aft-form .af-content-editor > .alert,
+#aft-form .af-content-field--wide {
+  grid-column: 1 / -1;
+}
+#aft-form .af-content-field {
+  min-width: 0;
+  padding: 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: color-mix(in srgb, var(--muted) 45%, var(--card));
+}
+#aft-form .af-content-field .form-label {
+  margin-bottom: 0.5rem;
+  color: var(--foreground);
+  font-size: 0.75rem;
+}
+#aft-form .af-content-field .caption-meta {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--muted-foreground);
+  font-size: 0.65rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+#aft-form .af-form-footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 7;
+  margin: 1rem -0.5rem -0.5rem;
+  padding: 0.75rem 0.5rem 0.5rem;
+  background: linear-gradient(180deg, transparent, var(--card) 24%);
+}
+@media (max-width: 720px) {
+  #aft-form .st-card.p-tile {
+    padding: 1rem;
+    border-radius: 0.875rem;
+  }
+  #aft-form .af-editor-header {
+    align-items: flex-start;
+  }
+  #aft-form .af-editor-header__actions {
+    width: 100%;
+  }
+  #aft-form .af-editor-header__actions .btn {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+  #aft-form .af-tab-bar {
+    top: 3.75rem;
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  #aft-form .af-tab-btn {
+    flex: 0 0 auto;
+  }
+  #aft-form .af-content-editor {
+    grid-template-columns: 1fr;
+  }
+  #aft-form .af-content-editor > .alert,
+  #aft-form .af-content-field--wide {
+    grid-column: auto;
+  }
+  /* Older admin forms still use inline desktop grids. Keep every create/edit
+     form readable on phones until those pages migrate to .form-grid-* helpers. */
+  #main-content form [style*="grid-template-columns:1fr 1fr"],
+  #main-content form [style*="grid-template-columns: 1fr 1fr"],
+  #main-content form [style*="grid-template-columns:repeat(2"],
+  #main-content form [style*="grid-template-columns: repeat(2"],
+  #main-content form [style*="grid-template-columns:repeat(3"],
+  #main-content form [style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (max-height: 680px) {
+  #aft-form .af-form-footer {
+    position: static;
+  }
 }
 
 /* ── Form section dividers ───────────────────────────── */

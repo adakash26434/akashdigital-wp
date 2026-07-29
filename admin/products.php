@@ -253,10 +253,10 @@ if (!empty($_GET['edit'])) {
 </div><!-- /aft-list -->
 
 <div id="aft-form" style="<?=$afActive==='form'?'display:block':'display:none'?>">
-  <div class="st-card p-tile" style="max-height:calc(100vh - 120px);overflow-y:auto;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);flex-shrink:0;gap:0.75rem;flex-wrap:wrap;">
+  <div class="st-card p-tile af-editor-wide">
+    <div class="af-editor-header">
       <h3 class="h-eyebrow-tight" style="margin:0;"><?= $editing ? '✏ Edit Product' : '➕ New Product' ?></h3>
-      <div style="display:flex;gap:0.5rem;align-items:center;">
+      <div class="af-editor-header__actions">
         <?php if ($editing && !empty($editing['slug'])): ?>
         <a href="<?= url('product-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="btn btn-outline btn-sm" style="font-size:0.75rem;">View detail page</a>
         <?php endif; ?>
@@ -270,14 +270,14 @@ if (!empty($_GET['edit'])) {
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
 
       <!-- Tab nav — sticky at top -->
-      <div style="display:flex;gap:0.5rem;margin-bottom:1rem;padding-bottom:0.75rem;border-bottom:2px solid var(--border);flex-shrink:0;">
-        <button type="button" class="af-tab-btn active" data-tab="basic" style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--primary);border-bottom-color:var(--primary);" onclick="switchTab(this,'basic')">
+      <div class="af-tab-bar">
+        <button type="button" class="af-tab-btn active" data-tab="basic" onclick="switchTab(this,'basic')">
           <i data-lucide="info" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Basic
         </button>
-        <button type="button" class="af-tab-btn" data-tab="content" style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--muted-foreground);border-bottom-color:transparent;" onclick="switchTab(this,'content')">
+        <button type="button" class="af-tab-btn" data-tab="content" onclick="switchTab(this,'content')">
           <i data-lucide="file-text" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Content
         </button>
-        <button type="button" class="af-tab-btn" data-tab="homepage" style="padding:0.5rem 1rem;border:none;border-bottom:3px solid;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--muted-foreground);border-bottom-color:transparent;" onclick="switchTab(this,'homepage')">
+        <button type="button" class="af-tab-btn" data-tab="homepage" onclick="switchTab(this,'homepage')">
           <i data-lucide="home" style="width:13px;height:13px;display:inline;vertical-align:middle;margin-right:0.4rem;"></i>Homepage
         </button>
       </div>
@@ -340,7 +340,7 @@ if (!empty($_GET['edit'])) {
         <input type="hidden" name="lucide_icon" x-model="icon">
         <input type="hidden" name="icon_color" x-model="iconColor">
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Slug</label>
             <input type="text" name="slug" class="form-input" value="<?=e($editing['slug']??'')?>" placeholder="auto">
@@ -383,7 +383,7 @@ if (!empty($_GET['edit'])) {
           <input type="text" name="tagline" class="form-input" value="<?=e($editing['tagline']??'')?>" placeholder="e.g., Fast & Secure Banking" maxlength="80">
           <span class="form-hint">Optional. Short one-liner (max 80 chars) describing the product.</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Price From</label>
             <input type="number" name="price_from" class="form-input" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="4999">
@@ -399,7 +399,7 @@ if (!empty($_GET['edit'])) {
             </select>
           </div>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Position</label>
             <input type="number" name="position" class="form-input" value="<?=e($editing['position']??0)?>">
@@ -414,7 +414,7 @@ if (!empty($_GET['edit'])) {
       </div>
 
       <!-- Tab: Content -->
-      <div class="af-tab-pane" data-tab-pane="content" style="padding-bottom:2rem;">
+      <div class="af-tab-pane af-content-editor" data-tab-pane="content">
         <div class="alert" style="background:color-mix(in srgb,var(--primary) 8%,var(--card));border:1px solid color-mix(in srgb,var(--primary) 22%,var(--border));border-radius:0.5rem;padding:0.75rem 1rem;font-size:0.8125rem;line-height:1.55;margin-bottom:0.75rem;">
           These fields power the public <strong>More details</strong> page (<code>product-detail.php</code>).
           Summary + highlights also appear on the listing cards. Fill description and features for a richer detail page.
@@ -422,19 +422,19 @@ if (!empty($_GET['edit'])) {
           <div style="margin-top:0.5rem;"><a href="<?= url('product-detail.php?slug=' . urlencode($editing['slug'])) ?>" target="_blank" rel="noopener" class="text-primary font-medium">Preview detail page →</a></div>
           <?php endif; ?>
         </div>
-        <div>
+        <div class="af-content-field af-content-field--wide">
           <label class="form-label">Short Summary <span class="caption-meta">(listing card + detail hero)</span></label>
           <textarea name="summary" class="form-input fs-sm-r" rows="2" placeholder="One short paragraph visitors see first…"><?=e($editing['summary']??'')?></textarea>
         </div>
-        <div>
+        <div class="af-content-field af-content-field--wide">
           <label class="form-label">Full Description <span class="caption-meta">(detail page — plain text preferred)</span></label>
           <textarea name="description" class="form-input fs-sm-r" rows="5" placeholder="Longer explanation shown on More details…"><?=e($editing['description']??'')?></textarea>
         </div>
-        <div>
+        <div class="af-content-field">
           <label class="form-label">Features <span class="caption-meta">(one per line → detail page checklist)</span></label>
           <textarea name="features" class="form-input fs-sm-r" rows="4" placeholder="NRB-compliant reports&#10;Mobile Banking&#10;Multi-branch support"><?=e($editing['features_text']??'')?></textarea>
         </div>
-        <div>
+        <div class="af-content-field">
           <label class="form-label">Highlights <span class="caption-meta">(one per line → listing card bullets)</span></label>
           <textarea name="highlights" class="form-input fs-sm-r" rows="2" placeholder="120+ cooperatives&#10;24/7 support"><?=e($editing['highlights_text']??'')?></textarea>
         </div>
@@ -453,7 +453,7 @@ if (!empty($_GET['edit'])) {
             <input type="checkbox" name="home_card_dark" value="1" <?=($editing['home_card_dark']??0)?'checked':''?>> Dark card
           </label>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+        <div class="form-grid-2" style="gap:0.5rem;">
           <div>
             <label class="form-label">Home Position</label>
             <input type="number" name="home_position" class="form-input" value="<?=e($editing['home_position']??0)?>">
@@ -696,10 +696,6 @@ function updatePreview() {
 
 // Wire up all relevant inputs
 document.addEventListener('DOMContentLoaded', function() {
-  // Ensure first tab pane is visible on load
-  var activePane = document.querySelector('.af-tab-pane.active');
-  if (activePane) activePane.style.display = 'flex';
-  
   var triggers = ['name','tagline','badge','price_from','summary','lucide_icon'];
   triggers.forEach(function(n) {
     var el = document.querySelector('[name='+n+']');
@@ -708,6 +704,17 @@ document.addEventListener('DOMContentLoaded', function() {
   var sel = document.querySelector('[name=icon_color]');
   if (sel) sel.addEventListener('change', updatePreview);
   updatePreview();
+
+  var editorForm = document.querySelector('#aft-form form');
+  if (editorForm) {
+    editorForm.addEventListener('invalid', function(event) {
+      var pane = event.target.closest('.af-tab-pane');
+      if (!pane) return;
+      var tabName = pane.getAttribute('data-tab-pane');
+      var button = document.querySelector('.af-tab-btn[data-tab="' + tabName + '"]');
+      if (button) switchTab(button, tabName);
+    }, true);
+  }
 });
 
 function stAdminUpload(input, urlFieldId, prevId, previewBoxId) {

@@ -59,6 +59,11 @@ $edit = null;
 if (!empty($_GET['edit'])) {
     try { $edit = queryOne("SELECT * FROM announcements WHERE id=?", [(int)$_GET['edit']]); } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
 }
+$formatDatetimeLocal = static function ($value): string {
+    if (!$value) return '';
+    $timestamp = strtotime((string)$value);
+    return $timestamp === false ? '' : date('Y-m-d\TH:i', $timestamp);
+};
 
 $TYPES = ['info'=>['','#dbeafe','var(--primary-dark)'],'success'=>['','var(--success-soft)','var(--success-fg)'],'warning'=>['','var(--warning-soft)','var(--warning-fg)'],'danger'=>['','var(--danger-soft)','var(--danger-fg)'],'promo'=>['','#f3e8ff','#7e22ce']];
 $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast'=>'Toast Notification'];
@@ -136,21 +141,20 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
 </div><!-- /aft-list -->
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);">
+  <div class="st-card p-tile">
+    <div class="af-editor-header">
       <h3 class="h-eyebrow-tight" style="margin:0;">
         <?=$edit?'Edit Announcement':'New Announcement'?>
       </h3>
       <?php if($edit):?><a href="?" class="btn btn-ghost btn-sm" style="font-size:0.75rem;">Cancel</a><?php endif;?>
     </div>
     
-    <form method="POST" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
+    <form method="POST">
       <?=csrfField()?>
       <input type="hidden" name="action" value="save">
       <?php if($edit):?><input type="hidden" name="id" value="<?=$edit['id']?>"><?php endif;?>
 
-      <!-- Scrollable content -->
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
+      <div class="af-editor-body">
 
       <div>
         <label class="form-label">Title <span class="text-danger-token">*</span></label>
@@ -162,7 +166,7 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
         <textarea name="body" class="form-input" rows="3" placeholder="Optional description..."><?=e($edit['body']??'')?></textarea>
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div class="form-grid-2" style="gap:0.75rem;">
         <div>
           <label class="form-label">Type</label>
           <select name="type" class="form-input">
@@ -200,14 +204,14 @@ $SCOPES = ['banner'=>'Inline Banner (top of page)','popup'=>'Modal Popup','toast
         <input type="url" name="btn_url" class="form-input" value="<?=e($edit['btn_url']??'')?>" placeholder="https://...">
       </div>
 
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+      <div class="form-grid-2" style="gap:0.75rem;">
         <div>
           <label class="form-label">Starts At</label>
-          <input type="datetime-local" data-bs-picker name="starts_at" class="form-input" value="<?=e($edit['starts_at']??'')?>">
+          <input type="datetime-local" data-bs-picker name="starts_at" class="form-input" value="<?=e($formatDatetimeLocal($edit['starts_at'] ?? null))?>">
         </div>
         <div>
           <label class="form-label">Ends At</label>
-          <input type="datetime-local" data-bs-picker name="ends_at" class="form-input" value="<?=e($edit['ends_at']??'')?>">
+          <input type="datetime-local" data-bs-picker name="ends_at" class="form-input" value="<?=e($formatDatetimeLocal($edit['ends_at'] ?? null))?>">
         </div>
       </div>
 

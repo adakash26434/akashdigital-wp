@@ -241,8 +241,8 @@ $__s = siteSettings();
 </div><!-- /aft-list -->
 
 <div id="aft-form" <?=$afActive==='list'?'style="display:none"':''?>>
-  <div class="st-card p-tile" style="display:flex;flex-direction:column;min-height:0;max-height:calc(100vh - 160px);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;padding-bottom:0.875rem;border-bottom:1px solid var(--border);gap:0.75rem;flex-wrap:wrap;">
+  <div class="st-card p-tile af-editor-wide">
+    <div class="af-editor-header">
       <div>
         <h3 class="h-eyebrow-tight" style="margin:0;"><?=$editing?'Edit Post':'New Post'?></h3>
         <p style="margin:0.35rem 0 0;font-size:0.75rem;color:var(--muted-foreground);line-height:1.4;">
@@ -252,7 +252,7 @@ $__s = siteSettings();
       <a href="?" class="btn btn-outline btn-sm">← Back to list</a>
     </div>
 
-    <form method="POST" id="news-admin-form" style="display:flex;flex-direction:column;overflow:hidden;flex:1;">
+    <form method="POST" id="news-admin-form">
       <?=csrfField()?>
       <input type="hidden" name="action" value="<?=$editing?'update':'create'?>">
       <?php if($editing):?><input type="hidden" name="id" value="<?=$editing['id']?>"><?php endif;?>
@@ -266,7 +266,7 @@ $__s = siteSettings();
         </button>
       </div>
 
-      <div style="flex:1;overflow-y:auto;padding-right:0.5rem;margin-right:-0.5rem;">
+      <div class="af-editor-body">
 
       <div class="af-tab-pane active" data-tab-pane="content" style="padding-bottom:2rem;display:flex;flex-direction:column;gap:1rem;">
         <div>
@@ -276,7 +276,7 @@ $__s = siteSettings();
                  oninput="newsAutoSlug()">
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;">
+        <div class="form-grid-2" style="gap:0.75rem;">
           <div>
             <label class="form-label">Category</label>
             <select name="category" class="form-input">
@@ -301,7 +301,7 @@ $__s = siteSettings();
               </div>
             </div>
           </div>
-          <div style="display:grid;grid-template-columns:1fr 1.4fr;gap:0.75rem;">
+          <div class="form-grid-2" style="gap:0.75rem;">
             <div>
               <label class="form-label">Portal name</label>
               <input type="text" name="source_name" maxlength="120" class="form-input"
@@ -352,7 +352,7 @@ $__s = siteSettings();
 
         <details style="border:1px solid var(--border);border-radius:0.75rem;padding:0.75rem 1rem;background:var(--muted);">
           <summary style="cursor:pointer;font-size:0.8125rem;font-weight:600;color:var(--foreground);user-select:none;">Advanced: slug &amp; author</summary>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-top:0.75rem;">
+          <div class="form-grid-2" style="gap:0.75rem;margin-top:0.75rem;">
             <div>
               <label class="form-label">URL slug</label>
               <input type="text" name="slug" id="news-slug" maxlength="100" class="form-input"
@@ -369,7 +369,7 @@ $__s = siteSettings();
         </details>
       </div>
 
-      <div class="af-tab-pane" data-tab-pane="publish" style="display:none;padding-bottom:2rem;">
+      <div class="af-tab-pane" data-tab-pane="publish">
         <div style="display:flex;flex-direction:column;gap:1rem;">
           <div>
             <label class="form-label">Tags <span style="font-weight:400;color:var(--muted-foreground);">(comma-separated)</span></label>
@@ -411,20 +411,25 @@ $__s = siteSettings();
 <script>
 function switchTab(btn, tabName) {
   document.querySelectorAll('.af-tab-btn').forEach(function(b){
-    b.style.color = 'var(--muted-foreground)';
-    b.style.borderBottomColor = 'transparent';
     b.classList.remove('active');
   });
-  btn.style.color = 'var(--primary)';
-  btn.style.borderBottomColor = 'var(--primary)';
   btn.classList.add('active');
 
   document.querySelectorAll('.af-tab-pane').forEach(function(p){
-    p.style.display = 'none';
+    p.classList.remove('active');
+    p.style.display = '';
   });
   var pane = document.querySelector('[data-tab-pane="'+tabName+'"]');
-  if (pane) pane.style.display = (tabName === 'content') ? 'flex' : 'block';
+  if (pane) pane.classList.add('active');
 }
+
+document.getElementById('news-admin-form')?.addEventListener('invalid', function(event) {
+  var pane = event.target.closest('.af-tab-pane');
+  if (!pane) return;
+  var tabName = pane.getAttribute('data-tab-pane');
+  var button = document.querySelector('.af-tab-btn[data-tab="' + tabName + '"]');
+  if (button) switchTab(button, tabName);
+}, true);
 
 function newsSlugify(s) {
   return String(s || '').toLowerCase()
