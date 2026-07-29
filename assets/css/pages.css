@@ -3194,6 +3194,12 @@ html.dark .footer-input::placeholder { color: rgba(241,245,249,0.35); }
 }
 
 /* ── Portal profile layout ────────────────────────────────────── */
+.portal-page-lead {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+}
 .portal-profile-grid {
   display: grid;
   grid-template-columns: 1fr;

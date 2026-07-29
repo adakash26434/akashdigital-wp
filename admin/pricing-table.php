@@ -106,7 +106,7 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
   <?= csrfField() ?>
   <input type="hidden" name="action" value="save-table">
 
-  <div class="af-split">
+  <div class="af-split af-split--natural">
 
     <!-- LEFT: feature name editor -->
     <div class="st-card p-tile col-1">
@@ -224,7 +224,7 @@ $features_str = implode("\n", array_map(fn($r) => $r['feature'], $table_data));
     </div><!-- /left -->
 
     <!-- RIGHT: live preview panel -->
-    <div class="af-panel">
+    <div class="af-panel af-panel--natural">
       <div class="st-card p-tile">
         <p class="h-eyebrow-tight" style="margin-bottom:0.75rem;">Preview</p>
         <div style="overflow-x:auto;">

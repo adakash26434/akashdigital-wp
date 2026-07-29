@@ -29,7 +29,7 @@ if (empty($orders)) {
 
 <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;">
   <div>
-    <h1 style="font-family:var(--font-display);font-size:1.375rem;font-weight:700;color:var(--foreground);">My Products & Orders</h1>
+    <p class="portal-page-lead"><?= e(isNepali() ? 'तपाईंका सक्रिय उत्पादन र अर्डरहरू' : 'Your active products and order history') ?></p>
     <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:0.25rem;">
       <?= count($orders) ?> order<?= count($orders)!==1?'s':'' ?> · Manage your licenses and renewals
     </p>

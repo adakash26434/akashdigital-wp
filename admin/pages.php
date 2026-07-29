@@ -127,7 +127,7 @@ $__hlDefs = [
       ?>
       <div class="st-card" style="padding:0.875rem;background:var(--background);">
         <div style="font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.625rem;">Card <?= $i ?></div>
-        <div style="display:grid;grid-template-columns:120px 1fr 2fr;gap:0.625rem;">
+        <div class="form-grid-kv">
           <div>
             <label class="form-label" style="font-size:0.7rem;">Icon (Lucide)</label>
             <input type="hidden" name="bulk_keys[]" value="services_why_<?= $i ?>_icon">
@@ -174,7 +174,7 @@ $__hlDefs = [
       ?>
       <div class="st-card" style="padding:0.875rem;background:var(--background);">
         <div style="font-size:0.6875rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted-foreground);margin-bottom:0.625rem;">Highlight <?= $i ?></div>
-        <div style="display:grid;grid-template-columns:120px 1fr 2fr;gap:0.625rem;">
+        <div class="form-grid-kv">
           <div>
             <label class="form-label" style="font-size:0.7rem;">Icon (Lucide)</label>
             <input type="hidden" name="bulk_keys[]" value="about_highlight_<?= $i ?>_icon">
@@ -200,7 +200,7 @@ $__hlDefs = [
   </form>
 </div>
 
-<div class="af-split">
+<div class="af-split af-split--natural">
 
   <!-- Settings Table -->
   <div>
@@ -255,7 +255,7 @@ $__hlDefs = [
   </div>
 
   <!-- Form -->
-  <div class="af-panel">
+  <div class="af-panel af-panel--natural">
     <div class="st-card p-tile" style="margin-bottom:1.25rem;">
       <h3 class="h-eyebrow-tight"><?= $edit_row ? 'Edit Setting: <code class="fs-sm2">'.e($edit_key).'</code>' : 'Add / Update Setting' ?></h3>
       <form method="POST" class="col-1-tight">

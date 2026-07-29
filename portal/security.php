@@ -54,7 +54,7 @@ $setupSecret = $_SESSION['totp_setup_secret'] ?? '';
 $enabled     = !empty($__user['totp_enabled']);
 ?>
 <div style="max-width:640px;">
-  <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;margin-bottom:0.25rem;">Two-Factor Authentication</h1>
+  <p class="portal-page-lead" style="margin-bottom:0.25rem;"><?= e(isNepali() ? 'तपाईंको खाता अझ सुरक्षित बनाउनुहोस्' : 'Add an extra layer of protection to your account') ?></p>
   <p style="color:var(--muted-foreground);font-size:0.875rem;margin-bottom:1.5rem;">
     Protect your account with a second step at sign-in using an authenticator app.
   </p>

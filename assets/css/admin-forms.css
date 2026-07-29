@@ -68,6 +68,22 @@
   grid-template-columns: minmax(4.5rem, 5.5rem) minmax(0, 1fr);
   gap: 0.5rem;
 }
+.form-grid-meta--rev {
+  grid-template-columns: minmax(0, 1fr) minmax(4.5rem, 5.5rem);
+}
+.form-grid-kv {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 7.5rem) minmax(0, 1fr) minmax(0, 2fr);
+  gap: 0.625rem;
+  align-items: start;
+}
+.af-panel.af-panel--natural,
+.af-split--natural .af-panel {
+  position: static;
+  top: auto;
+  max-height: none;
+  overflow: visible;
+}
 
 /* ── Inline form group ───────────────────────────────── */
 .form-group {
@@ -610,7 +626,9 @@
   }
   .form-grid-2,
   .form-grid-3,
-  .form-grid-meta {
+  .form-grid-meta,
+  .form-grid-meta--rev,
+  .form-grid-kv {
     grid-template-columns: 1fr !important;
   }
 }

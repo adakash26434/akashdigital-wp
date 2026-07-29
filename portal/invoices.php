@@ -43,8 +43,7 @@ $ORDER_STATUS = [
 <!-- Summary stats -->
 <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.75rem;">
   <div>
-    <h1 style="font-family:var(--font-display);font-size:1.375rem;font-weight:700;color:var(--foreground);">Invoices & Billing</h1>
-    <p style="font-size:0.875rem;color:var(--muted-foreground);margin-top:0.25rem;">Your subscription history and payment records</p>
+    <p class="portal-page-lead"><?= e(isNepali() ? 'तपाईंको सदस्यता र भुक्तानी इतिहास' : 'Your subscription history and payment records') ?></p>
   </div>
   <a href="<?= url('portal/tickets-new.php') ?>" class="btn btn-outline btn-sm"> Billing Query →</a>
 </div>

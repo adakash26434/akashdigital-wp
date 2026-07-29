@@ -92,7 +92,7 @@ catch (\Throwable $e) {
       <div style="width:2.25rem;height:2.25rem;border-radius:9999px;background:var(--primary-light);display:grid;place-items:center;font-size:0.875rem;font-weight:700;color:var(--primary);flex-shrink:0;"><?=strtoupper(substr($t['author_name'],0,1))?></div>
       <div class="flex-1-min">
         <div class="fw-strong"><?=e($t['author_name'])?> <span style="font-weight:400;color:var(--muted-foreground);">· <?=e($t['author_role']??'') ?><?=!empty($t['author_org'])?' @ '.e($t['author_org']):''; ?></span></div>
-        <div style="font-size:0.75rem;color:#f59e0b;"><?=str_repeat('',$t['rating']??5)?><span style="color:var(--border);"><?=str_repeat('',5-($t['rating']??5))?></span></div>
+        <div style="font-size:0.75rem;color:#f59e0b;letter-spacing:0.04em;"><?= str_repeat('★', (int)($t['rating'] ?? 5)) ?><span style="color:var(--border);"><?= str_repeat('☆', max(0, 5 - (int)($t['rating'] ?? 5))) ?></span></div>
       </div>
       <div style="display:flex;gap:0.375rem;flex-shrink:0;">
         <a href="?edit=<?=$t['id']?>" class="btn btn-ghost btn-sm" title="Edit" style="padding:.25rem .4375rem;"><i data-lucide="pencil" style="width:14px;height:14px;pointer-events:none;"></i></a>
@@ -160,12 +160,12 @@ catch (\Throwable $e) {
           <?php endforeach;?>
         </select>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 80px;gap:0.5rem;">
+      <div class="form-grid-meta form-grid-meta--rev" style="gap:0.5rem;">
         <div>
           <label class="form-label">Rating (1–5 )</label>
           <select name="rating" class="form-input">
             <?php for($i=5;$i>=1;$i--):?>
-            <option value="<?=$i?>" <?=($editing['rating']??5)==$i?'selected':''?>><?=str_repeat('',$i)?></option>
+            <option value="<?=$i?>" <?=($editing['rating']??5)==$i?'selected':''?>><?= str_repeat('★', $i) . str_repeat('☆', 5 - $i) ?></option>
             <?php endfor;?>
           </select>
         </div>
