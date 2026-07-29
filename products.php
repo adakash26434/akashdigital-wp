@@ -160,8 +160,9 @@ ob_start(); ?>
               <i data-lucide="arrow-right"></i>
             </a>
             <?php if (!empty($productsFromDb) && !empty($p['slug'])): ?>
-            <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-ghost btn-md" style="color:var(--primary);">
+            <a href="<?= url('product-detail.php?slug=' . urlencode($p['slug'])) ?>" class="btn btn-md product-card__details">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
+              <i data-lucide="arrow-up-right"></i>
             </a>
             <?php endif; ?>
           </div>

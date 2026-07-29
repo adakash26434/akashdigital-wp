@@ -188,22 +188,15 @@ ob_start(); ?>
           </div>
           <?php endif; ?>
 
-          <?php if (!empty($svc['screenshot_url'])): ?>
-          <div class="product-card__shot">
-            <img src="<?= e($svc['screenshot_url']) ?>"
-                 alt="<?= e($svc['name']) ?> screenshot"
-                 loading="lazy">
-          </div>
-          <?php endif; ?>
-
           <div class="product-card__actions">
             <a href="<?= url('contact.php') ?>?service=<?= urlencode($svc['name']) ?>" class="btn btn-outline btn-md">
               <?= e(__('services_get_quote')) ?>
               <i data-lucide="arrow-right"></i>
             </a>
             <?php if (!empty($servicesFromDb) && !empty($svc['slug'])): ?>
-            <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-ghost btn-md" style="color:var(--primary);">
+            <a href="<?= url('service-detail.php?slug=' . urlencode($svc['slug'])) ?>" class="btn btn-md product-card__details">
               <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
+              <i data-lucide="arrow-up-right"></i>
             </a>
             <?php endif; ?>
           </div>

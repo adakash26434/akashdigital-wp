@@ -597,22 +597,8 @@ include 'includes/stats-bar.php';
           $pFeats = json_decode($prod['features']   ?? '[]', true) ?: [];
           $tIcon  = $prod['lucide_icon'] ?: 'box';
           $tColor = $prod['icon_color'] ?? 'blue';
-          $hasSS  = !empty($prod['demo_screenshot_url']);
         ?>
         <div id="tab-<?= e($tSlug) ?>" class="tab-pane <?= $i===0?'active':'' ?>">
-          <?php if($hasSS): ?>
-          <div style="border-radius:var(--radius-2xl);overflow:hidden;box-shadow:0 24px 80px rgba(15,23,42,.12);border:1px solid var(--border);">
-            <div class="wc">
-              <span class="wd dot-danger"></span><span class="wd dot-warning"></span><span class="wd dot-success"></span>
-              <div class="pill-row">
-                <i data-lucide="lock" class="ic-9 text-success"></i>
-                <span class="mono-meta"><?= e($prod['name']) ?></span>
-              </div>
-            </div>
-            <img src="<?= e($prod['demo_screenshot_url']) ?>" alt="<?= e($prod['name']) ?>" loading="lazy"
-                 style="width:100%;display:block;max-height:32rem;object-fit:cover;object-position:top;">
-          </div>
-          <?php else: ?>
           <div style="border-radius:var(--radius-2xl);border:1px solid var(--border);overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,.07);">
             <div class="wc">
               <span class="wd dot-danger"></span><span class="wd dot-warning"></span><span class="wd dot-success"></span>
@@ -651,7 +637,6 @@ include 'includes/stats-bar.php';
               </a>
             </div>
           </div>
-          <?php endif; ?>
         </div>
         <?php endforeach; ?>
       </div><!-- /prod-panel -->
