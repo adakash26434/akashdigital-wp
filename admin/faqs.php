@@ -75,7 +75,6 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> FAQs (<?=count($faqs)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add FAQ</a>
   </div>
 
   <?php if(empty($faqs)):?>

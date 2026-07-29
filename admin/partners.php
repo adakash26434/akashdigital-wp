@@ -152,11 +152,10 @@ sort($DISTRICTS);
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Partners & Clients (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Partner</a>
   </div>
 
   <?php if(empty($items)):?>
-    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No partners yet. Click "+ Add Partner" to get started.</div>
+    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No partners yet. Use the <strong>+ NEW</strong> tab to add one.</div>
   <?php else:?>
   <div class="st-card ov-hidden">
   <div class="tbl-wrap" style="overflow-x:auto;-webkit-overflow-scrolling:touch;">

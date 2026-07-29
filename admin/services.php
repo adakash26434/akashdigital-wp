@@ -205,7 +205,6 @@ $ICONS_JSON = json_encode($ICONS);
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat">Services (<?=count($services)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Service</a>
   </div>
   <div style="display:flex;flex-direction:column;gap:0.375rem;">
     <?php if(empty($services)):?>

@@ -203,7 +203,7 @@ if (!empty($_GET['edit'])) {
       </tr></thead>
       <tbody>
         <?php if(empty($products)):?>
-        <tr><td colspan="5" class="p-empty">No products yet. Click "+ Add Product" to get started.</td></tr>
+        <tr><td colspan="5" class="p-empty">No products yet. Use the <strong>+ NEW</strong> tab to add one.</td></tr>
         <?php else: foreach($products as $p): $active=(bool)$p['active']; ?>
         <tr style="border-bottom:1px solid var(--border);transition:background 0.12s;" onmouseover="this.style.background='var(--muted)'" onmouseout="this.style.background='transparent'">
           <td class="p-row">

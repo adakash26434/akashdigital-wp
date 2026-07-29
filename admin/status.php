@@ -202,7 +202,7 @@ function stTab(id) {
         <label class="form-label">Description</label>
         <input name="description" class="form-input" value="<?=e($editComp['description']??'')?>" placeholder="Brief description…">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div class="form-grid-2" style="gap:.75rem;">
         <div>
           <label class="form-label">Status</label>
           <select name="status" class="form-input">
@@ -320,7 +320,7 @@ function stTab(id) {
         <label class="form-label">Title <span class="text-danger-token">*</span></label>
         <input name="title" required class="form-input" placeholder="e.g. CBS login delays">
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+      <div class="form-grid-2" style="gap:.75rem;">
         <div>
           <label class="form-label">Component</label>
           <select name="component_id" class="form-input">

@@ -118,7 +118,6 @@ if (!empty($_GET['edit'])) {
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Team Members (<?=count($team)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Member</a>
   </div>
 
   <?php

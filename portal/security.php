@@ -72,12 +72,12 @@ $enabled     = !empty($__user['totp_enabled']);
       <form method="post" class="mt-1">
         <?= csrfField() ?>
         <input type="hidden" name="action" value="disable">
-        <label style="display:block;font-size:0.8125rem;font-weight:600;margin-bottom:0.5rem;">
-          Enter current 6-digit code to disable
-        </label>
-        <input type="text" name="code" maxlength="6" inputmode="numeric" required
-               style="padding:0.625rem;border:1px solid var(--border);border-radius:0.5rem;letter-spacing:0.2rem;font-size:1rem;width:160px;">
-        <button class="btn btn-outline btn-sm" style="margin-left:0.5rem;">Disable 2FA</button>
+        <label class="form-label" for="totp-disable-code">Enter current 6-digit code to disable</label>
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <input type="text" id="totp-disable-code" name="code" maxlength="6" inputmode="numeric" required autocomplete="one-time-code"
+                 class="form-input" style="letter-spacing:0.2rem;width:160px;" aria-label="6-digit authenticator code">
+          <button type="submit" class="btn btn-outline btn-sm">Disable 2FA</button>
+        </div>
       </form>
 
     <?php elseif ($setupSecret): ?>
@@ -97,10 +97,11 @@ $enabled     = !empty($__user['totp_enabled']);
       <form method="post" style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
         <?= csrfField() ?>
         <input type="hidden" name="action" value="enable">
-        <input type="text" name="code" maxlength="6" inputmode="numeric" required autofocus
-               placeholder="123456"
-               style="padding:0.625rem;border:1px solid var(--border);border-radius:0.5rem;letter-spacing:0.25rem;font-size:1.125rem;width:160px;">
-        <button class="btn btn-primary">Verify & Enable</button>
+        <label class="sr-only" for="totp-enable-code">6-digit authenticator code</label>
+        <input type="text" id="totp-enable-code" name="code" maxlength="6" inputmode="numeric" required autofocus
+               placeholder="123456" autocomplete="one-time-code"
+               class="form-input" style="letter-spacing:0.25rem;font-size:1.125rem;width:160px;" aria-label="6-digit authenticator code">
+        <button type="submit" class="btn btn-primary">Verify & Enable</button>
       </form>
 
     <?php else: ?>

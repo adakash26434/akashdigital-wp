@@ -184,7 +184,7 @@ $csrf = generateCsrf();
   </form>
 </div>
 
-<div style="display:grid;grid-template-columns:2fr 1fr;gap:1.5rem;@media(max-width:900px){grid-template-columns:1fr;}">
+<div class="form-grid-2 form-grid-2--wide-main" style="gap:1.5rem;align-items:start;">
   <!-- Growth Chart -->
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;">
     <h2 style="font-size:1rem;font-weight:700;margin-bottom:1rem;">

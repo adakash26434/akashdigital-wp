@@ -81,7 +81,6 @@ catch (\Throwable $e) {
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat">⭐ Testimonials (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Testimonial</a>
   </div>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
     <?php if(empty($items)):?>

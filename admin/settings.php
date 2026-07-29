@@ -1261,7 +1261,7 @@ $tabs = [
   <div x-show="tab==='brand_colors'" x-cloak>
     <form method="POST">
       <?= csrfField() ?><input type="hidden" name="section" value="brand_colors">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;max-width:960px;">
+      <div class="form-grid-2" style="gap:1.5rem;align-items:start;max-width:960px;">
 
         <!-- Left: Controls -->
         <div class="st-card" style="padding:1.75rem;">

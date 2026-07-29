@@ -105,11 +105,10 @@ if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $edi
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat">Pricing Plans (<?=count($plans)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Plan</a>
   </div>
   <div style="display:flex;flex-direction:column;gap:0.625rem;">
   <?php if(empty($plans)):?>
-    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No plans yet. Add your first plan →</div>
+    <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">No plans yet. Use the <strong>+ NEW</strong> tab to add one.</div>
   <?php else: foreach($plans as $p):
     $feats = json_decode($p['features'] ?? '[]', true) ?: [];
   ?>

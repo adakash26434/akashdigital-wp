@@ -170,7 +170,6 @@ $__s = siteSettings();
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Blog Posts (<?=count($posts)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ New Post</a>
   </div>
 
   <div class="tbl-wrap">
@@ -186,7 +185,7 @@ $__s = siteSettings();
           <div class="af-empty">
             <i data-lucide="file-text" class="af-empty-icon"></i>
             <div class="af-empty-title">No posts yet</div>
-            <div class="af-empty-sub">Click &ldquo;+ New Post&rdquo; to publish your first article.</div>
+            <div class="af-empty-sub">Use the <strong>+ NEW</strong> tab to publish your first article.</div>
           </div>
         </td></tr>
         <?php else: foreach($posts as $i => $p): ?>

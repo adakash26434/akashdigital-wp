@@ -137,7 +137,7 @@ require_once '../includes/admin-layout.php';
   </div>
 </div>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;@media(max-width:900px){grid-template-columns:1fr;}">
+<div class="form-grid-2" style="gap:1.5rem;align-items:start;">
   <!-- Terminated Clients List -->
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;">
     <div style="padding:1rem 1.25rem;border-bottom:1px solid var(--border);">

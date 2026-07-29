@@ -57,6 +57,12 @@
   gap: 0.75rem;
 }
 
+.form-grid-2--wide-main {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 0.75rem;
+}
+
 .form-grid-3 {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
@@ -256,14 +262,6 @@
   gap: 0.375rem;
   justify-content: flex-end;
   flex-wrap: wrap;
-}
-
-/* ── Scrollable form container ───────────────────────── */
-.af-form-scroll {
-  overflow-y: auto;
-  max-height: calc(100vh - 280px);
-  padding-right: 0.5rem;
-  margin-right: -0.5rem;
 }
 
 /* ── Tab layout: full-width form ─────────────────────── */
@@ -627,6 +625,7 @@
     overflow-y: visible !important;
   }
   .form-grid-2,
+  .form-grid-2--wide-main,
   .form-grid-3,
   .form-grid-meta,
   .form-grid-meta--rev,

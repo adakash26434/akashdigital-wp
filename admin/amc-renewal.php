@@ -181,7 +181,7 @@ require_once '../includes/admin-layout.php';
 </div>
 <?php endif; ?>
 
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;@media(max-width:900px){grid-template-columns:1fr;}">
+<div class="form-grid-2" style="gap:1.5rem;align-items:start;">
   <!-- Client Selection & Config Form -->
   <div>
     <div class="config-card">

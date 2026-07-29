@@ -85,7 +85,6 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Portfolio (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Item</a>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:0.875rem;">
@@ -177,7 +176,7 @@ $CATS = ['Core Banking','Mobile App','DMS','HR Software','Website / Portal','Tra
         <label class="form-label">Live URL</label>
         <input type="url" name="url" maxlength="200" class="form-input" value="<?=e($editing['url']??'')?>" placeholder="https://example.com">
       </div>
-      <div style="display:grid;grid-template-columns:80px 1fr;gap:0.5rem;align-items:end;">
+      <div class="form-grid-meta" style="gap:0.5rem;align-items:end;">
         <div>
           <label class="form-label">Position</label>
           <input type="number" name="position" min="0" max="9999" class="form-input" value="<?=e($editing['position']??0)?>">

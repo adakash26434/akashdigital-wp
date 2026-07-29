@@ -90,11 +90,10 @@ $ICONS = ['cpu','code-2','database','cloud','server','smartphone','git-branch','
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat">Technical Expertise (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Tech</a>
   </div>
   <?php if(empty($items)):?>
   <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">
-    No technologies yet. Add your first tech stack item.
+    No technologies yet. Use the <strong>+ NEW</strong> tab to add one.
   </div>
   <?php else:?>
   <?php foreach($byCategory as $cat => $techs):?>

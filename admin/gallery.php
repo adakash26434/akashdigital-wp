@@ -71,7 +71,6 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
 <div>
   <div class="row-between-mb">
     <h2 class="h-eyebrow-flat"> Gallery (<?=count($items)?>)</h2>
-    <a href="?new=1" class="btn btn-primary btn-sm">+ Add Image</a>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:0.625rem;">

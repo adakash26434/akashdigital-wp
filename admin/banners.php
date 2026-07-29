@@ -86,21 +86,20 @@ if (isset($_GET['edit'])) {
   <div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
       <h2 style="font-family:var(--font-display);font-size:1.125rem;font-weight:700;">All Banners (<?= count($banners) ?>)</h2>
-      <a href="?new=1" class="btn btn-primary btn-sm">+ New Banner</a>
     </div>
     <!-- Hero slider tip -->
     <div style="background:linear-gradient(90deg,rgba(59,130,246,.08),rgba(99,102,241,.06));border:1px solid rgba(59,130,246,.2);border-radius:.75rem;padding:.875rem 1.1rem;margin-bottom:1.25rem;display:flex;align-items:flex-start;gap:.75rem;">
       <span style="font-size:1.4rem;flex-shrink:0;">🖼️</span>
       <div>
         <div style="font-weight:700;font-size:.875rem;color:var(--foreground);margin-bottom:.2rem;">Homepage Hero Slider</div>
-        <div style="font-size:.8125rem;color:var(--muted-foreground);">Click <strong>+ New Banner</strong>, select <strong>Homepage Hero Slider</strong>, upload a photo and fill in title &amp; subtitle. Multiple hero slides auto-rotate every 5.5 seconds.</div>
+        <div style="font-size:.8125rem;color:var(--muted-foreground);">Use the <strong>+ NEW</strong> tab, select <strong>Homepage Hero Slider</strong>, upload a photo and fill in title &amp; subtitle. Multiple hero slides auto-rotate every 5.5 seconds.</div>
       </div>
     </div>
 
     <?php if (empty($banners)): ?>
     <div style="border:2px dashed var(--border);border-radius:1rem;padding:3rem;text-align:center;color:var(--muted-foreground);">
       <div style="font-size:2.5rem;margin-bottom:0.75rem;">🖼️</div>
-      <p>No banners yet. Click <strong>+ New Banner</strong> and choose <strong>Homepage Hero Slider</strong> to add your first photo!</p>
+      <p>No banners yet. Use the <strong>+ NEW</strong> tab and choose <strong>Homepage Hero Slider</strong> to add your first photo.</p>
     </div>
     <?php else: ?>
     <div style="display:flex;flex-direction:column;gap:0.75rem;">
