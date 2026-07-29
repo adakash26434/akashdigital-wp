@@ -151,8 +151,10 @@ $CATS = ['General','Products','Pricing','Support','Technical','About'];
           </label>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update FAQ':'Add FAQ'?></button>
-      <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>
+      <div class="af-form-footer">
+        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update FAQ':'Add FAQ'?></button>
+        <?php if($editing):?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif;?>
+      </div>
     </form>
   </div>
 </div>

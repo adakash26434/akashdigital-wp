@@ -219,9 +219,9 @@ if (isset($_GET['edit'])) {
             <span>Active / Show on site</span>
           </label>
         </div>
-        <div style="display:flex;gap:0.5rem;padding-top:0.5rem;">
+        <div class="af-form-footer">
           <button type="submit" class="btn btn-primary flex-1"><?= $edit ? 'Update Banner' : 'Create Banner' ?></button>
-          <?php if ($edit): ?><a href="banners.php" class="btn btn-outline">Cancel</a><?php endif; ?>
+          <?php if ($edit): ?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif; ?>
         </div>
       </form>
   </div>

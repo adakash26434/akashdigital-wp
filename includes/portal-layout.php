@@ -175,8 +175,8 @@ require __DIR__ . '/head.php';
     <!-- Top bar -->
     <header style="background:var(--card);border-bottom:1px solid var(--border);padding:0 1.25rem;height:3.75rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
       <div style="display:flex;align-items:center;gap:0.75rem;">
-        <button id="sidebar-open-btn" onclick="openSidebar()" style="display:none;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--card);cursor:pointer;" title="Menu">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+        <button id="sidebar-open-btn" onclick="openSidebar()" aria-label="Open menu" style="display:none;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--card);cursor:pointer;" title="Menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
         </button>
         <h1 style="font-family:var(--font-display);font-weight:700;font-size:1rem;color:var(--foreground);"><?= e($pageTitle ?? 'Portal') ?></h1>
       </div>
@@ -188,7 +188,7 @@ require __DIR__ . '/head.php';
             $__notifUnseen = (int)($__nrow['c'] ?? 0);
           } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
         ?>
-        <a href="<?= url('portal/notifications.php') ?>" title="Notifications" style="position:relative;display:flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--card);color:var(--foreground);text-decoration:none;">
+        <a href="<?= url('portal/notifications.php') ?>" title="Notifications" aria-label="<?= $__notifUnseen > 0 ? 'Notifications, '.$__notifUnseen.' unread' : 'Notifications' ?>" style="position:relative;display:flex;align-items:center;justify-content:center;width:2.25rem;height:2.25rem;border-radius:0.5rem;border:1px solid var(--border);background:var(--card);color:var(--foreground);text-decoration:none;">
           <?= icon('bell', 16) ?>
           <?php if ($__notifUnseen > 0): ?>
             <span style="position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9999px;background:#ef4444;color:#fff;font-size:0.65rem;font-weight:700;display:grid;place-items:center;"><?= $__notifUnseen > 99 ? '99+' : $__notifUnseen ?></span>

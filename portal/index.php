@@ -108,14 +108,11 @@ try {
 ?>
 
 <!-- Welcome -->
-<div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
-  <div>
-    <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted-foreground);">Welcome back</div>
-    <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--foreground);margin-top:0.25rem;">
-      <?= e($__user['display_name'] ?? explode('@',$__user['email'])[0]) ?>'s Overview
-    </h1>
-  </div>
-  <a href="<?= url('portal/tickets-new.php') ?>" class="btn btn-primary btn-sm">+ New Ticket</a>
+<div style="margin-bottom:1.5rem;">
+  <div style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted-foreground);">Welcome back</div>
+  <h1 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;color:var(--foreground);margin-top:0.25rem;">
+    <?= e($__user['display_name'] ?? explode('@',$__user['email'])[0]) ?>'s Overview
+  </h1>
 </div>
 
 <?php if(!empty($__user['client_code'])): ?>

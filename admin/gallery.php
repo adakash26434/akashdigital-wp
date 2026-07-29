@@ -133,8 +133,10 @@ $CATS = ['General','Office','Team','Events','Product','Training'];
         <input type="checkbox" name="active" value="1" <?=($editing['active']??1)?'checked':''?>>
         <span>Active / Visible</span>
       </label>
-      <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update Image':'Add Image'?></button>
-      <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>
+      <div class="af-form-footer">
+        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Image':'Add Image'?></button>
+        <?php if($editing):?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif;?>
+      </div>
     </form>
   </div>
 </div>

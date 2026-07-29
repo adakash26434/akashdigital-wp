@@ -34,16 +34,18 @@ $categories = query("SELECT DISTINCT category FROM faqs WHERE active=1 AND categ
   </div>
 
   <!-- Search bar -->
-  <form method="get" style="margin-bottom:1.5rem;">
+  <form method="get" style="margin-bottom:1.5rem;" role="search">
     <input type="hidden" name="cat" value="<?= e($category) ?>">
     <div class="pos-rel">
-      <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1.125rem;pointer-events:none;"></span>
-      <input type="text" name="q" value="<?= e($search) ?>"
+      <span style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);font-size:1.125rem;pointer-events:none;" aria-hidden="true"></span>
+      <label class="sr-only" for="kb-search">Search knowledge base</label>
+      <input type="text" id="kb-search" name="q" value="<?= e($search) ?>"
              placeholder="Search questions, topics, or keywords…"
+             aria-label="Search knowledge base"
              style="width:100%;padding:0.875rem 1rem 0.875rem 2.875rem;border-radius:0.875rem;border:1.5px solid var(--border);background:var(--card);color:var(--foreground);font-size:0.9375rem;font-family:inherit;outline:none;transition:border-color 0.15s;box-sizing:border-box;"
              onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'">
       <?php if($search):?>
-      <a href="?cat=<?=urlencode($category)?>" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--muted-foreground);text-decoration:none;font-size:1rem;"></a>
+      <a href="?cat=<?=urlencode($category)?>" aria-label="Clear search" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);color:var(--muted-foreground);text-decoration:none;font-size:1rem;">×</a>
       <?php endif;?>
     </div>
   </form>

@@ -37,14 +37,14 @@ $PRI = ['low'=>'Low','normal'=>'Normal','high'=>'High','urgent'=>'Urgent'];
   <div>
     <p class="portal-page-lead"><?= count($tickets) ?> ticket<?= count($tickets)!==1?'s':'' ?></p>
   </div>
-  <a href="<?= url('portal/tickets-new.php') ?>" class="btn btn-primary btn-sm">+ New Ticket</a>
 </div>
 
 <!-- Filters -->
 <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.5rem;align-items:center;">
-  <form method="GET" style="display:flex;gap:0.5rem;flex:1;min-width:200px;">
+  <form method="GET" style="display:flex;gap:0.5rem;flex:1;min-width:200px;" role="search">
     <?php if($status_filter):?><input type="hidden" name="status" value="<?=e($status_filter)?>"> <?php endif;?>
-    <input type="text" name="q" value="<?= e($search) ?>" placeholder="Search tickets..." class="form-input flex-1">
+    <label class="sr-only" for="ticket-search">Search tickets</label>
+    <input type="text" id="ticket-search" name="q" value="<?= e($search) ?>" placeholder="Search tickets..." class="form-input flex-1" aria-label="Search tickets">
     <button type="submit" class="btn btn-outline btn-sm">Search</button>
     <?php if($search):?><a href="?<?=$status_filter?'status='.urlencode($status_filter):''?>" class="btn btn-outline btn-sm" style="display:inline-flex;align-items:center;gap:0.25rem;"><?= icon('x',12) ?> Clear</a><?php endif;?>
   </form>

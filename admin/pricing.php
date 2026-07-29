@@ -232,9 +232,9 @@ if ($editingCta !== '' && preg_match('/product-detail\.php\?slug=([^&]+)/', $edi
       </label>
     </div>
 
-    <div style="display:flex;gap:0.625rem;padding-top:0.25rem;">
+    <div class="af-form-footer">
       <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Save Changes':'Add Plan'?></button>
-      <a href="<?=url('admin/pricing.php')?>" class="btn btn-ghost">Cancel</a>
+      <a href="?" class="btn btn-ghost flex-1">Cancel</a>
     </div>
   </form>
 </div>

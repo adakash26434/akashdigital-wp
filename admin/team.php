@@ -353,8 +353,10 @@ if (!empty($_GET['edit'])) {
         </div>
         <div style="margin-top:0.5rem;">Title मा Chairman / CEO / Director / Manager लेखे Auto ले row तय गर्छ। मिलेन भने माथिबाट Row manually चुन्नुहोस्।</div>
       </div>
-      <button type="submit" class="btn btn-primary w-100"><?=$editing?'Update Member':'Add Member'?></button>
-      <?php if($editing):?><a href="?" class="btn btn-ghost w-100-c">Cancel</a><?php endif;?>
+      <div class="af-form-footer">
+        <button type="submit" class="btn btn-primary flex-1"><?=$editing?'Update Member':'Add Member'?></button>
+        <?php if($editing):?><a href="?" class="btn btn-ghost flex-1">Cancel</a><?php endif;?>
+      </div>
     </form>
   </div>
 </div>

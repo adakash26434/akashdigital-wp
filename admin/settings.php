@@ -537,7 +537,7 @@ $tabs = [
       <div class="st-card p-card-lg">
         <h3 class="h-eyebrow">Contact Information</h3>
         <div class="col-stack">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+          <div class="form-grid-2" style="gap:1rem;">
             <div>
               <label class="form-label">Contact Email</label>
               <input type="email" name="contact_email" class="form-input" value="<?= e(sv($s,'contact_email','')) ?>" placeholder="contact@company.com">
@@ -1679,7 +1679,7 @@ $tabs = [
                 <button type="button" class="btn btn-ghost btn-sm" style="color:var(--danger);" @click="removeItem(idx)"><?= icon('trash-2',14) ?></button>
               </div>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;">
+            <div class="form-grid-2" style="gap:0.625rem;">
               <div>
                 <label class="form-label">Link type</label>
                 <select class="form-input" x-model="item.link_type" @change="if(item.link_type==='custom') item.link_id=0">
@@ -1721,7 +1721,7 @@ $tabs = [
               <label class="form-label">Description</label>
               <textarea class="form-input" rows="2" x-model="item.desc" placeholder="Short card description"></textarea>
             </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.625rem;align-items:end;">
+            <div class="form-grid-2" style="gap:0.625rem;align-items:end;">
               <div>
                 <label class="form-label">Card price <span style="color:var(--primary);font-weight:700;">(public)</span></label>
                 <input type="text" class="form-input" x-model="item.price" placeholder="from NPR 8,000" style="font-weight:700;color:var(--primary);">

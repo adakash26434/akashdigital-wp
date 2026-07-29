@@ -28,10 +28,10 @@ include 'includes/page-hero.php';
   <div class="container">
 
     <?php if (!empty($categories)): ?>
-    <div style="display:flex;flex-wrap:wrap;gap:0.5rem;justify-content:center;margin-bottom:2.5rem;">
-      <button @click="filter=''" :class="filter==='' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'">All</button>
+    <div class="gallery-filters" role="toolbar" aria-label="Gallery categories">
+      <button type="button" @click="filter=''" :class="filter==='' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'">All</button>
       <?php foreach ($categories as $cat): ?>
-      <button @click="filter='<?= e($cat) ?>'" :class="filter==='<?= e($cat) ?>' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'"><?= e(ucfirst($cat)) ?></button>
+      <button type="button" @click="filter='<?= e($cat) ?>'" :class="filter==='<?= e($cat) ?>' ? 'btn btn-primary btn-sm' : 'btn btn-outline btn-sm'"><?= e(ucfirst($cat)) ?></button>
       <?php endforeach; ?>
     </div>
     <?php endif; ?>
@@ -58,7 +58,7 @@ include 'includes/page-hero.php';
             <div style="aspect-ratio:4/3;background:linear-gradient(135deg,#3b82f620,#8b5cf620);display:grid;place-items:center;font-size:3rem;"></div>
             <?php endif; ?>
             <?php if (!empty($item['caption'])): ?>
-            <div style="position:absolute;bottom:0;left:0;right:0;padding:0.75rem 1rem;background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);color:#fff;font-size:var(--text-sm);text-align:left;"><?= e($item['caption']) ?></div>
+            <div class="gallery-item__caption"><?= e($item['caption']) ?></div>
             <?php endif; ?>
           </div>
         </button>
@@ -67,20 +67,16 @@ include 'includes/page-hero.php';
     </div>
 
     <!-- Lightbox -->
-    <div x-show="lightbox" x-cloak
+    <div class="gallery-lightbox" x-show="lightbox" x-cloak
          role="dialog" aria-modal="true" aria-label="Gallery image viewer"
-         @keydown.escape.window="lightbox=null" @click.self="lightbox=null"
-         style="position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;padding:1rem;">
-      <button type="button" @click="prev()" aria-label="Previous image"
-              style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">‹</button>
-      <div style="max-width:90vw;max-height:90vh;text-align:center;">
-        <img :src="currentImg()" :alt="currentCaption()" style="max-width:100%;max-height:80vh;object-fit:contain;border-radius:0.75rem;" loading="lazy">
-        <p x-text="currentCaption()" style="color:rgba(255,255,255,0.8);margin-top:0.75rem;font-size:var(--text-sm);"></p>
+         @keydown.escape.window="lightbox=null" @click.self="lightbox=null">
+      <button type="button" class="gallery-lightbox__nav gallery-lightbox__nav--prev" @click="prev()" aria-label="Previous image">‹</button>
+      <div class="gallery-lightbox__stage">
+        <img :src="currentImg()" :alt="currentCaption()" class="gallery-lightbox__img" loading="lazy">
+        <p class="gallery-lightbox__caption" x-text="currentCaption()"></p>
       </div>
-      <button type="button" @click="next()" aria-label="Next image"
-              style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.12);border:none;color:#fff;width:3rem;height:3rem;border-radius:50%;font-size:var(--text-xl);cursor:pointer;">›</button>
-      <button type="button" @click="lightbox=null" aria-label="Close gallery viewer"
-              style="position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,0.12);border:none;color:#fff;width:2.5rem;height:2.5rem;border-radius:50%;font-size:1.25rem;line-height:1;cursor:pointer;">×</button>
+      <button type="button" class="gallery-lightbox__nav gallery-lightbox__nav--next" @click="next()" aria-label="Next image">›</button>
+      <button type="button" class="gallery-lightbox__close" @click="lightbox=null" aria-label="Close gallery viewer">×</button>
     </div>
 
     <?php endif; ?>

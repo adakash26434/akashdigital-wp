@@ -1493,6 +1493,7 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 .leadership-detail {
   max-width: 52rem;
   margin: 0 auto;
+  padding-top: 0.5rem;
 }
 .leadership-detail__card {
   padding: clamp(1.5rem, 4vw, 3rem);
@@ -1862,8 +1863,90 @@ html:not(.dark) .hero-left .hero-title .tg { background: linear-gradient(135deg,
 }
 
 /* ── gallery.php ── */
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 2.5rem;
+}
+.gallery-item__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 0.75rem 1rem;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: #fff;
+  font-size: var(--text-sm);
+  text-align: left;
+  pointer-events: none;
+}
+.gallery-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.9);
+}
+.gallery-lightbox__stage {
+  max-width: 90vw;
+  max-height: 90vh;
+  text-align: center;
+}
+.gallery-lightbox__img {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 0.75rem;
+}
+.gallery-lightbox__caption {
+  margin-top: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--text-sm);
+}
+.gallery-lightbox__nav,
+.gallery-lightbox__close {
+  position: absolute;
+  border: none;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 1;
+}
+.gallery-lightbox__nav {
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3rem;
+  height: 3rem;
+  font-size: var(--text-xl);
+}
+.gallery-lightbox__nav--prev { left: 1rem; }
+.gallery-lightbox__nav--next { right: 1rem; }
+.gallery-lightbox__close {
+  top: 1rem;
+  right: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 1.25rem;
+}
 @media (min-width: 640px)  { .gallery-grid { columns: 2 !important; } }
 @media (min-width: 1024px) { .gallery-grid { columns: 3 !important; } }
+
+/* Detail page breadcrumbs */
+.detail-breadcrumb {
+  padding-top: 5.5rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+}
+.detail-breadcrumb .breadcrumb {
+  margin: 0;
+  padding: 0.75rem 0;
+}
 
 /* ── includes/footer.php ── */
 @media (min-width: 768px) {

@@ -140,13 +140,15 @@ require_once 'includes/header.php';
 ?>
 
 <!-- Breadcrumb -->
-<div style="padding-top:5.5rem;background:var(--card);border-bottom:1px solid var(--border);">
-  <div class="container" style="padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
-    <a href="<?= url('index.php') ?>" class="st-crumb-link">Home</a>
-    <span>/</span>
-    <a href="<?= url('products.php') ?>" class="st-crumb-link">Products</a>
-    <span>/</span>
-    <span style="color:var(--foreground);font-weight:500;"><?= e($product['name']) ?></span>
+<div class="detail-breadcrumb">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="<?= url('index.php') ?>">Home</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="<?= url('products.php') ?>">Products</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="current"><?= e($product['name']) ?></span>
+    </nav>
   </div>
 </div>
 

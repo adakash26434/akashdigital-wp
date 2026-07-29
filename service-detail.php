@@ -99,13 +99,15 @@ $ogImage   = !empty($service['screenshot_url']) ? $service['screenshot_url'] : n
 require_once 'includes/header.php';
 ?>
 
-<div style="padding-top:5.5rem;background:var(--card);border-bottom:1px solid var(--border);">
-  <div class="container" style="padding:0.75rem 1.5rem;display:flex;align-items:center;gap:0.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
-    <a href="<?= url('index.php') ?>" class="st-crumb-link">Home</a>
-    <span>/</span>
-    <a href="<?= url('services.php') ?>" class="st-crumb-link">Services</a>
-    <span>/</span>
-    <span style="color:var(--foreground);font-weight:500;"><?= e($service['name']) ?></span>
+<div class="detail-breadcrumb">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a href="<?= url('index.php') ?>">Home</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <a href="<?= url('services.php') ?>">Services</a>
+      <span class="sep" aria-hidden="true">/</span>
+      <span class="current"><?= e($service['name']) ?></span>
+    </nav>
   </div>
 </div>
 
