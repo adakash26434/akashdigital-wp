@@ -1,6 +1,6 @@
 /*
  * ================================================================
- * Ankur Infotech Pvt. Ltd. — Global Design System  v3.1
+ * Site CMS — Global Design System  v3.1
  * Enhanced SaaS UI — animations, improved components, refined type
  * Palette: bg #fafbfc · surface #e8ecf1 · muted #94a3b8 · primary #2563eb
  * Fonts:   Poppins · Noto Sans Devanagari · JetBrains Mono
@@ -1456,7 +1456,7 @@ html.dark .skeleton { background: color-mix(in oklab, var(--foreground) 10%, tra
 
 /*
  * ================================================================
- * Ankur Infotech Pvt. Ltd. — Polish Overlay  v3.7
+ * Site CMS — Polish Overlay  v3.7
  * Loads AFTER theme.css. Smooths every remaining UI/UX rough edge
  * without rewriting components: scrollbars, focus rings, auth card,
  * error pages, empty states, toast, modal, dropdown, password eye,
@@ -1964,7 +1964,7 @@ body {
   max-width: 100%;
 }
 
-/* End Ankur Infotech v3.1 Improvements */
+/* End Site CMS v3.1 Improvements */
 
 /* ════════════════════════════════════════════════════════════════════
    § 32. GLOBAL TYPOGRAPHY SYSTEM  (v3.2 — uniform across all pages)

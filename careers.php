@@ -428,7 +428,7 @@ ob_start(); ?>
 
 <?php
 $ctaTitle = 'Build software that matters';
-$ctaSubtitle = 'Join a team delivering quality IT solutions across Nepal — from Birgunj to every province.';
+$ctaSubtitle = 'Join a team delivering quality IT solutions across Nepal.';
 $ctaPrimary = ['label' => 'View open roles', 'url' => '#openings', 'icon' => 'briefcase'];
 $ctaSecondary = ['label' => 'About us', 'url' => url('about.php'), 'icon' => 'building-2'];
 include 'includes/cta-banner.php';

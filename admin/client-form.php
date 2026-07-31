@@ -231,10 +231,10 @@ function generateAgreementFromTemplate($pdo, $clientId, $template, $createdBy) {
         '{{EFFECTIVE_DATE}}' => date('F j, Y'),
         '{{EXPIRY_DATE}}' => date('F j, Y', strtotime('+1 year')),
         '{{TODAY_DATE}}' => date('F j, Y'),
-        '{{COMPANY_NAME}}' => $company['site_name'] ?? 'Aakash Digital Pvt. Ltd.',
-        '{{COMPANY_ADDRESS}}' => $company['address'] ?? 'Pokhara-8, New Road',
-        '{{COMPANY_PHONE}}' => $company['phone'] ?? '',
-        '{{COMPANY_EMAIL}}' => $company['email'] ?? '',
+        '{{COMPANY_NAME}}' => $company['company_name'] ?? $company['site_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company'),
+        '{{COMPANY_ADDRESS}}' => $company['address'] ?? '',
+        '{{COMPANY_PHONE}}' => $company['contact_phone'] ?? $company['phone'] ?? '',
+        '{{COMPANY_EMAIL}}' => $company['contact_email'] ?? $company['email'] ?? '',
     ];
     
     foreach ($replacements as $placeholder => $value) {

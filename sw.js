@@ -1,5 +1,5 @@
 /**
- * Ankur Infotech Pvt. Ltd. — Service Worker v1.1
+ * Site CMS — Service Worker v1.1
  * Provides offline support for static assets
  */
 const CACHE_NAME = 'ankur-infotech-v1';

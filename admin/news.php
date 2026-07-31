@@ -271,7 +271,7 @@ $__s = siteSettings();
         <div>
           <label class="form-label">Title <span class="text-danger-token">*</span></label>
           <input type="text" name="title" id="news-title" required minlength="5" maxlength="200" class="form-input"
-                 value="<?=e($editing['title']??'')?>" placeholder="e.g. Aakash Digital featured in Online Khabar"
+                 value="<?=e($editing['title']??'')?>" placeholder="e.g. Company featured in Online Khabar"
                  oninput="newsAutoSlug()">
         </div>
 

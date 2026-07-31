@@ -104,7 +104,7 @@ $companyPhone = $company['phone'] ?? '+977-1-XXXXXXX';
   <!-- Header -->
   <div class="header">
     <div class="company-info">
-      <h1><?= e($company['site_name'] ?? 'Aakash Digital Payment') ?></h1>
+      <h1><?= e($company['company_name'] ?? $company['site_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) ?></h1>
       <p><?= e($companyAddress) ?></p>
       <p>Email: <?= e($companyEmail) ?></p>
       <p>Phone: <?= e($companyPhone) ?></p>
