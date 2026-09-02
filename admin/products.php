@@ -52,6 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $demo_ss_url  = $galleryUrls[0] ?? null;
         $screenshots  = !empty($galleryUrls) ? json_encode($galleryUrls) : null;
         $tab_label    = trim($_POST['tab_label']     ?? '');
+        $pricePeriod  = stNormalizePricePeriod($_POST['price_period'] ?? 'month');
 
         if (!$name) { $error = 'Product name is required.'; }
         else {
@@ -82,12 +83,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                          [$name,$slug,$icon,$badge?:null,$price,$category?:null,$position,$active]],
                     ];
                 }
-                $saved = false; $lastErr = null;
+                $saved = false; $lastErr = null; $insertId = 0;
                 foreach ($attempts as [$sql, $params]) {
-                    try { execute($sql, $params); $saved = true; break; }
+                    try { $insertId = execute($sql, $params); $saved = true; break; }
                     catch (\Throwable $fe) { $lastErr = $fe; }
                 }
                 if (!$saved) throw $lastErr ?? new \RuntimeException('Save failed');
+                $rowId = $id ?: (int)$insertId;
+                if ($rowId) {
+                    try { execute("UPDATE products SET price_period=? WHERE id=?", [$pricePeriod, $rowId]); }
+                    catch (\Throwable $pe) { /* column missing on older schema */ }
+                }
                 $success = $id ? 'Product updated.' : 'Product created.';
             } catch(\Throwable $e) { $error = 'Save failed: ' . $e->getMessage(); }
         }
@@ -385,19 +391,31 @@ if (!empty($_GET['edit'])) {
         </div>
         <div class="form-grid-2" style="gap:0.5rem;">
           <div>
-            <label class="form-label">Price From</label>
-            <input type="number" name="price_from" class="form-input" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="4999">
-            <span class="form-hint">Optional. Base price in Rupees. Leave blank for "Custom" pricing.</span>
+            <label class="form-label" for="price_from">Price From (NPR)</label>
+            <input type="number" id="price_from" name="price_from" class="form-input" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="Leave blank = Contact us">
+            <span class="form-hint">Blank = Contact us. Period is hidden until a price is entered.</span>
           </div>
-          <div>
-            <label class="form-label">Category</label>
-            <select name="category" class="form-input">
-              <option value="">Select</option>
-              <?php foreach(['Banking Software','Mobile App','Document Management','HR Software','Website','Support'] as $c):?>
-              <option value="<?=$c?>" <?=($editing['category']??'')===$c?'selected':''?>><?=$c?></option>
+          <div id="price-period-wrap" <?= empty($editing['price_from']) || (float)($editing['price_from'] ?? 0) <= 0 ? 'hidden' : '' ?>>
+            <label class="form-label" for="price_period">Period</label>
+            <select id="price_period" name="price_period" class="form-input">
+              <?php
+                $curPeriod = stNormalizePricePeriod($editing['price_period'] ?? 'month');
+                foreach (stPricePeriodAdminOptions() as $pk => $pl):
+              ?>
+              <option value="<?=e($pk)?>" <?=$curPeriod===$pk?'selected':''?>><?=e($pl)?></option>
               <?php endforeach;?>
             </select>
+            <span class="form-hint">Default Month. Change to Day, Yearly, or License, then Save.</span>
           </div>
+        </div>
+        <div>
+          <label class="form-label">Category</label>
+          <select name="category" class="form-input">
+            <option value="">Select</option>
+            <?php foreach(['Banking Software','Mobile App','Document Management','HR Software','Website','Support'] as $c):?>
+            <option value="<?=$c?>" <?=($editing['category']??'')===$c?'selected':''?>><?=$c?></option>
+            <?php endforeach;?>
+          </select>
         </div>
         <div class="form-grid-2" style="gap:0.5rem;">
           <div>
@@ -561,7 +579,7 @@ if (!empty($_GET['edit'])) {
           <div id="prv-tagline" style="color:var(--primary);font-size:0.75rem;font-weight:600;margin-bottom:0.5rem;"><?=e($editing['tagline']??'Tagline goes here')?></div>
           <div id="prv-price" style="font-size:1.125rem;font-weight:700;color:var(--foreground);margin-bottom:0.5rem;">
             <?php if(strtolower($editing['badge']??'')==='included'): ?>Included<span id="prv-pricelabel" style="font-size:0.7rem;font-weight:400;color:var(--muted-foreground);margin-left:0.25rem;"> with any plan</span>
-            <?php elseif(!empty($editing['price_from'])): ?>NPR <?=number_format((float)($editing['price_from']??0),0)?><span id="prv-pricelabel" style="font-size:0.7rem;font-weight:400;color:var(--muted-foreground);margin-left:0.25rem;"> / month</span>
+            <?php elseif(!empty($editing['price_from'])): ?>NPR <?=number_format((float)($editing['price_from']??0),0)?><span id="prv-pricelabel" style="font-size:0.7rem;font-weight:400;color:var(--muted-foreground);margin-left:0.25rem;"> <?=e(stPricePeriodLabel($editing['price_period'] ?? 'month', $editing['price_from']))?></span>
             <?php else: ?>Contact us<span id="prv-pricelabel" style="display:none;"></span>
             <?php endif;?>
           </div>
@@ -664,6 +682,10 @@ function updatePreview() {
   var icon    = (f.querySelector('[name=lucide_icon]')?.value||'layers').trim();
   var color   = (f.querySelector('[name=icon_color]')?.value||'blue').trim();
 
+  var periodMap = {month:' / month', day:' / day', year:' / year', license:' / license'};
+  var period  = (f.querySelector('[name=price_period]')?.value||'month').trim();
+  var pNote   = periodMap[period] || ' / month';
+
   document.getElementById('prv-name').textContent    = name || 'Product Name';
   document.getElementById('prv-tagline').textContent = tagline;
   document.getElementById('prv-badge').textContent   = badge;
@@ -678,7 +700,7 @@ function updatePreview() {
     pLabel.textContent = ' with any plan'; pLabel.style.display = '';
   } else if (price > 0) {
     priceDiv.childNodes[0].textContent = 'NPR ' + Math.round(price).toLocaleString();
-    pLabel.textContent = ' / month'; pLabel.style.display = '';
+    pLabel.textContent = pNote; pLabel.style.display = '';
   } else {
     priceDiv.childNodes[0].textContent = 'Contact us';
     pLabel.textContent = ''; pLabel.style.display = 'none';
@@ -696,7 +718,7 @@ function updatePreview() {
 
 // Wire up all relevant inputs
 document.addEventListener('DOMContentLoaded', function() {
-  var triggers = ['name','tagline','badge','price_from','summary','lucide_icon'];
+  var triggers = ['name','tagline','badge','price_from','price_period','summary','lucide_icon'];
   triggers.forEach(function(n) {
     var el = document.querySelector('[name='+n+']');
     if (el) el.addEventListener('input', updatePreview);

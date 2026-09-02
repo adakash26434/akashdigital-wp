@@ -32,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $lucide_icon = trim($_POST['lucide_icon'] ?? '');
         $icon_color  = trim($_POST['icon_color']  ?? 'blue');
+        $pricePeriod = stNormalizePricePeriod($_POST['price_period'] ?? 'month');
         $position    = (int)($_POST['position']   ?? 0);
         $active      = isset($_POST['active']) ? 1 : 0;
         $features    = trim($_POST['features']    ?? '');
@@ -107,6 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                     $success = 'Service updated.';
+                    try { execute("UPDATE services SET price_period=? WHERE id=?", [$pricePeriod, $id]); }
+                    catch (\Throwable $pe) { /* older schema */ }
                 } else {
                     try {
                         execute(
@@ -127,6 +130,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         }
                     }
                     $success = 'Service added.';
+                    $newRow = queryOne("SELECT id FROM services WHERE slug=? ORDER BY id DESC LIMIT 1", [$slug]);
+                    $newId = (int)($newRow['id'] ?? 0);
+                    if ($newId) {
+                        try { execute("UPDATE services SET price_period=? WHERE id=?", [$pricePeriod, $newId]); }
+                        catch (\Throwable $pe) { /* older schema */ }
+                    }
                 }
             } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
         }
@@ -360,11 +369,23 @@ $__svcSlot2 = $editing['gallery_slots'][1] ?? '';
             </select>
           </div>
           <div>
-            <label class="form-label">Price From (NPR)</label>
-            <input type="number" name="price_from" class="form-input" step="0.01" min="0"
-                   value="<?=e($editing['price_from']??'')?>" placeholder="e.g. 4999">
-            <p class="caption-meta">Blank = Contact us</p>
+            <label class="form-label" for="svc_price_from">Price From (NPR)</label>
+            <input type="number" id="svc_price_from" name="price_from" class="form-input" step="0.01" min="0"
+                   value="<?=e($editing['price_from']??'')?>" placeholder="Leave blank = Contact us">
+            <p class="caption-meta">Blank = Contact us. Period appears only after you enter a price.</p>
           </div>
+        </div>
+        <div id="price-period-wrap" <?= empty($editing['price_from']) || (float)($editing['price_from'] ?? 0) <= 0 ? 'hidden' : '' ?> style="max-width:16rem;">
+          <label class="form-label" for="price_period">Period</label>
+          <select id="price_period" name="price_period" class="form-input">
+            <?php
+              $curPeriod = stNormalizePricePeriod($editing['price_period'] ?? 'month');
+              foreach (stPricePeriodAdminOptions() as $pk => $pl):
+            ?>
+            <option value="<?=e($pk)?>" <?=$curPeriod===$pk?'selected':''?>><?=e($pl)?></option>
+            <?php endforeach;?>
+          </select>
+          <p class="caption-meta">Default Month. You can change to Day, Yearly, or License.</p>
         </div>
 
         <!-- Position + Active -->

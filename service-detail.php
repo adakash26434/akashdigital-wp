@@ -10,7 +10,7 @@ if (!$slug) { header('Location: ' . url('services.php')); exit; }
 $service = null;
 try {
     $service = queryOne(
-        "SELECT id, title AS name, slug, tagline, summary, description, badge, price_from,
+        "SELECT id, title AS name, slug, tagline, summary, description, badge, price_from, price_period,
                 COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
                 icon_color, highlights, features, screenshot_url, screenshots, active
          FROM services WHERE slug=? AND active=1",
@@ -161,6 +161,8 @@ require_once 'includes/header.php';
         <?php if (!empty($service['price_from']) && (float)$service['price_from'] > 0): ?>
         <p style="margin-top:1.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
           From <strong style="color:var(--primary);font-size:var(--text-lg);">NPR <?= e(number_format((float)$service['price_from'], 0)) ?></strong>
+          <?php $__sp = stPricePeriodLabel($service['price_period'] ?? 'month', $service['price_from']); ?>
+          <?php if ($__sp !== ''): ?><span><?= e($__sp) ?></span><?php endif; ?>
         </p>
         <?php endif; ?>
       </div>

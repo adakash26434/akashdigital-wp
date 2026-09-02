@@ -899,4 +899,14 @@ function runDbMigrations() {
             'screenshots' => "TEXT NULL",
         ]);
     } catch (\Throwable $e) { error_log('[db-migrations] M38: ' . $e->getMessage()); }
+
+    try {
+        // Migration 39: product/service billing cycle (month, day, year, license)
+        dbEnsureColumns('products', [
+            'price_period' => "VARCHAR(20) NOT NULL DEFAULT 'month'",
+        ]);
+        dbEnsureColumns('services', [
+            'price_period' => "VARCHAR(20) NOT NULL DEFAULT 'month'",
+        ]);
+    } catch (\Throwable $e) { error_log('[db-migrations] M39: ' . $e->getMessage()); }
 }

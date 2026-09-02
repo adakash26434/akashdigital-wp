@@ -208,6 +208,8 @@ require_once 'includes/header.php';
         <?php if (!empty($product['price_from'])): ?>
         <p style="margin-top:1.5rem;font-size:var(--text-sm);color:var(--muted-foreground);">
           From <strong style="color:var(--primary);font-size:var(--text-lg);">NPR <?= e(number_format((float)$product['price_from'], 0)) ?></strong>
+          <?php $__pp = stPricePeriodLabel($product['price_period'] ?? 'month', $product['price_from']); ?>
+          <?php if ($__pp !== ''): ?><span><?= e($__pp) ?></span><?php endif; ?>
         </p>
         <?php endif; ?>
       </div>

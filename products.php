@@ -34,7 +34,11 @@ $__productDefaults = [
 
 $products = [];
 try {
-    $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+    try {
+        $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from,price_period FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+    } catch (\Throwable $eCol) {
+        $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+    }
     foreach ($rows as $r) {
         $highs = json_decode($r['highlights'] ?? '[]', true) ?: [];
         $feats = json_decode($r['features'] ?? '[]', true) ?: [];
@@ -42,11 +46,9 @@ try {
             $highs = array_slice($feats, 0, 4);
         }
         $slug = $r['slug'];
-        if (!empty($r['price_from'])) {
+        if (!empty($r['price_from']) && (float)$r['price_from'] > 0) {
             $price = 'NPR ' . number_format((float)$r['price_from'], 0);
-            $priceNote = '/ month';
-        } elseif (isset($__priceDefaults[$slug])) {
-            [$price, $priceNote] = $__priceDefaults[$slug];
+            $priceNote = stPricePeriodLabel($r['price_period'] ?? 'month', $r['price_from']);
         } else {
             $price = 'Contact us';
             $priceNote = '';

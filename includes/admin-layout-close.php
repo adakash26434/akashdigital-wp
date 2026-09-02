@@ -129,6 +129,24 @@ document.addEventListener('keydown',function(e){
   document.querySelectorAll('.af-modal.is-open').forEach(function(m){ m.classList.remove('is-open'); });
   document.body.style.overflow='';
 });
+document.addEventListener('DOMContentLoaded', function () {
+  var wrap = document.getElementById('price-period-wrap');
+  var price = document.getElementById('price_from') || document.getElementById('svc_price_from');
+  var sel = document.getElementById('price_period');
+  if (!wrap || !price) return;
+  function sync() {
+    var n = parseFloat(price.value || '0') || 0;
+    if (n > 0) {
+      wrap.hidden = false;
+      if (sel && !sel.value) sel.value = 'month';
+    } else {
+      wrap.hidden = true;
+    }
+  }
+  price.addEventListener('input', sync);
+  price.addEventListener('change', sync);
+  sync();
+});
 </script>
 <script src="<?= asset('js/st-bs-datepicker.js') ?>?v=1.3" defer></script>
 <script>

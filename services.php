@@ -31,7 +31,7 @@ try {
         $rows = query(
             "SELECT id, title AS name, slug, tagline, summary, badge,
                     COALESCE(lucide_icon, icon, 'layers') AS lucide_icon,
-                    icon_color, highlights, features, price_from, active,
+                    icon_color, highlights, features, price_from, price_period, active,
                     screenshot_url AS demo_screenshot_url
              FROM services WHERE active=1 ORDER BY position, id LIMIT 20"
         );
@@ -71,7 +71,7 @@ try {
         $priceNote = '';
         if (!empty($r['price_from']) && $r['price_from'] > 0) {
             $price     = 'NPR ' . number_format((float)$r['price_from'], 0);
-            $priceNote = '/ month';
+            $priceNote = stPricePeriodLabel($r['price_period'] ?? 'month', $r['price_from']);
         }
         $isIncluded = strtolower($r['badge'] ?? '') === 'included';
         if ($isIncluded) { $price = 'Included'; $priceNote = 'with any plan'; }

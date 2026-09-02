@@ -400,6 +400,46 @@ function stCompanyName(): string {
     return $n !== '' ? $n : stSiteName();
 }
 
+/** Billing cycle keys for product/service Price From. Default month. */
+function stNormalizePricePeriod(?string $period): string {
+    $p = strtolower(trim((string)$period));
+    $map = [
+        'month' => 'month', 'monthly' => 'month',
+        'day' => 'day', 'daily' => 'day',
+        'year' => 'year', 'yearly' => 'year', 'annual' => 'year',
+        'license' => 'license', 'licence' => 'license',
+    ];
+    return $map[$p] ?? 'month';
+}
+
+/** Admin dropdown values (English labels). */
+function stPricePeriodAdminOptions(): array {
+    return [
+        'month'   => 'Month',
+        'day'     => 'Day',
+        'year'    => 'Yearly',
+        'license' => 'License',
+    ];
+}
+
+/** Public suffix like "/ month". Empty when there is no price. */
+function stPricePeriodLabel(?string $period, $price = true): string {
+    if ($price === false || $price === null || $price === '' || $price === 0 || $price === '0') {
+        return '';
+    }
+    if (is_numeric($price) && (float)$price <= 0) {
+        return '';
+    }
+    $np = function_exists('isNepali') && isNepali();
+    $labels = [
+        'month'   => $np ? '/ महिना' : '/ month',
+        'day'     => $np ? '/ दिन' : '/ day',
+        'year'    => $np ? '/ वर्ष' : '/ year',
+        'license' => $np ? '/ लाइसेन्स' : '/ license',
+    ];
+    return $labels[stNormalizePricePeriod($period)] ?? $labels['month'];
+}
+
 function stContactEmail(): string {
     $s = siteSettings();
     return trim((string)($s['contact_email'] ?? ''));
