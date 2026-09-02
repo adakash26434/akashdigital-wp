@@ -395,11 +395,11 @@ if (!empty($_GET['edit'])) {
             <input type="number" id="price_from" name="price_from" class="form-input" step="0.01" min="0" value="<?=e($editing['price_from']??'')?>" placeholder="Leave blank = Contact us">
             <span class="form-hint">Blank = Contact us. Period is hidden until a price is entered.</span>
           </div>
-          <div id="price-period-wrap" <?= empty($editing['price_from']) || (float)($editing['price_from'] ?? 0) <= 0 ? 'hidden' : '' ?>>
+          <div id="price-period-wrap" <?= (!is_array($editing) || empty($editing['price_from']) || (float)($editing['price_from'] ?? 0) <= 0) ? 'hidden' : '' ?>>
             <label class="form-label" for="price_period">Period</label>
             <select id="price_period" name="price_period" class="form-input">
               <?php
-                $curPeriod = stNormalizePricePeriod($editing['price_period'] ?? 'month');
+                $curPeriod = stNormalizePricePeriod(is_array($editing) ? ($editing['price_period'] ?? 'month') : 'month');
                 foreach (stPricePeriodAdminOptions() as $pk => $pl):
               ?>
               <option value="<?=e($pk)?>" <?=$curPeriod===$pk?'selected':''?>><?=e($pl)?></option>

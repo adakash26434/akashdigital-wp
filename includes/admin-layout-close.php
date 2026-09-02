@@ -133,14 +133,18 @@ document.addEventListener('DOMContentLoaded', function () {
   var wrap = document.getElementById('price-period-wrap');
   var price = document.getElementById('price_from') || document.getElementById('svc_price_from');
   var sel = document.getElementById('price_period');
-  if (!wrap || !price) return;
+  if (!wrap || !price || !sel) return;
   function sync() {
     var n = parseFloat(price.value || '0') || 0;
     if (n > 0) {
       wrap.hidden = false;
-      if (sel && !sel.value) sel.value = 'month';
+      wrap.style.display = '';
+      if (!sel.value) sel.value = 'month';
+      sel.disabled = false;
     } else {
       wrap.hidden = true;
+      wrap.style.display = 'none';
+      sel.disabled = true;
     }
   }
   price.addEventListener('input', sync);
