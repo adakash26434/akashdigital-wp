@@ -889,3 +889,114 @@ html[data-ui-look="compact"] .news-card__media--placeholder {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Motion personality — Soft keeps live timing.
+   Hover/scroll only; looping motion is slow and optional.
+   ════════════════════════════════════════════════════════════ */
+@keyframes look-ed-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes look-ed-bar {
+  from { transform: scaleX(0.35); opacity: 0.4; }
+  to   { transform: scaleX(1); opacity: 1; }
+}
+
+html[data-ui-look="sharp"] .animate-fade-up,
+html[data-ui-look="sharp"] .animate-on-scroll,
+html[data-ui-look="sharp"] .animate-scale-up {
+  transform: translateY(10px);
+  transition-duration: 0.32s;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.32, 1);
+}
+html[data-ui-look="sharp"] .nav-pill::after {
+  transition-duration: 0.15s;
+}
+html[data-ui-look="sharp"] .btn {
+  transition-duration: 0.12s;
+}
+html[data-ui-look="sharp"] .product-card,
+html[data-ui-look="sharp"] .news-card,
+html[data-ui-look="sharp"] .price-card,
+html[data-ui-look="sharp"] .trust-proof__card {
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+html[data-ui-look="sharp"] .product-card:hover,
+html[data-ui-look="sharp"] .news-card:hover,
+html[data-ui-look="sharp"] .price-card:hover {
+  background-color: var(--muted);
+}
+
+html[data-ui-look="editorial"] .animate-fade-up,
+html[data-ui-look="editorial"] .animate-on-scroll {
+  transform: translateY(36px);
+  transition-duration: 0.85s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+html[data-ui-look="editorial"] .st-hero-mesh span {
+  animation-duration: 26s;
+}
+html[data-ui-look="editorial"] .hero-left .hero-bar {
+  transform-origin: center;
+  animation: look-ed-bar 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+}
+html[data-ui-look="editorial"] .hero-right .hero-mockup {
+  animation: look-ed-bob 8s ease-in-out infinite;
+}
+html[data-ui-look="editorial"] .hero-right .hero-mockup:hover {
+  animation-play-state: paused;
+  transform: translateY(-6px);
+}
+html[data-ui-look="editorial"] .product-card,
+html[data-ui-look="editorial"] .news-card,
+html[data-ui-look="editorial"] .testi-card,
+html[data-ui-look="editorial"] .price-card {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.45s ease;
+}
+html[data-ui-look="editorial"] .product-card:hover,
+html[data-ui-look="editorial"] .news-card:hover,
+html[data-ui-look="editorial"] .price-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 44px color-mix(in srgb, var(--primary) 14%, transparent);
+}
+html[data-ui-look="editorial"] .btn {
+  transition-duration: 0.28s;
+}
+
+html[data-ui-look="compact"] .animate-fade-up,
+html[data-ui-look="compact"] .animate-on-scroll,
+html[data-ui-look="compact"] .animate-scale-up {
+  transform: translateY(8px);
+  transition-duration: 0.22s;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+html[data-ui-look="compact"] .st-hero-mesh span {
+  animation-duration: 12s;
+}
+html[data-ui-look="compact"] .btn,
+html[data-ui-look="compact"] .product-card,
+html[data-ui-look="compact"] .news-card,
+html[data-ui-look="compact"] .prod-sidebar-item {
+  transition-duration: 0.12s;
+}
+html[data-ui-look="compact"] #prod-list .prod-accent {
+  transition: left 0.12s ease, width 0.12s ease, background 0.12s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-look="sharp"] .hero-right .hero-mockup,
+  html[data-ui-look="editorial"] .hero-right .hero-mockup,
+  html[data-ui-look="compact"] .hero-right .hero-mockup,
+  html[data-ui-look="editorial"] .hero-left .hero-bar,
+  html[data-ui-look="editorial"] .st-hero-mesh span,
+  html[data-ui-look="compact"] .st-hero-mesh span,
+  html[data-ui-look="editorial"] .product-card,
+  html[data-ui-look="editorial"] .news-card,
+  html[data-ui-look="editorial"] .price-card {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
