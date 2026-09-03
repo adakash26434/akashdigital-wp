@@ -28,8 +28,14 @@ function isAdminOrAbove(): bool {
     $user = currentUser();
     return $user !== null && in_array($user['role'], ['superadmin', 'admin']);
 }
-// Alias for backward compatibility
+// Alias for backward compatibility (admin + superadmin)
 function isSuperAdmin(): bool { return isAdminOrAbove(); }
+
+/** Env myadmin or users.role = superadmin only — not regular admin/editor/support. */
+function isSuperadminRole(): bool {
+    $user = currentUser();
+    return $user !== null && ($user['role'] ?? '') === 'superadmin';
+}
 
 // नेपालीमा: isLoggedIn() — yo function le aafno kaam garchha
 function isLoggedIn(): bool { return isset($_SESSION['user_id']); }

@@ -248,13 +248,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
         } elseif ($section === 'look') {
+            if (!function_exists('isSuperadminRole') || !isSuperadminRole()) {
+                throw new \RuntimeException('Only Superadmin can change the public look.');
+            }
             $look = strtolower(trim((string)($_POST['public_ui_look'] ?? 'soft')));
             $allowed = function_exists('stPublicUiLooks') ? array_keys(stPublicUiLooks()) : ['soft', 'sharp', 'editorial', 'compact'];
             if (!in_array($look, $allowed, true)) {
                 $look = 'soft';
             }
             saveSetting('public_ui_look', $look);
-            $success = 'Public look saved. Open the homepage to see it.';
+            $success = 'Public look saved. Visitors see it on the next page load. Soft keeps the current live layout.';
 
         } elseif ($section === 'footer') {
             saveSetting('footer_tagline',    trim($_POST['footer_tagline'] ?? ''));
@@ -431,10 +434,12 @@ $tabs = [
     ['footer',        icon('align-bottom',13),   'Footer'],
     ['features',      icon('toggle-right',13),   'Features'],
     ['seo',           icon('search',13),         'SEO'],
-    ['look',          icon('layout-template',13), 'Public Look'],
     ['brand_colors',  icon('palette',13),        'Brand Colors'],
     ['security',      icon('shield',13),         'Security'],
 ];
+if (function_exists('isSuperadminRole') && isSuperadminRole()) {
+    array_splice($tabs, 14, 0, [['look', icon('layout-template',13), 'Public Look']]);
+}
 ?>
 
 <style>
@@ -1294,7 +1299,8 @@ $tabs = [
     </form>
   </div>
 
-  <!-- Public Look -->
+  <?php if (function_exists('isSuperadminRole') && isSuperadminRole()): ?>
+  <!-- Public Look (superadmin only) -->
   <div x-show="tab==='look'" x-cloak>
     <?php
       $looks = function_exists('stPublicUiLooks') ? stPublicUiLooks() : [];
@@ -1304,7 +1310,7 @@ $tabs = [
       <?= csrfField() ?><input type="hidden" name="section" value="look">
       <div class="st-card p-card-lg" style="max-width:1100px;">
         <h3 class="h-eyebrow">Public site look</h3>
-        <p class="caption-meta" style="margin-bottom:1.25rem;">Same theme, pages, and copy. Visitors see a different layout personality. <strong>Soft</strong> is today’s live site (no change). Brand colors stay in Brand Colors. Admin and client portal are not affected.</p>
+        <p class="caption-meta" style="margin-bottom:1.25rem;"><strong>Superadmin only.</strong> Default is <strong>Soft</strong> — the current live layout. Saving another look changes the public site for all visitors. Admin and portal stay the same. Brand colors stay in Brand Colors.</p>
         <div class="look-pick" role="radiogroup" aria-label="Public site look">
           <?php foreach ($looks as $key => $meta): ?>
           <label>
@@ -1324,6 +1330,7 @@ $tabs = [
       </div>
     </form>
   </div>
+  <?php endif; ?>
 
   <!-- Brand Colors -->
   <div x-show="tab==='brand_colors'" x-cloak>
