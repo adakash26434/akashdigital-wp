@@ -8,12 +8,6 @@ $pageDesc  = 'Software solutions and IT services — Web Development, Document M
 
 $__s = siteSettings();
 
-$__colorMap = [
-  'blue'=>'icon-box-blue','teal'=>'icon-box-teal','purple'=>'icon-box-purple',
-  'amber'=>'icon-box-amber','green'=>'icon-box-green','rose'=>'icon-box-rose',
-  'orange'=>'icon-box-orange','indigo'=>'icon-box-indigo','gray'=>'icon-box-gray',
-];
-
 $__priceDefaults = [
   'cbs'            => ['NPR 8,999',  '/ month · per branch'],
   'mobile-banking' => ['NPR 5,999',  '/ month'],
@@ -60,7 +54,7 @@ try {
         $color = strtolower($r['icon_color'] ?? 'blue');
         $products[] = [
             'slug'        => $slug,
-            'box'         => $__colorMap[$color] ?? 'icon-box-blue',
+            'box'         => stIconBoxClass($color),
             'badge'       => $r['badge'] ?? '',
             'name'        => $r['name'],
             'tagline'     => $r['tagline'] ?? '',

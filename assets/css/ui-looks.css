@@ -1503,12 +1503,5 @@ html[data-ui-look="compact"] .pricing-empty {
   text-align: center;
 }
 
-/* Lucide sizing in product panel feature chips */
-.tab-pane .prod-panel-body [data-lucide] {
-  width: 13px;
-  height: 13px;
-  flex-shrink: 0;
-}
-html[data-ui-look="sharp"] .tab-pane .prod-panel-body [data-lucide] {
-  color: var(--primary);
-}
+html[data-ui-look="sharp"] .hero-dot { border-radius: 0.1rem; }
+html[data-ui-look="editorial"] .hero-dot { width: 0.55rem; height: 0.55rem; }

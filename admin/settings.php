@@ -1099,7 +1099,7 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
           <div class="st-accordion__body">
             <p class="caption-meta" style="margin-top:0;">Count comes from Stat 1 value (Hero section above).</p>
             <?php biI($s,'home_trust_unit','Unit word after count','clients','ग्राहकहरू') ?>
-            <?php biI($s,'home_trusted_label','Trust strip heading','Trusted by Leading Institutions Across Nepal','नेपालभरका अग्रणी सं���्थाहरूले विश्वास गर्छन्') ?>
+            <?php biI($s,'home_trusted_label','Trust strip heading','Trusted by Leading Institutions Across Nepal','नेपालभरका अग्रणी संस्थाहरूले विश्वास गर्छन्') ?>
           </div>
         </details>
 

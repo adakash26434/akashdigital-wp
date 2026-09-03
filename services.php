@@ -9,12 +9,6 @@ $pageDesc  = 'IT services and software solutions — Cloud, SMS, Domain, Securit
 $__s = siteSettings();
 $__trust = siteTrustStats($__s);
 
-$__colorMap = [
-  'blue'  =>'icon-box-blue',  'teal'  =>'icon-box-teal',  'purple'=>'icon-box-purple',
-  'amber' =>'icon-box-amber', 'green' =>'icon-box-green',  'rose'  =>'icon-box-rose',
-  'orange'=>'icon-box-orange','indigo'=>'icon-box-indigo',  'gray'  =>'icon-box-gray',
-];
-
 // Fallback if DB is empty
 $__svcDefaults = [
   ['slug'=>'cloud',    'box'=>'icon-box-blue',  'badge'=>'Popular',  'name'=>'Cloud Services',           'tagline'=>'Managed cloud for businesses across Nepal', 'summary'=>'Scalable, secure cloud infrastructure — managed servers, auto backups, 99.9% uptime SLA and 24×7 NOC monitoring.','price'=>'Contact us','price_note'=>'','icon'=>'cloud',          'highlights'=>['Managed Servers','Auto Backups','99.9% Uptime SLA','24×7 NOC Monitor']],
@@ -78,7 +72,7 @@ try {
         $color = strtolower($r['icon_color'] ?? 'blue');
         $services[] = [
             'slug'           => $r['slug'] ?? '',
-            'box'            => $__colorMap[$color] ?? 'icon-box-blue',
+            'box'            => stIconBoxClass($color),
             'badge'          => $r['badge'] ?? '',
             'name'           => $r['name'],
             'tagline'        => $r['tagline'] ?? '',

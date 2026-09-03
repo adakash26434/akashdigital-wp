@@ -115,7 +115,7 @@ $_stepDefsD = isNepali()
   ? ['तपाईंको आवश्यकता बुझ्छौं — निःशुल्क, कुनै बाध्यता छैन।',
      'विस्तृत प्रस्ताव २ कार्यदिवसभित्र पठाइन्छ।',
      'डाटा माइग्रेसन, कन्फिगरेसन र स्टाफ तालिम।',
-     '२ हप्तामा ल������इभ। लन्च पछि ३० दिन अन-कल सहयोग।']
+     '२ हप्तामा लाइभ। लन्च पछि ३० दिन अन-कल सहयोग।']
   : ['We learn your needs — free, no commitment.',
      'Detailed proposal with price & timeline in 2 days.',
      'We migrate data, configure the system and train staff.',
@@ -279,9 +279,11 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
   .hero-left .hero-actions{justify-content:center;}
   .hero-trust{justify-content:center;}
 }
-.hero-copy{position:relative;}
+.hero-copy{position:relative;min-height:6.5rem;}
 .hero-copy-slide{display:none;}
 .hero-copy-slide.is-active{display:block;}
+.hero-visual-slide{display:none;width:100%;min-height:8rem;}
+.hero-visual-slide.is-active{display:flex;align-items:center;justify-content:center;}
 .hero-copy-slide.is-active .hero-title,
 .hero-copy-slide.is-active .hero-sub{animation:hero-copy-in .45s ease;}
 @keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
@@ -289,8 +291,6 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 .st-hero-split.hero-no-right .hero-dots{justify-content:center;}
 .hero-dot{width:.5rem;height:.5rem;border-radius:999px;border:0;padding:0;background:var(--h-badge-border);cursor:pointer;}
 .hero-dot.is-active{background:var(--primary);transform:scale(1.15);}
-.hero-visual-slide{display:none;width:100%;}
-.hero-visual-slide.is-active{display:flex;align-items:center;justify-content:center;}
 .hero-visual-slide img{width:100%;max-width:520px;height:auto;display:block;border-radius:var(--radius-2xl);}
 @media (prefers-reduced-motion:reduce){
   .hero-copy-slide.is-active .hero-title,
@@ -323,7 +323,10 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
         <div class="hero-copy">
           <?php foreach ($_heroSlides as $_si => $_slide): ?>
           <div class="hero-copy-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>">
-            <h1 class="hero-title"><?= $_slide['title'] ?></h1>
+            <h1 class="hero-title"><?php
+              $_t = (string)$_slide['title'];
+              echo str_contains($_t, '<') ? $_t : e($_t);
+            ?></h1>
             <div class="hero-bar"></div>
             <p class="hero-sub"><?= e(strip_tags((string)$_slide['sub'])) ?></p>
           </div>
@@ -761,7 +764,7 @@ include 'includes/stats-bar.php';
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.5rem;margin-bottom:1.375rem;">
                 <?php foreach(array_slice($pFeats,0,8) as $f): ?>
                 <div style="display:flex;align-items:center;gap:.5rem;padding:.625rem .875rem;background:var(--muted);border-radius:.625rem;font-size:var(--text-sm);font-weight:600;color:var(--foreground);">
-                  <i data-lucide="check-circle" style="width:13px;height:13px;color:var(--primary);flex-shrink:0;"></i><?= e($f) ?>
+                  <i data-lucide="check-circle" class="prod-feat-icon"></i><?= e($f) ?>
                 </div>
                 <?php endforeach; ?>
               </div>
@@ -860,6 +863,12 @@ include 'includes/stats-bar.php';
   text-overflow: ellipsis;
   white-space: nowrap;
   min-width: 0;
+}
+.prod-feat-icon {
+  width: 13px;
+  height: 13px;
+  color: var(--primary);
+  flex-shrink: 0;
 }
 .prod-panel-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; }
 .home-news-head {
