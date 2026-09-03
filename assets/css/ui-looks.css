@@ -736,12 +736,12 @@ html[data-ui-look="sharp"] .st-stats .st-stat {
 
 @media (min-width: 1024px) {
   html[data-ui-look="sharp"] .hero-left .hero-sub,
-  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="compact"] .hero-left .hero-sub,
   html[data-ui-look="compact"] .page-hero__subtitle {
     text-align: start;
     hyphens: manual;
   }
+  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-sub,
   html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-sub {
     text-align: center;
@@ -755,7 +755,6 @@ html[data-ui-look="compact"] .tab-pane p {
 }
 @media (max-width: 1023px) {
   html[data-ui-look="sharp"] .hero-left .hero-sub,
-  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="sharp"] .tab-pane p,
   html[data-ui-look="compact"] .hero-left .hero-sub,
   html[data-ui-look="compact"] .page-hero__subtitle,
@@ -769,6 +768,7 @@ html[data-ui-look="compact"] .tab-pane p {
     text-align: start;
     hyphens: manual;
   }
+  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-sub,
   html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-sub {
     text-align: center;
@@ -815,27 +815,53 @@ html[data-ui-look="sharp"] .nav-pill[aria-current="page"]::after {
   transform: scaleX(1);
 }
 @media (min-width: 768px) {
-  html[data-ui-look="sharp"] .section-head:not(.st-stats__head):not(.trust-partners__head),
-  html[data-ui-look="sharp"] .section-head-tight:not(.st-stats__head):not(.trust-partners__head) {
-    text-align: start;
-  }
-  html[data-ui-look="sharp"] .section-lede,
-  html[data-ui-look="sharp"] .section-head:not(.st-stats__head):not(.trust-partners__head) > p {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
-    max-width: 38rem;
-    text-align: start;
-  }
-  html[data-ui-look="sharp"] .section-head:not(.st-stats__head):not(.trust-partners__head) .section-title {
-    border-left: 3px solid var(--primary);
-    padding-left: 0.8rem;
-  }
   html[data-ui-look="sharp"] .product-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   html[data-ui-look="sharp"] .news-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* Sharp: keep boxed chrome, but section intros stay centered like Soft. */
+html[data-ui-look="sharp"] .section-head,
+html[data-ui-look="sharp"] .section-head-tight,
+html[data-ui-look="sharp"] .home-news-head,
+html[data-ui-look="sharp"] .st-stats__head,
+html[data-ui-look="sharp"] .trust-partners__head,
+html[data-ui-look="sharp"] .section-foot {
+  text-align: center;
+}
+html[data-ui-look="sharp"] .section-head .section-title,
+html[data-ui-look="sharp"] .section-head-tight .section-title,
+html[data-ui-look="sharp"] .home-news-head .section-title,
+html[data-ui-look="sharp"] .st-stats__head .section-title,
+html[data-ui-look="sharp"] .trust-partners__head .section-title {
+  border-left: none;
+  padding-left: 0;
+}
+html[data-ui-look="sharp"] .section-lede,
+html[data-ui-look="sharp"] .st-stats__lede,
+html[data-ui-look="sharp"] .trust-partners__lede,
+html[data-ui-look="sharp"] .section-head > p,
+html[data-ui-look="sharp"] .section-head-tight > p {
+  text-align: center;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  max-width: 38rem;
+}
+html[data-ui-look="sharp"] .section-head .section-eyebrow,
+html[data-ui-look="sharp"] .section-head-tight .section-eyebrow,
+html[data-ui-look="sharp"] .home-news-head .section-eyebrow,
+html[data-ui-look="sharp"] .st-stats__head .section-eyebrow,
+html[data-ui-look="sharp"] .trust-partners__head .section-eyebrow {
+  display: inline-flex;
+  margin-inline: auto;
+}
+html[data-ui-look="sharp"] .st-stats__grid,
+html[data-ui-look="sharp"] .trust-proof {
+  margin-left: auto;
+  margin-right: auto;
 }
 html[data-ui-look="sharp"] .news-card__media,
 html[data-ui-look="sharp"] .news-card__media--placeholder {
@@ -1164,55 +1190,14 @@ html[data-ui-look="compact"] .pricing-empty {
 }
 
 @media (min-width: 768px) {
-  html[data-ui-look="sharp"] .section-foot,
-  html[data-ui-look="sharp"] .home-news-head {
-    text-align: start;
-  }
   html[data-ui-look="sharp"] .home-news-head {
     padding-right: 8.5rem;
-  }
-  html[data-ui-look="sharp"] .home-news-head .section-title {
-    border-left: 3px solid var(--primary);
-    padding-left: 0.8rem;
   }
   html[data-ui-look="sharp"] .home-news-head__all {
     right: 0;
   }
-  html[data-ui-look="sharp"] .st-stats__head {
-    text-align: center;
-  }
-  html[data-ui-look="sharp"] .st-stats__head .section-eyebrow,
-  html[data-ui-look="sharp"] .trust-partners__head .section-eyebrow {
-    margin-inline: auto;
-  }
-  html[data-ui-look="sharp"] .st-stats__head .section-title {
-    border-left: none;
-    padding-left: 0;
-  }
-  html[data-ui-look="sharp"] .st-stats__head .st-stats__lede {
-    text-align: center;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
   html[data-ui-look="sharp"] .st-stats__grid {
     max-width: 56rem;
-    margin-inline: auto;
-  }
-  html[data-ui-look="sharp"] .trust-partners__head {
-    text-align: center;
-  }
-  html[data-ui-look="sharp"] .trust-partners__head .section-title {
-    border-left: none;
-    padding-left: 0;
-  }
-  html[data-ui-look="sharp"] .trust-partners__head .trust-partners__lede {
-    text-align: center;
-    margin-left: auto !important;
-    margin-right: auto !important;
-  }
-  html[data-ui-look="sharp"] .trust-proof {
-    margin-left: auto;
-    margin-right: auto;
   }
 }
 
@@ -1326,23 +1311,20 @@ html[data-ui-look="compact"] .prod-sidebar-item:focus-visible {
 /* ── Pass 2: page heroes + Soft-safe catalog rhythm ── */
 @media (min-width: 768px) {
   html[data-ui-look="sharp"] .page-hero__inner {
-    text-align: start;
+    text-align: center;
   }
   html[data-ui-look="sharp"] .page-hero__title {
-    border-left: 3px solid var(--primary);
-    padding-left: 0.8rem;
+    border-left: none;
+    padding-left: 0;
   }
   html[data-ui-look="sharp"] .page-hero__subtitle {
-    margin-left: 0;
-    margin-right: 0;
+    margin-left: auto;
+    margin-right: auto;
     max-width: 38rem;
+    text-align: center;
   }
   html[data-ui-look="sharp"] .page-hero__actions {
-    justify-content: flex-start;
-  }
-  html[data-ui-look="sharp"] .section-head .section-eyebrow,
-  html[data-ui-look="sharp"] .home-news-head .section-eyebrow {
-    display: inline-block;
+    justify-content: center;
   }
 }
 
