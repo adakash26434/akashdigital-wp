@@ -104,6 +104,9 @@ html[data-ui-look="sharp"] .product-card {
   border: 1px solid var(--border);
   border-left: 3px solid var(--primary);
 }
+html[data-ui-look="sharp"] .product-card__icon {
+  border-radius: 0.2rem;
+}
 html[data-ui-look="sharp"] .trust-proof__card,
 html[data-ui-look="sharp"] .bc {
   border-left: 3px solid var(--primary);
@@ -202,9 +205,17 @@ html[data-ui-look="editorial"] .hero-left .hero-bar {
   border-radius: 999px;
 }
 html[data-ui-look="editorial"] .hero-left .hero-actions .btn,
+html[data-ui-look="editorial"] .btn,
 html[data-ui-look="editorial"] .btn-primary,
-html[data-ui-look="editorial"] .btn-outline {
+html[data-ui-look="editorial"] .btn-outline,
+html[data-ui-look="editorial"] .btn-white,
+html[data-ui-look="editorial"] .btn-glass {
   border-radius: 999px;
+}
+html[data-ui-look="editorial"] .btn-primary:hover,
+html[data-ui-look="editorial"] .btn-white:hover,
+html[data-ui-look="editorial"] .btn-glass:hover {
+  transform: none;
 }
 html[data-ui-look="editorial"] #wa-float-btn,
 html[data-ui-look="editorial"] #float-chat-btn {
@@ -331,7 +342,8 @@ html[data-ui-look="compact"] .st-stat__value { font-size: clamp(1.35rem, 2.4vw, 
 html[data-ui-look="sharp"] #st-desktop-nav .nav-pill > [data-lucide] {
   display: none;
 }
-html[data-ui-look="sharp"] .band-tinted {
+html[data-ui-look="sharp"] .band-tinted,
+html[data-ui-look="sharp"] .st-section--tinted {
   background: var(--muted);
 }
 html[data-ui-look="sharp"] .st-stat__icon-wrap {
@@ -388,7 +400,6 @@ html[data-ui-look="sharp"] .footer-heading {
   }
   html[data-ui-look="sharp"] .product-card__icon {
     margin-inline: 0;
-    border-radius: 0.2rem;
   }
   html[data-ui-look="sharp"] .product-card__head-copy {
     align-items: flex-start;
@@ -410,6 +421,7 @@ html[data-ui-look="editorial"] .st-hero-mesh {
   pointer-events: none;
 }
 html[data-ui-look="editorial"] .band-tinted,
+html[data-ui-look="editorial"] .st-section--tinted,
 html[data-ui-look="editorial"] .page-hero {
   background: var(--look-wash);
 }
@@ -443,7 +455,8 @@ html[data-ui-look="compact"] .product-card__summary {
 html[data-ui-look="compact"] .hero-right .float-chip {
   display: none;
 }
-html[data-ui-look="compact"] .band-tinted {
+html[data-ui-look="compact"] .band-tinted,
+html[data-ui-look="compact"] .st-section--tinted {
   padding-block: 2rem;
 }
 html[data-ui-look="compact"] footer {
@@ -611,6 +624,15 @@ html[data-ui-look="editorial"] .mobile-nav-item { border-radius: 999px; }
     background: var(--muted);
   }
 }
+html[data-ui-look="compact"] .st-lang-btn,
+html[data-ui-look="compact"] .st-icon-btn,
+html[data-ui-look="compact"] .st-user-btn,
+html[data-ui-look="compact"] .st-hamburger-btn {
+  border-radius: 0.4rem;
+}
+html[data-ui-look="compact"] .st-dropdown {
+  border-radius: 0.5rem;
+}
 
 /* ════════════════════════════════════════════════════════════
    Footer personality — Soft keeps the live footer.
@@ -749,7 +771,6 @@ html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .he
 }
 html[data-ui-look="editorial"] .product-grid { gap: 1.25rem; }
 html[data-ui-look="sharp"] .product-grid { gap: 1.05rem; }
-html[data-ui-look="compact"] .hero-left { gap: 0.65rem; }
 html[data-ui-look="compact"] footer .footer-list { gap: 0.45rem; }
 html[data-ui-look="sharp"] .st-stats .st-stat {
   padding-top: 0.75rem;
@@ -923,10 +944,15 @@ html[data-ui-look="editorial"] .news-card__media--placeholder {
 /* ── Compact: denser catalog — smaller chrome, 4-col when wide ── */
 @media (min-width: 1024px) {
   html[data-ui-look="compact"] .btn,
-  html[data-ui-look="compact"] .btn-md {
+  html[data-ui-look="compact"] .btn-md,
+  html[data-ui-look="compact"] .btn-lg {
     padding: 0.45rem 0.95rem;
     font-size: 0.8125rem;
     border-radius: 0.4rem;
+  }
+  html[data-ui-look="compact"] .btn-lg {
+    padding: 0.55rem 1.1rem;
+    font-size: 0.875rem;
   }
   html[data-ui-look="compact"] .hero-right .hero-mockup {
     max-width: 340px;
@@ -936,8 +962,12 @@ html[data-ui-look="compact"] .btn-primary {
   box-shadow: none;
 }
 html[data-ui-look="compact"] .news-card,
-html[data-ui-look="compact"] .price-card {
+html[data-ui-look="compact"] .price-card,
+html[data-ui-look="compact"] .product-card {
   border-radius: 0.5rem;
+}
+html[data-ui-look="compact"] .product-card {
+  box-shadow: none;
 }
 html[data-ui-look="compact"] .news-card__media,
 html[data-ui-look="compact"] .news-card__media--placeholder {
@@ -945,7 +975,7 @@ html[data-ui-look="compact"] .news-card__media--placeholder {
 }
 @media (min-width: 1280px) {
   html[data-ui-look="compact"] .product-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1319,7 +1349,7 @@ html[data-ui-look="compact"] .pricing-empty {
 
 @media (min-width: 768px) {
   html[data-ui-look="sharp"] .home-news-head {
-    padding-right: 8.5rem;
+    padding-right: 11rem;
   }
   html[data-ui-look="sharp"] .home-news-head__all {
     right: 0;
@@ -1623,7 +1653,7 @@ html[data-ui-look="compact"] #prod-list .prod-sidebar-item .icon-box-sm svg {
   width: 0.95rem;
   height: 0.95rem;
 }
-#prod-list .prod-chevron {
+html[data-ui-look="sharp"] #prod-list .prod-chevron {
   width: 15px;
   height: 15px;
   color: var(--muted-foreground);
@@ -1723,3 +1753,152 @@ html[data-ui-look="compact"] .pricing-empty {
 
 html[data-ui-look="sharp"] .hero-dot { border-radius: 0.1rem; }
 html[data-ui-look="editorial"] .hero-dot { width: 0.55rem; height: 0.55rem; }
+
+/* ════════════════════════════════════════════════════════════
+   Completion pass — leftover chrome only. Soft stays empty.
+   ════════════════════════════════════════════════════════════ */
+
+/* Explorer active wash — Soft keeps primary-light blue */
+html[data-ui-look="sharp"] .prod-sidebar-item.active,
+html[data-ui-look="compact"] .prod-sidebar-item.active {
+  background: var(--muted);
+}
+html[data-ui-look="editorial"] .prod-sidebar-item.active {
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+}
+
+/* Tooltip clamp so first/last names stay in frame */
+html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:first-child .prod-tab-label,
+html[data-ui-look="compact"] #prod-list .prod-sidebar-item:first-child .prod-tab-label {
+  left: 0;
+  transform: translateX(0) translateY(0.2rem);
+}
+html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:last-child .prod-tab-label,
+html[data-ui-look="compact"] #prod-list .prod-sidebar-item:last-child .prod-tab-label {
+  left: auto;
+  right: 0;
+  transform: translateX(0) translateY(0.2rem);
+}
+@media (hover: hover) and (pointer: fine) {
+  html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:first-child:hover .prod-tab-label,
+  html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:first-child:focus-visible .prod-tab-label,
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:first-child:hover .prod-tab-label,
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:first-child:focus-visible .prod-tab-label,
+  html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:last-child:hover .prod-tab-label,
+  html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:last-child:focus-visible .prod-tab-label,
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:last-child:hover .prod-tab-label,
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:last-child:focus-visible .prod-tab-label {
+    transform: translateX(0) translateY(0);
+  }
+}
+
+/* Editorial band rhythm matches section padding */
+html[data-ui-look="editorial"] .band {
+  padding-block: 5.25rem;
+}
+
+/* Compact card / testi / brand radii */
+html[data-ui-look="compact"] .bc,
+html[data-ui-look="compact"] .testi-card {
+  border-radius: 0.5rem;
+}
+
+/* Process step icons + numbers */
+html[data-ui-look="sharp"] .proc-step-icon,
+html[data-ui-look="sharp"] .proc-step-num {
+  border-radius: 0.15rem;
+  border: 1px solid var(--border);
+  box-shadow: none;
+  background: var(--look-paper);
+}
+html[data-ui-look="editorial"] .proc-step-icon,
+html[data-ui-look="editorial"] .proc-step-num {
+  border-radius: 1.1rem;
+}
+html[data-ui-look="compact"] .proc-step-icon,
+html[data-ui-look="compact"] .proc-step-num {
+  border-radius: 0.55rem;
+}
+
+/* Panel / mockup traffic-light dots */
+html[data-ui-look="sharp"] .wc .wd,
+html[data-ui-look="sharp"] .hero-mockup .dot {
+  border-radius: 0.1rem;
+}
+html[data-ui-look="editorial"] .wc {
+  border-radius: 0;
+}
+
+/* CTA banner Soft leftovers */
+html[data-ui-look="sharp"] .cta-banner__bg,
+html[data-ui-look="editorial"] .cta-banner__bg,
+html[data-ui-look="compact"] .cta-banner__bg {
+  display: none;
+}
+html[data-ui-look="sharp"] .cta-banner__eyebrow {
+  border-radius: 0;
+  letter-spacing: 0.12em;
+}
+html[data-ui-look="compact"] .cta-banner {
+  padding-block: 2.25rem;
+}
+html[data-ui-look="editorial"] .cta-banner .btn,
+html[data-ui-look="editorial"] .cta-banner .btn-white,
+html[data-ui-look="editorial"] .cta-banner .btn-glass {
+  border-radius: 999px;
+}
+
+/* Sharp feature-card hover shine off */
+html[data-ui-look="sharp"] .feature-card::after {
+  display: none;
+}
+html[data-ui-look="sharp"] .feature-card:hover {
+  transform: none;
+}
+
+/* Pricing badge / icon roundness */
+html[data-ui-look="sharp"] .price-card__badge {
+  border-radius: 0 0 0.15rem 0;
+}
+html[data-ui-look="sharp"] .price-card__icon {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] .price-card__badge {
+  border-radius: 0 0 1rem 0;
+}
+html[data-ui-look="editorial"] .price-card__icon {
+  border-radius: 999px;
+}
+html[data-ui-look="compact"] .price-card__badge {
+  border-radius: 0 0 0.4rem 0;
+}
+html[data-ui-look="compact"] .price-card__icon {
+  border-radius: 0.4rem;
+}
+
+/* Compact panel body denser on desktop */
+@media (min-width: 701px) {
+  html[data-ui-look="compact"] .prod-panel-body {
+    padding: 1.1rem 1.2rem !important;
+  }
+}
+
+/* Scroll-top + chat panel radii */
+html[data-ui-look="sharp"] .st-scroll-top,
+html[data-ui-look="sharp"] #st-chat-panel {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] .st-scroll-top,
+html[data-ui-look="editorial"] #st-chat-panel {
+  border-radius: 1.25rem;
+}
+html[data-ui-look="compact"] .st-scroll-top,
+html[data-ui-look="compact"] #st-chat-panel {
+  border-radius: 0.5rem;
+}
+
+/* Sharp primary hover stays flat */
+html[data-ui-look="sharp"] .btn-white:hover,
+html[data-ui-look="sharp"] .btn-glass:hover {
+  transform: none;
+}
