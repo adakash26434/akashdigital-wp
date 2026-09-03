@@ -138,13 +138,13 @@ ob_start(); ?>
       ?>
       <div class="st-card product-card">
         <div class="product-card__head">
+          <?php if (!empty($svc['badge'])): ?>
+          <span class="product-card__badge"><?= e($svc['badge']) ?></span>
+          <?php endif; ?>
           <div class="product-card__head-top">
             <div class="icon-box product-card__icon <?= e($svc['box']) ?>" aria-hidden="true">
               <i data-lucide="<?= e($svc['icon']) ?>"></i>
             </div>
-            <?php if (!empty($svc['badge'])): ?>
-            <span class="product-card__badge"><?= e($svc['badge']) ?></span>
-            <?php endif; ?>
           </div>
           <div class="product-card__head-copy">
             <h2 class="product-card__title"><?= e($svc['name']) ?></h2>

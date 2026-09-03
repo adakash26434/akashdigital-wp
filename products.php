@@ -117,13 +117,13 @@ ob_start(); ?>
       ?>
       <div class="st-card product-card">
         <div class="product-card__head">
+          <?php if (!empty($p['badge'])): ?>
+          <span class="product-card__badge"><?= e($p['badge']) ?></span>
+          <?php endif; ?>
           <div class="product-card__head-top">
             <div class="icon-box product-card__icon <?= e($p['box']) ?>" aria-hidden="true">
               <i data-lucide="<?= e($p['icon']) ?>"></i>
             </div>
-            <?php if (!empty($p['badge'])): ?>
-            <span class="product-card__badge"><?= e($p['badge']) ?></span>
-            <?php endif; ?>
           </div>
           <div class="product-card__head-copy">
             <h2 class="product-card__title"><?= e($p['name']) ?></h2>
