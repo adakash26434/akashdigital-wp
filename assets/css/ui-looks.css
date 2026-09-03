@@ -762,3 +762,130 @@ html[data-ui-look="sharp"] .st-stats .st-stat {
     hyphens: manual;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Safer extra contrast (CSS-only). Soft still has zero rules.
+   No copy hidden. Nav height / logo unchanged. Not .st-card forms.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Sharp: government catalog — square chrome, left rails, 2-col ── */
+html[data-ui-look="sharp"] .btn,
+html[data-ui-look="sharp"] .btn-sm,
+html[data-ui-look="sharp"] .btn-md,
+html[data-ui-look="sharp"] .btn-lg,
+html[data-ui-look="sharp"] .form-input,
+html[data-ui-look="sharp"] .news-card,
+html[data-ui-look="sharp"] .price-card,
+html[data-ui-look="sharp"] .pricing-card {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="sharp"] #wa-float-btn,
+html[data-ui-look="sharp"] #float-chat-btn {
+  border-radius: 0.2rem;
+}
+html[data-ui-look="sharp"] .btn-primary {
+  background: var(--primary);
+  box-shadow: none;
+}
+html[data-ui-look="sharp"] .btn-primary:hover,
+html[data-ui-look="sharp"] .btn-primary:active {
+  transform: none;
+  box-shadow: none;
+  background: var(--primary-dark);
+}
+html[data-ui-look="sharp"] .hero-left .hero-title {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+html[data-ui-look="sharp"] .nav-pill.active::after,
+html[data-ui-look="sharp"] .nav-pill[aria-current="page"]::after {
+  height: 3px;
+  transform: scaleX(1);
+}
+@media (min-width: 768px) {
+  html[data-ui-look="sharp"] .section-head,
+  html[data-ui-look="sharp"] .section-head-tight {
+    text-align: start;
+  }
+  html[data-ui-look="sharp"] .section-lede,
+  html[data-ui-look="sharp"] .st-stats__lede,
+  html[data-ui-look="sharp"] .trust-partners__lede {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 38rem;
+    text-align: start;
+  }
+  html[data-ui-look="sharp"] .section-title {
+    border-left: 3px solid var(--primary);
+    padding-left: 0.8rem;
+  }
+  html[data-ui-look="sharp"] .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  html[data-ui-look="sharp"] .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+html[data-ui-look="sharp"] .news-card__media,
+html[data-ui-look="sharp"] .news-card__media--placeholder {
+  border-radius: 0;
+}
+
+/* ── Editorial: magazine — 2-col stories, airy news, calm pills ── */
+html[data-ui-look="editorial"] .btn-primary {
+  box-shadow: none;
+}
+html[data-ui-look="editorial"] .btn-primary:hover {
+  transform: none;
+  box-shadow: none;
+}
+html[data-ui-look="editorial"] .news-card,
+html[data-ui-look="editorial"] .price-card {
+  border-radius: 1.35rem;
+  box-shadow: none;
+}
+html[data-ui-look="editorial"] .news-card__media,
+html[data-ui-look="editorial"] .news-card__media--placeholder {
+  height: 13rem;
+}
+@media (min-width: 768px) {
+  html[data-ui-look="editorial"] .product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  html[data-ui-look="editorial"] .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem;
+  }
+}
+
+/* ── Compact: denser catalog — smaller chrome, 4-col when wide ── */
+@media (min-width: 1024px) {
+  html[data-ui-look="compact"] .btn,
+  html[data-ui-look="compact"] .btn-md {
+    padding: 0.45rem 0.95rem;
+    font-size: 0.8125rem;
+    border-radius: 0.4rem;
+  }
+  html[data-ui-look="compact"] .hero-right .hero-mockup {
+    max-width: 340px;
+  }
+}
+html[data-ui-look="compact"] .btn-primary {
+  box-shadow: none;
+}
+html[data-ui-look="compact"] .news-card,
+html[data-ui-look="compact"] .price-card {
+  border-radius: 0.5rem;
+}
+html[data-ui-look="compact"] .news-card__media,
+html[data-ui-look="compact"] .news-card__media--placeholder {
+  height: 7.25rem;
+}
+@media (min-width: 1280px) {
+  html[data-ui-look="compact"] .product-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

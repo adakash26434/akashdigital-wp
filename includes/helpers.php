@@ -414,18 +414,18 @@ function stPublicUiLooks(): array {
         ],
         'sharp'     => [
             'label' => 'Sharp',
-            'hint'  => 'Corporate bar, grid hero, square cards, striped footer.',
-            'best'  => 'Best for a formal / government-style feel. Same pages and text.',
+            'hint'  => 'Square buttons, left section titles, 2-column catalog, underline nav, striped footer.',
+            'best'  => 'Best for a formal / government-style feel. Same pages, text, and brand colors.',
         ],
         'editorial' => [
             'label' => 'Editorial',
-            'hint'  => 'Cream header, pill nav, stacked hero, roomy footer.',
-            'best'  => 'Best for a calmer, story-led look. Same pages and text.',
+            'hint'  => 'Stacked hero, pill buttons, 2-column magazine cards, airy news, roomy footer.',
+            'best'  => 'Best for a calmer, story-led look. Same pages, text, and brand colors.',
         ],
         'compact'   => [
             'label' => 'Compact',
-            'hint'  => 'Tighter nav and spacing, shorter footer, product tabs on desktop.',
-            'best'  => 'Best if you want more on one screen. Same pages and text.',
+            'hint'  => 'Denser type, 4-column catalog on wide screens, product tabs, shorter footer.',
+            'best'  => 'Best if you want more on one screen. Same pages, text, and brand colors.',
         ],
     ];
 }
