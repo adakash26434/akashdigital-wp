@@ -408,9 +408,9 @@ function stCompanyName(): string {
 function stPublicUiLooks(): array {
     return [
         'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS (default)'],
-        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: white grid hero, text nav, left-aligned cards'],
-        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: stacked hero, cream bands, text-only eyebrows'],
-        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: shorter hero, tighter cards, product tabs on desktop'],
+        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: solid text nav, grid hero, left-aligned cards'],
+        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: cream header, pill nav, stacked hero'],
+        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: tighter desktop nav, shorter hero, product tabs'],
     ];
 }
 

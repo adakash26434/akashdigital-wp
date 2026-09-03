@@ -496,3 +496,62 @@ html[data-ui-look="compact"] .section-title.whitespace-nowrap {
     min-height: 0;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Navbar personality — Soft stays the live glass bar.
+   Height / logo / labels unchanged. Desktop spacing from 1024px.
+   ════════════════════════════════════════════════════════════ */
+html[data-ui-look="sharp"] .st-lang-btn,
+html[data-ui-look="sharp"] .st-icon-btn,
+html[data-ui-look="sharp"] .st-user-btn,
+html[data-ui-look="sharp"] .st-hamburger-btn {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="sharp"] .mobile-nav-item {
+  border-radius: 0;
+  border-left: 3px solid transparent;
+}
+html[data-ui-look="sharp"] .mobile-nav-item[aria-current="page"] {
+  border-left-color: var(--primary);
+  background: transparent;
+}
+@media (min-width: 1024px) {
+  html[data-ui-look="sharp"] #st-desktop-nav { gap: 0.4rem; }
+  html[data-ui-look="sharp"] .nav-pill {
+    padding-inline: 0.5rem;
+    font-weight: 500;
+  }
+}
+
+html[data-ui-look="editorial"]:not(.dark) #st-navbar,
+html[data-ui-look="editorial"]:not(.dark) #st-navbar.is-scrolled {
+  background: rgba(247, 245, 242, 0.94);
+  box-shadow: none;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+}
+html[data-ui-look="editorial"] .st-lang-btn,
+html[data-ui-look="editorial"] .st-icon-btn,
+html[data-ui-look="editorial"] .st-hamburger-btn {
+  border-radius: 999px;
+}
+html[data-ui-look="editorial"] .st-dropdown { border-radius: 1.1rem; }
+html[data-ui-look="editorial"] .mobile-nav-item { border-radius: 999px; }
+@media (min-width: 1024px) {
+  html[data-ui-look="editorial"] #st-desktop-nav { gap: 0.4rem; }
+  html[data-ui-look="editorial"] .nav-pill {
+    padding: 0.4rem 0.95rem;
+  }
+  html[data-ui-look="editorial"] .nav-pill.active,
+  html[data-ui-look="editorial"] .nav-pill[aria-current="page"] {
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+  }
+}
+
+@media (min-width: 1024px) {
+  html[data-ui-look="compact"] #st-desktop-nav { gap: 0; }
+  html[data-ui-look="compact"] #st-desktop-actions { gap: 0.35rem !important; }
+  html[data-ui-look="compact"] .nav-pill.active,
+  html[data-ui-look="compact"] .nav-pill[aria-current="page"] {
+    background: var(--muted);
+  }
+}
