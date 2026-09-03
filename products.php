@@ -63,7 +63,7 @@ try {
             'summary'     => $r['summary'] ?? '',
             'price'       => $price,
             'price_note'  => $priceNote,
-            'icon'        => $r['lucide_icon'] ?: 'package',
+            'icon'        => stLucideIcon($r['lucide_icon'] ?? '', 'package', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? '')),
             'highlights'  => $highs,
             'features'    => $feats,
         ];

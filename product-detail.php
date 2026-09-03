@@ -48,7 +48,7 @@ $screenshots = stDetailGalleryImages(
     $product['demo_screenshot_url'] ?? null
 );
 
-$lucideIcon = trim((string)($product['lucide_icon'] ?? '')) ?: 'package';
+$lucideIcon = stLucideIcon($product['lucide_icon'] ?? '', 'package', ($product['name'] ?? '') . ' ' . ($product['slug'] ?? ''));
 
 // Demo request
 $demo_success = false;
@@ -316,7 +316,7 @@ endif; ?>
       <a href="<?= url('product-detail.php?slug='.urlencode($r['slug'])) ?>" class="st-card st-card-link">
         <div style="display:flex;align-items:center;gap:0.875rem;margin-bottom:0.75rem;">
           <div class="icon-box icon-box-sm" style="background:var(--gradient-primary);box-shadow:none;">
-            <i data-lucide="<?= e($r['lucide_icon'] ?? 'package') ?>"></i>
+            <i data-lucide="<?= e(stLucideIcon($r['lucide_icon'] ?? '', 'package', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? ''))) ?>"></i>
           </div>
           <h3 style="font-family:var(--font-display);font-size:var(--text-md);font-weight:700;color:var(--foreground);"><?= e($r['name']) ?></h3>
         </div>

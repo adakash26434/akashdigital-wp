@@ -1533,8 +1533,47 @@ function csrfField(): string {
     return '<input type="hidden" name="_csrf" value="' . e(generateCsrf()) . '">';
 }
 
+/**
+ * Normalize a CMS lucide_icon to a name that exists in bundled Lucide.
+ * Invalid / alias names (e.g. ticket desk) otherwise render an empty box.
+ */
+function stLucideIcon(?string $name, string $fallback = 'box', string $hint = ''): string {
+    $n = strtolower(trim((string)$name));
+    $n = str_replace(['_', ' '], '-', $n);
+    $aliases = [
+        'lifebuoy'     => 'life-buoy',
+        'life-ring'    => 'life-buoy',
+        'life-belt'    => 'life-buoy',
+        'support'      => 'headset',
+        'helpdesk'     => 'headset',
+        'help-desk'    => 'headset',
+        'ticket-desk'  => 'ticket',
+        'ticketdesk'   => 'ticket',
+        'tickets-desk' => 'tickets',
+        'ticket-check' => 'ticket-check',
+    ];
+    if (isset($aliases[$n])) {
+        $n = $aliases[$n];
+    }
+    $blob = strtolower($hint . ' ' . $n);
+    if ($n === '' || $n === 'null' || $n === 'undefined') {
+        if (preg_match('/ticket|helpdesk|help-desk/', $blob)) {
+            return 'ticket';
+        }
+        if (preg_match('/support|headset/', $blob)) {
+            return 'headset';
+        }
+        return $fallback;
+    }
+    if (preg_match('/ticket/', $blob) && !preg_match('/^(ticket|tickets|ticket-check|ticket-plus|ticket-minus|ticket-x|ticket-slash|ticket-percent)$/', $n)) {
+        return 'ticket';
+    }
+    return $n;
+}
+
 // नेपालीमा: Lucide SVG icon ko HTML banaune (size + inline style sahit)
 function icon(string $name, int $size = 16, string $style = ''): string {
+    $name = stLucideIcon($name);
     $s = "width:{$size}px;height:{$size}px;display:inline-block;vertical-align:middle;flex-shrink:0;";
     if ($style) $s .= $style;
     return '<i data-lucide="' . e($name) . '" style="' . $s . '"></i>';
@@ -1819,7 +1858,7 @@ function resolveProductsAddons(?array $settings = null): array {
                     if ($title === '') $title = (string)$row['name'];
                     if ($desc === '')  $desc  = (string)($row['summary'] ?? '');
                     if ($icon === 'puzzle' || empty($item['icon'])) {
-                        $icon = trim((string)($row['lucide_icon'] ?? '')) ?: $icon;
+                        $icon = stLucideIcon($row['lucide_icon'] ?? '', $icon, ($row['name'] ?? '') . ' ' . ($row['slug'] ?? ''));
                     }
                     if ($price === '' && !empty($row['price_from'])) {
                         $price = 'from NPR ' . number_format((float)$row['price_from'], 0);
@@ -1841,7 +1880,7 @@ function resolveProductsAddons(?array $settings = null): array {
                     if ($title === '') $title = (string)$row['name'];
                     if ($desc === '')  $desc  = (string)($row['summary'] ?? '');
                     if ($icon === 'puzzle' || empty($item['icon'])) {
-                        $icon = trim((string)($row['lucide_icon'] ?? '')) ?: $icon;
+                        $icon = stLucideIcon($row['lucide_icon'] ?? '', $icon, ($row['name'] ?? '') . ' ' . ($row['slug'] ?? ''));
                     }
                     if ($price === '' && !empty($row['price_from'])) {
                         $price = 'from NPR ' . number_format((float)$row['price_from'], 0);
@@ -1855,7 +1894,7 @@ function resolveProductsAddons(?array $settings = null): array {
 
         if ($title === '') continue;
         $out[] = [
-            'icon'       => $icon,
+            'icon'       => stLucideIcon($icon, 'puzzle', $title),
             'title'      => $title,
             'desc'       => $desc,
             'price'      => $price,

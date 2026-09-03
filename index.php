@@ -495,11 +495,7 @@ include 'includes/stats-bar.php';
         <?php endif; ?>
         <div style="position:relative;display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
           <div class="icon-box icon-box-sm icon-box-<?= e($iconColor) ?>">
-            <?php if(!empty($prod['lucide_icon'])): ?>
-              <i data-lucide="<?= e($prod['lucide_icon']) ?>"></i>
-            <?php else: ?>
-              <span style="font-size:1.25rem;line-height:1;"><?= e($prod['icon'] ?? '📦') ?></span>
-            <?php endif; ?>
+            <i data-lucide="<?= e(stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''))) ?>"></i>
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;flex-wrap:wrap;">
@@ -569,7 +565,7 @@ include 'includes/stats-bar.php';
         <?php foreach($homeProducts as $i=>$prod):
           $tSlug  = $prod['slug'];
           $tLabel = $prod['tab_label'] ?: $prod['name'];
-          $tIcon  = $prod['lucide_icon'] ?: 'box';
+          $tIcon  = stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''));
           $tColor = $prod['icon_color'] ?? 'blue';
           $isLast = $i === count($homeProducts) - 1;
         ?>
@@ -595,7 +591,7 @@ include 'includes/stats-bar.php';
         <?php foreach($homeProducts as $i=>$prod):
           $tSlug  = $prod['slug'];
           $pFeats = json_decode($prod['features']   ?? '[]', true) ?: [];
-          $tIcon  = $prod['lucide_icon'] ?: 'box';
+          $tIcon  = stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''));
           $tColor = $prod['icon_color'] ?? 'blue';
         ?>
         <div id="tab-<?= e($tSlug) ?>" class="tab-pane <?= $i===0?'active':'' ?>">

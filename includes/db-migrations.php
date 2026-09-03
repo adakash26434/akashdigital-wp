@@ -909,4 +909,17 @@ function runDbMigrations() {
             'price_period' => "VARCHAR(20) NOT NULL DEFAULT 'month'",
         ]);
     } catch (\Throwable $e) { error_log('[db-migrations] M39: ' . $e->getMessage()); }
+
+    try {
+        // Migration 40: Support & Ticket Desk — invalid lucide names render an empty icon box
+        if (dbTableExists('products') && dbColumnExists('products', 'lucide_icon')) {
+            execute(
+                "UPDATE products SET lucide_icon = 'ticket' WHERE (" .
+                "LOWER(COALESCE(name,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) IN ('support','support-desk')" .
+                ") AND LOWER(TRIM(COALESCE(lucide_icon,''))) NOT IN (" .
+                "'ticket','tickets','ticket-check','life-buoy','headset','headphones','inbox'" .
+                ")"
+            );
+        }
+    } catch (\Throwable $e) { error_log('[db-migrations] M40: ' . $e->getMessage()); }
 }

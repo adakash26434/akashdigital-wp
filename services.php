@@ -85,7 +85,7 @@ try {
             'summary'        => $r['summary'] ?? '',
             'price'          => $price,
             'price_note'     => $priceNote,
-            'icon'           => ($r['lucide_icon'] ?? '') ?: 'layers',
+            'icon'           => stLucideIcon($r['lucide_icon'] ?? '', 'layers', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? '')),
             'highlights'     => $highs,
             'chips'          => array_slice($chips, 0, 6),
             'screenshot_url' => $r['demo_screenshot_url'] ?? '',
