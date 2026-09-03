@@ -1269,3 +1269,71 @@ html[data-ui-look="compact"] .prod-sidebar-item:focus-visible {
     padding-block: 3.5rem;
   }
 }
+
+/* ── Pass 2: page heroes + Soft-safe catalog rhythm ── */
+@media (min-width: 768px) {
+  html[data-ui-look="sharp"] .page-hero__inner {
+    text-align: start;
+  }
+  html[data-ui-look="sharp"] .page-hero__title {
+    border-left: 3px solid var(--primary);
+    padding-left: 0.8rem;
+  }
+  html[data-ui-look="sharp"] .page-hero__subtitle {
+    margin-left: 0;
+    margin-right: 0;
+    max-width: 38rem;
+  }
+  html[data-ui-look="sharp"] .page-hero__actions {
+    justify-content: flex-start;
+  }
+  html[data-ui-look="sharp"] .section-head .section-eyebrow,
+  html[data-ui-look="sharp"] .home-news-head .section-eyebrow {
+    display: inline-block;
+  }
+}
+
+html[data-ui-look="editorial"] .page-hero {
+  background: var(--look-wash);
+  border-bottom: none;
+}
+html[data-ui-look="editorial"] .page-hero__title {
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+html[data-ui-look="editorial"] .page-hero__actions .section-eyebrow {
+  border-radius: 999px;
+}
+
+html[data-ui-look="compact"] .page-hero {
+  padding-block: 2.75rem 2rem;
+}
+html[data-ui-look="compact"] .page-hero__title {
+  font-size: clamp(1.45rem, 3vw, 2.05rem);
+}
+html[data-ui-look="compact"] .page-hero__subtitle {
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+html[data-ui-look="compact"] .page-hero__actions {
+  margin-top: 1.25rem;
+}
+
+html[data-ui-look="sharp"] .product-card__price-strip,
+html[data-ui-look="compact"] .product-card__price-strip {
+  justify-content: flex-start;
+  text-align: start;
+  padding-inline: 1.15rem;
+}
+html[data-ui-look="editorial"] .product-card__price-strip {
+  background: color-mix(in srgb, var(--primary) 5%, var(--muted));
+}
+
+@media (max-width: 640px) {
+  html[data-ui-look="compact"] .trust-proof {
+    grid-template-columns: 1fr;
+  }
+  html[data-ui-look="editorial"] .trust-proof {
+    grid-template-columns: 1fr;
+  }
+}
