@@ -101,12 +101,18 @@ html:not(.dark) .st-hero {
 /* No side visual → centered hero copy (Soft + all looks) */
 .st-hero-split.hero-no-right {
   grid-template-columns: 1fr;
-  max-width: 42rem;
+  max-width: min(58rem, 100%);
   margin-inline: auto;
   text-align: center;
 }
 .st-hero-split.hero-no-right .hero-right { display: none; }
+.st-hero-split.hero-no-right .hero-left .hero-badge { margin-inline: auto; }
+.st-hero-split.hero-no-right .hero-left .hero-sub { max-width: 46rem; }
 @media (min-width: 769px) {
+  .st-hero-split {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 1.5rem;
+  }
   .st-hero-split.hero-no-right .hero-left { align-items: center; }
   .st-hero-split.hero-no-right .hero-left .hero-bar { margin-inline: auto; }
   .st-hero-split.hero-no-right .hero-left .hero-sub { margin-inline: auto; }
