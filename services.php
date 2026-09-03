@@ -85,7 +85,7 @@ try {
             'summary'        => $r['summary'] ?? '',
             'price'          => $price,
             'price_note'     => $priceNote,
-            'icon'           => stLucideIcon($r['lucide_icon'] ?? '', 'layers', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? '')),
+            'icon'           => stRowLucideIcon($r, 'layers'),
             'highlights'     => $highs,
             'chips'          => array_slice($chips, 0, 6),
             'screenshot_url' => $r['demo_screenshot_url'] ?? '',
@@ -160,6 +160,12 @@ ob_start(); ?>
           <span class="product-card__price-note"><?= e($svc['price_note']) ?></span>
           <?php endif; ?>
         </div>
+
+        <?php if (!empty($svc['screenshot_url'])): ?>
+        <div class="product-card__shot">
+          <img src="<?= e($svc['screenshot_url']) ?>" alt="<?= e($svc['name']) ?>" loading="lazy" decoding="async">
+        </div>
+        <?php endif; ?>
 
         <div class="product-card__body">
           <?php if (!empty($svc['summary'])): ?>

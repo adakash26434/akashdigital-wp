@@ -117,7 +117,7 @@ if ($active_count > 0):?>
 <h2 style="font-family:var(--font-display);font-size:1rem;font-weight:700;color:var(--foreground);margin-bottom:1rem;">Available Products</h2>
 <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1rem;">
   <?php foreach ($demoProducts as $p):
-    $iconName  = stLucideIcon($p['lucide_icon'] ?: ($p['icon'] ?? ''), 'box', ($p['name'] ?? '') . ' ' . ($p['slug'] ?? ''));
+    $iconName  = stRowLucideIcon($p, 'box');
     $iconColor = $p['icon_color'] ?: 'blue';
     $BADGE_COLORS = [
       'Flagship'=>['#f3e8ff','#7e22ce'], 'Popular'=>['#dbeafe','var(--primary-dark)'],

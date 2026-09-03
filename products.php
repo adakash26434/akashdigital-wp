@@ -35,9 +35,13 @@ $__productDefaults = [
 $products = [];
 try {
     try {
-        $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from,price_period FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+        $rows = query("SELECT slug,name,tagline,summary,badge,icon,lucide_icon,icon_color,highlights,features,price_from,price_period,demo_screenshot_url FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
     } catch (\Throwable $eCol) {
-        $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+        try {
+            $rows = query("SELECT slug,name,tagline,summary,badge,icon,lucide_icon,icon_color,highlights,features,price_from,price_period FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+        } catch (\Throwable $eCol2) {
+            $rows = query("SELECT slug,name,tagline,summary,badge,lucide_icon,icon_color,highlights,features,price_from FROM products WHERE active=1 ORDER BY position,id LIMIT 12");
+        }
     }
     foreach ($rows as $r) {
         $highs = json_decode($r['highlights'] ?? '[]', true) ?: [];
@@ -63,9 +67,10 @@ try {
             'summary'     => $r['summary'] ?? '',
             'price'       => $price,
             'price_note'  => $priceNote,
-            'icon'        => stLucideIcon($r['lucide_icon'] ?? '', 'package', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? '')),
+            'icon'        => stRowLucideIcon($r, 'package'),
             'highlights'  => $highs,
             'features'    => $feats,
+            'shot'        => trim((string)($r['demo_screenshot_url'] ?? '')),
         ];
     }
 } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
@@ -134,6 +139,12 @@ ob_start(); ?>
           <span class="product-card__price-note"><?= e($p['price_note']) ?></span>
           <?php endif; ?>
         </div>
+
+        <?php if (!empty($p['shot'])): ?>
+        <div class="product-card__shot">
+          <img src="<?= e($p['shot']) ?>" alt="<?= e($p['name']) ?>" loading="lazy" decoding="async">
+        </div>
+        <?php endif; ?>
 
         <div class="product-card__body">
           <?php if (!empty($p['summary'])): ?>

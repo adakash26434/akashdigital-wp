@@ -51,7 +51,7 @@ $stats = [];
 for ($__i=1;$__i<=4;$__i++) {
   $v = trim($__s["stat_{$__i}_value"] ?? '');
   $l = cms($__s, "stat_{$__i}_label");
-  $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2], $_def[$__i-1][3]];
+  $stats[] = [$v?:$_def[$__i-1][0], $l?:$_def[$__i-1][1], $_def[$__i-1][2], ''];
 }
 unset($__i,$v,$l,$_def);
 
@@ -495,7 +495,7 @@ include 'includes/stats-bar.php';
         <?php endif; ?>
         <div style="position:relative;display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
           <div class="icon-box icon-box-sm icon-box-<?= e($iconColor) ?>">
-            <i data-lucide="<?= e(stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''))) ?>"></i>
+            <i data-lucide="<?= e(stRowLucideIcon($prod, 'box')) ?>"></i>
           </div>
           <div>
             <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;flex-wrap:wrap;">
@@ -561,18 +561,23 @@ include 'includes/stats-bar.php';
     <div id="prod-explorer" style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:1.5rem;align-items:start;max-width:72rem;margin:0 auto;">
 
       <!-- ── LEFT: product list ── -->
-      <div id="prod-list" style="border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;background:var(--card);box-shadow:0 2px 12px rgba(15,23,42,.06);">
+      <div id="prod-list" role="tablist" aria-label="<?= e(isNepali() ? 'उत्पादनहरू' : 'Products') ?>" style="border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;background:var(--card);box-shadow:0 2px 12px rgba(15,23,42,.06);">
         <?php foreach($homeProducts as $i=>$prod):
-          $tSlug  = $prod['slug'];
-          $tLabel = $prod['tab_label'] ?: $prod['name'];
-          $tIcon  = stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''));
+          $tSlug  = $prod['slug'] ?? '';
+          $tLabel = trim((string)($prod['tab_label'] ?? '')) ?: ($prod['name'] ?? '');
+          $tIcon  = stRowLucideIcon($prod, 'box');
           $tColor = $prod['icon_color'] ?? 'blue';
           $isLast = $i === count($homeProducts) - 1;
         ?>
         <button
+          type="button"
           onclick="sTab('<?= e($tSlug) ?>')"
           data-tab="<?= e($tSlug) ?>"
           class="prod-sidebar-item <?= $i===0?'active':'' ?>"
+          role="tab"
+          aria-selected="<?= $i===0?'true':'false' ?>"
+          aria-controls="tab-<?= e($tSlug) ?>"
+          id="prod-tab-<?= e($tSlug) ?>"
           style="width:100%;display:flex;align-items:center;gap:.875rem;padding:1.0625rem 1.25rem;text-align:left;background:none;border:none;cursor:pointer;border-bottom:<?= $isLast?'none':'1px solid var(--border)' ?>;position:relative;transition:background .15s;">
           <!-- Active left accent bar -->
           <span class="prod-accent" style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0;background:var(--primary);opacity:0;transition:opacity .15s;"></span>
@@ -589,28 +594,39 @@ include 'includes/stats-bar.php';
       <!-- ── RIGHT: detail panels ── -->
       <div id="prod-panel">
         <?php foreach($homeProducts as $i=>$prod):
-          $tSlug  = $prod['slug'];
-          $pFeats = json_decode($prod['features']   ?? '[]', true) ?: [];
-          $tIcon  = stLucideIcon($prod['lucide_icon'] ?? '', 'box', ($prod['name'] ?? '') . ' ' . ($prod['slug'] ?? ''));
+          $tSlug  = $prod['slug'] ?? '';
+          $pFeats = json_decode($prod['features'] ?? '[]', true) ?: [];
+          if (!$pFeats) {
+            $pFeats = json_decode($prod['highlights'] ?? '[]', true) ?: [];
+          }
+          $tIcon  = stRowLucideIcon($prod, 'box');
           $tColor = $prod['icon_color'] ?? 'blue';
+          $tShot  = trim((string)($prod['demo_screenshot_url'] ?? ''));
+          if ($tShot !== '' && function_exists('normalizeImageUrl')) {
+            $tNorm = normalizeImageUrl($tShot);
+            $tShot = ($tNorm !== false && $tNorm !== '') ? (string)$tNorm : $tShot;
+          }
         ?>
-        <div id="tab-<?= e($tSlug) ?>" class="tab-pane <?= $i===0?'active':'' ?>">
+        <div id="tab-<?= e($tSlug) ?>" class="tab-pane <?= $i===0?'active':'' ?>" role="tabpanel" aria-labelledby="prod-tab-<?= e($tSlug) ?>">
           <div style="border-radius:var(--radius-2xl);border:1px solid var(--border);overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,.07);">
             <div class="wc">
               <span class="wd dot-danger"></span><span class="wd dot-warning"></span><span class="wd dot-success"></span>
               <div class="pill-row">
                 <i data-lucide="lock" class="ic-9 text-success"></i>
-                <span class="mono-meta"><?= e($prod['name']) ?></span>
+                <span class="mono-meta"><?= e($prod['name'] ?? '') ?></span>
               </div>
             </div>
+            <?php if ($tShot !== ''): ?>
+            <img class="prod-panel-shot" src="<?= e($tShot) ?>" alt="<?= e(($prod['name'] ?? '') . ' screenshot') ?>" loading="lazy" decoding="async" width="1200" height="640">
+            <?php endif; ?>
             <div style="background:var(--card);padding:1.75rem 2rem;">
               <div style="display:flex;align-items:center;gap:.875rem;margin-bottom:1.375rem;">
                 <div class="icon-box icon-box-<?= e($tColor) ?>">
                   <i data-lucide="<?= e($tIcon) ?>"></i>
                 </div>
                 <div>
-                  <h3 style="font-family:var(--font-display);font-weight:800;color:var(--foreground);margin:0 0 .2rem;"><?= e($prod['name']) ?></h3>
-                  <?php if($prod['tagline']): ?>
+                  <h3 style="font-family:var(--font-display);font-weight:800;color:var(--foreground);margin:0 0 .2rem;"><?= e($prod['name'] ?? '') ?></h3>
+                  <?php if(!empty($prod['tagline'])): ?>
                   <p style="color:var(--muted-foreground);font-size:var(--text-sm);margin:0;"><?= e($prod['tagline']) ?></p>
                   <?php endif; ?>
                 </div>
@@ -624,13 +640,21 @@ include 'includes/stats-bar.php';
                 <?php endforeach; ?>
               </div>
               <?php endif; ?>
-              <?php if($prod['summary']): ?>
+              <?php if(!empty($prod['summary'])): ?>
               <p style="margin:0 0 1.375rem;color:var(--muted-foreground);font-size:var(--text-sm);line-height:1.75;"><?= e($prod['summary']) ?></p>
               <?php endif; ?>
-              <a href="<?= url('contact.php?product='.urlencode($prod['name'])) ?>" class="btn btn-primary btn-md">
-                <i data-lucide="calendar" class="ic-14"></i>
-                <?= e(cms($__s,'home_tab_demo_cta') ?: __('cta_demo')) ?> — <?= e($prod['name']) ?>
-              </a>
+              <div class="prod-panel-actions">
+                <a href="<?= url('contact.php?product='.urlencode((string)($prod['name'] ?? ''))) ?>" class="btn btn-primary btn-md">
+                  <i data-lucide="calendar" class="ic-14"></i>
+                  <?= e(cms($__s,'home_tab_demo_cta') ?: __('cta_demo')) ?> — <?= e($prod['name'] ?? '') ?>
+                </a>
+                <?php if ($tSlug !== ''): ?>
+                <a href="<?= url('product-detail.php?slug='.urlencode($tSlug)) ?>" class="btn btn-outline btn-md">
+                  <?= e(isNepali() ? 'थप विवरण' : 'More details') ?>
+                  <i data-lucide="arrow-right" class="ic-14"></i>
+                </a>
+                <?php endif; ?>
+              </div>
             </div>
           </div>
         </div>
@@ -641,8 +665,8 @@ include 'includes/stats-bar.php';
 
     <?php else: ?>
     <p style="text-align:center;color:var(--muted-foreground);padding:3rem 0;">
-      <?= e(isNepali() ? 'कुनै उत्पादन कन्फिगर गरिएको छैन।' : 'No products configured.') ?>
-      <a href="<?= url('admin/products.php') ?>" class="text-primary"><?= e(isNepali() ? 'Admin → उत्पादनहरूबाट थप्नुस।' : 'Add products from the admin panel.') ?></a>
+      <?= e(isNepali() ? 'उत्पादनहरू चाँडै यहाँ देखिनेछन्।' : 'Products will appear here soon.') ?>
+      <a href="<?= url('contact.php') ?>" class="text-primary"><?= e(isNepali() ? 'हामीलाई सम्पर्क गर्नुस।' : 'Talk to us about a demo.') ?></a>
     </p>
     <?php endif; ?>
 
@@ -658,11 +682,26 @@ include 'includes/stats-bar.php';
 .prod-sidebar-item.active .prod-accent { opacity:1 !important; }
 .prod-sidebar-item.active .prod-chevron { color:var(--primary) !important; transform:translateX(2px); }
 .prod-sidebar-item:hover:not(.active) { background:var(--muted); }
+.prod-panel-shot { display:block; width:100%; max-height:220px; object-fit:cover; object-position:top center; background:var(--muted); }
+.prod-panel-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; }
+@media (max-width:700px) {
+  .home-news-head { position:static !important; }
+  .home-news-head .btn { position:static !important; transform:none !important; margin-top:.875rem; }
+}
 </style>
 <script>
 function sTab(slug){
-  document.querySelectorAll('.prod-sidebar-item').forEach(function(b){ b.classList.toggle('active', b.dataset.tab===slug); });
-  document.querySelectorAll('.tab-pane').forEach(function(p){ p.classList.toggle('active', p.id==='tab-'+slug); });
+  var root = document.getElementById('prod-explorer');
+  if (!root) return;
+  root.querySelectorAll('.prod-sidebar-item').forEach(function(b){
+    var on = b.dataset.tab===slug;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  var panel = document.getElementById('prod-panel');
+  (panel || root).querySelectorAll('.tab-pane').forEach(function(p){
+    p.classList.toggle('active', p.id==='tab-'+slug);
+  });
 }
 </script>
 
@@ -814,7 +853,7 @@ function sTab(slug){
 <?php if($newsItems): ?>
 <section class="band">
   <div class="container">
-    <div style="position:relative;text-align:center;margin-bottom:3rem;" class="animate-fade-up">
+    <div class="home-news-head animate-fade-up" style="position:relative;text-align:center;margin-bottom:3rem;">
       <div class="section-eyebrow section-eyebrow-rose" style="margin-bottom:.75rem;display:inline-block;"><?= e(cms($__s,'home_news_eyebrow') ?: (isNepali() ? 'समाचार' : 'Latest from us')) ?></div>
       <h2 style="font-family:var(--font-display);font-weight:800;letter-spacing:-.025em;color:var(--foreground);margin:0;"><?= e(cms($__s,'home_news_title') ?: (isNepali() ? 'समाचार र अपडेट' : 'News & updates')) ?></h2>
       <a href="<?= url('news.php') ?>" class="btn btn-outline btn-sm" style="position:absolute;right:0;top:50%;transform:translateY(-50%);"><?= e(__('home_news_view_all')) ?> <i data-lucide="arrow-right" class="ic-13"></i></a>

@@ -252,33 +252,40 @@ function siteStatNormalizeItem(array $row, int $index = 0): array {
 
     $ll = mb_strtolower($lab);
 
+    // Label is itself a year figure ("8 Years") — don't leave a mismatched number on the card.
+    if (preg_match('/^(\d+)\s*(?:years?|yrs\.?|वर्ष)$/iu', $lab, $m)) {
+        $val = $m[1] . '+';
+        $lab = (function_exists('isNepali') && isNepali()) ? 'वर्षको अनुभव' : 'Years of Experience';
+        $ll  = mb_strtolower($lab);
+    }
+
     if (preg_match('/year|experience|वर्ष/', $ll)) {
         if (preg_match('/(\d+)\s*years?/i', $val, $m) || preg_match('/(\d+)\s*years?/i', $lab, $m)) {
             $val = $m[1] . '+';
         } elseif (!preg_match('/\d/', $val)) {
             $val = $def[0];
         }
-        if ($icon === '') $icon = 'calendar';
-        if ($hint === '') $hint = 'Years in the field';
+        $icon = 'calendar';
+        $hint = 'Years in the field';
     }
 
     if (preg_match('/product|platform|solution/', $ll)) {
         if ($val === '' || preg_match('/^<\s*[\d.]/u', $val) || preg_match('/\bhr\b|hour|min|ticket|response/i', $val)) {
             $val = '7+';
         }
-        if ($icon === '') $icon = 'layers';
-        if ($hint === '') $hint = 'Core platforms live';
+        $icon = 'layers';
+        $hint = 'Core platforms live';
     }
 
     if (preg_match('/retention|uptime|sla/', $ll)) {
         if ($val === '' || !preg_match('/\d/', $val)) $val = '99.9%';
-        if ($icon === '') $icon = 'shield-check';
-        if ($hint === '') $hint = 'Long-term partnerships';
+        $icon = 'shield-check';
+        $hint = 'Long-term partnerships';
     }
 
     if (siteTrustLabelIsClientCount($lab)) {
-        if ($icon === '') $icon = 'users';
-        if ($hint === '') $hint = 'Live client count';
+        $icon = 'users';
+        $hint = 'Organisations we support';
     }
 
     if ($icon === '') $icon = $def[2];
@@ -1540,6 +1547,9 @@ function csrfField(): string {
 function stLucideIcon(?string $name, string $fallback = 'box', string $hint = ''): string {
     $n = strtolower(trim((string)$name));
     $n = str_replace(['_', ' '], '-', $n);
+    if ($n !== '' && !preg_match('/^[a-z][a-z0-9-]*$/', $n)) {
+        $n = '';
+    }
     $aliases = [
         'lifebuoy'     => 'life-buoy',
         'life-ring'    => 'life-buoy',
@@ -1569,6 +1579,16 @@ function stLucideIcon(?string $name, string $fallback = 'box', string $hint = ''
         return 'ticket';
     }
     return $n;
+}
+
+/** Prefer lucide_icon, then legacy icon column (skip emoji). */
+function stRowLucideIcon(array $row, string $fallback = 'box'): string {
+    $raw = trim((string)($row['lucide_icon'] ?? ''));
+    if ($raw === '') {
+        $raw = trim((string)($row['icon'] ?? ''));
+    }
+    $hint = trim((string)($row['name'] ?? '') . ' ' . ($row['title'] ?? '') . ' ' . ($row['slug'] ?? ''));
+    return stLucideIcon($raw, $fallback, $hint);
 }
 
 // नेपालीमा: Lucide SVG icon ko HTML banaune (size + inline style sahit)

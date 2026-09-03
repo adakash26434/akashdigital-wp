@@ -117,7 +117,7 @@ require_once 'includes/header.php';
       <div>
         <div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">
           <div class="icon-box icon-box-lg icon-box-blue" style="background:var(--gradient-primary);">
-            <i data-lucide="<?= e(stLucideIcon($service['lucide_icon'] ?? '', 'layers', ($service['name'] ?? '') . ' ' . ($service['slug'] ?? ''))) ?>"></i>
+            <i data-lucide="<?= e(stRowLucideIcon($service, 'layers')) ?>"></i>
           </div>
           <?php if (!empty($service['badge'])): ?>
           <span class="badge badge-primary"><?= e($service['badge']) ?></span>
@@ -199,7 +199,7 @@ endif; ?>
       <a href="<?= url('service-detail.php?slug='.urlencode($r['slug'])) ?>" class="st-card st-card-link">
         <div style="display:flex;align-items:center;gap:0.875rem;margin-bottom:0.75rem;">
           <div class="icon-box icon-box-sm" style="background:var(--gradient-primary);box-shadow:none;">
-            <i data-lucide="<?= e(stLucideIcon($r['lucide_icon'] ?? '', 'layers', ($r['name'] ?? '') . ' ' . ($r['slug'] ?? ''))) ?>"></i>
+            <i data-lucide="<?= e(stRowLucideIcon($r, 'layers')) ?>"></i>
           </div>
           <h3 style="font-family:var(--font-display);font-size:var(--text-md);font-weight:700;color:var(--foreground);"><?= e($r['name']) ?></h3>
         </div>

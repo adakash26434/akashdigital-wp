@@ -36,7 +36,8 @@ if (function_exists('siteTrustStats') && function_exists('siteTrustLabelIsClient
             if (!is_array($__row) || !isset($__row[1])) continue;
             if (siteTrustLabelIsClientCount((string)$__row[1])) {
                 $statsBarItems[$__i][0] = $__trustBar['client_display'];
-                if (empty($statsBarItems[$__i][3])) $statsBarItems[$__i][3] = 'Live client count';
+                $statsBarItems[$__i][2] = 'users';
+                $statsBarItems[$__i][3] = 'Organisations we support';
             }
         }
         unset($__trustBar, $__i, $__row);
