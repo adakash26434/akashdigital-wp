@@ -247,6 +247,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
+        } elseif ($section === 'look') {
+            $look = strtolower(trim((string)($_POST['public_ui_look'] ?? 'soft')));
+            $allowed = function_exists('stPublicUiLooks') ? array_keys(stPublicUiLooks()) : ['soft', 'sharp', 'editorial', 'compact'];
+            if (!in_array($look, $allowed, true)) {
+                $look = 'soft';
+            }
+            saveSetting('public_ui_look', $look);
+            $success = 'Public look saved. Open the homepage to see it.';
+
         } elseif ($section === 'footer') {
             saveSetting('footer_tagline',    trim($_POST['footer_tagline'] ?? ''));
             saveSetting('copyright_text',    trim($_POST['copyright_text'] ?? ''));
@@ -422,6 +431,7 @@ $tabs = [
     ['footer',        icon('align-bottom',13),   'Footer'],
     ['features',      icon('toggle-right',13),   'Features'],
     ['seo',           icon('search',13),         'SEO'],
+    ['look',          icon('layout-template',13), 'Public Look'],
     ['brand_colors',  icon('palette',13),        'Brand Colors'],
     ['security',      icon('shield',13),         'Security'],
 ];
@@ -449,6 +459,32 @@ $tabs = [
 .st-accordion[open] summary::after{transform:rotate(90deg);}
 .st-accordion summary:hover{background:var(--primary-light);}
 .st-accordion__body{padding:1rem;background:var(--background);display:flex;flex-direction:column;gap:0.75rem;}
+.look-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:720px;}
+@media(min-width:900px){.look-pick{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none;}}
+.look-pick label{display:flex;flex-direction:column;gap:0.65rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.75rem;background:var(--card);transition:border-color .15s,box-shadow .15s;}
+.look-pick label:has(input:checked){border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent);}
+.look-pick label:focus-within{border-color:var(--primary);}
+.look-pick input{position:absolute;opacity:0;pointer-events:none;}
+.look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:#0f172a;}
+.look-mini span{position:absolute;display:block;background:rgba(255,255,255,.12);}
+.look-mini .bar{height:6px;width:55%;left:10%;top:18%;}
+.look-mini .bar2{height:4px;width:38%;left:10%;top:38%;opacity:.5;}
+.look-mini .card{width:28%;height:42%;right:10%;bottom:12%;background:rgba(255,255,255,.18);}
+.look-mini--soft{border-radius:0.85rem;}
+.look-mini--soft .card{border-radius:0.45rem;width:32%;right:8%;}
+.look-mini--sharp{border-radius:0;}
+.look-mini--sharp .card{border-radius:0;width:36%;right:6%;box-shadow:inset 3px 0 0 #60a5fa;}
+.look-mini--sharp .bar,.look-mini--sharp .bar2{border-radius:0;}
+.look-mini--editorial{border-radius:1.1rem;}
+.look-mini--editorial .bar{width:72%;height:8px;left:14%;top:22%;}
+.look-mini--editorial .bar2{width:48%;left:26%;top:42%;}
+.look-mini--editorial .card{width:70%;height:28%;left:15%;right:auto;bottom:10%;border-radius:0.7rem;}
+.look-mini--compact{border-radius:0.4rem;}
+.look-mini--compact .bar,.look-mini--compact .bar2{top:10%;height:4px;}
+.look-mini--compact .bar2{top:20%;}
+.look-mini--compact .card{height:22%;width:80%;left:10%;right:auto;bottom:8%;border-radius:0.2rem;}
+.look-pick h4{font-size:0.875rem;font-weight:700;margin:0;}
+.look-pick p{font-size:0.75rem;color:var(--muted-foreground);margin:0;line-height:1.4;}
 </style>
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
@@ -1253,6 +1289,36 @@ $tabs = [
           </div>
           <button type="submit" class="btn btn-primary w-fit">Save SEO Settings</button>
         </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Public Look -->
+  <div x-show="tab==='look'" x-cloak>
+    <?php
+      $looks = function_exists('stPublicUiLooks') ? stPublicUiLooks() : [];
+      $currentLook = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
+    ?>
+    <form method="POST" action="#look">
+      <?= csrfField() ?><input type="hidden" name="section" value="look">
+      <div class="st-card p-card-lg" style="max-width:1100px;">
+        <h3 class="h-eyebrow">Public site look</h3>
+        <p class="caption-meta" style="margin-bottom:1.25rem;">Same theme, pages, and copy. Visitors see a different layout personality. <strong>Soft</strong> is today’s live site (no change). Brand colors stay in Brand Colors. Admin and client portal are not affected.</p>
+        <div class="look-pick" role="radiogroup" aria-label="Public site look">
+          <?php foreach ($looks as $key => $meta): ?>
+          <label>
+            <input type="radio" name="public_ui_look" value="<?= e($key) ?>" <?= $currentLook === $key ? 'checked' : '' ?> aria-label="<?= e($meta['label']) ?>">
+            <div class="look-mini look-mini--<?= e($key) ?>">
+              <span class="bar"></span>
+              <span class="bar2"></span>
+              <span class="card"></span>
+            </div>
+            <h4><?= e($meta['label']) ?></h4>
+            <p><?= e($meta['hint']) ?></p>
+          </label>
+          <?php endforeach; ?>
+        </div>
+        <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.5rem;">Save public look</button>
       </div>
     </form>
   </div>

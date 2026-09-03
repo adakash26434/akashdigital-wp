@@ -400,6 +400,26 @@ function stCompanyName(): string {
     return $n !== '' ? $n : stSiteName();
 }
 
+/**
+ * Public-site look presets. Same pages/content; CSS-only layout personality.
+ * @return array<string, array{label:string, hint:string}>
+ */
+function stPublicUiLooks(): array {
+    return [
+        'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS'],
+        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: boxed, flat mockup, underline nav'],
+        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: stacked hero, large type, pill buttons'],
+        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: shorter hero, products as horizontal tabs'],
+    ];
+}
+
+function stPublicUiLook(): string {
+    $s = function_exists('siteSettings') ? siteSettings() : [];
+    $v = strtolower(trim((string)($s['public_ui_look'] ?? 'soft')));
+    $looks = stPublicUiLooks();
+    return isset($looks[$v]) ? $v : 'soft';
+}
+
 /** Billing cycle keys for product/service Price From. Default month. */
 function stNormalizePricePeriod(?string $period): string {
     $p = strtolower(trim((string)$period));

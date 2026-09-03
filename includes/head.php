@@ -120,8 +120,9 @@ $__asset = function (string $path) use ($__siteUrl, $__assetRoot): string {
     if ($__isHome): ?>
 <link rel="stylesheet" href="<?= e($__asset('/assets/css/home.css')) ?>">
 <?php   endif;
-  endif;
-endif; ?>
+  endif; ?>
+<link rel="stylesheet" href="<?= e($__asset('/assets/css/ui-looks.css')) ?>">
+<?php endif; ?>
 
 <?php if (in_array($__ctx, ['admin', 'portal'], true)): ?>
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/daisyui.min.css')) ?>">

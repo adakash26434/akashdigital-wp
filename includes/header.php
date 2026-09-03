@@ -23,7 +23,8 @@ h1{font-size:1.75rem;font-weight:700;margin-bottom:.75rem}p{color:#64748b;line-h
 }
 ?>
 <!DOCTYPE html>
-<html lang="<?= currentLang() === 'np' ? 'ne' : 'en' ?>" id="html-root">
+<?php $__uiLook = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft'; ?>
+<html lang="<?= currentLang() === 'np' ? 'ne' : 'en' ?>" id="html-root" class="ui-look-<?= e($__uiLook) ?>" data-ui-look="<?= e($__uiLook) ?>">
 <head>
 <?php
 $headContext = 'public';

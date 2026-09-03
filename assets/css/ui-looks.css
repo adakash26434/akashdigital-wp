@@ -1,0 +1,313 @@
+/* ============================================================
+   Public look presets (Settings → Public Look)
+   html[data-ui-look] + .ui-look-*  (header.php)
+
+   soft      = current live UI. No overrides — production unchanged
+               until an admin explicitly saves another look.
+   sharp     = corporate / boxed
+   editorial = magazine / stacked hero
+   compact   = dense / tabbed product explorer
+   ============================================================ */
+
+html[data-ui-look="soft"],
+html.ui-look-soft { /* keep pages.css + theme.css as-is */ }
+
+/* ════════════════════════════════════════════════════════════
+   SHARP
+   ════════════════════════════════════════════════════════════ */
+html[data-ui-look="sharp"] {
+  --radius-sm: 0.125rem;
+  --radius-md: 0.2rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.3rem;
+  --radius-2xl: 0.35rem;
+  --radius-3xl: 0.4rem;
+}
+
+html[data-ui-look="sharp"] #st-navbar {
+  background: var(--card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  border-bottom: 1px solid var(--border);
+}
+html[data-ui-look="sharp"] .nav-pill {
+  border-radius: 0;
+  background: transparent;
+}
+html[data-ui-look="sharp"] .nav-pill:hover,
+html[data-ui-look="sharp"] .nav-pill.active,
+html[data-ui-look="sharp"] .nav-pill[aria-current="page"] {
+  background: transparent;
+  color: var(--primary);
+}
+html[data-ui-look="sharp"] .st-dropdown { border-radius: 0.2rem; }
+
+html[data-ui-look="sharp"] .st-hero-mesh { display: none; }
+html[data-ui-look="sharp"] .st-hero-grid {
+  background-size: 28px 28px;
+  opacity: 1;
+}
+html[data-ui-look="sharp"]:not(.dark) .st-hero {
+  background: #fff !important;
+}
+html[data-ui-look="sharp"] .hero-left .hero-badge {
+  border-radius: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.65rem;
+}
+html[data-ui-look="sharp"] .hero-left .hero-bar {
+  width: 2.25rem;
+  height: 2px;
+  border-radius: 0;
+}
+html[data-ui-look="sharp"] .hero-right .hero-mockup {
+  border-radius: 0;
+  transform: none;
+  box-shadow: 0 0 0 1px var(--border), 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+html[data-ui-look="sharp"] .hero-right .hero-mockup:hover { transform: none; }
+html[data-ui-look="sharp"] .hero-right .float-chip { display: none; }
+
+/* Accent stripe only on listing/proof cards — not every .st-card (forms, org chart). */
+html[data-ui-look="sharp"] .product-card,
+html[data-ui-look="sharp"] .trust-proof__card,
+html[data-ui-look="sharp"] .bc {
+  border-radius: 0;
+  box-shadow: none;
+  border-left: 3px solid var(--primary);
+}
+html[data-ui-look="sharp"] .product-card:hover,
+html[data-ui-look="sharp"] .trust-proof__card:hover,
+html[data-ui-look="sharp"] .bc:hover {
+  transform: none;
+  box-shadow: none;
+}
+html[data-ui-look="sharp"] .st-stats .st-stat {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  border-right: 1px solid var(--border);
+}
+html[data-ui-look="sharp"] .st-stats .st-stat:last-child { border-right: none; }
+@media (max-width: 767px) {
+  html[data-ui-look="sharp"] .st-stats .st-stat:nth-child(2n) { border-right: none; }
+}
+html[data-ui-look="sharp"] .trust-proof__icon { border-radius: 0.15rem; }
+html[data-ui-look="sharp"] .section-eyebrow { border-radius: 0; letter-spacing: 0.12em; }
+
+/* ════════════════════════════════════════════════════════════
+   EDITORIAL
+   ════════════════════════════════════════════════════════════ */
+html[data-ui-look="editorial"] .nav-pill {
+  border-radius: 999px;
+  font-weight: 500;
+}
+html[data-ui-look="editorial"] .nav-pill::after { display: none; }
+
+html[data-ui-look="editorial"] .st-hero {
+  min-height: clamp(480px, 70vh, 640px);
+}
+@media (min-width: 769px) {
+  html[data-ui-look="editorial"] .st-hero {
+    min-height: clamp(560px, 82vh, 760px);
+  }
+}
+html[data-ui-look="editorial"]:not(.dark) .st-hero {
+  background: #f7f5f2 !important;
+}
+html[data-ui-look="editorial"] .st-hero-mesh span {
+  opacity: 0.16;
+  filter: blur(110px);
+}
+html[data-ui-look="editorial"] .st-hero-grid { display: none; }
+
+@media (min-width: 769px) {
+  html[data-ui-look="editorial"] .st-hero-split {
+    grid-template-columns: 1fr;
+    text-align: center;
+    max-width: 42rem;
+    margin-inline: auto;
+    padding: 4.25rem 0 3rem;
+    gap: 2.25rem;
+  }
+  html[data-ui-look="editorial"] .st-hero-split.hero-no-right { max-width: 40rem; }
+  html[data-ui-look="editorial"] .hero-left { align-items: center; }
+  html[data-ui-look="editorial"] .hero-left .hero-bar { margin-inline: auto; }
+  html[data-ui-look="editorial"] .hero-left .hero-sub { margin-inline: auto; }
+  html[data-ui-look="editorial"] .hero-left .hero-actions { justify-content: center; }
+  html[data-ui-look="editorial"] .hero-trust { justify-content: center; }
+  html[data-ui-look="editorial"] .hero-right {
+    max-width: 34rem;
+    margin-inline: auto;
+  }
+  html[data-ui-look="editorial"] .st-hero-split .hero-right { display: flex; }
+}
+
+html[data-ui-look="editorial"] .hero-left .hero-title {
+  font-size: clamp(2.15rem, 6vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.045em;
+  line-height: 1.08;
+  text-shadow: none;
+}
+html[data-ui-look="editorial"] .hero-left .hero-sub {
+  font-size: clamp(1.05rem, 2vw, 1.2rem);
+  font-weight: 400;
+  max-width: 36rem;
+}
+html[data-ui-look="editorial"] .hero-left .hero-badge { border-radius: 999px; }
+html[data-ui-look="editorial"] .hero-left .hero-bar {
+  width: 4.5rem;
+  height: 1.5px;
+  border-radius: 999px;
+}
+html[data-ui-look="editorial"] .btn:not(.btn-circle):not(.btn-square),
+html[data-ui-look="editorial"] .hero-left .hero-actions .btn {
+  border-radius: 999px;
+}
+html[data-ui-look="editorial"] .hero-right .hero-mockup {
+  transform: none;
+  border-radius: 1.5rem;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12);
+}
+html[data-ui-look="editorial"] .hero-right .hero-mockup:hover { transform: none; }
+html[data-ui-look="editorial"] .hero-right .float-chip { display: none; }
+
+html[data-ui-look="editorial"] .st-section { padding: 5.25rem 0; }
+html[data-ui-look="editorial"] .st-section--lg { padding: 6.5rem 0; }
+html[data-ui-look="editorial"] .section-title,
+html[data-ui-look="editorial"] .st-page-hero__title {
+  letter-spacing: -0.04em;
+  font-weight: 700;
+}
+html[data-ui-look="editorial"] .st-card:not(.product-card):not(.team-card--lead),
+html[data-ui-look="editorial"] .trust-proof__card,
+html[data-ui-look="editorial"] .bc {
+  border-radius: 1.35rem;
+  box-shadow: none;
+  border-color: transparent;
+  background: var(--muted);
+  background: color-mix(in srgb, var(--card) 92%, var(--muted));
+}
+html[data-ui-look="editorial"] .product-card {
+  border-radius: 1.35rem;
+  box-shadow: none;
+}
+html[data-ui-look="editorial"] .trust-proof { gap: 1.5rem; }
+html[data-ui-look="editorial"] .trust-proof__card {
+  flex-direction: column;
+  text-align: center;
+  align-items: center;
+  box-shadow: none;
+}
+html[data-ui-look="editorial"] .trust-proof__body { text-align: center; }
+html[data-ui-look="editorial"] .product-card__head { min-height: 11rem; }
+html[data-ui-look="editorial"] .st-page-hero {
+  padding: 4.5rem 0 3rem;
+  background: transparent;
+  border-bottom: none;
+}
+
+/* ════════════════════════════════════════════════════════════
+   COMPACT
+   ════════════════════════════════════════════════════════════ */
+html[data-ui-look="compact"] .nav-pill {
+  padding: 0.28rem 0.6rem;
+  font-size: 0.75rem;
+}
+
+html[data-ui-look="compact"] .st-hero {
+  min-height: clamp(380px, 54vh, 500px);
+}
+html[data-ui-look="compact"] .st-hero-split {
+  padding: 1.75rem 0 1.25rem;
+  gap: 1.25rem;
+}
+html[data-ui-look="compact"] .st-hero-mesh span {
+  filter: blur(56px);
+  opacity: 0.26;
+}
+html[data-ui-look="compact"] .hero-left { gap: 0.45rem; }
+html[data-ui-look="compact"] .hero-left .hero-title {
+  font-size: clamp(1.55rem, 3.6vw, 2.2rem);
+}
+html[data-ui-look="compact"] .hero-left .hero-sub {
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+html[data-ui-look="compact"] .hero-left .hero-bar { display: none; }
+html[data-ui-look="compact"] .hero-right .hero-mockup {
+  transform: none;
+  max-width: 420px;
+}
+html[data-ui-look="compact"] .hero-right .hero-mockup:hover { transform: none; }
+html[data-ui-look="compact"] .hero-right .float-chip {
+  transform: scale(0.88);
+  animation: none;
+}
+
+html[data-ui-look="compact"] .st-section { padding: 2.4rem 0; }
+html[data-ui-look="compact"] .st-section--lg { padding: 3rem 0; }
+html[data-ui-look="compact"] .st-section--sm { padding: 1.5rem 0; }
+html[data-ui-look="compact"] .st-page-hero { padding: 2rem 0 1.25rem; }
+html[data-ui-look="compact"] .st-page-hero__title {
+  font-size: clamp(1.4rem, 3vw, 2rem);
+}
+/* product-card uses padding:0 + inner sections — do not flatten it */
+html[data-ui-look="compact"] .st-card:not(.product-card) { padding: 1.05rem; }
+html[data-ui-look="compact"] .product-grid { gap: 0.75rem; }
+html[data-ui-look="compact"] .product-card__head { min-height: 7.5rem; padding: 1rem; }
+html[data-ui-look="compact"] .section-head { margin-bottom: 1.25rem; }
+html[data-ui-look="compact"] .trust-partners { padding-block: 2rem; }
+html[data-ui-look="compact"] .st-stats__lede,
+html[data-ui-look="compact"] .trust-partners__lede { font-size: 0.8125rem; }
+
+@media (min-width: 769px) {
+  html[data-ui-look="compact"] #prod-explorer {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+  html[data-ui-look="compact"] #prod-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    border-radius: 0.65rem;
+  }
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item {
+    flex: 1 0 auto;
+    min-width: 9.5rem;
+    border-bottom: none !important;
+    border-right: 1px solid var(--border);
+    padding: 0.75rem 0.9rem !important;
+  }
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:last-child {
+    border-right: none;
+  }
+  html[data-ui-look="compact"] #prod-list .prod-accent {
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 3px !important;
+    border-radius: 0 !important;
+  }
+  html[data-ui-look="compact"] #prod-list .prod-chevron { display: none; }
+}
+
+html[data-ui-look="compact"] .st-stats .st-stat { padding: 0.85rem 0.5rem; }
+html[data-ui-look="compact"] .st-stat__value { font-size: clamp(1.35rem, 2.4vw, 1.75rem); }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-look="sharp"] .hero-right .hero-mockup,
+  html[data-ui-look="editorial"] .hero-right .hero-mockup,
+  html[data-ui-look="compact"] .hero-right .hero-mockup {
+    transition: none;
+  }
+}
