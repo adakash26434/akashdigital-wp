@@ -919,7 +919,7 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
         <details class="st-accordion">
           <summary><?= icon('image',14,'color:var(--primary);flex-shrink:0;') ?> Hero Slides (Add up to 5 slides)</summary>
           <div class="st-accordion__body">
-            <p class="caption-meta">Configure individual hero slides. Leave an image blank to skip a slide. Slides are shown in order.</p>
+            <p class="caption-meta">Each slide needs a <strong>title, subtitle, or image</strong>. Homepage hero copy is slide 1. Extra slides auto-rotate every 5.5 seconds. Empty slides are skipped.</p>
             <?php for ($hs = 1; $hs <= 5; $hs++): ?>
             <div class="hero-slide-block" data-hero-slide="<?= $hs ?>" style="border:2px solid var(--border);padding:1rem;border-radius:0.625rem;margin-bottom:1rem;background:var(--card);transition:all 0.2s ease;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;margin-bottom:1rem;">

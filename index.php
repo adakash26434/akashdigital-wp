@@ -63,49 +63,37 @@ $_heroBadge2       = cms($__s, 'hero_badge2_text');
 $_heroCtaText      = cms($__s, 'homepage_cta_text');
 $_heroCtaUrl       = trim($__s['homepage_cta_url'] ?? '');
 $_heroCtaSecondary = cms($__s, 'hero_cta_secondary');
-// ── Hero slider setup ────────────────────────────────────────────────
 $_ctaHref  = trim($__s['homepage_cta_url'] ?? '') ?: url('contact.php');
 $_ctaLabel = cms($__s,'homepage_cta_text') ?: __('home_hero_book_demo');
-$_heroSlides = [];
-// Primary source: site settings slides (Settings → Homepage → Hero Section)
+$_heroExtras = [];
 for ($_hsi = 1; $_hsi <= 5; $_hsi++) {
   $_himg = trim($__s["hero_image_{$_hsi}"] ?? '');
-  if (!$_himg) continue;
-  $_htit = cms($__s, "hero_slide_{$_hsi}_title");
-  $_hsub = cms($__s, "hero_slide_{$_hsi}_subtitle");
-  $_heroSlides[] = [
+  $_htit = trim((string)cms($__s, "hero_slide_{$_hsi}_title"));
+  $_hsub = trim((string)cms($__s, "hero_slide_{$_hsi}_subtitle"));
+  if ($_himg === '' && $_htit === '' && $_hsub === '') continue;
+  $_heroExtras[] = [
     'img'   => $_himg,
-    'title' => $_htit ?: ($_heroTitle ?: (isNepali() ? 'डिजिटाइजेसन र अटोमेसन' : 'IT Solutions & Automation')),
-    'sub'   => $_hsub ?: ($_heroSub   ?: (isNepali() ? 'सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।' : 'End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.')),
-    'link'  => '', 'btn' => '',
+    'title' => $_htit,
+    'sub'   => $_hsub,
   ];
 }
 unset($_hsi, $_himg, $_htit, $_hsub);
-// Secondary source: Banners admin (page_target = 'hero') if no explicit settings images exist.
-if (empty($_heroSlides)) {
+if (empty($_heroExtras)) {
   try {
     $_heroBanners = query("SELECT * FROM banners WHERE page_target='hero' AND active=1 ORDER BY position ASC, id ASC LIMIT 5");
     foreach ($_heroBanners as $_hb) {
-      $_heroSlides[] = [
-        'img'   => trim($_hb['image_url'] ?? ''),
-        'title' => trim($_hb['title'] ?? '') ?: ($_heroTitle ?: (isNepali() ? 'डिजिटाइजेसन र अटोमेसन' : 'IT Solutions & Automation')),
-        'sub'   => trim($_hb['subtitle'] ?? '') ?: ($_heroSub ?: (isNepali() ? 'सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।' : 'End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.')),
-        'link'  => trim($_hb['link_url'] ?? ''),
-        'btn'   => trim($_hb['btn_text'] ?? ''),
+      $_timg = trim((string)($_hb['image_url'] ?? ''));
+      $_ttit = trim((string)($_hb['title'] ?? ''));
+      $_tsub = trim((string)($_hb['subtitle'] ?? ''));
+      if ($_timg === '' && $_ttit === '' && $_tsub === '') continue;
+      $_heroExtras[] = [
+        'img'   => $_timg,
+        'title' => $_ttit,
+        'sub'   => $_tsub,
       ];
     }
-    unset($_heroBanners, $_hb);
+    unset($_heroBanners, $_hb, $_timg, $_ttit, $_tsub);
   } catch (\Throwable $e) { error_log('[' . basename(__FILE__) . ']' . $e->getMessage()); }
-}
-// Final fallback slide if no hero content is configured.
-if (empty($_heroSlides)) {
-  $_heroSlides[] = [
-    'img'   => '',
-    'title' => $_heroTitle ?: (isNepali() ? 'डिजिटाइजेसन र अटोमेसन' : 'IT Solutions & Automation'),
-    'sub'   => $_heroSub   ?: (isNepali() ? 'सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।' : 'End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.'),
-    'link'  => $_ctaHref,
-    'btn'   => $_ctaLabel,
-  ];
 }
 // Bento section
 $_bentoEyebrow = cms($__s, 'home_bento_eyebrow');
@@ -186,6 +174,27 @@ $_heroDashboardImage = trim($__s['hero_dashboard_image'] ?? '');
 // Hero title & subtitle
 $_heroTitleVal = cms($__s, 'homepage_hero_title') ?: (isNepali() ? 'डिजिटाइजेसन र <span class="tg">अटोमेसन</span>' : 'IT Solutions & <span class="tg">Automation</span>');
 $_heroSubVal   = cms($__s, 'homepage_hero_subtitle') ?: (isNepali() ? 'सहकारी एवं वित्तीय संस्थाहरूलाई रूपान्तरण गर्ने सुरक्षित र सहज प्रणाली।' : 'End-to-end software solutions purpose-built for Nepal\'s cooperatives and businesses.');
+
+$_heroSlides = [[
+  'img'   => '',
+  'title' => $_heroTitleVal,
+  'sub'   => $_heroSubVal,
+]];
+foreach ($_heroExtras as $_hx) {
+  $_heroSlides[] = [
+    'img'   => $_hx['img'],
+    'title' => $_hx['title'] !== '' ? $_hx['title'] : $_heroTitleVal,
+    'sub'   => $_hx['sub'] !== '' ? $_hx['sub'] : $_heroSubVal,
+  ];
+}
+unset($_hx, $_heroExtras);
+$_heroRotate = count($_heroSlides) > 1;
+$_heroHasSlideImg = false;
+foreach ($_heroSlides as $_hs) {
+  if (!empty($_hs['img'])) { $_heroHasSlideImg = true; break; }
+}
+unset($_hs);
+$_showHeroRight = $_showDashboard || $_heroHasSlideImg;
 ?>
 <!-- Critical hero CSS inlined so the split layout never collapses if the
      external pages.css is stale/cached/out-of-sync on the deployed host.
@@ -267,6 +276,23 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
   .hero-left .hero-actions{justify-content:center;}
   .hero-trust{justify-content:center;}
 }
+.hero-copy{position:relative;}
+.hero-copy-slide{display:none;}
+.hero-copy-slide.is-active{display:block;}
+.hero-copy-slide.is-active .hero-title,
+.hero-copy-slide.is-active .hero-sub{animation:hero-copy-in .45s ease;}
+@keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero-dots{display:flex;gap:.4rem;margin-top:.25rem;}
+.st-hero-split.hero-no-right .hero-dots{justify-content:center;}
+.hero-dot{width:.5rem;height:.5rem;border-radius:999px;border:0;padding:0;background:var(--h-badge-border);cursor:pointer;}
+.hero-dot.is-active{background:var(--primary);transform:scale(1.15);}
+.hero-visual-slide{display:none;width:100%;}
+.hero-visual-slide.is-active{display:flex;align-items:center;justify-content:center;}
+.hero-visual-slide img{width:100%;max-width:520px;height:auto;display:block;border-radius:var(--radius-2xl);}
+@media (prefers-reduced-motion:reduce){
+  .hero-copy-slide.is-active .hero-title,
+  .hero-copy-slide.is-active .hero-sub{animation:none;}
+}
 </style>
 <section class="st-hero" style="--hero-bg:<?= e($_heroBg) ?>;--hero-mesh-1:<?= e($_heroMesh1) ?>;--hero-mesh-2:<?= e($_heroMesh2) ?>;--hero-mesh-3:<?= e($_heroMesh3) ?>;">
 
@@ -281,7 +307,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
   <div class="st-hero-grid"></div>
 
   <div class="container">
-    <div class="st-hero-split<?= !$_showDashboard ? ' hero-no-right' : '' ?>">
+    <div class="st-hero-split<?= !$_showHeroRight ? ' hero-no-right' : '' ?>"<?= $_heroRotate ? ' id="hero-rotator" data-hero-interval="5500"' : '' ?>>
 
       <!-- ── LEFT: Text content ── -->
       <div class="hero-left">
@@ -291,14 +317,22 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
           <?= e($_badge2) ?>
         </div>
 
-        <!-- Title -->
-        <h1 class="hero-title"><?= $_heroTitleVal ?></h1>
-
-        <!-- Accent bar -->
-        <div class="hero-bar"></div>
-
-        <!-- Subtitle -->
-        <p class="hero-sub"><?= e($_heroSubVal) ?></p>
+        <div class="hero-copy">
+          <?php foreach ($_heroSlides as $_si => $_slide): ?>
+          <div class="hero-copy-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>">
+            <h1 class="hero-title"><?= $_slide['title'] ?></h1>
+            <div class="hero-bar"></div>
+            <p class="hero-sub"><?= e(strip_tags((string)$_slide['sub'])) ?></p>
+          </div>
+          <?php endforeach; unset($_si, $_slide); ?>
+        </div>
+        <?php if ($_heroRotate): ?>
+        <div class="hero-dots" role="tablist" aria-label="Hero slides">
+          <?php for ($_di = 0; $_di < count($_heroSlides); $_di++): ?>
+          <button type="button" class="hero-dot<?= $_di === 0 ? ' is-active' : '' ?>" data-hero-to="<?= $_di ?>" aria-label="Slide <?= $_di + 1 ?>"></button>
+          <?php endfor; unset($_di); ?>
+        </div>
+        <?php endif; ?>
 
         <!-- CTA buttons -->
         <div class="hero-actions">
@@ -319,27 +353,65 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
         </div>
       </div>
 
-      <!-- ── RIGHT: Dashboard mockup ── -->
-      <?php if($_showDashboard): ?>
+      <!-- ── RIGHT: Dashboard mockup / slide image ── -->
+      <?php if($_showHeroRight): ?>
       <div class="hero-right">
-        <?php if($_heroDashboardImage): ?>
-        <!-- Real screenshot mode -->
+        <?php if ($_heroHasSlideImg): ?>
+          <?php foreach ($_heroSlides as $_si => $_slide): ?>
+          <div class="hero-visual-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>">
+            <?php if (!empty($_slide['img'])): ?>
+            <div class="hero-mockup" style="padding:0;transform:none;">
+              <img src="<?= e($_slide['img']) ?>" alt="" loading="<?= $_si === 0 ? 'eager' : 'lazy' ?>">
+            </div>
+            <?php elseif ($_showDashboard && $_heroDashboardImage): ?>
+            <div class="hero-mockup" style="padding:0;">
+              <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+                <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
+              </div>
+            </div>
+            <?php elseif ($_showDashboard): ?>
+            <div class="hero-mockup">
+              <div class="mockup-bar">
+                <span class="dot dot-r"></span>
+                <span class="dot dot-y"></span>
+                <span class="dot dot-g"></span>
+                <span class="mockup-title">Dashboard — <?= e(stCompanyName()) ?></span>
+              </div>
+              <div class="mockup-body">
+                <div class="mockup-row">
+                  <span class="label">Total Members</span>
+                  <span class="value blue"><?= e($_mockMembers) ?></span>
+                </div>
+                <div class="mockup-row">
+                  <span class="label">Total Deposits</span>
+                  <span class="value green"><?= e($_mockDeposits) ?></span>
+                </div>
+                <div class="mockup-row">
+                  <span class="label">Active Loans</span>
+                  <span class="value amber"><?= e($_mockLoans) ?></span>
+                </div>
+                <div class="mockup-chart">
+                  <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                </div>
+              </div>
+            </div>
+            <?php endif; ?>
+          </div>
+          <?php endforeach; unset($_si, $_slide); ?>
+        <?php elseif($_heroDashboardImage): ?>
         <div class="hero-mockup" style="padding:0;">
           <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
             <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
           </div>
         </div>
         <?php else: ?>
-        <!-- Mockup mode (default) -->
         <div class="hero-mockup">
-          <!-- Chrome bar -->
           <div class="mockup-bar">
             <span class="dot dot-r"></span>
             <span class="dot dot-y"></span>
             <span class="dot dot-g"></span>
             <span class="mockup-title">Dashboard — <?= e(stCompanyName()) ?></span>
           </div>
-          <!-- Body -->
           <div class="mockup-body">
             <div class="mockup-row">
               <span class="label">Total Members</span>
@@ -353,7 +425,6 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
               <span class="label">Active Loans</span>
               <span class="value amber"><?= e($_mockLoans) ?></span>
             </div>
-            <!-- Mini bar chart -->
             <div class="mockup-chart">
               <div class="bar"></div>
               <div class="bar"></div>
@@ -367,7 +438,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
         </div>
         <?php endif; ?>
 
-        <!-- Floating stat chips -->
+        <?php if ($_showDashboard && !$_heroHasSlideImg): ?>
         <div class="float-chip f1 green">
           <i data-lucide="trending-up" style="width:12px;height:12px;"></i>
           <?= e($_mockGrowth) ?> growth
@@ -380,12 +451,50 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
           <i data-lucide="clock" style="width:12px;height:12px;"></i>
           <?= isNepali() ? '२४/७ सहयोग' : '24/7 Support' ?>
         </div>
+        <?php endif; ?>
       </div>
       <?php endif; ?>
 
     </div>
   </div>
 </section>
+
+<?php if (!empty($_heroRotate)): ?>
+<script>
+(function(){
+  var root = document.getElementById('hero-rotator');
+  if (!root) return;
+  var copies = root.querySelectorAll('.hero-copy-slide');
+  var visuals = root.querySelectorAll('.hero-visual-slide');
+  var dots = root.querySelectorAll('.hero-dot');
+  var n = copies.length;
+  if (n < 2) return;
+  var i = 0;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var ms = reduce ? 0 : parseInt(root.getAttribute('data-hero-interval') || '5500', 10);
+  function go(to){
+    copies[i].classList.remove('is-active');
+    if (visuals[i]) visuals[i].classList.remove('is-active');
+    if (dots[i]) dots[i].classList.remove('is-active');
+    i = (to + n) % n;
+    copies[i].classList.add('is-active');
+    if (visuals[i]) visuals[i].classList.add('is-active');
+    if (dots[i]) dots[i].classList.add('is-active');
+  }
+  dots.forEach(function(d){
+    d.addEventListener('click', function(){
+      go(parseInt(d.getAttribute('data-hero-to') || '0', 10));
+    });
+  });
+  if (!ms) return;
+  var timer = setInterval(function(){ go(i + 1); }, ms);
+  root.addEventListener('mouseenter', function(){ clearInterval(timer); timer = null; });
+  root.addEventListener('mouseleave', function(){
+    if (!timer) timer = setInterval(function(){ go(i + 1); }, ms);
+  });
+})();
+</script>
+<?php endif; ?>
 
 <!-- ══════════════════════════════════════════════
   § 2 — STATS BAR
