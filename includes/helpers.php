@@ -407,10 +407,26 @@ function stCompanyName(): string {
  */
 function stPublicUiLooks(): array {
     return [
-        'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS (default)'],
-        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: solid text nav, grid hero, left-aligned cards'],
-        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: cream header, pill nav, stacked hero'],
-        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: tighter desktop nav, shorter hero, product tabs'],
+        'soft'      => [
+            'label' => 'Soft',
+            'hint'  => 'Today’s live layout — rounded cards, split hero, glass navbar.',
+            'best'  => 'Recommended default. Choose this to keep the site as visitors already know it.',
+        ],
+        'sharp'     => [
+            'label' => 'Sharp',
+            'hint'  => 'Corporate bar, grid hero, square cards, left-aligned listings.',
+            'best'  => 'Best for a formal / government-style feel. Same pages and text.',
+        ],
+        'editorial' => [
+            'label' => 'Editorial',
+            'hint'  => 'Cream header, pill nav, stacked magazine hero, airy type.',
+            'best'  => 'Best for a calmer, story-led look. Same pages and text.',
+        ],
+        'compact'   => [
+            'label' => 'Compact',
+            'hint'  => 'Tighter desktop nav and spacing; product tabs on large screens.',
+            'best'  => 'Best if you want more on one screen. Same pages and text.',
+        ],
     ];
 }
 

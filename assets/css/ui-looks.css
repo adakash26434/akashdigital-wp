@@ -199,6 +199,9 @@ html[data-ui-look="editorial"] .product-card {
   border-radius: 1.35rem;
   box-shadow: none;
 }
+html[data-ui-look="editorial"] .product-card__head {
+  background: transparent;
+}
 html[data-ui-look="editorial"] .trust-proof { gap: 1.5rem; }
 html[data-ui-look="editorial"] .trust-proof__card {
   flex-direction: column;
@@ -406,8 +409,14 @@ html[data-ui-look="editorial"] .testi-card {
 html[data-ui-look="editorial"] footer {
   margin-top: 4.5rem !important;
 }
-html[data-ui-look="editorial"] .product-card__head {
-  background: transparent;
+html[data-ui-look="editorial"] .trust-proof__body,
+html[data-ui-look="editorial"] .trust-proof__label,
+html[data-ui-look="editorial"] .trust-proof__hint {
+  text-align: center;
+}
+html[data-ui-look="sharp"] .product-card__summary,
+html[data-ui-look="compact"] .product-card__summary {
+  text-align: start;
 }
 
 /* ── Compact: pack chrome only — keep all CMS copy visible ── */
@@ -470,7 +479,7 @@ html[data-ui-look="compact"] .product-card__title,
 html[data-ui-look="compact"] .product-card__tagline,
 html[data-ui-look="compact"] .section-title,
 html[data-ui-look="compact"] .st-page-hero__title {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 html[data-ui-look="sharp"] .section-title.whitespace-nowrap,
 html[data-ui-look="editorial"] .section-title.whitespace-nowrap,

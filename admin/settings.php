@@ -479,14 +479,19 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
 .st-accordion[open] summary::after{transform:rotate(90deg);}
 .st-accordion summary:hover{background:var(--primary-light);}
 .st-accordion__body{padding:1rem;background:var(--background);display:flex;flex-direction:column;gap:0.75rem;}
-.look-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:720px;}
-@media(min-width:900px){.look-pick{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none;}}
-.look-pick label{position:relative;display:flex;flex-direction:column;gap:0.65rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.75rem;background:var(--card);transition:border-color .15s,box-shadow .15s;}
+.look-pick{display:grid;grid-template-columns:1fr;gap:1rem;max-width:28rem;}
+@media(min-width:640px){.look-pick{grid-template-columns:repeat(2,minmax(0,1fr));max-width:none;}}
+@media(min-width:1100px){.look-pick{grid-template-columns:repeat(4,minmax(0,1fr));}}
+.look-pick label{position:relative;display:flex;flex-direction:column;gap:0.5rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.85rem;background:var(--card);transition:border-color .15s,box-shadow .15s;min-width:0;text-align:left;}
 .look-pick label:has(input:checked),
 .look-pick label.is-selected{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent);}
 .look-pick label:focus-within{border-color:var(--primary);outline:2px solid var(--ring,var(--primary));outline-offset:2px;}
 .look-pick input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1;}
-.look-pick .look-mini,.look-pick h4,.look-pick p{position:relative;z-index:0;pointer-events:none;}
+.look-pick .look-mini,.look-pick h4,.look-pick p,.look-pick .look-badge{position:relative;z-index:0;pointer-events:none;}
+.look-badge{display:inline-block;width:fit-content;font-size:0.625rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:.15rem .4rem;border-radius:999px;background:var(--muted);color:var(--muted-foreground);}
+.look-badge--live{background:var(--primary-light,rgba(37,99,235,.12));color:var(--primary);}
+.look-pick h4{font-size:0.9375rem;font-weight:700;margin:0;overflow-wrap:break-word;}
+.look-pick p{font-size:0.75rem;color:var(--muted-foreground);margin:0;line-height:1.45;overflow-wrap:break-word;text-align:left;hyphens:manual;}
 .look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:#0f172a;}
 .look-mini span{position:absolute;display:block;background:rgba(255,255,255,.12);}
 .look-mini .bar{height:6px;width:55%;left:10%;top:18%;}
@@ -505,8 +510,6 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
 .look-mini--compact .bar,.look-mini--compact .bar2{top:10%;height:4px;}
 .look-mini--compact .bar2{top:20%;}
 .look-mini--compact .card{height:22%;width:80%;left:10%;right:auto;bottom:8%;border-radius:0.2rem;}
-.look-pick h4{font-size:0.875rem;font-weight:700;margin:0;}
-.look-pick p{font-size:0.75rem;color:var(--muted-foreground);margin:0;line-height:1.4;}
 </style>
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
@@ -1326,23 +1329,47 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
       <?= csrfField() ?><input type="hidden" name="section" value="look">
       <div class="st-card p-card-lg" style="max-width:1100px;">
         <h3 class="h-eyebrow">Public site look</h3>
-        <p class="caption-meta" style="margin-bottom:1.25rem;"><strong>Superadmin only.</strong> Live now: <strong><?= e($looks[$currentLook]['label'] ?? 'Soft') ?></strong>. Default <strong>Soft</strong> is the original layout. Saving another look changes the public site for all visitors. Admin and portal stay the same.</p>
+        <p class="caption-meta" style="margin-bottom:1rem;">Superadmin only. Pick one layout for visitors. <strong>Pages, text, and brand colors stay the same</strong> — only spacing, navbar, and card shape change. Admin and the client portal are not affected.</p>
+        <p class="caption-meta" style="margin-bottom:1.25rem;">Live now: <strong><?= e($looks[$currentLook]['label'] ?? 'Soft') ?></strong>. Keep <strong>Soft</strong> to match the current site.</p>
         <div class="look-pick" role="radiogroup" aria-label="Public site look">
-          <?php foreach ($looks as $key => $meta): ?>
-          <label class="<?= $currentLook === $key ? 'is-selected' : '' ?>">
-            <input type="radio" name="public_ui_look" value="<?= e($key) ?>" <?= $currentLook === $key ? 'checked' : '' ?> aria-label="<?= e($meta['label']) ?>">
+          <?php foreach ($looks as $key => $meta):
+            $isLive = $currentLook === $key;
+          ?>
+          <label class="<?= $isLive ? 'is-selected' : '' ?>">
+            <input type="radio" name="public_ui_look" value="<?= e($key) ?>" <?= $isLive ? 'checked' : '' ?> aria-label="<?= e($meta['label']) ?>">
             <div class="look-mini look-mini--<?= e($key) ?>">
               <span class="bar"></span>
               <span class="bar2"></span>
               <span class="card"></span>
             </div>
             <h4><?= e($meta['label']) ?></h4>
+            <?php if ($key === 'soft'): ?>
+            <span class="look-badge<?= $isLive ? ' look-badge--live' : '' ?>">Default</span>
+            <?php elseif ($isLive): ?>
+            <span class="look-badge look-badge--live">Live</span>
+            <?php endif; ?>
             <p><?= e($meta['hint']) ?></p>
+            <?php if (!empty($meta['best'])): ?>
+            <p><?= e($meta['best']) ?></p>
+            <?php endif; ?>
           </label>
           <?php endforeach; ?>
         </div>
-        <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.5rem;">Save public look</button>
-        <p class="caption-meta" style="margin-top:0.85rem;">After save, <a href="<?= e(function_exists('url') ? url('index.php') : '/') ?>" target="_blank" rel="noopener">open the homepage</a> (hard-refresh) to preview. Leave <strong>Soft</strong> selected to keep the current live layout.</p>
+        <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.5rem;">Save look for visitors</button>
+        <p class="caption-meta" style="margin-top:0.85rem;">After save, <a href="<?= e(function_exists('url') ? url('index.php') : '/') ?>" target="_blank" rel="noopener">open the homepage</a> and hard-refresh. Phone and desktop both work; nothing is deleted from content.</p>
+        <script>
+        (function(){
+          var g=document.querySelector('.look-pick');
+          if(!g) return;
+          function sync(){
+            g.querySelectorAll('label').forEach(function(l){
+              var i=l.querySelector('input[type=radio]');
+              l.classList.toggle('is-selected', !!(i&&i.checked));
+            });
+          }
+          g.addEventListener('change', sync);
+        })();
+        </script>
       </div>
     </form>
   </div>
