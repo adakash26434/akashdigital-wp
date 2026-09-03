@@ -492,20 +492,21 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
 .look-badge--live{background:var(--primary-light,rgba(37,99,235,.12));color:var(--primary);}
 .look-pick h4{font-size:0.9375rem;font-weight:700;margin:0;overflow-wrap:break-word;}
 .look-pick p{font-size:0.75rem;color:var(--muted-foreground);margin:0;line-height:1.45;overflow-wrap:break-word;text-align:left;hyphens:manual;}
-.look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:#0f172a;}
-.look-mini span{position:absolute;display:block;background:rgba(255,255,255,.12);}
+.look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:color-mix(in srgb, var(--primary) 28%, #0f172a);}
+.look-mini span{position:absolute;display:block;background:color-mix(in srgb, var(--primary) 55%, #fff);}
 .look-mini .bar{height:6px;width:55%;left:10%;top:18%;}
 .look-mini .bar2{height:4px;width:38%;left:10%;top:38%;opacity:.5;}
-.look-mini .card{width:28%;height:42%;right:10%;bottom:12%;background:rgba(255,255,255,.18);}
-.look-mini--soft{border-radius:0.85rem;}
-.look-mini--soft .card{border-radius:0.45rem;width:32%;right:8%;}
+.look-mini .card{width:28%;height:42%;right:10%;bottom:12%;background:color-mix(in srgb, var(--secondary) 45%, #fff);}
+.look-mini--soft{border-radius:0.85rem;background:color-mix(in srgb, var(--primary) 16%, var(--muted));}
+.look-mini--soft .bar,.look-mini--soft .bar2{background:color-mix(in srgb, var(--primary) 50%, var(--foreground));}
+.look-mini--soft .card{border-radius:0.45rem;width:32%;right:8%;background:var(--card);box-shadow:0 0 0 1px var(--border);}
 .look-mini--sharp{border-radius:0;}
-.look-mini--sharp .card{border-radius:0;width:36%;right:6%;box-shadow:inset 3px 0 0 #60a5fa;}
+.look-mini--sharp .card{border-radius:0;width:36%;right:6%;box-shadow:inset 3px 0 0 var(--primary);}
 .look-mini--sharp .bar,.look-mini--sharp .bar2{border-radius:0;}
-.look-mini--editorial{border-radius:1.1rem;}
-.look-mini--editorial .bar{width:72%;height:8px;left:14%;top:22%;}
-.look-mini--editorial .bar2{width:48%;left:26%;top:42%;}
-.look-mini--editorial .card{width:70%;height:28%;left:15%;right:auto;bottom:10%;border-radius:0.7rem;}
+.look-mini--editorial{border-radius:1.1rem;background:color-mix(in srgb, var(--secondary) 18%, var(--muted));}
+.look-mini--editorial .bar{width:72%;height:8px;left:14%;top:22%;background:var(--primary);}
+.look-mini--editorial .bar2{width:48%;left:26%;top:42%;background:color-mix(in srgb, var(--primary) 40%, var(--foreground));}
+.look-mini--editorial .card{width:70%;height:28%;left:15%;right:auto;bottom:10%;border-radius:0.7rem;background:var(--card);}
 .look-mini--compact{border-radius:0.4rem;}
 .look-mini--compact .bar,.look-mini--compact .bar2{top:10%;height:4px;}
 .look-mini--compact .bar2{top:20%;}
@@ -1329,7 +1330,7 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
       <?= csrfField() ?><input type="hidden" name="section" value="look">
       <div class="st-card p-card-lg" style="max-width:1100px;">
         <h3 class="h-eyebrow">Public site look</h3>
-        <p class="caption-meta" style="margin-bottom:1rem;">Superadmin only. Pick one layout for visitors. <strong>Pages, text, and brand colors stay the same</strong> — only spacing, navbar, and card shape change. Admin and the client portal are not affected.</p>
+        <p class="caption-meta" style="margin-bottom:1rem;">Superadmin only. Pick one layout for visitors. <strong>Brand colors stay the same on every look</strong> — they come from <a href="#brand_colors" @click="tab='brand_colors'; history.replaceState(null,'','#brand_colors')">Brand Colors</a> (plus Homepage mesh colors on Soft / Compact / Editorial). Only spacing, navbar shape, and cards change. Admin and the client portal are not affected.</p>
         <p class="caption-meta" style="margin-bottom:1.25rem;">Live now: <strong><?= e($looks[$currentLook]['label'] ?? 'Soft') ?></strong>. Keep <strong>Soft</strong> to match the current site.</p>
         <div class="look-pick" role="radiogroup" aria-label="Public site look">
           <?php foreach ($looks as $key => $meta):

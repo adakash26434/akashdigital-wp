@@ -31,6 +31,11 @@ $toPath = static function (string $url) use ($siteUrl): string {
 $iconPngPath = $toPath($iconPng);
 $iconAnyPath = $toPath($iconAny);
 
+$themeColor = trim((string)($s['brand_primary'] ?? ''));
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $themeColor)) {
+    $themeColor = '#2563eb';
+}
+
 $manifest = [
     'name'             => $siteName,
     'short_name'       => $siteName,
@@ -40,7 +45,7 @@ $manifest = [
     'display'          => 'standalone',
     'orientation'      => 'portrait-primary',
     'background_color' => '#fafbfc',
-    'theme_color'      => '#2563eb',
+    'theme_color'      => $themeColor,
     'lang'             => $__langCode,
     'categories'       => ['business', 'productivity'],
     'icons'            => [

@@ -12,6 +12,27 @@
 html[data-ui-look="soft"],
 html.ui-look-soft { /* keep pages.css + theme.css as-is */ }
 
+/* Surfaces tinted from Settings → Brand Colors (--primary / --secondary).
+   Soft does not set these, so live colors stay exactly as saved. */
+html[data-ui-look="sharp"] {
+  --look-paper: color-mix(in srgb, var(--primary) 4%, var(--card));
+  --look-wash: var(--muted);
+}
+html[data-ui-look="editorial"] {
+  --look-paper: color-mix(in srgb, var(--primary) 8%, var(--background));
+  --look-wash: color-mix(in srgb, var(--secondary) 10%, var(--background));
+}
+html[data-ui-look="compact"] {
+  --look-paper: var(--background);
+  --look-wash: color-mix(in srgb, var(--primary) 6%, var(--background));
+}
+html.dark[data-ui-look="sharp"],
+html.dark[data-ui-look="editorial"],
+html.dark[data-ui-look="compact"] {
+  --look-paper: color-mix(in srgb, var(--primary) 12%, var(--card));
+  --look-wash: color-mix(in srgb, var(--secondary) 10%, var(--background));
+}
+
 /* ════════════════════════════════════════════════════════════
    SHARP
    ════════════════════════════════════════════════════════════ */
@@ -49,8 +70,8 @@ html[data-ui-look="sharp"] .st-hero-grid {
   background-size: 28px 28px;
   opacity: 1;
 }
-html[data-ui-look="sharp"]:not(.dark) .st-hero {
-  background: #fff !important;
+html[data-ui-look="sharp"] .st-hero {
+  background: var(--look-paper) !important;
 }
 html[data-ui-look="sharp"] .hero-left .hero-badge {
   border-radius: 0;
@@ -120,8 +141,8 @@ html[data-ui-look="editorial"] .st-hero {
     min-height: clamp(560px, 82vh, 760px);
   }
 }
-html[data-ui-look="editorial"]:not(.dark) .st-hero {
-  background: #f7f5f2 !important;
+html[data-ui-look="editorial"] .st-hero {
+  background: var(--look-paper) !important;
 }
 html[data-ui-look="editorial"] .st-hero-grid { display: none; }
 
@@ -231,6 +252,7 @@ html[data-ui-look="editorial"] .st-page-hero {
 
 html[data-ui-look="compact"] .st-hero {
   min-height: clamp(380px, 54vh, 500px);
+  background: var(--look-wash) !important;
 }
 html[data-ui-look="compact"] .st-hero-split {
   padding: 1.75rem 0 1.25rem;
@@ -387,11 +409,14 @@ html[data-ui-look="sharp"] .footer-heading {
   }
 }
 
-/* ── Editorial: cream bands, un-pilled eyebrows, quiet mesh ── */
-html[data-ui-look="editorial"] .st-hero-mesh { display: none; }
-html[data-ui-look="editorial"]:not(.dark) .band-tinted,
-html[data-ui-look="editorial"]:not(.dark) .st-page-hero {
-  background: #f7f5f2;
+/* ── Editorial: brand-wash bands, un-pilled eyebrows, quiet mesh ── */
+html[data-ui-look="editorial"] .st-hero-mesh {
+  opacity: 0.42;
+  pointer-events: none;
+}
+html[data-ui-look="editorial"] .band-tinted,
+html[data-ui-look="editorial"] .st-page-hero {
+  background: var(--look-wash);
 }
 html[data-ui-look="editorial"] .section-eyebrow {
   background: none;
@@ -532,11 +557,11 @@ html[data-ui-look="sharp"] .mobile-nav-item[aria-current="page"] {
   }
 }
 
-html[data-ui-look="editorial"]:not(.dark) #st-navbar,
-html[data-ui-look="editorial"]:not(.dark) #st-navbar.is-scrolled {
-  background: rgba(247, 245, 242, 0.94);
+html[data-ui-look="editorial"] #st-navbar,
+html[data-ui-look="editorial"] #st-navbar.is-scrolled {
+  background: color-mix(in srgb, var(--look-paper) 88%, transparent);
   box-shadow: none;
-  border-bottom: 1px solid rgba(15, 23, 42, 0.07);
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
 }
 html[data-ui-look="editorial"] .st-lang-btn,
 html[data-ui-look="editorial"] .st-icon-btn,

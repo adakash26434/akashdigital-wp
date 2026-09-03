@@ -62,10 +62,14 @@ $__asset = function (string $path) use ($__siteUrl, $__assetRoot): string {
     $v = @filemtime($__assetRoot . $path);
     return rtrim($__siteUrl, '/') . '/' . ltrim($path, '/') . ($v ? '?v=' . $v : '');
 };
+$__themeColor = trim((string)($__s['brand_primary'] ?? ''));
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $__themeColor)) {
+    $__themeColor = '#2563eb';
+}
 ?>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#2563eb">
+<meta name="theme-color" content="<?= e($__themeColor) ?>">
 <?php if (!$__indexable): ?>
 <meta name="robots" content="noindex,nofollow">
 <?php endif; ?>
