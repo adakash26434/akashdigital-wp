@@ -3281,6 +3281,7 @@ html.dark #st-navbar.is-scrolled {
   color: var(--muted-foreground);
   font-size: var(--text-sm);
   line-height: 1.7;
+  text-align: center;
 }
 .trust-proof {
   display: grid;
