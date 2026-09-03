@@ -18,21 +18,22 @@
   --h-sub: rgba(255,255,255,0.8);
   --h-badge-bg: rgba(255,255,255,0.08);
   --h-badge-border: rgba(255,255,255,0.15);
-  --h-badge-color: #93c5fd;
+  --h-badge-color: color-mix(in srgb, var(--primary) 42%, #ffffff);
   --h-trust: rgba(255,255,255,0.6);
   --h-grid: rgba(255,255,255,0.03);
   --h-shadow: 0 4px 24px rgba(0,0,0,0.5);
 }
-/* Light mode — hero shell only (mockup stays dark) */
+/* Light mode — hero shell only (mockup stays dark); follows brand primary */
 html:not(.dark) .st-hero {
-  --h-text: #0f172a;
-  --h-sub: rgba(15,23,42,0.75);
-  --h-badge-bg: rgba(37,99,235,0.08);
-  --h-badge-border: rgba(37,99,235,0.2);
-  --h-badge-color: #2563eb;
-  --h-trust: rgba(15,23,42,0.6);
-  --h-grid: rgba(15,23,42,0.04);
-  --h-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  background: color-mix(in srgb, var(--primary) 9%, var(--background, #ffffff)) !important;
+  --h-text: var(--foreground, #0f172a);
+  --h-sub: color-mix(in srgb, var(--foreground, #0f172a) 72%, transparent);
+  --h-badge-bg: color-mix(in srgb, var(--primary) 10%, transparent);
+  --h-badge-border: color-mix(in srgb, var(--primary) 22%, transparent);
+  --h-badge-color: var(--primary);
+  --h-trust: color-mix(in srgb, var(--foreground, #0f172a) 58%, transparent);
+  --h-grid: color-mix(in srgb, var(--primary) 6%, transparent);
+  --h-shadow: 0 4px 24px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 /* Mesh gradient overlay — animated blobs */
@@ -53,19 +54,19 @@ html:not(.dark) .st-hero {
 .st-hero-mesh .m1 {
   width: 45vw; height: 45vw;
   top: -15%; left: -10%;
-  background: var(--hero-mesh-1, #2563eb);
+  background: var(--hero-mesh-1, var(--primary));
   animation-delay: 0s;
 }
 .st-hero-mesh .m2 {
   width: 35vw; height: 35vw;
   bottom: -10%; right: -5%;
-  background: var(--hero-mesh-2, #7c3aed);
+  background: var(--hero-mesh-2, var(--secondary));
   animation-delay: -6s;
 }
 .st-hero-mesh .m3 {
   width: 25vw; height: 25vw;
   top: 40%; right: 30%;
-  background: var(--hero-mesh-3, #06b6d4);
+  background: var(--hero-mesh-3, color-mix(in srgb, var(--primary) 45%, var(--secondary)));
   animation-delay: -12s;
   opacity: 0.2;
 }
@@ -173,7 +174,7 @@ html:not(.dark) .st-hero {
   bottom: 0.06em;
   height: 0.12em;
   border-radius: 999px;
-  background: color-mix(in srgb, var(--primary) 55%, transparent);
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 65%, transparent), color-mix(in srgb, var(--secondary) 45%, transparent));
   transform: scaleX(0);
   transform-origin: left center;
   pointer-events: none;
@@ -368,7 +369,7 @@ html:not(.dark) .st-hero {
   font-family: var(--font-display);
 }
 .hero-right .hero-mockup .mockup-row .value.green { color: #4ade80; }
-.hero-right .hero-mockup .mockup-row .value.blue  { color: #60a5fa; }
+.hero-right .hero-mockup .mockup-row .value.blue  { color: color-mix(in srgb, var(--primary) 55%, #ffffff); }
 .hero-right .hero-mockup .mockup-row .value.amber { color: #fbbf24; }
 .hero-right .hero-mockup .mockup-chart {
   display: flex;
@@ -380,7 +381,7 @@ html:not(.dark) .st-hero {
 .hero-right .hero-mockup .mockup-chart .bar {
   flex: 1;
   border-radius: 2px 2px 0 0;
-  background: linear-gradient(to top, var(--primary), rgba(96,165,250,0.4));
+  background: linear-gradient(to top, var(--primary), color-mix(in srgb, var(--primary) 35%, transparent));
   transition: height 0.3s ease;
 }
 .hero-right .hero-mockup .mockup-chart .bar:nth-child(1) { height: 60%; }
@@ -410,7 +411,7 @@ html:not(.dark) .st-hero {
   pointer-events: none;
 }
 .hero-right .float-chip.green { color: #4ade80; }
-.hero-right .float-chip.blue  { color: #60a5fa; }
+.hero-right .float-chip.blue  { color: color-mix(in srgb, var(--primary) 55%, #ffffff); }
 .hero-right .float-chip.amber { color: #fbbf24; }
 @keyframes chip-float {
   0%, 100% { transform: translateY(0); }
@@ -543,7 +544,7 @@ html:not(.dark) .st-hero {
 .price-card--highlight {
   background: linear-gradient(145deg, var(--primary-dark), var(--primary));
   border: 2px solid rgba(255,255,255,0.15);
-  box-shadow: 0 16px 48px rgba(37,99,235,0.25);
+  box-shadow: 0 16px 48px color-mix(in srgb, var(--primary) 28%, transparent);
   z-index: 1;
 }
 .price-card__badge {
@@ -1190,7 +1191,7 @@ html:not(.dark) .st-hero {
   height: 3.5rem;
   border-radius: 9999px;
   background: var(--primary-light);
-  border: 2px solid rgba(37,99,235,.2);
+  border: 2px solid color-mix(in srgb, var(--primary) 22%, transparent);
   margin: 0 auto 1.25rem;
   line-height: 0;
 }
@@ -2339,7 +2340,7 @@ html.dark .st-dropdown {
 }
 .st-card:hover, .st-card--hover:hover {
   box-shadow: var(--shadow-md);
-  border-color: rgba(37, 99, 235, 0.25);
+  border-color: color-mix(in srgb, var(--primary) 28%, transparent);
   transform: translateY(-1px);
 }
 /* Org-chart lead cards: keep wide/short after .st-card padding above */
@@ -2712,7 +2713,7 @@ html.dark input:-webkit-autofill:focus {
 /* ── 13. Pricing card hover — subtle lift ───────────────────── */
 .price-card:not(.price-card--highlight):hover {
   box-shadow: 0 8px 32px rgba(15,23,42,0.10);
-  border-color: rgba(37,99,235,0.2);
+  border-color: color-mix(in srgb, var(--primary) 22%, transparent);
   transform: translateY(-2px);
   transition: all 0.2s ease;
 }

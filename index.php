@@ -144,11 +144,14 @@ include 'includes/header.php';
   Fully editable from Admin → Settings → Homepage → Hero Section.
 ══════════════════════════════════════════════ -->
 <?php
-// Hero mesh colors — editable from admin
-$_heroMesh1 = trim($__s['hero_mesh_1'] ?? '') ?: '#2563eb';
-$_heroMesh2 = trim($__s['hero_mesh_2'] ?? '') ?: '#7c3aed';
-$_heroMesh3 = trim($__s['hero_mesh_3'] ?? '') ?: '#06b6d4';
+// Hero mesh — admin override, else follow brand primary / secondary
+$_heroMesh1 = trim($__s['hero_mesh_1'] ?? '');
+$_heroMesh2 = trim($__s['hero_mesh_2'] ?? '');
+$_heroMesh3 = trim($__s['hero_mesh_3'] ?? '');
 $_heroBg    = trim($__s['hero_bg'] ?? '') ?: '#0a1023';
+$_heroMesh1Css = $_heroMesh1 !== '' ? $_heroMesh1 : 'var(--primary)';
+$_heroMesh2Css = $_heroMesh2 !== '' ? $_heroMesh2 : 'var(--secondary)';
+$_heroMesh3Css = $_heroMesh3 !== '' ? $_heroMesh3 : 'color-mix(in srgb, var(--primary) 45%, var(--secondary))';
 
 // Badge text
 $_badge1 = cms($__s, 'hero_badge1_text') ?: (isNepali() ? '🇳🇵 नेपालमा बनेको' : '🇳🇵 Built for Nepal');
@@ -207,14 +210,14 @@ if (function_exists('stPublicUiLook') && stPublicUiLook() === 'editorial') {
      external pages.css is stale/cached/out-of-sync on the deployed host.
      Mirrors the .st-hero rules in assets/css/pages.css. -->
 <style>
-.st-hero{position:relative;overflow:hidden;min-height:clamp(480px,70vh,640px);display:flex;align-items:center;background:var(--hero-bg,#0a1023);--h-text:#fff;--h-sub:rgba(255,255,255,.8);--h-badge-bg:rgba(255,255,255,.08);--h-badge-border:rgba(255,255,255,.15);--h-badge-color:#93c5fd;--h-trust:rgba(255,255,255,.6);--h-grid:rgba(255,255,255,.03);--h-shadow:0 4px 24px rgba(0,0,0,.5);}
+.st-hero{position:relative;overflow:hidden;min-height:clamp(480px,70vh,640px);display:flex;align-items:center;background:var(--hero-bg,#0a1023);--h-text:#fff;--h-sub:rgba(255,255,255,.8);--h-badge-bg:rgba(255,255,255,.08);--h-badge-border:rgba(255,255,255,.15);--h-badge-color:color-mix(in srgb,var(--primary) 42%,#fff);--h-trust:rgba(255,255,255,.6);--h-grid:rgba(255,255,255,.03);--h-shadow:0 4px 24px rgba(0,0,0,.5);}
 /* Light mode overrides — hero shell only (mockup stays dark) */
-html:not(.dark) .st-hero{background:#eef2ff !important;--h-text:#0f172a;--h-sub:rgba(15,23,42,.75);--h-badge-bg:rgba(37,99,235,.08);--h-badge-border:rgba(37,99,235,.2);--h-badge-color:#2563eb;--h-trust:rgba(15,23,42,.6);--h-grid:rgba(15,23,42,.04);--h-shadow:0 4px 24px rgba(0,0,0,.08);}
+html:not(.dark) .st-hero{background:color-mix(in srgb,var(--primary) 9%,var(--background,#fff))!important;--h-text:var(--foreground,#0f172a);--h-sub:color-mix(in srgb,var(--foreground,#0f172a) 72%,transparent);--h-badge-bg:color-mix(in srgb,var(--primary) 10%,transparent);--h-badge-border:color-mix(in srgb,var(--primary) 22%,transparent);--h-badge-color:var(--primary);--h-trust:color-mix(in srgb,var(--foreground,#0f172a) 58%,transparent);--h-grid:color-mix(in srgb,var(--primary) 6%,transparent);--h-shadow:0 4px 24px color-mix(in srgb,var(--primary) 12%,transparent);}
 .st-hero-mesh{position:absolute;inset:0;pointer-events:none;overflow:hidden;}
 .st-hero-mesh span{position:absolute;border-radius:50%;filter:blur(80px);opacity:.35;will-change:transform;animation:mesh-float 18s ease-in-out infinite alternate;}
-.st-hero-mesh .m1{width:45vw;height:45vw;top:-15%;left:-10%;background:var(--hero-mesh-1,#2563eb);animation-delay:0s;}
-.st-hero-mesh .m2{width:35vw;height:35vw;bottom:-10%;right:-5%;background:var(--hero-mesh-2,#7c3aed);animation-delay:-6s;}
-.st-hero-mesh .m3{width:25vw;height:25vw;top:40%;right:30%;background:var(--hero-mesh-3,#06b6d4);animation-delay:-12s;opacity:.2;}
+.st-hero-mesh .m1{width:45vw;height:45vw;top:-15%;left:-10%;background:var(--hero-mesh-1,var(--primary));animation-delay:0s;}
+.st-hero-mesh .m2{width:35vw;height:35vw;bottom:-10%;right:-5%;background:var(--hero-mesh-2,var(--secondary));animation-delay:-6s;}
+.st-hero-mesh .m3{width:25vw;height:25vw;top:40%;right:30%;background:var(--hero-mesh-3,color-mix(in srgb,var(--primary) 45%,var(--secondary)));animation-delay:-12s;opacity:.2;}
 @keyframes mesh-float{0%{transform:translate(0,0) scale(1);}33%{transform:translate(3%,-4%) scale(1.08);}66%{transform:translate(-2%,3%) scale(.95);}100%{transform:translate(4%,2%) scale(1.05);}}
 .st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--h-grid) 1px,transparent 1px),linear-gradient(90deg,var(--h-grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
 .st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;}
@@ -234,8 +237,8 @@ html:not(.dark) .st-hero{background:#eef2ff !important;--h-text:#0f172a;--h-sub:
 .hero-left .hero-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;padding:.3rem .875rem .3rem .625rem;border-radius:9999px;font-size:var(--text-xs);font-weight:700;background:var(--h-badge-bg);border:1px solid var(--h-badge-border);color:var(--h-badge-color);backdrop-filter:blur(4px);}
 .hero-left .hero-badge i{width:13px;height:13px;}
 .hero-left .hero-title{font-family:var(--font-display);font-size:clamp(1.75rem,4.5vw,2.75rem);font-weight:800;line-height:1.1;color:var(--h-text);letter-spacing:-.025em;text-shadow:var(--h-shadow);margin:0;}
-.hero-left .hero-title .tg{background:linear-gradient(135deg,#60a5fa,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
-html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#2563eb,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-left .hero-title .tg{background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var(--primary),var(--secondary));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 .hero-left .hero-bar{width:3rem;height:3px;background:var(--primary);border-radius:2px;}
 .hero-left .hero-sub{font-size:clamp(.9375rem,1.6vw,1.0625rem);color:var(--h-sub);line-height:1.72;max-width:32rem;margin:0;font-weight:500;}
 .hero-left .hero-actions{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:.5rem;}
@@ -259,10 +262,10 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 .hero-right .hero-mockup .mockup-row .label{font-size:.625rem;color:rgba(255,255,255,.4);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 .hero-right .hero-mockup .mockup-row .value{font-size:.875rem;font-weight:800;color:#fff;font-family:var(--font-display);}
 .hero-right .hero-mockup .mockup-row .value.green{color:#4ade80;}
-.hero-right .hero-mockup .mockup-row .value.blue{color:#60a5fa;}
+.hero-right .hero-mockup .mockup-row .value.blue{color:color-mix(in srgb,var(--primary) 55%,#fff);}
 .hero-right .hero-mockup .mockup-row .value.amber{color:#fbbf24;}
 .hero-right .hero-mockup .mockup-chart{display:flex;align-items:flex-end;gap:.375rem;height:3rem;margin-top:.25rem;}
-.hero-right .hero-mockup .mockup-chart .bar{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(to top,var(--primary),rgba(96,165,250,.4));transition:height .3s ease;}
+.hero-right .hero-mockup .mockup-chart .bar{flex:1;border-radius:2px 2px 0 0;background:linear-gradient(to top,var(--primary),color-mix(in srgb,var(--primary) 35%,transparent));transition:height .3s ease;}
 .hero-right .hero-mockup .mockup-chart .bar:nth-child(1){height:60%;}
 .hero-right .hero-mockup .mockup-chart .bar:nth-child(2){height:85%;}
 .hero-right .hero-mockup .mockup-chart .bar:nth-child(3){height:45%;}
@@ -272,7 +275,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 .hero-right .hero-mockup .mockup-chart .bar:nth-child(7){height:75%;}
 .hero-right .float-chip{position:absolute;display:flex;align-items:center;gap:.375rem;padding:.4rem .75rem;border-radius:9999px;font-size:.625rem;font-weight:700;color:#fff;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 20px rgba(0,0,0,.25);animation:chip-float 3s ease-in-out infinite;pointer-events:none;}
 .hero-right .float-chip.green{color:#4ade80;}
-.hero-right .float-chip.blue{color:#60a5fa;}
+.hero-right .float-chip.blue{color:color-mix(in srgb,var(--primary) 55%,#fff);}
 .hero-right .float-chip.amber{color:#fbbf24;}
 @keyframes chip-float{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 .hero-right .float-chip.f1{top:8%;right:-5%;animation-delay:0s;}
@@ -296,7 +299,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 @keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .hero-left .hero-title .hero-word{display:inline-block;position:relative}
 .hero-left .hero-title.is-inking .hero-word{animation:hero-ink-write .58s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--w,0)*.09s + .12s)}
-.hero-left .hero-title.is-inking .hero-word::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;border-radius:999px;background:color-mix(in srgb,var(--primary) 55%,transparent);transform:scaleX(0);transform-origin:left center;pointer-events:none;animation:hero-ink-stroke .42s ease both;animation-delay:calc(var(--w,0)*.09s + .28s)}
+.hero-left .hero-title.is-inking .hero-word::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 65%,transparent),color-mix(in srgb,var(--secondary) 45%,transparent));transform:scaleX(0);transform-origin:left center;pointer-events:none;animation:hero-ink-stroke .42s ease both;animation-delay:calc(var(--w,0)*.09s + .28s)}
 @keyframes hero-ink-write{from{opacity:0;transform:translateY(.28em);clip-path:inset(0 105% 0 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
 @keyframes hero-ink-stroke{0%{transform:scaleX(0);opacity:.55}70%{transform:scaleX(1);opacity:.4}100%{transform:scaleX(1);opacity:0}}
 .hero-copy-slide.is-active .hero-title.is-inking{animation:none}
@@ -317,7 +320,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
   .hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:none!important}
 }
 </style>
-<section class="st-hero" style="--hero-bg:<?= e($_heroBg) ?>;--hero-mesh-1:<?= e($_heroMesh1) ?>;--hero-mesh-2:<?= e($_heroMesh2) ?>;--hero-mesh-3:<?= e($_heroMesh3) ?>;">
+<section class="st-hero" style="--hero-bg:<?= e($_heroBg) ?>;--hero-mesh-1:<?= e($_heroMesh1Css) ?>;--hero-mesh-2:<?= e($_heroMesh2Css) ?>;--hero-mesh-3:<?= e($_heroMesh3Css) ?>;">
 
   <!-- Animated mesh gradient blobs -->
   <div class="st-hero-mesh">
@@ -693,17 +696,17 @@ include 'includes/stats-bar.php';
         $bgCss     = $prod['home_bg_css'] ?? '';
         $textC     = $isDark ? '#f1f5f9'                : 'var(--foreground)';
         $mutedC    = $isDark ? 'rgba(241,245,249,.65)'  : 'var(--muted-foreground)';
-        $chipBg    = $isDark ? 'rgba(255,255,255,.08)'  : 'rgba(37,99,235,.08)';
-        $chipBord  = $isDark ? 'rgba(255,255,255,.14)'  : 'rgba(37,99,235,.15)';
-        $chipCol   = $isDark ? '#93c5fd'                : 'var(--primary)';
+        $chipBg    = $isDark ? 'rgba(255,255,255,.08)'  : 'color-mix(in srgb, var(--primary) 8%, transparent)';
+        $chipBord  = $isDark ? 'rgba(255,255,255,.14)'  : 'color-mix(in srgb, var(--primary) 16%, transparent)';
+        $chipCol   = $isDark ? 'color-mix(in srgb, var(--primary) 42%, #fff)' : 'var(--primary)';
         $cardBg    = $bgCss ?: ($isDark
-          ? 'background:linear-gradient(135deg,#0f172a 0%,#1e3a8a 100%)'
-          : 'background:linear-gradient(135deg,var(--primary-light) 0%,var(--success-soft) 100%)');
+          ? 'background:linear-gradient(135deg,#0f172a 0%,color-mix(in srgb, var(--primary) 45%, #0f172a) 100%)'
+          : 'background:linear-gradient(135deg,var(--primary-light) 0%,color-mix(in srgb, var(--secondary) 14%, var(--card)) 100%)');
         $cardStyle = $cardBg . ($isDark ? ';border-color:#1e293b' : '');
       ?>
       <div class="bc <?= $isWide ? 'bw' : '' ?>" style="<?= e($cardStyle) ?>">
         <?php if($isDark): ?>
-        <div style="position:absolute;top:-2rem;right:1.5rem;width:8rem;height:8rem;border-radius:9999px;background:radial-gradient(circle,rgba(37,99,235,.35),transparent);filter:blur(16px);pointer-events:none;"></div>
+        <div style="position:absolute;top:-2rem;right:1.5rem;width:8rem;height:8rem;border-radius:9999px;background:radial-gradient(circle,color-mix(in srgb, var(--primary) 35%, transparent),transparent);filter:blur(16px);pointer-events:none;"></div>
         <?php endif; ?>
         <div style="position:relative;display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
           <div class="icon-box icon-box-sm <?= e(stIconBoxClass($prod['icon_color'] ?? 'blue')) ?>">
@@ -713,7 +716,7 @@ include 'includes/stats-bar.php';
             <div style="display:flex;align-items:center;gap:.5rem;margin-bottom:.375rem;flex-wrap:wrap;">
               <h3 style="font-family:var(--font-display);font-weight:800;color:<?= $textC ?>;margin:0;"><?= e($prod['name']) ?></h3>
               <?php if(!empty($prod['badge'])): ?>
-              <span style="font-size:var(--text-3xs);padding:.15rem .5rem;border-radius:9999px;background:#dbeafe;color:var(--primary-dark);font-weight:700;"><?= e($prod['badge']) ?></span>
+              <span style="font-size:var(--text-3xs);padding:.15rem .5rem;border-radius:9999px;background:var(--primary-light);color:var(--primary-dark);font-weight:700;"><?= e($prod['badge']) ?></span>
               <?php endif; ?>
             </div>
             <p style="color:<?= $mutedC ?>;font-size:var(--text-sm);line-height:1.65;margin:0;"><?= e($prod['summary'] ?? '') ?></p>
@@ -1034,7 +1037,7 @@ function sTab(slug){
         left: calc(50% + 2rem);
         right: calc(-50% + 1rem);
         height: 1px;
-        background: linear-gradient(90deg, rgba(37,99,235,.35), rgba(37,99,235,.1));
+        background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 35%, transparent), color-mix(in srgb, var(--primary) 10%, transparent));
         pointer-events: none;
       }
     }
