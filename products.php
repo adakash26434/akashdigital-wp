@@ -189,7 +189,7 @@ include 'includes/page-hero.php';
       <div class="section-eyebrow mb-3q"><?= e($addonsEyebrow) ?></div>
       <h2 class="h-display section-title" style="margin-bottom:0;"><?= e($addonsTitle) ?></h2>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.875rem;">
+    <div class="addons-grid">
       <?php foreach ($addons as $addon): ?>
       <?php
         $cardTag = !empty($addon['detail_url']) ? 'a' : 'div';

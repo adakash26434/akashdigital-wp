@@ -1175,11 +1175,21 @@ html:not(.dark) .st-hero {
 }
 .why-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 16rem));
+  justify-content: center;
   gap: 1.25rem;
 }
 .why-grid .feature-card__icon {
   margin-inline: auto;
+}
+.addons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 15.5rem));
+  justify-content: center;
+  gap: 0.875rem;
+}
+.addons-grid .feature-card {
+  width: 100%;
 }
 @media (max-width: 480px) {
   .product-card__head { min-height: 0; }

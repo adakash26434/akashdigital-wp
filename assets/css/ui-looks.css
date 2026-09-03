@@ -1386,8 +1386,17 @@ html[data-ui-look="compact"] .product-card__price-strip {
   text-align: start;
   padding-inline: 1.15rem;
 }
-html[data-ui-look="sharp"] .product-card__chip {
+html[data-ui-look="sharp"] .addons-grid .feature-card,
+html[data-ui-look="sharp"] .why-grid .feature-card {
   border-radius: 0.15rem;
+  border-left: 3px solid var(--primary);
+}
+html[data-ui-look="editorial"] .addons-grid .feature-card,
+html[data-ui-look="editorial"] .why-grid .feature-card {
+  border-radius: 1.35rem;
+}
+html[data-ui-look="compact"] .addons-grid {
+  gap: 0.65rem;
 }
 html[data-ui-look="editorial"] .product-card__chip {
   border-radius: 999px;
