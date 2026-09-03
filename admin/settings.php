@@ -461,10 +461,11 @@ $tabs = [
 .st-accordion__body{padding:1rem;background:var(--background);display:flex;flex-direction:column;gap:0.75rem;}
 .look-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:720px;}
 @media(min-width:900px){.look-pick{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none;}}
-.look-pick label{display:flex;flex-direction:column;gap:0.65rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.75rem;background:var(--card);transition:border-color .15s,box-shadow .15s;}
+.look-pick label{position:relative;display:flex;flex-direction:column;gap:0.65rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.75rem;background:var(--card);transition:border-color .15s,box-shadow .15s;}
 .look-pick label:has(input:checked){border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent);}
 .look-pick label:focus-within{border-color:var(--primary);}
-.look-pick input{position:absolute;opacity:0;pointer-events:none;}
+.look-pick input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1;}
+.look-pick .look-mini,.look-pick h4,.look-pick p{position:relative;z-index:0;pointer-events:none;}
 .look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:#0f172a;}
 .look-mini span{position:absolute;display:block;background:rgba(255,255,255,.12);}
 .look-mini .bar{height:6px;width:55%;left:10%;top:18%;}
@@ -1319,6 +1320,7 @@ $tabs = [
           <?php endforeach; ?>
         </div>
         <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.5rem;">Save public look</button>
+        <p class="caption-meta" style="margin-top:0.85rem;">After save, <a href="<?= e(function_exists('url') ? url('index.php') : '/') ?>" target="_blank" rel="noopener">open the homepage</a> (hard-refresh) to preview. Leave <strong>Soft</strong> selected to keep the current live layout.</p>
       </div>
     </form>
   </div>

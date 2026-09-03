@@ -99,6 +99,7 @@ function siteSettings(bool $refresh = false): array {
         'whatsapp_message' => "Hello! I'm interested in your software.",
         'whatsapp_label'   => 'Support WhatsApp',
         'maintenance_mode' => false,
+        'public_ui_look'   => 'soft',
     ];
     // Try to get site settings, but gracefully fall back to defaults if DB is unavailable
     try {

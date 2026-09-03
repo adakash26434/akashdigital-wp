@@ -119,10 +119,11 @@ $__asset = function (string $path) use ($__siteUrl, $__assetRoot): string {
     $__isHome  = ($__reqPath === '/' || $__reqPath === '/index.php' || ($pageKey ?? '') === 'home');
     if ($__isHome): ?>
 <link rel="stylesheet" href="<?= e($__asset('/assets/css/home.css')) ?>">
-<?php   endif;
-  endif; ?>
+<?php   endif; ?>
 <link rel="stylesheet" href="<?= e($__asset('/assets/css/ui-looks.css')) ?>">
-<?php endif; ?>
+<?php
+  endif;
+endif; ?>
 
 <?php if (in_array($__ctx, ['admin', 'portal'], true)): ?>
   <link rel="stylesheet" href="<?= e($__asset('/assets/css/daisyui.min.css')) ?>">

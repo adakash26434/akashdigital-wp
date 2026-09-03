@@ -24,7 +24,8 @@ html[data-ui-look="sharp"] {
   --radius-3xl: 0.4rem;
 }
 
-html[data-ui-look="sharp"] #st-navbar {
+html[data-ui-look="sharp"] #st-navbar,
+html[data-ui-look="sharp"] #st-navbar.is-scrolled {
   background: var(--card);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -73,9 +74,14 @@ html[data-ui-look="sharp"] .hero-right .float-chip { display: none; }
 /* Accent stripe only on listing/proof cards — not every .st-card (forms, org chart). */
 html[data-ui-look="sharp"] .product-card,
 html[data-ui-look="sharp"] .trust-proof__card,
-html[data-ui-look="sharp"] .bc {
+html[data-ui-look="sharp"] .bc,
+html[data-ui-look="sharp"] .testi-card {
   border-radius: 0;
   box-shadow: none;
+}
+html[data-ui-look="sharp"] .product-card,
+html[data-ui-look="sharp"] .trust-proof__card,
+html[data-ui-look="sharp"] .bc {
   border-left: 3px solid var(--primary);
 }
 html[data-ui-look="sharp"] .product-card:hover,
@@ -163,8 +169,13 @@ html[data-ui-look="editorial"] .hero-left .hero-bar {
   height: 1.5px;
   border-radius: 999px;
 }
-html[data-ui-look="editorial"] .btn:not(.btn-circle):not(.btn-square),
-html[data-ui-look="editorial"] .hero-left .hero-actions .btn {
+html[data-ui-look="editorial"] .hero-left .hero-actions .btn,
+html[data-ui-look="editorial"] .btn-primary,
+html[data-ui-look="editorial"] .btn-outline {
+  border-radius: 999px;
+}
+html[data-ui-look="editorial"] #wa-float-btn,
+html[data-ui-look="editorial"] #float-chat-btn {
   border-radius: 999px;
 }
 html[data-ui-look="editorial"] .hero-right .hero-mockup {
@@ -182,14 +193,11 @@ html[data-ui-look="editorial"] .st-page-hero__title {
   letter-spacing: -0.04em;
   font-weight: 700;
 }
-html[data-ui-look="editorial"] .st-card:not(.product-card):not(.team-card--lead),
 html[data-ui-look="editorial"] .trust-proof__card,
-html[data-ui-look="editorial"] .bc {
+html[data-ui-look="editorial"] .bc,
+html[data-ui-look="editorial"] .testi-card {
   border-radius: 1.35rem;
   box-shadow: none;
-  border-color: transparent;
-  background: var(--muted);
-  background: color-mix(in srgb, var(--card) 92%, var(--muted));
 }
 html[data-ui-look="editorial"] .product-card {
   border-radius: 1.35rem;
@@ -299,6 +307,9 @@ html[data-ui-look="compact"] .trust-partners__lede { font-size: 0.8125rem; }
     border-radius: 0 !important;
   }
   html[data-ui-look="compact"] #prod-list .prod-chevron { display: none; }
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item span {
+    white-space: nowrap;
+  }
 }
 
 html[data-ui-look="compact"] .st-stats .st-stat { padding: 0.85rem 0.5rem; }
