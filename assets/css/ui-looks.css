@@ -902,6 +902,32 @@ html[data-ui-look="compact"] .news-card__media--placeholder {
   from { transform: scaleX(0.35); opacity: 0.4; }
   to   { transform: scaleX(1); opacity: 1; }
 }
+@keyframes look-tg-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+html[data-ui-look="sharp"] .tg,
+html[data-ui-look="editorial"] .tg,
+html[data-ui-look="compact"] .tg,
+html[data-ui-look="sharp"] .hero-left .hero-title .tg,
+html[data-ui-look="editorial"] .hero-left .hero-title .tg,
+html[data-ui-look="compact"] .hero-left .hero-title .tg {
+  background-image: linear-gradient(135deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+html[data-ui-look="sharp"] .hero-left .hero-bar,
+html[data-ui-look="editorial"] .hero-left .hero-bar {
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+}
+html[data-ui-look="editorial"] .tg,
+html[data-ui-look="editorial"] .hero-left .hero-title .tg {
+  background-image: linear-gradient(120deg, var(--primary), var(--secondary), var(--primary));
+  background-size: 200% auto;
+  animation: look-tg-shift 9s ease-in-out infinite;
+}
 
 html[data-ui-look="sharp"] .animate-fade-up,
 html[data-ui-look="sharp"] .animate-on-scroll,
@@ -925,7 +951,8 @@ html[data-ui-look="sharp"] .trust-proof__card {
 html[data-ui-look="sharp"] .product-card:hover,
 html[data-ui-look="sharp"] .news-card:hover,
 html[data-ui-look="sharp"] .price-card:hover {
-  background-color: var(--muted);
+  background-color: color-mix(in srgb, var(--primary) 7%, var(--card));
+  border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
 }
 
 html[data-ui-look="editorial"] .animate-fade-up,
@@ -994,7 +1021,9 @@ html[data-ui-look="compact"] #prod-list .prod-accent {
   html[data-ui-look="compact"] .st-hero-mesh span,
   html[data-ui-look="editorial"] .product-card,
   html[data-ui-look="editorial"] .news-card,
-  html[data-ui-look="editorial"] .price-card {
+  html[data-ui-look="editorial"] .price-card,
+  html[data-ui-look="editorial"] .tg,
+  html[data-ui-look="editorial"] .hero-left .hero-title .tg {
     animation: none !important;
     transition: none !important;
     transform: none !important;

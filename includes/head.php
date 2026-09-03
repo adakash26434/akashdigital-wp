@@ -231,7 +231,10 @@ if (!function_exists('__brandCss')) {
             $css .= "  --primary-dark:     " . e(__hexDarken($b['brand_primary'])) . ";\n";
             $css .= "  --primary-light:    {$p}26;\n";
             $css .= "  --ring:             {$p};\n";
-            $css .= "  --gradient-primary: linear-gradient(135deg,{$p} 0%," . e(__hexDarken($b['brand_primary'],0.70)) . " 100%);\n";
+            $gradEnd = !empty($b['brand_secondary'])
+                ? e($b['brand_secondary'])
+                : e(__hexDarken($b['brand_primary'], 0.70));
+            $css .= "  --gradient-primary: linear-gradient(135deg,{$p} 0%,{$gradEnd} 100%);\n";
             $css .= "  --footer-bg:        " . e(__hexDarken($b['brand_primary'],0.18)) . ";\n";
             $css .= "}\n";
         }

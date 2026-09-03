@@ -65,7 +65,7 @@
   --shadow-glow-lg:  0 0 0 1px rgba(37,99,235,0.2), 0 8px 32px rgba(37,99,235,0.25);
 
   /* Gradients */
-  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
   --gradient-hero:    radial-gradient(ellipse 70% 60% at 50% -10%, rgba(37,99,235,0.10) 0%, transparent 70%);
   --gradient-card:    linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
   --gradient-surface: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
