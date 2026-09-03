@@ -548,10 +548,10 @@ include 'includes/stats-bar.php';
         <i data-lucide="monitor" class="ic-11"></i>
         <?= e(cms($__s,'home_products_eyebrow') ?: (isNepali() ? 'उत्पादनहरू' : 'Our Products')) ?>
       </div>
-      <h2 style="font-family:var(--font-display);font-weight:800;letter-spacing:-.025em;color:var(--foreground);">
+      <h2 class="section-title">
         <?= e($_inActionTitle ?: (isNepali() ? 'कार्यमा हेर्नुस' : 'See it in action')) ?>
       </h2>
-      <p style="max-width:34rem;margin:.875rem auto 0;color:var(--muted-foreground);">
+      <p class="section-lede">
         <?= e($_inActionSub ?: (isNepali() ? 'तपाईंको टोलीले दैनिक प्रयोग गर्ने स्क्रिनहरू।' : 'The actual screens your team will use every day.')) ?>
       </p>
     </div>
@@ -578,7 +578,7 @@ include 'includes/stats-bar.php';
           aria-selected="<?= $i===0?'true':'false' ?>"
           aria-controls="tab-<?= e($tSlug) ?>"
           id="prod-tab-<?= e($tSlug) ?>"
-          style="width:100%;display:flex;align-items:center;gap:.875rem;padding:1.0625rem 1.25rem;text-align:left;background:none;border:none;cursor:pointer;border-bottom:<?= $isLast?'none':'1px solid var(--border)' ?>;position:relative;transition:background .15s;">
+          style="display:flex;align-items:center;gap:.875rem;padding:1.0625rem 1.25rem;text-align:left;background:none;border:none;cursor:pointer;border-bottom:<?= $isLast?'none':'1px solid var(--border)' ?>;position:relative;transition:background .15s;">
           <!-- Active left accent bar -->
           <span class="prod-accent" style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0;background:var(--primary);opacity:0;transition:opacity .15s;"></span>
           <!-- Icon -->
@@ -678,6 +678,7 @@ include 'includes/stats-bar.php';
 @media (max-width:700px) {
   #prod-explorer { grid-template-columns:1fr !important; }
 }
+.prod-sidebar-item { width: 100%; box-sizing: border-box; }
 .prod-sidebar-item.active { background:var(--primary-light,#eff6ff); }
 .prod-sidebar-item.active .prod-accent { opacity:1 !important; }
 .prod-sidebar-item.active .prod-chevron { color:var(--primary) !important; transform:translateX(2px); }
@@ -717,7 +718,7 @@ function sTab(slug){
         <?= e(cms($__s,'home_process_eyebrow') ?: (isNepali() ? 'कसरी सुरु गर्ने' : 'Getting started')) ?>
       </div>
       <h2 class="section-title"><?= cms($__s,'home_process_title') ?: (isNepali() ? 'पहिलो कलदेखि लाइभसम्म — <span class="tg">४ चरण</span>' : 'From first call to go-live — <span class="tg">4 steps</span>') ?></h2>
-      <p style="color:var(--muted-foreground);max-width:38rem;margin:0 auto;"><?= e(cms($__s,'home_process_sub') ?: (isNepali() ? 'डाटा माइग्रेसन, स्टाफ तालिम र ३०-दिन पोस्ट-लन्च सहयोगसहित सम्पूर्ण कार्यान्वयन हामी गर्छौं।' : 'We handle the full implementation — data migration, staff training and 30-day post-launch support.')) ?></p>
+      <p class="section-lede"><?= e(cms($__s,'home_process_sub') ?: (isNepali() ? 'डाटा माइग्रेसन, स्टाफ तालिम र ३०-दिन पोस्ट-लन्च सहयोगसहित सम्पूर्ण कार्यान्वयन हामी गर्छौं।' : 'We handle the full implementation — data migration, staff training and 30-day post-launch support.')) ?></p>
     </div>
     <style>
     #proc-grid {
