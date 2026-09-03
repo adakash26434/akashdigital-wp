@@ -3267,10 +3267,13 @@ html.dark #st-navbar.is-scrolled {
 
 /* ── Trust partners section (home): head → proof strip → marquee ── */
 .trust-partners {
-  padding-block: 3.25rem;
+  padding-block: 4.75rem;
+}
+@media (max-width: 768px) {
+  .trust-partners { padding-block: 3.75rem; }
 }
 .trust-partners__head {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.75rem;
 }
 .trust-partners__lede {
   max-width: 36rem;
@@ -3283,8 +3286,11 @@ html.dark #st-navbar.is-scrolled {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 0.875rem;
-  margin: 0 auto 2rem;
+  margin: 0 auto 2.75rem;
   max-width: 52rem;
+}
+.trust-partners .marquee-wrap {
+  padding-bottom: 0.25rem;
 }
 .trust-proof__card {
   display: flex;
