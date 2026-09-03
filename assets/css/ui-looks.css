@@ -206,7 +206,7 @@ html[data-ui-look="editorial"] .hero-right .float-chip { display: none; }
 html[data-ui-look="editorial"] .st-section { padding: 5.25rem 0; }
 html[data-ui-look="editorial"] .st-section--lg { padding: 6.5rem 0; }
 html[data-ui-look="editorial"] .section-title,
-html[data-ui-look="editorial"] .st-page-hero__title {
+html[data-ui-look="editorial"] .page-hero__title {
   letter-spacing: -0.04em;
   font-weight: 700;
 }
@@ -234,7 +234,7 @@ html[data-ui-look="editorial"] .trust-proof__body { text-align: center; }
 @media (min-width: 768px) {
   html[data-ui-look="editorial"] .product-card__head { min-height: 11rem; }
 }
-html[data-ui-look="editorial"] .st-page-hero {
+html[data-ui-look="editorial"] .page-hero {
   padding: 4.5rem 0 3rem;
   background: transparent;
   border-bottom: none;
@@ -283,8 +283,8 @@ html[data-ui-look="compact"] .hero-right .float-chip {
 html[data-ui-look="compact"] .st-section { padding: 2.4rem 0; }
 html[data-ui-look="compact"] .st-section--lg { padding: 3rem 0; }
 html[data-ui-look="compact"] .st-section--sm { padding: 1.5rem 0; }
-html[data-ui-look="compact"] .st-page-hero { padding: 2rem 0 1.25rem; }
-html[data-ui-look="compact"] .st-page-hero__title {
+html[data-ui-look="compact"] .page-hero { padding: 2rem 0 1.25rem; }
+html[data-ui-look="compact"] .page-hero__title {
   font-size: clamp(1.4rem, 3vw, 2rem);
 }
 html[data-ui-look="compact"] .product-grid { gap: 0.75rem; }
@@ -391,7 +391,7 @@ html[data-ui-look="editorial"] .st-hero-mesh {
   pointer-events: none;
 }
 html[data-ui-look="editorial"] .band-tinted,
-html[data-ui-look="editorial"] .st-page-hero {
+html[data-ui-look="editorial"] .page-hero {
   background: var(--look-wash);
 }
 html[data-ui-look="editorial"] .section-eyebrow {
@@ -494,19 +494,19 @@ html[data-ui-look="sharp"] .hero-left .hero-sub,
 html[data-ui-look="sharp"] .product-card__title,
 html[data-ui-look="sharp"] .product-card__tagline,
 html[data-ui-look="sharp"] .section-title,
-html[data-ui-look="sharp"] .st-page-hero__title,
+html[data-ui-look="sharp"] .page-hero__title,
 html[data-ui-look="editorial"] .hero-left .hero-title,
 html[data-ui-look="editorial"] .hero-left .hero-sub,
 html[data-ui-look="editorial"] .product-card__title,
 html[data-ui-look="editorial"] .product-card__tagline,
 html[data-ui-look="editorial"] .section-title,
-html[data-ui-look="editorial"] .st-page-hero__title,
+html[data-ui-look="editorial"] .page-hero__title,
 html[data-ui-look="compact"] .hero-left .hero-title,
 html[data-ui-look="compact"] .hero-left .hero-sub,
 html[data-ui-look="compact"] .product-card__title,
 html[data-ui-look="compact"] .product-card__tagline,
 html[data-ui-look="compact"] .section-title,
-html[data-ui-look="compact"] .st-page-hero__title {
+html[data-ui-look="compact"] .page-hero__title {
   overflow-wrap: break-word;
 }
 html[data-ui-look="sharp"] .section-title.whitespace-nowrap,
@@ -522,7 +522,7 @@ html[data-ui-look="compact"] .section-title.whitespace-nowrap {
   html[data-ui-look="editorial"] .hero-left .hero-title {
     font-size: clamp(1.6rem, 8vw, 2.1rem);
   }
-  html[data-ui-look="editorial"] .st-page-hero {
+  html[data-ui-look="editorial"] .page-hero {
     padding: 2.25rem 0 1.5rem;
   }
   html[data-ui-look="editorial"] .st-section,
@@ -602,7 +602,6 @@ html[data-ui-look="sharp"] footer .social-pill {
 }
 html[data-ui-look="sharp"] footer .footer-bottom-bar {
   border-top: 1px solid var(--footer-border);
-  box-shadow: inset 0 3px 0 var(--primary);
 }
 html[data-ui-look="sharp"] footer .footer-list {
   gap: 0.4rem;
@@ -689,9 +688,9 @@ html[data-ui-look="compact"] footer .footer-bottom-bar .container {
 html[data-ui-look="sharp"] .hero-left .hero-sub,
 html[data-ui-look="editorial"] .hero-left .hero-sub,
 html[data-ui-look="compact"] .hero-left .hero-sub,
-html[data-ui-look="sharp"] .st-page-hero__subtitle,
-html[data-ui-look="editorial"] .st-page-hero__subtitle,
-html[data-ui-look="compact"] .st-page-hero__subtitle,
+html[data-ui-look="sharp"] .page-hero__subtitle,
+html[data-ui-look="editorial"] .page-hero__subtitle,
+html[data-ui-look="compact"] .page-hero__subtitle,
 html[data-ui-look="sharp"] .section-lede,
 html[data-ui-look="editorial"] .section-lede,
 html[data-ui-look="compact"] .section-lede {
@@ -704,21 +703,21 @@ html[data-ui-look="compact"] .hero-left .hero-title,
 html[data-ui-look="sharp"] .section-title,
 html[data-ui-look="editorial"] .section-title,
 html[data-ui-look="compact"] .section-title,
-html[data-ui-look="sharp"] .st-page-hero__title,
-html[data-ui-look="editorial"] .st-page-hero__title,
-html[data-ui-look="compact"] .st-page-hero__title {
+html[data-ui-look="sharp"] .page-hero__title,
+html[data-ui-look="editorial"] .page-hero__title,
+html[data-ui-look="compact"] .page-hero__title {
   text-wrap: balance;
 }
 html[data-ui-look="editorial"] .hero-left .hero-title {
   line-height: 1.16;
 }
-html[data-ui-look="editorial"] .st-page-hero {
+html[data-ui-look="editorial"] .page-hero {
   text-align: center;
 }
 html[data-ui-look="editorial"] .hero-left .hero-sub,
 html[data-ui-look="editorial"] .section-lede,
-html[data-ui-look="editorial"] .st-page-hero__title,
-html[data-ui-look="editorial"] .st-page-hero__subtitle {
+html[data-ui-look="editorial"] .page-hero__title,
+html[data-ui-look="editorial"] .page-hero__subtitle {
   text-align: center;
   max-width: 38rem;
   margin-left: auto;
@@ -737,11 +736,15 @@ html[data-ui-look="sharp"] .st-stats .st-stat {
 
 @media (min-width: 1024px) {
   html[data-ui-look="sharp"] .hero-left .hero-sub,
-  html[data-ui-look="sharp"] .st-page-hero__subtitle,
+  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="compact"] .hero-left .hero-sub,
-  html[data-ui-look="compact"] .st-page-hero__subtitle {
+  html[data-ui-look="compact"] .page-hero__subtitle {
     text-align: start;
     hyphens: manual;
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-sub,
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-sub {
+    text-align: center;
   }
 }
 html[data-ui-look="sharp"] .tab-pane p,
@@ -752,10 +755,10 @@ html[data-ui-look="compact"] .tab-pane p {
 }
 @media (max-width: 1023px) {
   html[data-ui-look="sharp"] .hero-left .hero-sub,
-  html[data-ui-look="sharp"] .st-page-hero__subtitle,
+  html[data-ui-look="sharp"] .page-hero__subtitle,
   html[data-ui-look="sharp"] .tab-pane p,
   html[data-ui-look="compact"] .hero-left .hero-sub,
-  html[data-ui-look="compact"] .st-page-hero__subtitle,
+  html[data-ui-look="compact"] .page-hero__subtitle,
   html[data-ui-look="compact"] .tab-pane p,
   html[data-ui-look="sharp"] .product-card__summary,
   html[data-ui-look="editorial"] .product-card__summary,
@@ -765,6 +768,10 @@ html[data-ui-look="compact"] .tab-pane p {
   html[data-ui-look="compact"] .footer-brand-text {
     text-align: start;
     hyphens: manual;
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-sub,
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-sub {
+    text-align: center;
   }
 }
 
@@ -1340,4 +1347,124 @@ html[data-ui-look="editorial"] .product-card__price-strip {
   html[data-ui-look="editorial"] .trust-proof {
     grid-template-columns: 1fr;
   }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Final pass — icons, hero-no-right, tabs, footer bottom, pages
+   Soft block above stays empty; shared fixes scoped per look.
+   ════════════════════════════════════════════════════════════ */
+
+/* hero-no-right: keep centered copy in sharp/compact (soft in pages.css) */
+@media (min-width: 769px) {
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right,
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right {
+    text-align: center;
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left,
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left {
+    align-items: center;
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-bar,
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-bar {
+    margin-inline: auto;
+  }
+}
+html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-sub,
+html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-sub,
+html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-trust,
+html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-trust {
+  text-align: center;
+  margin-inline: auto;
+}
+html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-trust,
+html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-trust {
+  justify-content: center;
+}
+html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left .hero-actions,
+html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left .hero-actions {
+  justify-content: center;
+}
+
+/* Editorial magazine page heroes */
+html[data-ui-look="editorial"] .page-hero {
+  border-bottom: none;
+}
+html[data-ui-look="editorial"] .page-hero__inner {
+  text-align: center;
+}
+html[data-ui-look="editorial"] .page-hero__actions {
+  justify-content: center;
+}
+
+/* Product explorer tab icons + chrome per look */
+html[data-ui-look="sharp"] #prod-list {
+  border-radius: 0.2rem;
+  box-shadow: none;
+}
+html[data-ui-look="sharp"] #prod-list .icon-box-sm {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] #prod-list .icon-box-sm,
+html[data-ui-look="compact"] #prod-list .icon-box-sm {
+  transform: scale(0.92);
+}
+html[data-ui-look="compact"] #prod-list .prod-sidebar-item .icon-box-sm i,
+html[data-ui-look="compact"] #prod-list .prod-sidebar-item .icon-box-sm svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+#prod-list .prod-chevron {
+  width: 15px;
+  height: 15px;
+  color: var(--muted-foreground);
+  flex-shrink: 0;
+  transition: transform 0.2s, color 0.15s;
+  pointer-events: none;
+}
+html[data-ui-look="editorial"] .prod-panel-has-shot .prod-panel-lede,
+html[data-ui-look="compact"] .prod-panel-has-shot .prod-panel-lede {
+  text-align: start;
+}
+
+/* Footer bottom bar — stack on narrow screens */
+@media (max-width: 640px) {
+  html[data-ui-look="editorial"] footer .footer-bottom-bar .container,
+  html[data-ui-look="compact"] footer .footer-bottom-bar .container,
+  html[data-ui-look="sharp"] footer .footer-bottom-bar .container {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.65rem;
+  }
+  html[data-ui-look="editorial"] footer .footer-bottom-bar .container > div,
+  html[data-ui-look="compact"] footer .footer-bottom-bar .container > div,
+  html[data-ui-look="sharp"] footer .footer-bottom-bar .container > div {
+    justify-content: center;
+  }
+}
+
+/* Compact news density */
+@media (min-width: 1024px) {
+  html[data-ui-look="compact"] .news-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Pricing empty alignment per look */
+html[data-ui-look="editorial"] .pricing-empty {
+  text-align: center;
+}
+html[data-ui-look="compact"] .pricing-empty {
+  text-align: center;
+}
+
+/* Lucide sizing in product panel feature chips */
+.tab-pane .prod-panel-body [data-lucide] {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+html[data-ui-look="sharp"] .tab-pane .prod-panel-body [data-lucide] {
+  color: var(--primary);
 }

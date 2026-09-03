@@ -119,16 +119,13 @@ include 'includes/header.php';
 ?>
 
 <?php
-$heroEyebrow     = __('services_hero_eyebrow');
-$heroEyebrowIcon = 'layers';
+$heroEyebrow     = $trustBanner;
+$heroEyebrowIcon = 'shield-check';
 $heroTitle       = __('services_hero_title');
 $heroSubtitle    = __('services_hero_sub');
-ob_start(); ?>
-<div class="section-eyebrow section-eyebrow-primary">
-  <i data-lucide="shield-check" class="ic-11"></i>
-  <?= e($trustBanner) ?>
-</div>
-<?php $heroActions = ob_get_clean(); include 'includes/page-hero.php'; ?>
+$heroActions     = '';
+include 'includes/page-hero.php';
+?>
 
 <section class="st-section">
   <div class="container">

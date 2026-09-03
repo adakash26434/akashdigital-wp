@@ -594,7 +594,7 @@ include 'includes/stats-bar.php';
             <i data-lucide="<?= e($tIcon) ?>"></i>
           </div>
           <span style="flex:1;font-size:var(--text-sm);font-weight:600;color:var(--foreground);line-height:1.35;"><?= e($tLabel) ?></span>
-          <i data-lucide="chevron-right" class="prod-chevron" style="width:15px;height:15px;color:var(--muted-foreground);flex-shrink:0;transition:transform .2s,color .15s;pointer-events:none;"></i>
+          <i data-lucide="chevron-right" class="prod-chevron ic-15"></i>
         </button>
         <?php endforeach; ?>
       </div>

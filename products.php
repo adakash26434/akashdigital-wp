@@ -98,16 +98,13 @@ include 'includes/header.php';
 ?>
 
 <?php
-$heroEyebrow     = __('products_hero_eyebrow');
-$heroEyebrowIcon = 'box';
+$heroEyebrow     = $trustBanner;
+$heroEyebrowIcon = 'shield-check';
 $heroTitle       = __('products_hero_title');
 $heroSubtitle    = __('products_hero_sub');
-ob_start(); ?>
-<div class="section-eyebrow section-eyebrow-primary">
-  <i data-lucide="shield-check" class="ic-11"></i>
-  <?= e($trustBanner) ?>
-</div>
-<?php $heroActions = ob_get_clean(); include 'includes/page-hero.php'; ?>
+$heroActions     = '';
+include 'includes/page-hero.php';
+?>
 
 <section class="st-section">
   <div class="container">

@@ -32,7 +32,7 @@ try {
         <!-- Address from site settings -->
         <?php if (!empty($__s['address'])): ?>
         <div class="footer-meta-row">
-          <i data-lucide="map-pin"></i>
+          <i data-lucide="map-pin" class="ic-13"></i>
           <span><?= e($__s['address']) ?></span>
         </div>
         <?php endif; ?>
@@ -42,13 +42,13 @@ try {
         <div style="display:flex;flex-direction:column;gap:0.5rem;margin-bottom:1.625rem;">
           <?php if (!empty($__s['contact_phone'])): ?>
           <div class="nav-meta">
-            <i data-lucide="phone"></i>
+            <i data-lucide="phone" class="ic-13"></i>
             <?= e($__s['contact_phone']) ?>
           </div>
           <?php endif; ?>
           <?php if (!empty($__s['contact_email'])): ?>
           <div class="nav-meta">
-            <i data-lucide="mail"></i>
+            <i data-lucide="mail" class="ic-13"></i>
             <?= e($__s['contact_email']) ?>
           </div>
           <?php endif; ?>

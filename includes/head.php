@@ -291,10 +291,6 @@ function toggleTheme() {
 <script>
 document.addEventListener('DOMContentLoaded', function () {
   if (window.lucide) lucide.createIcons();
-  document.querySelectorAll('i[data-lucide]').forEach(function (el) {
-    el.setAttribute('data-lucide', 'box');
-  });
-  if (window.lucide && document.querySelectorAll('i[data-lucide]').length) lucide.createIcons();
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (entry.isIntersecting) { entry.target.classList.add('visible'); io.unobserve(entry.target); }
