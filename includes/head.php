@@ -236,6 +236,11 @@ if (!function_exists('__brandCss')) {
                 : e(__hexDarken($b['brand_primary'], 0.70));
             $css .= "  --gradient-primary: linear-gradient(135deg,{$p} 0%,{$gradEnd} 100%);\n";
             $css .= "  --footer-bg:        " . e(__hexDarken($b['brand_primary'],0.18)) . ";\n";
+            // Keep secondary in sync when unset so hero/tg/ink follow brand, not a hard green.
+            if (empty($b['brand_secondary'])) {
+                $css .= "  --secondary:       {$gradEnd};\n";
+                $css .= "  --secondary-soft:  {$gradEnd}33;\n";
+            }
             $css .= "}\n";
         }
         foreach (['brand_secondary'=>'secondary','brand_success'=>'success','brand_warning'=>'warning','brand_danger'=>'danger','brand_info'=>'info'] as $key => $var) {
