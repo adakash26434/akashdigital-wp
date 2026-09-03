@@ -1246,10 +1246,14 @@ html[data-ui-look="compact"] .prod-sidebar-item:focus-visible {
     position: sticky;
     top: 5.5rem;
   }
+  html[data-ui-look="sharp"] .prod-panel-actions,
   html[data-ui-look="editorial"] .prod-panel-actions,
-  html[data-ui-look="compact"] .prod-panel-actions,
-  html[data-ui-look="sharp"] .prod-panel-actions {
+  html[data-ui-look="compact"] .prod-panel-actions {
     gap: 0.65rem;
+  }
+  html[data-ui-look="sharp"] .prod-panel-shot-wrap {
+    border-radius: 0;
+    background: var(--look-paper);
   }
 }
 

@@ -625,20 +625,26 @@ include 'includes/stats-bar.php';
               </div>
             </div>
             <?php if ($tShot !== ''): ?>
-            <img class="prod-panel-shot" src="<?= e($tShot) ?>" alt="<?= e(($prod['name'] ?? '') . ' screenshot') ?>" loading="lazy" decoding="async" width="1200" height="640">
+            <div class="prod-panel-shot-wrap">
+              <img class="prod-panel-shot" src="<?= e($tShot) ?>" alt="<?= e(($prod['name'] ?? '') . ' preview') ?>" loading="lazy" decoding="async" width="1200" height="640">
+            </div>
             <?php endif; ?>
-            <div style="background:var(--card);padding:1.75rem 2rem;">
-              <div style="display:flex;align-items:center;gap:.875rem;margin-bottom:1.375rem;">
+            <div class="prod-panel-body<?= $tShot !== '' ? ' prod-panel-has-shot' : '' ?>">
+              <?php if ($tShot === ''): ?>
+              <div class="prod-panel-head">
                 <div class="icon-box icon-box-<?= e($tColor) ?>">
                   <i data-lucide="<?= e($tIcon) ?>"></i>
                 </div>
                 <div>
-                  <h3 style="font-family:var(--font-display);font-weight:800;color:var(--foreground);margin:0 0 .2rem;"><?= e($prod['name'] ?? '') ?></h3>
+                  <h3 class="prod-panel-title"><?= e($prod['name'] ?? '') ?></h3>
                   <?php if(!empty($prod['tagline'])): ?>
-                  <p style="color:var(--muted-foreground);font-size:var(--text-sm);margin:0;"><?= e($prod['tagline']) ?></p>
+                  <p class="prod-panel-tagline"><?= e($prod['tagline']) ?></p>
                   <?php endif; ?>
                 </div>
               </div>
+              <?php elseif(!empty($prod['tagline'])): ?>
+              <p class="prod-panel-lede"><?= e($prod['tagline']) ?></p>
+              <?php endif; ?>
               <?php if($pFeats): ?>
               <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.5rem;margin-bottom:1.375rem;">
                 <?php foreach(array_slice($pFeats,0,8) as $f): ?>
@@ -691,7 +697,58 @@ include 'includes/stats-bar.php';
 .prod-sidebar-item.active .prod-accent { opacity:1 !important; }
 .prod-sidebar-item.active .prod-chevron { color:var(--primary) !important; transform:translateX(2px); }
 .prod-sidebar-item:hover:not(.active) { background:var(--muted); }
-.prod-panel-shot { display:block; width:100%; max-height:220px; object-fit:cover; object-position:top center; background:var(--muted); }
+.prod-panel-shot-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 9rem;
+  max-height: 17.5rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--primary) 4%, var(--muted)) 0%, var(--card) 100%);
+  border-bottom: 1px solid var(--border);
+}
+.prod-panel-shot {
+  display: block;
+  width: 100%;
+  max-height: 11.5rem;
+  object-fit: contain;
+  object-position: center;
+}
+.prod-panel-body {
+  background: var(--card);
+  padding: 1.75rem 2rem;
+}
+.prod-panel-head {
+  display: flex;
+  align-items: center;
+  gap: .875rem;
+  margin-bottom: 1.375rem;
+}
+.prod-panel-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  color: var(--foreground);
+  margin: 0 0 .2rem;
+}
+.prod-panel-tagline {
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+.prod-panel-has-shot .prod-panel-lede {
+  text-align: center;
+  color: var(--muted-foreground);
+  font-size: var(--text-sm);
+  line-height: 1.65;
+  max-width: 36rem;
+  margin: 0 auto 1.375rem;
+}
+#prod-panel .pill-row .mono-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
 .prod-panel-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; }
 .home-news-head {
   position: relative;
