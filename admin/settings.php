@@ -256,7 +256,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!in_array($look, $allowed, true)) {
                 $look = 'soft';
             }
+            $prevLook = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
             saveSetting('public_ui_look', $look);
+            if (function_exists('logAudit')) {
+                logAudit('settings.public_ui_look', 'Public look updated', [
+                    'target_type' => 'site_settings',
+                    'old' => ['public_ui_look' => $prevLook],
+                    'new' => ['public_ui_look' => $look],
+                ]);
+            }
             $success = 'Public look saved. Visitors see it on the next page load. Soft keeps the current live layout.';
 
         } elseif ($section === 'footer') {
@@ -438,7 +446,14 @@ $tabs = [
     ['security',      icon('shield',13),         'Security'],
 ];
 if (function_exists('isSuperadminRole') && isSuperadminRole()) {
-    array_splice($tabs, 14, 0, [['look', icon('layout-template',13), 'Public Look']]);
+    $withLook = [];
+    foreach ($tabs as $t) {
+        if (($t[0] ?? '') === 'brand_colors') {
+            $withLook[] = ['look', icon('layout-template',13), 'Public Look'];
+        }
+        $withLook[] = $t;
+    }
+    $tabs = $withLook;
 }
 ?>
 
@@ -467,8 +482,9 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
 .look-pick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;max-width:720px;}
 @media(min-width:900px){.look-pick{grid-template-columns:repeat(4,minmax(0,1fr));max-width:none;}}
 .look-pick label{position:relative;display:flex;flex-direction:column;gap:0.65rem;cursor:pointer;margin:0;border:2px solid var(--border);border-radius:0.85rem;padding:0.75rem;background:var(--card);transition:border-color .15s,box-shadow .15s;}
-.look-pick label:has(input:checked){border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent);}
-.look-pick label:focus-within{border-color:var(--primary);}
+.look-pick label:has(input:checked),
+.look-pick label.is-selected{border-color:var(--primary);box-shadow:0 0 0 3px color-mix(in srgb,var(--primary) 22%,transparent);}
+.look-pick label:focus-within{border-color:var(--primary);outline:2px solid var(--ring,var(--primary));outline-offset:2px;}
 .look-pick input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1;}
 .look-pick .look-mini,.look-pick h4,.look-pick p{position:relative;z-index:0;pointer-events:none;}
 .look-mini{height:4.5rem;border:1px solid var(--border);overflow:hidden;position:relative;background:#0f172a;}
@@ -1310,10 +1326,10 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
       <?= csrfField() ?><input type="hidden" name="section" value="look">
       <div class="st-card p-card-lg" style="max-width:1100px;">
         <h3 class="h-eyebrow">Public site look</h3>
-        <p class="caption-meta" style="margin-bottom:1.25rem;"><strong>Superadmin only.</strong> Default is <strong>Soft</strong> — the current live layout. Saving another look changes the public site for all visitors. Admin and portal stay the same. Brand colors stay in Brand Colors.</p>
+        <p class="caption-meta" style="margin-bottom:1.25rem;"><strong>Superadmin only.</strong> Live now: <strong><?= e($looks[$currentLook]['label'] ?? 'Soft') ?></strong>. Default <strong>Soft</strong> is the original layout. Saving another look changes the public site for all visitors. Admin and portal stay the same.</p>
         <div class="look-pick" role="radiogroup" aria-label="Public site look">
           <?php foreach ($looks as $key => $meta): ?>
-          <label>
+          <label class="<?= $currentLook === $key ? 'is-selected' : '' ?>">
             <input type="radio" name="public_ui_look" value="<?= e($key) ?>" <?= $currentLook === $key ? 'checked' : '' ?> aria-label="<?= e($meta['label']) ?>">
             <div class="look-mini look-mini--<?= e($key) ?>">
               <span class="bar"></span>

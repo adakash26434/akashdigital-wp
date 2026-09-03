@@ -123,10 +123,6 @@ html[data-ui-look="editorial"] .st-hero {
 html[data-ui-look="editorial"]:not(.dark) .st-hero {
   background: #f7f5f2 !important;
 }
-html[data-ui-look="editorial"] .st-hero-mesh span {
-  opacity: 0.16;
-  filter: blur(110px);
-}
 html[data-ui-look="editorial"] .st-hero-grid { display: none; }
 
 @media (min-width: 769px) {
@@ -256,8 +252,7 @@ html[data-ui-look="compact"] .hero-right .hero-mockup {
 }
 html[data-ui-look="compact"] .hero-right .hero-mockup:hover { transform: none; }
 html[data-ui-look="compact"] .hero-right .float-chip {
-  transform: scale(0.88);
-  animation: none;
+  display: none;
 }
 
 html[data-ui-look="compact"] .st-section { padding: 2.4rem 0; }
@@ -456,14 +451,31 @@ html[data-ui-look="compact"] .st-stat__icon-wrap {
   }
 }
 
-/* Titles wrap on narrow screens — never clip CMS copy */
-html[data-ui-look] .hero-left .hero-title,
-html[data-ui-look] .hero-left .hero-sub,
-html[data-ui-look] .product-card__title,
-html[data-ui-look] .product-card__tagline,
-html[data-ui-look] .section-title,
-html[data-ui-look] .st-page-hero__title {
+/* Wrap long titles on alternate looks only — Soft must match live exactly */
+html[data-ui-look="sharp"] .hero-left .hero-title,
+html[data-ui-look="sharp"] .hero-left .hero-sub,
+html[data-ui-look="sharp"] .product-card__title,
+html[data-ui-look="sharp"] .product-card__tagline,
+html[data-ui-look="sharp"] .section-title,
+html[data-ui-look="sharp"] .st-page-hero__title,
+html[data-ui-look="editorial"] .hero-left .hero-title,
+html[data-ui-look="editorial"] .hero-left .hero-sub,
+html[data-ui-look="editorial"] .product-card__title,
+html[data-ui-look="editorial"] .product-card__tagline,
+html[data-ui-look="editorial"] .section-title,
+html[data-ui-look="editorial"] .st-page-hero__title,
+html[data-ui-look="compact"] .hero-left .hero-title,
+html[data-ui-look="compact"] .hero-left .hero-sub,
+html[data-ui-look="compact"] .product-card__title,
+html[data-ui-look="compact"] .product-card__tagline,
+html[data-ui-look="compact"] .section-title,
+html[data-ui-look="compact"] .st-page-hero__title {
   overflow-wrap: anywhere;
+}
+html[data-ui-look="sharp"] .section-title.whitespace-nowrap,
+html[data-ui-look="editorial"] .section-title.whitespace-nowrap,
+html[data-ui-look="compact"] .section-title.whitespace-nowrap {
+  white-space: normal;
 }
 
 @media (max-width: 767px) {

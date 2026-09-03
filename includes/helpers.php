@@ -410,7 +410,7 @@ function stPublicUiLooks(): array {
         'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS (default)'],
         'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: white grid hero, text nav, left-aligned cards'],
         'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: stacked hero, cream bands, text-only eyebrows'],
-        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: short hero, hidden extras, product tabs'],
+        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: shorter hero, tighter cards, product tabs on desktop'],
     ];
 }
 
