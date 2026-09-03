@@ -655,7 +655,8 @@ html[data-ui-look="compact"] footer .footer-bottom-bar .container {
 
 /* ════════════════════════════════════════════════════════════
    Readability — gap, alignment, justification (Soft untouched)
-   Phone: start-aligned. Desktop: even justify, no hyphen gaps.
+   Cards / footer stay start-aligned (narrow columns + justify
+   create large word gaps). Wide copy only, desktop only.
    ════════════════════════════════════════════════════════════ */
 html[data-ui-look="sharp"] .hero-left .hero-sub,
 html[data-ui-look="editorial"] .hero-left .hero-sub,
@@ -667,12 +668,28 @@ html[data-ui-look="sharp"] .section-lede,
 html[data-ui-look="editorial"] .section-lede,
 html[data-ui-look="compact"] .section-lede {
   line-height: 1.72;
+  text-wrap: pretty;
+}
+html[data-ui-look="sharp"] .hero-left .hero-title,
+html[data-ui-look="editorial"] .hero-left .hero-title,
+html[data-ui-look="compact"] .hero-left .hero-title,
+html[data-ui-look="sharp"] .section-title,
+html[data-ui-look="editorial"] .section-title,
+html[data-ui-look="compact"] .section-title,
+html[data-ui-look="sharp"] .st-page-hero__title,
+html[data-ui-look="editorial"] .st-page-hero__title,
+html[data-ui-look="compact"] .st-page-hero__title {
+  text-wrap: balance;
 }
 html[data-ui-look="editorial"] .hero-left .hero-title {
   line-height: 1.16;
 }
+html[data-ui-look="editorial"] .st-page-hero {
+  text-align: center;
+}
 html[data-ui-look="editorial"] .hero-left .hero-sub,
 html[data-ui-look="editorial"] .section-lede,
+html[data-ui-look="editorial"] .st-page-hero__title,
 html[data-ui-look="editorial"] .st-page-hero__subtitle {
   text-align: center;
   max-width: 38rem;
@@ -690,40 +707,33 @@ html[data-ui-look="sharp"] .st-stats .st-stat {
   padding-bottom: 0.75rem;
 }
 
-@media (min-width: 768px) {
-  html[data-ui-look="sharp"] .product-card__summary,
-  html[data-ui-look="sharp"] .pi p,
+@media (min-width: 1024px) {
+  html[data-ui-look="sharp"] .hero-left .hero-sub,
+  html[data-ui-look="sharp"] .st-page-hero__subtitle,
   html[data-ui-look="sharp"] .tab-pane p,
-  html[data-ui-look="sharp"] .footer-brand-text,
-  html[data-ui-look="editorial"] .product-card__summary,
-  html[data-ui-look="editorial"] .pi p,
-  html[data-ui-look="editorial"] .tab-pane p,
-  html[data-ui-look="editorial"] .footer-brand-text,
-  html[data-ui-look="compact"] .product-card__summary,
-  html[data-ui-look="compact"] .pi p,
-  html[data-ui-look="compact"] .tab-pane p,
-  html[data-ui-look="compact"] .footer-brand-text {
+  html[data-ui-look="compact"] .hero-left .hero-sub,
+  html[data-ui-look="compact"] .st-page-hero__subtitle,
+  html[data-ui-look="compact"] .tab-pane p {
     text-align: justify;
+    text-align-last: start;
     text-justify: inter-word;
     hyphens: none;
-    line-height: 1.72;
   }
 }
-@media (max-width: 767px) {
-  html[data-ui-look="sharp"] .product-card__summary,
-  html[data-ui-look="sharp"] .pi p,
+@media (max-width: 1023px) {
+  html[data-ui-look="sharp"] .hero-left .hero-sub,
+  html[data-ui-look="sharp"] .st-page-hero__subtitle,
   html[data-ui-look="sharp"] .tab-pane p,
-  html[data-ui-look="sharp"] .footer-brand-text,
-  html[data-ui-look="editorial"] .product-card__summary,
-  html[data-ui-look="editorial"] .pi p,
-  html[data-ui-look="editorial"] .tab-pane p,
-  html[data-ui-look="editorial"] .footer-brand-text,
-  html[data-ui-look="compact"] .product-card__summary,
-  html[data-ui-look="compact"] .pi p,
+  html[data-ui-look="compact"] .hero-left .hero-sub,
+  html[data-ui-look="compact"] .st-page-hero__subtitle,
   html[data-ui-look="compact"] .tab-pane p,
+  html[data-ui-look="sharp"] .product-card__summary,
+  html[data-ui-look="editorial"] .product-card__summary,
+  html[data-ui-look="compact"] .product-card__summary,
+  html[data-ui-look="sharp"] .footer-brand-text,
+  html[data-ui-look="editorial"] .footer-brand-text,
   html[data-ui-look="compact"] .footer-brand-text {
     text-align: start;
     hyphens: manual;
-    line-height: 1.65;
   }
 }
