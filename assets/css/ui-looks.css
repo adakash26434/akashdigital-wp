@@ -564,3 +564,91 @@ html[data-ui-look="editorial"] .mobile-nav-item { border-radius: 999px; }
     background: var(--muted);
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Footer personality — Soft keeps the live footer.
+   Same links, address, copyright. Chrome only.
+   ════════════════════════════════════════════════════════════ */
+html[data-ui-look="sharp"] footer .social-pill {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="sharp"] footer .footer-bottom-bar {
+  border-top: 1px solid var(--footer-border);
+  box-shadow: inset 0 3px 0 var(--primary);
+}
+html[data-ui-look="sharp"] footer .footer-list {
+  gap: 0.4rem;
+}
+html[data-ui-look="sharp"] footer > .container {
+  padding-top: 2.25rem !important;
+  padding-bottom: 2.15rem !important;
+}
+
+html[data-ui-look="editorial"] footer > .container {
+  padding-top: 3.35rem !important;
+  padding-bottom: 3.1rem !important;
+}
+html[data-ui-look="editorial"] footer #footer-cols {
+  gap: 2.75rem !important;
+}
+html[data-ui-look="editorial"] footer .footer-heading {
+  letter-spacing: 0.14em;
+  font-weight: 600;
+  opacity: 0.8;
+  margin-bottom: 1.1rem;
+}
+html[data-ui-look="editorial"] footer .footer-list {
+  gap: 0.7rem;
+}
+html[data-ui-look="editorial"] footer .footer-brand-text {
+  line-height: 1.85;
+  margin-bottom: 1.75rem;
+}
+html[data-ui-look="editorial"] footer .social-pill {
+  border-radius: 999px;
+  width: 2.4rem;
+  height: 2.4rem;
+}
+html[data-ui-look="editorial"] footer .footer-bottom-bar {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-ui-look="compact"] footer > .container {
+  padding-top: 1.65rem !important;
+  padding-bottom: 1.4rem !important;
+}
+html[data-ui-look="compact"] footer #footer-cols {
+  gap: 1.5rem !important;
+}
+html[data-ui-look="compact"] footer .footer-heading {
+  margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+}
+html[data-ui-look="compact"] footer .footer-list {
+  gap: 0.3rem;
+}
+html[data-ui-look="compact"] footer .footer-brand-text {
+  margin-bottom: 1rem;
+  line-height: 1.55;
+}
+html[data-ui-look="compact"] footer .social-pill {
+  width: 2rem;
+  height: 2rem;
+}
+html[data-ui-look="compact"] footer .footer-bottom-bar .container {
+  padding-top: 0.7rem !important;
+  padding-bottom: 0.7rem !important;
+}
+
+@media (max-width: 767px) {
+  html[data-ui-look="editorial"] footer > .container,
+  html[data-ui-look="compact"] footer > .container,
+  html[data-ui-look="sharp"] footer > .container {
+    padding-top: 2rem !important;
+    padding-bottom: 1.75rem !important;
+  }
+  html[data-ui-look="editorial"] footer #footer-cols,
+  html[data-ui-look="compact"] footer #footer-cols {
+    gap: 1.75rem !important;
+  }
+}

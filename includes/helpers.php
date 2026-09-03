@@ -414,17 +414,17 @@ function stPublicUiLooks(): array {
         ],
         'sharp'     => [
             'label' => 'Sharp',
-            'hint'  => 'Corporate bar, grid hero, square cards, left-aligned listings.',
+            'hint'  => 'Corporate bar, grid hero, square cards, striped footer.',
             'best'  => 'Best for a formal / government-style feel. Same pages and text.',
         ],
         'editorial' => [
             'label' => 'Editorial',
-            'hint'  => 'Cream header, pill nav, stacked magazine hero, airy type.',
+            'hint'  => 'Cream header, pill nav, stacked hero, roomy footer.',
             'best'  => 'Best for a calmer, story-led look. Same pages and text.',
         ],
         'compact'   => [
             'label' => 'Compact',
-            'hint'  => 'Tighter desktop nav and spacing; product tabs on large screens.',
+            'hint'  => 'Tighter nav and spacing, shorter footer, product tabs on desktop.',
             'best'  => 'Best if you want more on one screen. Same pages and text.',
         ],
     ];
