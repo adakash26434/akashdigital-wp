@@ -915,10 +915,13 @@ function runDbMigrations() {
         if (dbTableExists('products') && dbColumnExists('products', 'lucide_icon')) {
             execute(
                 "UPDATE products SET lucide_icon = 'ticket' WHERE (" .
-                "LOWER(COALESCE(name,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) IN ('support','support-desk')" .
+                "LOWER(COALESCE(name,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) LIKE '%ticket%' OR LOWER(COALESCE(slug,'')) IN ('support','support-desk','support-ticket-desk')" .
                 ") AND LOWER(TRIM(COALESCE(lucide_icon,''))) NOT IN (" .
                 "'ticket','tickets','ticket-check','life-buoy','headset','headphones','inbox'" .
                 ")"
+            );
+            execute(
+                "UPDATE products SET icon_color = 'rose' WHERE LOWER(TRIM(COALESCE(icon_color,''))) = 'red'"
             );
         }
     } catch (\Throwable $e) { error_log('[db-migrations] M40: ' . $e->getMessage()); }

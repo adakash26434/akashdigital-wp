@@ -1550,6 +1550,29 @@ function csrfField(): string {
 }
 
 /**
+ * Map admin icon_color (e.g. red) to a themed icon-box-* class.
+ */
+function stIconBoxClass(?string $color, string $fallback = 'icon-box-blue'): string {
+    $c = strtolower(trim((string)$color));
+    $map = [
+        'blue'   => 'icon-box-blue',
+        'teal'   => 'icon-box-teal',
+        'purple' => 'icon-box-purple',
+        'amber'  => 'icon-box-amber',
+        'green'  => 'icon-box-green',
+        'rose'   => 'icon-box-rose',
+        'red'    => 'icon-box-rose',
+        'orange' => 'icon-box-orange',
+        'indigo' => 'icon-box-indigo',
+        'gray'   => 'icon-box-gray',
+        'grey'   => 'icon-box-gray',
+        'cyan'   => 'icon-box-cyan',
+        'sky'    => 'icon-box-sky',
+    ];
+    return $map[$c] ?? $fallback;
+}
+
+/**
  * Normalize a CMS lucide_icon to a name that exists in bundled Lucide.
  * Invalid / alias names (e.g. ticket desk) otherwise render an empty box.
  */
@@ -1570,6 +1593,10 @@ function stLucideIcon(?string $name, string $fallback = 'box', string $hint = ''
         'ticketdesk'   => 'ticket',
         'tickets-desk' => 'tickets',
         'ticket-check' => 'ticket-check',
+        'support-ticket-desk' => 'ticket',
+        'support-ticket'      => 'ticket',
+        'life-buoy'    => 'life-buoy',
+        'lifebuoy'     => 'life-buoy',
     ];
     if (isset($aliases[$n])) {
         $n = $aliases[$n];

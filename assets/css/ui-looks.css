@@ -1177,8 +1177,11 @@ html[data-ui-look="compact"] #prod-list .prod-accent {
 /* Soft-shared empty pricing lives in pages.css; look chrome only below. */
 html[data-ui-look="sharp"] .pricing-empty {
   border-radius: 0.15rem;
-  text-align: start;
+  text-align: center;
   padding: 1.75rem 1.25rem;
+}
+html[data-ui-look="sharp"] .pricing-empty__cta {
+  justify-content: center;
 }
 html[data-ui-look="editorial"] .pricing-empty {
   border-radius: 1.35rem;

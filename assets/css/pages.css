@@ -434,8 +434,13 @@ html:not(.dark) .st-hero {
   padding: 2rem 1rem;
   border: 1px dashed var(--border);
   border-radius: 1rem;
+  text-align: center;
 }
-.pricing-empty__cta { margin-top: 0.75rem; }
+.pricing-empty__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.75rem;
+}
 .price-grid {
   display: grid;
   grid-template-columns: 1fr;

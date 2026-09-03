@@ -485,7 +485,7 @@ include 'includes/stats-bar.php';
         $prodHighs = json_decode($prod['highlights'] ?? '[]', true) ?: [];
         $isDark    = !empty($prod['home_card_dark']);
         $isWide    = !empty($prod['home_card_wide']);
-        $iconColor = $prod['icon_color'] ?? 'blue';
+        $iconColor = stIconBoxClass($prod['icon_color'] ?? 'blue');
         $bgCss     = $prod['home_bg_css'] ?? '';
         $textC     = $isDark ? '#f1f5f9'                : 'var(--foreground)';
         $mutedC    = $isDark ? 'rgba(241,245,249,.65)'  : 'var(--muted-foreground)';
@@ -502,7 +502,7 @@ include 'includes/stats-bar.php';
         <div style="position:absolute;top:-2rem;right:1.5rem;width:8rem;height:8rem;border-radius:9999px;background:radial-gradient(circle,rgba(37,99,235,.35),transparent);filter:blur(16px);pointer-events:none;"></div>
         <?php endif; ?>
         <div style="position:relative;display:flex;align-items:flex-start;gap:1rem;margin-bottom:1.25rem;">
-          <div class="icon-box icon-box-sm icon-box-<?= e($iconColor) ?>">
+          <div class="icon-box icon-box-sm <?= e(stIconBoxClass($prod['icon_color'] ?? 'blue')) ?>">
             <i data-lucide="<?= e(stRowLucideIcon($prod, 'box')) ?>"></i>
           </div>
           <div>
@@ -574,7 +574,7 @@ include 'includes/stats-bar.php';
           $tSlug  = $prod['slug'] ?? '';
           $tLabel = trim((string)($prod['tab_label'] ?? '')) ?: ($prod['name'] ?? '');
           $tIcon  = stRowLucideIcon($prod, 'box');
-          $tColor = $prod['icon_color'] ?? 'blue';
+          $tBox   = stIconBoxClass($prod['icon_color'] ?? 'blue');
           $isLast = $i === count($homeProducts) - 1;
         ?>
         <button
@@ -590,7 +590,7 @@ include 'includes/stats-bar.php';
           <!-- Active left accent bar -->
           <span class="prod-accent" style="position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:0 2px 2px 0;background:var(--primary);opacity:0;transition:opacity .15s;"></span>
           <!-- Icon -->
-          <div class="icon-box icon-box-sm icon-box-<?= e($tColor) ?>">
+          <div class="icon-box icon-box-sm <?= e($tBox) ?>">
             <i data-lucide="<?= e($tIcon) ?>"></i>
           </div>
           <span style="flex:1;font-size:var(--text-sm);font-weight:600;color:var(--foreground);line-height:1.35;"><?= e($tLabel) ?></span>
@@ -608,7 +608,7 @@ include 'includes/stats-bar.php';
             $pFeats = json_decode($prod['highlights'] ?? '[]', true) ?: [];
           }
           $tIcon  = stRowLucideIcon($prod, 'box');
-          $tColor = $prod['icon_color'] ?? 'blue';
+          $tBox   = stIconBoxClass($prod['icon_color'] ?? 'blue');
           $tShot  = trim((string)($prod['demo_screenshot_url'] ?? ''));
           if ($tShot !== '' && function_exists('normalizeImageUrl')) {
             $tNorm = normalizeImageUrl($tShot);
@@ -632,7 +632,7 @@ include 'includes/stats-bar.php';
             <div class="prod-panel-body<?= $tShot !== '' ? ' prod-panel-has-shot' : '' ?>">
               <?php if ($tShot === ''): ?>
               <div class="prod-panel-head">
-                <div class="icon-box icon-box-<?= e($tColor) ?>">
+                <div class="icon-box <?= e($tBox) ?>">
                   <i data-lucide="<?= e($tIcon) ?>"></i>
                 </div>
                 <div>
