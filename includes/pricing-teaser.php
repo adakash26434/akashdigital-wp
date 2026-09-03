@@ -64,9 +64,9 @@ if (!$__pricingTableOk) {
 unset($__planIcons);
 ?>
 <?php if (empty($plans)): ?>
-<div class="text-center text-muted" style="padding:2rem 1rem;border:1px dashed var(--border);border-radius:1rem;">
+<div class="pricing-empty text-center text-muted">
   <?= e(isNepali() ? 'अहिले कुनै मूल्य योजना देखाइएको छैन। सम्पर्क गर्नुहोस्।' : 'No pricing plans are published right now. Please contact us for a quote.') ?>
-  <div style="margin-top:0.75rem;"><a href="<?= url('contact.php') ?>" class="btn btn-outline btn-sm">Contact us</a></div>
+  <div class="pricing-empty__cta"><a href="<?= url('contact.php') ?>" class="btn btn-outline btn-sm">Contact us</a></div>
 </div>
 <?php else: ?>
 <div id="<?= e($pricingTeaserGridId) ?>" class="price-grid stagger-children<?= $pricingTeaserWide ? ' price-grid--wide' : '' ?>">

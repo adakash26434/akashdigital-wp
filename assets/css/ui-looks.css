@@ -1137,3 +1137,135 @@ html[data-ui-look="compact"] #prod-list .prod-accent {
     order: unset;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Final safe polish — Soft still has zero overrides.
+   Alignment, focus, empty pricing, tab scroll — no copy hidden.
+   ════════════════════════════════════════════════════════════ */
+
+/* Soft-shared empty pricing lives in pages.css; look chrome only below. */
+html[data-ui-look="sharp"] .pricing-empty {
+  border-radius: 0.15rem;
+  text-align: start;
+  padding: 1.75rem 1.25rem;
+}
+html[data-ui-look="editorial"] .pricing-empty {
+  border-radius: 1.35rem;
+  padding: 2.5rem 1.5rem;
+}
+html[data-ui-look="compact"] .pricing-empty {
+  border-radius: 0.5rem;
+  padding: 1.35rem 1rem;
+}
+
+@media (min-width: 768px) {
+  html[data-ui-look="sharp"] .section-foot,
+  html[data-ui-look="sharp"] .home-news-head {
+    text-align: start;
+  }
+  html[data-ui-look="sharp"] .home-news-head {
+    padding-right: 8.5rem;
+  }
+  html[data-ui-look="sharp"] .home-news-head .section-title {
+    border-left: 3px solid var(--primary);
+    padding-left: 0.8rem;
+  }
+  html[data-ui-look="sharp"] .home-news-head__all {
+    right: 0;
+  }
+  html[data-ui-look="sharp"] .st-stats__head {
+    text-align: start;
+  }
+  html[data-ui-look="sharp"] .st-stats__lede {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+html[data-ui-look="editorial"] .section-head .section-eyebrow,
+html[data-ui-look="editorial"] .home-news-head .section-eyebrow {
+  display: inline-block;
+}
+html[data-ui-look="editorial"] .home-news-head {
+  margin-bottom: 2.75rem;
+}
+html[data-ui-look="editorial"] .product-card__badge {
+  border-radius: 999px;
+  top: 0.85rem;
+  right: 0.85rem;
+}
+html[data-ui-look="editorial"] .trust-partners {
+  padding-block: 5rem;
+}
+html[data-ui-look="editorial"] .trust-proof {
+  margin-bottom: 3rem;
+}
+
+html[data-ui-look="compact"] .home-news-head {
+  margin-bottom: 1.75rem;
+}
+html[data-ui-look="compact"] .trust-proof {
+  gap: 0.65rem;
+  margin-bottom: 1.75rem;
+}
+html[data-ui-look="compact"] .trust-proof__card {
+  padding: 0.8rem 0.9rem;
+}
+html[data-ui-look="compact"] .product-card__badge {
+  top: 0.55rem;
+  right: 0.55rem;
+}
+html[data-ui-look="compact"] .band {
+  padding-block: 2.5rem;
+}
+
+html[data-ui-look="sharp"] .product-card__badge {
+  border-radius: 0.15rem;
+  top: 0.55rem;
+  right: 0.55rem;
+}
+
+html[data-ui-look="sharp"] .prod-sidebar-item:focus-visible,
+html[data-ui-look="editorial"] .prod-sidebar-item:focus-visible,
+html[data-ui-look="compact"] .prod-sidebar-item:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+@media (min-width: 701px) {
+  html[data-ui-look="editorial"] #prod-list,
+  html[data-ui-look="compact"] #prod-list {
+    scroll-padding-inline: 0.5rem;
+  }
+  html[data-ui-look="editorial"] #prod-list .prod-sidebar-item:focus-visible,
+  html[data-ui-look="compact"] #prod-list .prod-sidebar-item:focus-visible {
+    outline-offset: 0;
+  }
+  html[data-ui-look="sharp"] #prod-list {
+    position: sticky;
+    top: 5.5rem;
+  }
+  html[data-ui-look="editorial"] .prod-panel-actions,
+  html[data-ui-look="compact"] .prod-panel-actions,
+  html[data-ui-look="sharp"] .prod-panel-actions {
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-ui-look="sharp"] .home-news-head {
+    padding-right: 0;
+    text-align: center;
+  }
+  html[data-ui-look="sharp"] .home-news-head .section-title {
+    border-left: none;
+    padding-left: 0;
+  }
+  html[data-ui-look="compact"] .band {
+    padding-block: 2rem;
+  }
+  html[data-ui-look="editorial"] .trust-partners {
+    padding-block: 3.5rem;
+  }
+}

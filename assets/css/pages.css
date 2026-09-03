@@ -415,6 +415,12 @@ html:not(.dark) .st-hero {
 }
 
 /* ── Pricing cards (homepage + pricing teaser) ── */
+.pricing-empty {
+  padding: 2rem 1rem;
+  border: 1px dashed var(--border);
+  border-radius: 1rem;
+}
+.pricing-empty__cta { margin-top: 0.75rem; }
 .price-grid {
   display: grid;
   grid-template-columns: 1fr;

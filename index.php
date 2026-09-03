@@ -685,9 +685,23 @@ include 'includes/stats-bar.php';
 .prod-sidebar-item:hover:not(.active) { background:var(--muted); }
 .prod-panel-shot { display:block; width:100%; max-height:220px; object-fit:cover; object-position:top center; background:var(--muted); }
 .prod-panel-actions { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; }
+.home-news-head {
+  position: relative;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.home-news-head__all {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
 @media (max-width:700px) {
-  .home-news-head { position:static !important; }
-  .home-news-head .btn { position:static !important; transform:none !important; margin-top:.875rem; }
+  .home-news-head__all {
+    position: static;
+    transform: none;
+    margin-top: .875rem;
+  }
 }
 </style>
 <script>
@@ -854,10 +868,10 @@ function sTab(slug){
 <?php if($newsItems): ?>
 <section class="band">
   <div class="container">
-    <div class="home-news-head animate-fade-up" style="position:relative;text-align:center;margin-bottom:3rem;">
-      <div class="section-eyebrow section-eyebrow-rose" style="margin-bottom:.75rem;display:inline-block;"><?= e(cms($__s,'home_news_eyebrow') ?: (isNepali() ? 'समाचार' : 'Latest from us')) ?></div>
-      <h2 style="font-family:var(--font-display);font-weight:800;letter-spacing:-.025em;color:var(--foreground);margin:0;"><?= e(cms($__s,'home_news_title') ?: (isNepali() ? 'समाचार र अपडेट' : 'News & updates')) ?></h2>
-      <a href="<?= url('news.php') ?>" class="btn btn-outline btn-sm" style="position:absolute;right:0;top:50%;transform:translateY(-50%);"><?= e(__('home_news_view_all')) ?> <i data-lucide="arrow-right" class="ic-13"></i></a>
+    <div class="home-news-head animate-fade-up">
+      <div class="section-eyebrow section-eyebrow-rose mb-card"><?= e(cms($__s,'home_news_eyebrow') ?: (isNepali() ? 'समाचार' : 'Latest from us')) ?></div>
+      <h2 class="section-title" style="margin:0;"><?= e(cms($__s,'home_news_title') ?: (isNepali() ? 'समाचार र अपडेट' : 'News & updates')) ?></h2>
+      <a href="<?= url('news.php') ?>" class="btn btn-outline btn-sm home-news-head__all"><?= e(__('home_news_view_all')) ?> <i data-lucide="arrow-right" class="ic-13"></i></a>
     </div>
     <div class="news-grid stagger-children">
       <?php foreach($newsItems as $article): ?>
