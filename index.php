@@ -698,6 +698,7 @@ include 'includes/stats-bar.php';
           data-tab="<?= e($tSlug) ?>"
           class="prod-sidebar-item <?= $i===0?'active':'' ?>"
           role="tab"
+          aria-label="<?= e($tLabel) ?>"
           aria-selected="<?= $i===0?'true':'false' ?>"
           aria-controls="tab-<?= e($tSlug) ?>"
           id="prod-tab-<?= e($tSlug) ?>"
@@ -708,7 +709,7 @@ include 'includes/stats-bar.php';
           <div class="icon-box icon-box-sm <?= e($tBox) ?>">
             <i data-lucide="<?= e($tIcon) ?>"></i>
           </div>
-          <span style="flex:1;font-size:var(--text-sm);font-weight:600;color:var(--foreground);line-height:1.35;"><?= e($tLabel) ?></span>
+          <span class="prod-tab-label" style="flex:1;font-size:var(--text-sm);font-weight:600;color:var(--foreground);line-height:1.35;"><?= e($tLabel) ?></span>
           <i data-lucide="chevron-right" class="prod-chevron ic-15"></i>
         </button>
         <?php endforeach; ?>
@@ -731,7 +732,7 @@ include 'includes/stats-bar.php';
           }
         ?>
         <div id="tab-<?= e($tSlug) ?>" class="tab-pane <?= $i===0?'active':'' ?>" role="tabpanel" aria-labelledby="prod-tab-<?= e($tSlug) ?>">
-          <div style="border-radius:var(--radius-2xl);border:1px solid var(--border);overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,.07);">
+          <div class="prod-panel-shell" style="border-radius:var(--radius-2xl);border:1px solid var(--border);overflow:hidden;box-shadow:0 8px 32px rgba(15,23,42,.07);">
             <div class="wc">
               <span class="wd dot-danger"></span><span class="wd dot-warning"></span><span class="wd dot-success"></span>
               <div class="pill-row">
@@ -761,9 +762,9 @@ include 'includes/stats-bar.php';
               <p class="prod-panel-lede"><?= e($prod['tagline']) ?></p>
               <?php endif; ?>
               <?php if($pFeats): ?>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.5rem;margin-bottom:1.375rem;">
+              <div class="prod-feat-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(13rem,1fr));gap:.5rem;margin-bottom:1.375rem;">
                 <?php foreach(array_slice($pFeats,0,8) as $f): ?>
-                <div style="display:flex;align-items:center;gap:.5rem;padding:.625rem .875rem;background:var(--muted);border-radius:.625rem;font-size:var(--text-sm);font-weight:600;color:var(--foreground);">
+                <div class="prod-feat-chip" style="display:flex;align-items:center;gap:.5rem;padding:.625rem .875rem;background:var(--muted);border-radius:.625rem;font-size:var(--text-sm);font-weight:600;color:var(--foreground);">
                   <i data-lucide="check-circle" class="prod-feat-icon"></i><?= e($f) ?>
                 </div>
                 <?php endforeach; ?>
