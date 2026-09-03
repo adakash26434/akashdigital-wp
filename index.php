@@ -193,16 +193,23 @@ foreach ($_heroExtras as $_hx) {
 unset($_hx, $_heroExtras);
 $_heroRotate = count($_heroSlides) > 1;
 $_heroHasSlideImg = false;
+$_heroFallbackImg = $_heroDashboardImage;
 foreach ($_heroSlides as $_hs) {
-  if (!empty($_hs['img'])) { $_heroHasSlideImg = true; break; }
+  if (!empty($_hs['img'])) {
+    $_heroHasSlideImg = true;
+    if ($_heroFallbackImg === '') {
+      $_heroFallbackImg = (string)$_hs['img'];
+    }
+  }
 }
 unset($_hs);
 $_hasHeroPhoto = $_heroHasSlideImg || $_heroDashboardImage !== '';
-// Soft keeps the CSS dashboard mockup as the right visual.
-// Editorial: left-align only when a real photo exists — otherwise center
-// so the empty right column does not leave a large dead gap.
-$_showHeroRight = $_showDashboard || $_heroHasSlideImg;
-if (function_exists('stPublicUiLook') && stPublicUiLook() === 'editorial') {
+$_uiLookNow = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
+// Soft may keep the CSS dashboard mockup as the right visual.
+// Editorial / Sharp / Compact: real photo only — never an empty right column.
+if ($_uiLookNow === 'soft') {
+  $_showHeroRight = $_showDashboard || $_heroHasSlideImg;
+} else {
   $_showHeroRight = $_hasHeroPhoto;
 }
 ?>
@@ -221,12 +228,21 @@ html:not(.dark) .st-hero{background:color-mix(in srgb,var(--primary) 9%,var(--ba
 @keyframes mesh-float{0%{transform:translate(0,0) scale(1);}33%{transform:translate(3%,-4%) scale(1.08);}66%{transform:translate(-2%,3%) scale(.95);}100%{transform:translate(4%,2%) scale(1.05);}}
 .st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--h-grid) 1px,transparent 1px),linear-gradient(90deg,var(--h-grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
 .st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;}
-.st-hero-split.hero-no-right{grid-template-columns:1fr;max-width:min(58rem,100%);margin-inline:auto;text-align:center;padding-inline:0;}
-.st-hero-split.hero-no-right .hero-right{display:none;}
+.st-hero-split.hero-no-right{grid-template-columns:1fr!important;max-width:min(58rem,100%);margin-inline:auto;text-align:center;padding-inline:0;}
+.st-hero-split.hero-no-right .hero-right{display:none!important;}
+.st-hero-split.hero-no-right .hero-left{align-items:center;width:100%;max-width:46rem;margin-inline:auto;}
 .st-hero-split.hero-no-right .hero-left .hero-badge{margin-inline:auto;}
-.st-hero-split.hero-no-right .hero-left .hero-sub{max-width:46rem;}
+.st-hero-split.hero-no-right .hero-left .hero-bar{margin-inline:auto;}
+.st-hero-split.hero-no-right .hero-left .hero-title,
+.st-hero-split.hero-no-right .hero-left .hero-sub,
+.st-hero-split.hero-no-right .hero-copy{text-align:center;margin-inline:auto;}
+.st-hero-split.hero-no-right .hero-left .hero-sub{max-width:40rem;}
+.st-hero-split.hero-no-right .hero-left .hero-actions,
+.st-hero-split.hero-no-right .hero-trust,
+.st-hero-split.hero-no-right .hero-dots{justify-content:center;}
 @media (min-width:769px){
   .st-hero-split{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:1.5rem;}
+  .st-hero-split.hero-no-right{grid-template-columns:1fr!important;}
   .st-hero-split.hero-no-right .hero-left{align-items:center;}
   .st-hero-split.hero-no-right .hero-left .hero-bar{margin-inline:auto;}
   .st-hero-split.hero-no-right .hero-left .hero-sub{margin-inline:auto;}
@@ -392,11 +408,9 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
             <div class="hero-mockup" style="padding:0;transform:none;">
               <img src="<?= e($_slide['img']) ?>" alt="" loading="<?= $_si === 0 ? 'eager' : 'lazy' ?>">
             </div>
-            <?php elseif ($_showDashboard && $_heroDashboardImage): ?>
-            <div class="hero-mockup" style="padding:0;">
-              <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
-                <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
-              </div>
+            <?php elseif ($_heroFallbackImg !== ''): ?>
+            <div class="hero-mockup" style="padding:0;transform:none;">
+              <img src="<?= e($_heroFallbackImg) ?>" alt="" loading="lazy">
             </div>
             <?php elseif ($_showDashboard): ?>
             <div class="hero-mockup">
@@ -525,6 +539,36 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 })();
 </script>
 <?php endif; ?>
+<script>
+(function(){
+  var split = document.querySelector('.st-hero-split');
+  if (!split) return;
+  var look = (document.documentElement.getAttribute('data-ui-look') || 'soft').toLowerCase();
+  if (look === 'soft') return;
+  function rightHasVisual(){
+    var right = split.querySelector('.hero-right');
+    if (!right) return false;
+    var scope = right.querySelector('.hero-visual-slide.is-active') || right;
+    if (scope.querySelector('.mockup-body')) return true;
+    var imgs = scope.querySelectorAll('img[src]');
+    for (var i = 0; i < imgs.length; i++) {
+      var s = (imgs[i].getAttribute('src') || '').trim();
+      if (s) return true;
+    }
+    return false;
+  }
+  function syncHeroLayout(){
+    if (!rightHasVisual()) split.classList.add('hero-no-right');
+  }
+  syncHeroLayout();
+  // After rotator changes, re-check in case a slide has no image
+  var root = document.getElementById('hero-rotator');
+  if (root) {
+    var obs = new MutationObserver(syncHeroLayout);
+    obs.observe(root, { attributes: true, subtree: true, attributeFilter: ['class'] });
+  }
+})();
+</script>
 <script>
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
