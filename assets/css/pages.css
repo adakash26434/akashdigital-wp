@@ -98,6 +98,21 @@ html:not(.dark) .st-hero {
   align-items: center;
   padding: 3rem 0 2rem;
 }
+/* No side visual → centered hero copy (Soft + all looks) */
+.st-hero-split.hero-no-right {
+  grid-template-columns: 1fr;
+  max-width: 42rem;
+  margin-inline: auto;
+  text-align: center;
+}
+.st-hero-split.hero-no-right .hero-right { display: none; }
+@media (min-width: 769px) {
+  .st-hero-split.hero-no-right .hero-left { align-items: center; }
+  .st-hero-split.hero-no-right .hero-left .hero-bar { margin-inline: auto; }
+  .st-hero-split.hero-no-right .hero-left .hero-sub { margin-inline: auto; }
+  .st-hero-split.hero-no-right .hero-left .hero-actions { justify-content: center; }
+  .st-hero-split.hero-no-right .hero-trust { justify-content: center; }
+}
 @media (max-width: 768px) {
   .st-hero-split { grid-template-columns: 1fr; text-align: center; }
   .st-hero-split .hero-right { display: none; }
