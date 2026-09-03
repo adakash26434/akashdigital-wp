@@ -322,3 +322,141 @@ html[data-ui-look="compact"] .st-stat__value { font-size: clamp(1.35rem, 2.4vw, 
     transition: none;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Deeper personality (still CSS-only; Soft stays empty)
+   Scoped to listing/home chrome — not forms or org charts.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Sharp: text nav, ledger stats, left product heads, hairline footer ── */
+html[data-ui-look="sharp"] #st-desktop-nav .nav-pill > [data-lucide] {
+  display: none;
+}
+html[data-ui-look="sharp"] .band-tinted {
+  background: var(--muted);
+}
+html[data-ui-look="sharp"] .st-stat__icon-wrap,
+html[data-ui-look="sharp"] .st-stat__hint,
+html[data-ui-look="sharp"] .trust-proof__hint {
+  display: none;
+}
+html[data-ui-look="sharp"] .st-stats .st-stat {
+  border: none;
+  border-right: 1px solid var(--border);
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+html[data-ui-look="sharp"] .hero-trust span i,
+html[data-ui-look="sharp"] .hero-trust span [data-lucide] {
+  display: none;
+}
+html[data-ui-look="sharp"] .hero-trust {
+  gap: 0;
+}
+html[data-ui-look="sharp"] .hero-trust span + span::before {
+  content: "·";
+  margin: 0 0.65rem;
+  opacity: 0.45;
+}
+html[data-ui-look="sharp"] footer {
+  margin-top: 0 !important;
+  border-top: 3px solid var(--primary);
+}
+html[data-ui-look="sharp"] .footer-heading {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+}
+@media (min-width: 640px) {
+  html[data-ui-look="sharp"] .product-card__head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    min-height: 0;
+    gap: 1rem;
+  }
+  html[data-ui-look="sharp"] .product-card__icon {
+    margin-inline: 0;
+    border-radius: 0.2rem;
+  }
+  html[data-ui-look="sharp"] .product-card__head-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+}
+
+/* ── Editorial: cream bands, un-pilled eyebrows, quiet mesh ── */
+html[data-ui-look="editorial"] .st-hero-mesh { display: none; }
+html[data-ui-look="editorial"]:not(.dark) .band-tinted,
+html[data-ui-look="editorial"]:not(.dark) .st-page-hero {
+  background: #f7f5f2;
+}
+html[data-ui-look="editorial"] .section-eyebrow {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+  letter-spacing: 0.16em;
+}
+html[data-ui-look="editorial"] .section-head {
+  margin-bottom: 2.25rem;
+}
+html[data-ui-look="editorial"] .testi-card {
+  width: min(20rem, 82vw);
+}
+html[data-ui-look="editorial"] footer {
+  margin-top: 4.5rem !important;
+}
+html[data-ui-look="editorial"] .product-card__head {
+  background: transparent;
+}
+
+/* ── Compact: drop decorative chrome, pack listings ── */
+html[data-ui-look="compact"] .section-eyebrow {
+  display: none;
+}
+html[data-ui-look="compact"] .hero-trust,
+html[data-ui-look="compact"] .hero-right .float-chip,
+html[data-ui-look="compact"] .st-stat__hint,
+html[data-ui-look="compact"] .trust-proof__hint,
+html[data-ui-look="compact"] .st-stats__lede,
+html[data-ui-look="compact"] .trust-partners__lede {
+  display: none;
+}
+html[data-ui-look="compact"] .band-tinted {
+  padding-block: 2rem;
+}
+html[data-ui-look="compact"] footer {
+  margin-top: 1.5rem !important;
+}
+html[data-ui-look="compact"] .testi-card {
+  width: min(14.5rem, 78vw);
+  padding: 0.9rem 1rem;
+}
+html[data-ui-look="compact"] .st-stats .st-stat {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+html[data-ui-look="compact"] .st-stat__icon-wrap {
+  transform: scale(0.85);
+}
+@media (min-width: 640px) {
+  html[data-ui-look="compact"] .product-card__head {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
+    min-height: 0;
+    padding: 0.85rem 1rem;
+  }
+  html[data-ui-look="compact"] .product-card__icon {
+    margin-inline: 0;
+    width: 2.15rem;
+    height: 2.15rem;
+  }
+  html[data-ui-look="compact"] .product-card__head-copy {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

@@ -407,10 +407,10 @@ function stCompanyName(): string {
  */
 function stPublicUiLooks(): array {
     return [
-        'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS'],
-        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: boxed, flat mockup, underline nav'],
-        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: stacked hero, large type, pill buttons'],
-        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: shorter hero, products as horizontal tabs'],
+        'soft'      => ['label' => 'Soft',      'hint' => 'Current live look — split hero, rounded SaaS (default)'],
+        'sharp'     => ['label' => 'Sharp',     'hint' => 'Corporate: white grid hero, text nav, left-aligned cards'],
+        'editorial' => ['label' => 'Editorial', 'hint' => 'Magazine: stacked hero, cream bands, text-only eyebrows'],
+        'compact'   => ['label' => 'Compact',   'hint' => 'Dense: short hero, hidden extras, product tabs'],
     ];
 }
 
