@@ -205,13 +205,13 @@ foreach ($_heroSlides as $_hs) {
 unset($_hs);
 $_hasHeroPhoto = $_heroHasSlideImg || $_heroDashboardImage !== '';
 $_uiLookNow = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
-// Soft may keep the CSS dashboard mockup as the right visual.
-// Editorial / Sharp / Compact: real photo only — never an empty right column.
-if ($_uiLookNow === 'soft') {
-  $_showHeroRight = $_showDashboard || $_heroHasSlideImg;
-} else {
-  $_showHeroRight = $_hasHeroPhoto;
-}
+$_softDash = ($_uiLookNow === 'soft' && $_showDashboard);
+// Keep the right rail in the DOM when any slide can show a photo (or Soft dashboard).
+$_showHeroRight = $_softDash || $_hasHeroPhoto;
+// Start centered unless the first slide actually has a visual.
+$_firstSlideHasPhoto = !empty($_heroSlides[0]['img']);
+$_firstSlideHasVisual = $_firstSlideHasPhoto || $_softDash;
+$_heroNoRightInit = !$_firstSlideHasVisual;
 ?>
 <!-- Critical hero CSS inlined so the split layout never collapses if the
      external pages.css is stale/cached/out-of-sync on the deployed host.
@@ -349,7 +349,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   <div class="st-hero-grid"></div>
 
   <div class="container">
-    <div class="st-hero-split<?= !$_showHeroRight ? ' hero-no-right' : '' ?>"<?= $_heroRotate ? ' id="hero-rotator" data-hero-interval="5500"' : '' ?>>
+    <div class="st-hero-split<?= $_heroNoRightInit ? ' hero-no-right' : '' ?>"<?= $_heroRotate ? ' id="hero-rotator" data-hero-interval="5500"' : ' id="hero-rotator"' ?> data-soft-dashboard="<?= $_softDash ? '1' : '0' ?>" data-hero-per-slide="1">
 
       <!-- ── LEFT: Text content ── -->
       <div class="hero-left">
@@ -360,8 +360,10 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
         </div>
 
         <div class="hero-copy">
-          <?php foreach ($_heroSlides as $_si => $_slide): ?>
-          <div class="hero-copy-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>">
+          <?php foreach ($_heroSlides as $_si => $_slide):
+            $_slidePhoto = !empty($_slide['img']);
+          ?>
+          <div class="hero-copy-slide<?= $_si === 0?' is-active':'' ?>" data-hero-slide="<?= (int)$_si ?>" data-has-photo="<?= $_slidePhoto ? '1' : '0' ?>">
             <h1 class="hero-title"><?php
               $_t = (string)$_slide['title'];
               echo str_contains($_t, '<') ? $_t : e($_t);
@@ -369,7 +371,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
             <div class="hero-bar"></div>
             <p class="hero-sub"><?= e(strip_tags((string)$_slide['sub'])) ?></p>
           </div>
-          <?php endforeach; unset($_si, $_slide); ?>
+          <?php endforeach; unset($_si, $_slide, $_slidePhoto); ?>
         </div>
         <?php if ($_heroRotate): ?>
         <div class="hero-dots" role="tablist" aria-label="Hero slides">
@@ -398,21 +400,25 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
         </div>
       </div>
 
-      <!-- ── RIGHT: Dashboard mockup / slide image ── -->
+      <!-- ── RIGHT: per-slide photo (Soft may keep dashboard mockup) ── -->
       <?php if($_showHeroRight): ?>
       <div class="hero-right">
-        <?php if ($_heroHasSlideImg): ?>
-          <?php foreach ($_heroSlides as $_si => $_slide): ?>
-          <div class="hero-visual-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>">
-            <?php if (!empty($_slide['img'])): ?>
+        <?php if ($_heroHasSlideImg || $_softDash): ?>
+          <?php foreach ($_heroSlides as $_si => $_slide):
+            $_slidePhoto = !empty($_slide['img']);
+          ?>
+          <div class="hero-visual-slide<?= $_si === 0 ? ' is-active' : '' ?>" data-hero-slide="<?= (int)$_si ?>" data-has-photo="<?= $_slidePhoto ? '1' : '0' ?>">
+            <?php if ($_slidePhoto): ?>
             <div class="hero-mockup" style="padding:0;transform:none;">
               <img src="<?= e($_slide['img']) ?>" alt="" loading="<?= $_si === 0 ? 'eager' : 'lazy' ?>">
             </div>
-            <?php elseif ($_heroFallbackImg !== ''): ?>
-            <div class="hero-mockup" style="padding:0;transform:none;">
-              <img src="<?= e($_heroFallbackImg) ?>" alt="" loading="lazy">
+            <?php elseif ($_softDash && $_heroDashboardImage !== ''): ?>
+            <div class="hero-mockup" style="padding:0;">
+              <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+                <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
+              </div>
             </div>
-            <?php elseif ($_showDashboard): ?>
+            <?php elseif ($_softDash): ?>
             <div class="hero-mockup">
               <div class="mockup-bar">
                 <span class="dot dot-r"></span>
@@ -440,15 +446,15 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
             </div>
             <?php endif; ?>
           </div>
-          <?php endforeach; unset($_si, $_slide); ?>
+          <?php endforeach; unset($_si, $_slide, $_slidePhoto); ?>
         <?php elseif($_heroDashboardImage): ?>
-        <div class="hero-mockup" style="padding:0;">
+        <div class="hero-mockup" style="padding:0;" data-has-photo="1">
           <div style="background:#fff;border-radius:0.75rem;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
             <img src="<?= e($_heroDashboardImage) ?>" alt="Dashboard Preview" style="width:100%;height:auto;display:block;">
           </div>
         </div>
         <?php else: ?>
-        <div class="hero-mockup">
+        <div class="hero-mockup" data-has-photo="0">
           <div class="mockup-bar">
             <span class="dot dot-r"></span>
             <span class="dot dot-y"></span>
@@ -481,7 +487,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
         </div>
         <?php endif; ?>
 
-        <?php if ($_showDashboard && !$_heroHasSlideImg): ?>
+        <?php if ($_softDash && !$_heroHasSlideImg): ?>
         <div class="float-chip f1 green">
           <i data-lucide="trending-up" style="width:12px;height:12px;"></i>
           <?= e($_mockGrowth) ?> growth
@@ -502,7 +508,6 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   </div>
 </section>
 
-<?php if (!empty($_heroRotate)): ?>
 <script>
 (function(){
   var root = document.getElementById('hero-rotator');
@@ -511,20 +516,36 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   var visuals = root.querySelectorAll('.hero-visual-slide');
   var dots = root.querySelectorAll('.hero-dot');
   var n = copies.length;
-  if (n < 2) return;
+  var softDash = root.getAttribute('data-soft-dashboard') === '1';
   var i = 0;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var ms = reduce ? 0 : parseInt(root.getAttribute('data-hero-interval') || '5500', 10);
+  var ms = (!reduce && n > 1) ? parseInt(root.getAttribute('data-hero-interval') || '5500', 10) : 0;
+
+  function slideHasVisual(idx){
+    var slide = copies[idx];
+    if (slide && slide.getAttribute('data-has-photo') === '1') return true;
+    // Soft dashboard mockup counts as a right visual for every slide
+    if (softDash) return true;
+    return false;
+  }
+  function syncLayout(idx){
+    if (slideHasVisual(idx)) root.classList.remove('hero-no-right');
+    else root.classList.add('hero-no-right');
+  }
   function go(to){
-    copies[i].classList.remove('is-active');
+    if (n < 1) return;
+    if (copies[i]) copies[i].classList.remove('is-active');
     if (visuals[i]) visuals[i].classList.remove('is-active');
     if (dots[i]) dots[i].classList.remove('is-active');
-    i = (to + n) % n;
-    copies[i].classList.add('is-active');
+    i = ((to % n) + n) % n;
+    if (copies[i]) copies[i].classList.add('is-active');
     if (visuals[i]) visuals[i].classList.add('is-active');
     if (dots[i]) dots[i].classList.add('is-active');
-    if (window.stHeroInkReplay) window.stHeroInkReplay(copies[i]);
+    syncLayout(i);
+    if (window.stHeroInkReplay && copies[i]) window.stHeroInkReplay(copies[i]);
   }
+
+  syncLayout(0);
   dots.forEach(function(d){
     d.addEventListener('click', function(){
       go(parseInt(d.getAttribute('data-hero-to') || '0', 10));
@@ -536,37 +557,6 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   root.addEventListener('mouseleave', function(){
     if (!timer) timer = setInterval(function(){ go(i + 1); }, ms);
   });
-})();
-</script>
-<?php endif; ?>
-<script>
-(function(){
-  var split = document.querySelector('.st-hero-split');
-  if (!split) return;
-  var look = (document.documentElement.getAttribute('data-ui-look') || 'soft').toLowerCase();
-  if (look === 'soft') return;
-  function rightHasVisual(){
-    var right = split.querySelector('.hero-right');
-    if (!right) return false;
-    var scope = right.querySelector('.hero-visual-slide.is-active') || right;
-    if (scope.querySelector('.mockup-body')) return true;
-    var imgs = scope.querySelectorAll('img[src]');
-    for (var i = 0; i < imgs.length; i++) {
-      var s = (imgs[i].getAttribute('src') || '').trim();
-      if (s) return true;
-    }
-    return false;
-  }
-  function syncHeroLayout(){
-    if (!rightHasVisual()) split.classList.add('hero-no-right');
-  }
-  syncHeroLayout();
-  // After rotator changes, re-check in case a slide has no image
-  var root = document.getElementById('hero-rotator');
-  if (root) {
-    var obs = new MutationObserver(syncHeroLayout);
-    obs.observe(root, { attributes: true, subtree: true, attributeFilter: ['class'] });
-  }
 })();
 </script>
 <script>
