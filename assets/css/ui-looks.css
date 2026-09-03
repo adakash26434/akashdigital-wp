@@ -247,7 +247,7 @@ html[data-ui-look="editorial"] .trust-proof__card {
 }
 html[data-ui-look="editorial"] .trust-proof__body { text-align: center; }
 @media (min-width: 768px) {
-  html[data-ui-look="editorial"] .product-card__head { min-height: 8.5rem; }
+  html[data-ui-look="editorial"] .product-card__head { min-height: 0; padding: 1.35rem 1.25rem 1.15rem; }
 }
 html[data-ui-look="editorial"] .page-hero {
   padding: 4.5rem 0 3rem;
@@ -303,7 +303,9 @@ html[data-ui-look="compact"] .page-hero__title {
   font-size: clamp(1.4rem, 3vw, 2rem);
 }
 html[data-ui-look="compact"] .product-grid { gap: 0.75rem; }
-html[data-ui-look="compact"] .product-card__head { min-height: 7.5rem; padding: 1rem; }
+@media (max-width: 767px) {
+  html[data-ui-look="compact"] .product-card__head { min-height: 0; padding: 1rem; }
+}
 html[data-ui-look="compact"] .section-head { margin-bottom: 1.25rem; }
 html[data-ui-look="compact"] .trust-partners { padding-block: 2rem; }
 html[data-ui-look="compact"] .st-stats__lede,
@@ -1384,8 +1386,34 @@ html[data-ui-look="compact"] .product-card__price-strip {
   text-align: start;
   padding-inline: 1.15rem;
 }
-html[data-ui-look="editorial"] .product-card__price-strip {
-  background: color-mix(in srgb, var(--primary) 5%, var(--muted));
+html[data-ui-look="sharp"] .product-card__chip {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] .product-card__chip {
+  border-radius: 999px;
+}
+html[data-ui-look="compact"] .product-card__chip {
+  border-radius: 0.4rem;
+  padding: 0.15rem 0.45rem;
+}
+html[data-ui-look="sharp"] .product-card__chip--accent,
+html[data-ui-look="editorial"] .product-card__chip--accent,
+html[data-ui-look="compact"] .product-card__chip--accent {
+  background: color-mix(in srgb, var(--primary) 10%, var(--muted));
+}
+html[data-ui-look="sharp"] .product-card__shot img,
+html[data-ui-look="compact"] .product-card__shot img {
+  max-height: 140px;
+  object-fit: cover;
+}
+html[data-ui-look="editorial"] .product-card__shot img {
+  max-height: 170px;
+  object-fit: cover;
+}
+html[data-ui-look="sharp"] .product-card__body,
+html[data-ui-look="editorial"] .product-card__body,
+html[data-ui-look="compact"] .product-card__body {
+  padding-top: 1rem;
 }
 
 @media (max-width: 640px) {
