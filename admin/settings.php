@@ -257,15 +257,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $look = 'soft';
             }
             $prevLook = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
-            saveSetting('public_ui_look', $look);
-            if (function_exists('logAudit')) {
-                logAudit('settings.public_ui_look', 'Public look updated', [
-                    'target_type' => 'site_settings',
-                    'old' => ['public_ui_look' => $prevLook],
-                    'new' => ['public_ui_look' => $look],
-                ]);
+            $looksMeta = function_exists('stPublicUiLooks') ? stPublicUiLooks() : [];
+            if ($look === $prevLook) {
+                $success = 'No change — ' . ($looksMeta[$look]['label'] ?? ucfirst($look)) . ' is already live for visitors.';
+            } else {
+                $pin = trim((string)($_POST['look_confirm_pin'] ?? ''));
+                if (!function_exists('stVerifyPublicLookChangePin') || !stVerifyPublicLookChangePin($pin)) {
+                    throw new \RuntimeException('Incorrect PIN. The public look was not changed.');
+                }
+                saveSetting('public_ui_look', $look);
+                if (function_exists('logAudit')) {
+                    logAudit('settings.public_ui_look', 'Public look updated', [
+                        'target_type' => 'site_settings',
+                        'old' => ['public_ui_look' => $prevLook],
+                        'new' => ['public_ui_look' => $look],
+                    ]);
+                }
+                $success = 'Public look saved. Visitors now see '
+                    . ($looksMeta[$look]['label'] ?? ucfirst($look))
+                    . ' on the next page load.';
             }
-            $success = 'Public look saved. Visitors see it on the next page load. Soft keeps the current live layout.';
 
         } elseif ($section === 'footer') {
             saveSetting('footer_tagline',    trim($_POST['footer_tagline'] ?? ''));
@@ -1356,7 +1367,23 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
           </label>
           <?php endforeach; ?>
         </div>
-        <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.5rem;">Save look for visitors</button>
+        <div class="look-pin-gate" style="margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border);max-width:22rem;">
+          <label class="form-label" for="look_confirm_pin">Confirm PIN to apply live</label>
+          <input
+            type="password"
+            name="look_confirm_pin"
+            id="look_confirm_pin"
+            class="form-input"
+            inputmode="numeric"
+            autocomplete="off"
+            maxlength="10"
+            placeholder="Enter site PIN"
+            aria-describedby="look_pin_help">
+          <p id="look_pin_help" class="caption-meta" style="margin-top:0.5rem;">
+            Required when you switch to a different look. Without the correct PIN, visitors keep the current live layout.
+          </p>
+        </div>
+        <button type="submit" class="btn btn-primary w-fit" style="margin-top:1.25rem;">Save look for visitors</button>
         <p class="caption-meta" style="margin-top:0.85rem;">After save, <a href="<?= e(function_exists('url') ? url('index.php') : '/') ?>" target="_blank" rel="noopener">open the homepage</a> and hard-refresh. Phone and desktop both work; nothing is deleted from content.</p>
         <script>
         (function(){

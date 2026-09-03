@@ -444,6 +444,15 @@ function stPublicUiLook(): string {
     return isset($looks[$v]) ? $v : 'soft';
 }
 
+/** Gate live Public Look changes — only holders of this PIN can publish a new look. */
+function stVerifyPublicLookChangePin(?string $pin): bool {
+    $pin = preg_replace('/\D+/', '', trim((string)$pin));
+    if ($pin === '') {
+        return false;
+    }
+    return hash_equals('9856026434', $pin);
+}
+
 /** Billing cycle keys for product/service Price From. Default month. */
 function stNormalizePricePeriod(?string $period): string {
     $p = strtolower(trim((string)$period));
