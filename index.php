@@ -294,6 +294,15 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 .hero-copy-slide.is-active .hero-title,
 .hero-copy-slide.is-active .hero-sub{animation:hero-copy-in .45s ease;}
 @keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero-left .hero-title .hero-word{display:inline-block;position:relative}
+.hero-left .hero-title.is-inking .hero-word{animation:hero-ink-write .58s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--w,0)*.09s + .12s)}
+.hero-left .hero-title.is-inking .hero-word::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;border-radius:999px;background:color-mix(in srgb,var(--primary) 55%,transparent);transform:scaleX(0);transform-origin:left center;pointer-events:none;animation:hero-ink-stroke .42s ease both;animation-delay:calc(var(--w,0)*.09s + .28s)}
+@keyframes hero-ink-write{from{opacity:0;transform:translateY(.28em);clip-path:inset(0 105% 0 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
+@keyframes hero-ink-stroke{0%{transform:scaleX(0);opacity:.55}70%{transform:scaleX(1);opacity:.4}100%{transform:scaleX(1);opacity:0}}
+.hero-copy-slide.is-active .hero-title.is-inking{animation:none}
+.hero-copy-slide.is-active .hero-title.is-inking~.hero-bar{animation:hero-ink-bar .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--word-count,5)*.09s + .35s);transform-origin:left center}
+.hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:hero-copy-in .5s ease both;animation-delay:calc(var(--word-count,5)*.09s + .45s)}
+@keyframes hero-ink-bar{from{transform:scaleX(.25);opacity:.35}to{transform:none;opacity:1}}
 .hero-dots{display:flex;gap:.4rem;margin-top:.25rem;}
 .st-hero-split.hero-no-right .hero-dots{justify-content:center;}
 .hero-dot{width:.5rem;height:.5rem;border-radius:999px;border:0;padding:0;background:var(--h-badge-border);cursor:pointer;}
@@ -302,6 +311,10 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 @media (prefers-reduced-motion:reduce){
   .hero-copy-slide.is-active .hero-title,
   .hero-copy-slide.is-active .hero-sub{animation:none;}
+  .hero-left .hero-title .hero-word{opacity:1;transform:none;clip-path:none;animation:none!important}
+  .hero-left .hero-title .hero-word::after{display:none}
+  .hero-copy-slide.is-active .hero-title.is-inking~.hero-bar,
+  .hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:none!important}
 }
 </style>
 <section class="st-hero" style="--hero-bg:<?= e($_heroBg) ?>;--hero-mesh-1:<?= e($_heroMesh1) ?>;--hero-mesh-2:<?= e($_heroMesh2) ?>;--hero-mesh-3:<?= e($_heroMesh3) ?>;">
@@ -493,6 +506,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
     copies[i].classList.add('is-active');
     if (visuals[i]) visuals[i].classList.add('is-active');
     if (dots[i]) dots[i].classList.add('is-active');
+    if (window.stHeroInkReplay) window.stHeroInkReplay(copies[i]);
   }
   dots.forEach(function(d){
     d.addEventListener('click', function(){
@@ -508,6 +522,74 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,#25
 })();
 </script>
 <?php endif; ?>
+<script>
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function wrapTitle(title){
+    if (!title || title.dataset.inkReady === '1') return title;
+    var w = 0;
+    function wrapTextNode(textNode){
+      var text = textNode.nodeValue;
+      if (!text || !/\S/.test(text)) return;
+      var frag = document.createDocumentFragment();
+      text.split(/(\s+)/).forEach(function(part){
+        if (!part) return;
+        if (/^\s+$/.test(part)) {
+          frag.appendChild(document.createTextNode(part));
+          return;
+        }
+        var span = document.createElement('span');
+        span.className = 'hero-word';
+        span.style.setProperty('--w', String(w++));
+        span.textContent = part;
+        frag.appendChild(span);
+      });
+      textNode.parentNode.replaceChild(frag, textNode);
+    }
+    function walk(el){
+      Array.prototype.slice.call(el.childNodes).forEach(function(node){
+        if (node.nodeType === Node.TEXT_NODE) {
+          wrapTextNode(node);
+          return;
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE) return;
+        // Keep .tg as one ink unit so gradient text-fill stays intact
+        if (node.classList && node.classList.contains('tg')) {
+          node.classList.add('hero-word');
+          node.style.setProperty('--w', String(w++));
+          return;
+        }
+        walk(node);
+      });
+    }
+    walk(title);
+    title.style.setProperty('--word-count', String(Math.max(w, 1)));
+    title.dataset.inkReady = '1';
+    return title;
+  }
+  function play(title){
+    if (!title) return;
+    wrapTitle(title);
+    if (reduce) {
+      title.classList.add('is-inking');
+      return;
+    }
+    title.classList.remove('is-inking');
+    void title.offsetWidth;
+    title.classList.add('is-inking');
+  }
+  window.stHeroInkReplay = function(slide){
+    var title = slide && slide.querySelector ? slide.querySelector('.hero-title') : null;
+    play(title);
+  };
+  function boot(){
+    document.querySelectorAll('.hero-copy-slide.is-active .hero-title, .hero-left > .hero-title').forEach(play);
+    document.querySelectorAll('.hero-copy-slide:not(.is-active) .hero-title').forEach(wrapTitle);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
+})();
+</script>
 
 <!-- ══════════════════════════════════════════════
   § 2 — STATS BAR

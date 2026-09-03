@@ -155,6 +155,79 @@ html:not(.dark) .st-hero {
   text-shadow: var(--h-shadow);
   margin: 0;
 }
+/* Hero title — pen / ink word reveal (all looks; Soft included via pages.css) */
+.hero-left .hero-title .hero-word {
+  display: inline-block;
+  position: relative;
+  will-change: transform, opacity, clip-path;
+}
+.hero-left .hero-title.is-inking .hero-word {
+  animation: hero-ink-write 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--w, 0) * 0.09s + 0.12s);
+}
+.hero-left .hero-title.is-inking .hero-word::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.06em;
+  height: 0.12em;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 55%, transparent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  pointer-events: none;
+  animation: hero-ink-stroke 0.42s ease both;
+  animation-delay: calc(var(--w, 0) * 0.09s + 0.28s);
+}
+@keyframes hero-ink-write {
+  from {
+    opacity: 0;
+    transform: translateY(0.28em);
+    clip-path: inset(0 105% 0 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes hero-ink-stroke {
+  0% { transform: scaleX(0); opacity: 0.55; }
+  70% { transform: scaleX(1); opacity: 0.4; }
+  100% { transform: scaleX(1); opacity: 0; }
+}
+.hero-copy-slide.is-active .hero-title.is-inking {
+  animation: none;
+}
+.hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar {
+  animation: hero-ink-bar 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--word-count, 5) * 0.09s + 0.35s);
+  transform-origin: left center;
+}
+.hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
+  animation: hero-copy-in 0.5s ease both;
+  animation-delay: calc(var(--word-count, 5) * 0.09s + 0.45s);
+}
+@keyframes hero-ink-bar {
+  from { transform: scaleX(0.25); opacity: 0.35; }
+  to { transform: none; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-left .hero-title .hero-word {
+    opacity: 1;
+    transform: none;
+    clip-path: none;
+    animation: none !important;
+  }
+  .hero-left .hero-title .hero-word::after {
+    display: none;
+  }
+  .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar,
+  .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
+    animation: none !important;
+  }
+}
 .hero-left .hero-title .tg {
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
