@@ -194,7 +194,14 @@ foreach ($_heroSlides as $_hs) {
   if (!empty($_hs['img'])) { $_heroHasSlideImg = true; break; }
 }
 unset($_hs);
+$_hasHeroPhoto = $_heroHasSlideImg || $_heroDashboardImage !== '';
+// Soft keeps the CSS dashboard mockup as the right visual.
+// Editorial: left-align only when a real photo exists — otherwise center
+// so the empty right column does not leave a large dead gap.
 $_showHeroRight = $_showDashboard || $_heroHasSlideImg;
+if (function_exists('stPublicUiLook') && stPublicUiLook() === 'editorial') {
+  $_showHeroRight = $_hasHeroPhoto;
+}
 ?>
 <!-- Critical hero CSS inlined so the split layout never collapses if the
      external pages.css is stale/cached/out-of-sync on the deployed host.
