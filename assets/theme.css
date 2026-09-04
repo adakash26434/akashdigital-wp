@@ -2528,19 +2528,51 @@ input[type="checkbox"]:hover {
 }
 .footer-bottom-bar {
   border-top: 1px solid var(--footer-border);
-}
-.footer-bottom-bar p {
+  /* Shared size so Nepali + English share one optical line */
   font-size: var(--text-xs);
+  line-height: 1.45;
+  font-family: var(--font-body);
+  font-weight: 400;
+}
+.footer-bottom-bar p,
+.footer-bottom-bar .footer-bottom-meta,
+.footer-bottom-bar .footer-copy-text,
+.footer-bottom-bar .footer-dev-credit {
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  font-weight: inherit;
   color: var(--footer-fg-mute);
   margin: 0;
 }
-.footer-bottom-bar a {
+.footer-bottom-bar a,
+.footer-bottom-bar .footer-link {
   color: var(--footer-fg);
   text-decoration: none;
   white-space: nowrap;
-  font-size: var(--text-xs);
+  font-size: inherit;
+  line-height: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  margin: 0;
+  padding: 0;
+  display: inline;
+}
+.footer-bottom-bar .footer-link::after {
+  content: none;
 }
 .footer-bottom-bar a:hover { color: var(--footer-fg-strong); }
+/* Devanagari reads ~8–10% taller than Latin at the same rem — nudge down */
+.footer-bottom-bar .footer-link[lang="ne"] {
+  font-size: 0.9em;
+  font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif;
+}
+.footer-bottom-bar .footer-link[lang="en"],
+.footer-bottom-bar .footer-copy-text,
+.footer-bottom-bar .footer-dev-credit {
+  font-size: 1em;
+  font-family: 'Poppins', 'Noto Sans Devanagari', sans-serif;
+}
 .footer-dot { color: var(--footer-border); }
 .social-pill {
   display: grid; place-items: center; width: 2.25rem; height: 2.25rem;

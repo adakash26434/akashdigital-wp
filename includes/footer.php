@@ -162,13 +162,13 @@ try {
         ob_start();
       ?>
       <div class="footer-bottom-links">
-        <a href="<?= url('privacy.php') ?>" class="footer-link">गोपनीयता</a>
+        <a href="<?= url('privacy.php') ?>" class="footer-link" lang="ne">गोपनीयता</a>
         <span class="footer-dot">•</span>
-        <a href="<?= url('terms.php') ?>" class="footer-link">सेवाका सर्त</a>
+        <a href="<?= url('terms.php') ?>" class="footer-link" lang="ne">सेवाका सर्त</a>
         <span class="footer-dot">•</span>
-        <a href="<?= url('cookie-policy.php') ?>" class="footer-link">कुकी नीति</a>
+        <a href="<?= url('cookie-policy.php') ?>" class="footer-link" lang="ne">कुकी नीति</a>
         <span class="footer-dot">•</span>
-        <a href="<?= url('sitemap.php') ?>" class="footer-link">Sitemap</a>
+        <a href="<?= url('sitemap.php') ?>" class="footer-link" lang="en">Sitemap</a>
       </div>
       <?php
         $__footerLinksHtml = ob_get_clean();
