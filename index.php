@@ -193,13 +193,9 @@ foreach ($_heroExtras as $_hx) {
 unset($_hx, $_heroExtras);
 $_heroRotate = count($_heroSlides) > 1;
 $_heroHasSlideImg = false;
-$_heroFallbackImg = $_heroDashboardImage;
 foreach ($_heroSlides as $_hs) {
   if (!empty($_hs['img'])) {
     $_heroHasSlideImg = true;
-    if ($_heroFallbackImg === '') {
-      $_heroFallbackImg = (string)$_hs['img'];
-    }
   }
 }
 unset($_hs);
