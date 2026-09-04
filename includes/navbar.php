@@ -64,8 +64,10 @@ if (!isset($__s)) $__s = siteSettings();
 
       <?php foreach ($navLinks as $l):
         $active = $__currentPath === $l['href'];
+        $navKey = preg_replace('/\.php$/', '', (string)$l['href']);
+        if ($navKey === 'index') $navKey = 'home';
       ?>
-      <li>
+      <li data-nav="<?= e($navKey) ?>">
         <a href="<?= url($l['href']) ?>"
            <?= $active ? 'aria-current="page"' : '' ?>
            class="nav-pill <?= $active ? 'active' : '' ?>">
@@ -79,7 +81,7 @@ if (!isset($__s)) $__s = siteSettings();
 
       <!-- Company dropdown -->
       <?php $companyActive = in_array($__currentPath, ['about.php','careers.php']); ?>
-      <li class="pos-rel" style="position:relative;" x-data="{companyOpen:false}" @click.outside="companyOpen=false">
+      <li data-nav="company" class="pos-rel" style="position:relative;" x-data="{companyOpen:false}" @click.outside="companyOpen=false">
         <button @click="companyOpen=!companyOpen"
           :aria-expanded="companyOpen.toString()"
           aria-label="Company"
@@ -113,7 +115,7 @@ if (!isset($__s)) $__s = siteSettings();
 
       <!-- More dropdown -->
       <?php $moreActive = in_array($__currentPath, array_column($moreLinks, 'href')); ?>
-      <li class="pos-rel" style="position:relative;" x-data="{moreOpen:false}" @click.outside="moreOpen=false">
+      <li data-nav="more" class="pos-rel" style="position:relative;" x-data="{moreOpen:false}" @click.outside="moreOpen=false">
         <button @click="moreOpen=!moreOpen"
           :aria-expanded="moreOpen.toString()"
           aria-label="More pages"

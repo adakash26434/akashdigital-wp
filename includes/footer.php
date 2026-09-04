@@ -136,8 +136,9 @@ try {
 
   <!-- Bottom bar -->
   <div class="footer-bottom-bar">
-    <div class="container" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
-      <p>
+    <div class="container footer-bottom-bar__inner" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
+      <p class="footer-bottom-meta">
+        <span class="footer-copy-text">
         <?php
           $__copyTpl = trim((string)($__s['copyright_text'] ?? ''));
           if ($__copyTpl === '' && function_exists('cms')) {
@@ -153,9 +154,9 @@ try {
               echo sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME));
           }
         ?>
-        | Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer">Aakash Adhikari</a>
+        </span><span class="footer-dev-credit"> | Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer">Aakash Adhikari</a></span>
       </p>
-      <div style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
+      <div class="footer-bottom-links" style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
         <a href="<?= url('privacy.php') ?>" class="footer-link">गोपनीयता</a>
         <span class="footer-dot">•</span>
         <a href="<?= url('terms.php') ?>" class="footer-link">सेवाका सर्त</a>

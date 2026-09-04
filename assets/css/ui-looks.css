@@ -2686,6 +2686,120 @@ html.dark[data-ui-look="editorial"] #st-navbar.is-scrolled {
 }
 
 /* ════════════════════════════════════════════════════════════
+   Nav order + footer credit placement — Soft DOM/order unchanged.
+   Desktop nav only (mobile keeps familiar Soft list order).
+   ════════════════════════════════════════════════════════════ */
+
+/* Soft: Home · Products · Services · Contact · Company · More (DOM)
+   Sharp: Company before Contact (institutional)
+   Editorial: Company early after Home (story / brand)
+   Compact: Contact earlier after Products (conversion) */
+@media (min-width: 1024px) {
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="home"] { order: 1; }
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="products"] { order: 2; }
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="services"] { order: 3; }
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="company"] { order: 4; }
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="contact"] { order: 5; }
+  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="more"] { order: 6; }
+
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="home"] { order: 1; }
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="company"] { order: 2; }
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="products"] { order: 3; }
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="services"] { order: 4; }
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="contact"] { order: 5; }
+  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="more"] { order: 6; }
+
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="home"] { order: 1; }
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="products"] { order: 2; }
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="contact"] { order: 3; }
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="services"] { order: 4; }
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="company"] { order: 5; }
+  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="more"] { order: 6; }
+}
+
+/* Footer bottom — Soft keeps copy+dev left, links right */
+html[data-ui-look="sharp"] .footer-bottom-bar__inner {
+  flex-direction: row-reverse;
+  justify-content: space-between;
+}
+html[data-ui-look="sharp"] .footer-bottom-meta {
+  text-align: right;
+  margin: 0;
+}
+html[data-ui-look="sharp"] .footer-dev-credit {
+  display: block;
+  margin-top: 0.3rem;
+}
+
+html[data-ui-look="editorial"] .footer-bottom-bar__inner {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.85rem;
+}
+html[data-ui-look="editorial"] .footer-bottom-meta {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+html[data-ui-look="editorial"] .footer-dev-credit {
+  display: block;
+  opacity: 0.88;
+  font-size: 0.8125rem;
+}
+html[data-ui-look="editorial"] .footer-bottom-links {
+  justify-content: center;
+  order: -1;
+}
+
+html[data-ui-look="compact"] .footer-bottom-bar__inner {
+  gap: 0.5rem 1rem;
+}
+html[data-ui-look="compact"] .footer-bottom-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.65rem;
+  margin: 0;
+  flex: 1 1 auto;
+}
+html[data-ui-look="compact"] .footer-dev-credit {
+  margin-left: auto;
+  font-size: 0.7rem;
+  opacity: 0.9;
+}
+html[data-ui-look="compact"] .footer-bottom-links {
+  order: 3;
+  width: 100%;
+  justify-content: flex-start;
+}
+
+@media (max-width: 640px) {
+  html[data-ui-look="sharp"] .footer-bottom-bar__inner,
+  html[data-ui-look="compact"] .footer-bottom-bar__inner {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  html[data-ui-look="sharp"] .footer-bottom-meta,
+  html[data-ui-look="compact"] .footer-bottom-meta {
+    text-align: center;
+  }
+  html[data-ui-look="sharp"] .footer-dev-credit,
+  html[data-ui-look="compact"] .footer-dev-credit {
+    margin-left: 0;
+  }
+  html[data-ui-look="sharp"] .footer-bottom-links,
+  html[data-ui-look="compact"] .footer-bottom-links,
+  html[data-ui-look="editorial"] .footer-bottom-links {
+    justify-content: center;
+    width: auto;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
    Expert differentiation pass — Soft untouched.
    Finish inner-page personality so looks stay distinct past the hero.
    Listing cards / stats / CTA / page-hero only — not forms or portal.
