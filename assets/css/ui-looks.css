@@ -1100,7 +1100,7 @@ html[data-ui-look="editorial"] .hero-left .hero-bar {
   transform-origin: center;
   animation: look-ed-bar 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
 }
-/* Ink writing personality — Soft uses pages.css defaults */
+/* Ink writing personality — Soft uses pages.css defaults; pen follows in JS */
 html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word {
   animation-duration: 0.38s;
   animation-timing-function: cubic-bezier(0.2, 0.9, 0.2, 1);
@@ -1108,6 +1108,11 @@ html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word {
 }
 html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word::after {
   display: none;
+}
+html[data-ui-look="sharp"] .hero-left .hero-title .hero-pen {
+  width: 1.75rem;
+  height: 1.75rem;
+  filter: none;
 }
 html[data-ui-look="editorial"] .hero-left .hero-title.is-inking .hero-word {
   animation-duration: 0.72s;
@@ -1119,6 +1124,10 @@ html[data-ui-look="editorial"] .hero-left .hero-title.is-inking .hero-word::afte
   background: color-mix(in srgb, var(--primary) 70%, transparent);
   animation-delay: calc(var(--w, 0) * 0.11s + 0.38s);
 }
+html[data-ui-look="editorial"] .hero-left .hero-title .hero-pen {
+  width: 2.25rem;
+  height: 2.25rem;
+}
 html[data-ui-look="compact"] .hero-left .hero-title.is-inking .hero-word {
   animation-duration: 0.42s;
   animation-delay: calc(var(--w, 0) * 0.06s + 0.08s);
@@ -1127,6 +1136,10 @@ html[data-ui-look="compact"] .hero-left .hero-title.is-inking .hero-word::after 
   height: 0.08em;
   opacity: 0.35;
   animation-delay: calc(var(--w, 0) * 0.06s + 0.18s);
+}
+html[data-ui-look="compact"] .hero-left .hero-title .hero-pen {
+  width: 1.7rem;
+  height: 1.7rem;
 }
 html[data-ui-look="editorial"] .hero-right .hero-mockup {
   animation: look-ed-bob 8s ease-in-out infinite;

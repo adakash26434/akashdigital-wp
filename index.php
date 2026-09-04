@@ -308,15 +308,26 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 .hero-copy-slide.is-active .hero-title,
 .hero-copy-slide.is-active .hero-sub{animation:hero-copy-in .45s ease;}
 @keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hero-left .hero-title{position:relative;overflow:visible}
 .hero-left .hero-title .hero-word{display:inline-block;position:relative}
-.hero-left .hero-title.is-inking .hero-word{animation:hero-ink-write .58s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--w,0)*.09s + .12s)}
-.hero-left .hero-title.is-inking .hero-word::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.12em;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 65%,transparent),color-mix(in srgb,var(--secondary) 45%,transparent));transform:scaleX(0);transform-origin:left center;pointer-events:none;animation:hero-ink-stroke .42s ease both;animation-delay:calc(var(--w,0)*.09s + .28s)}
-@keyframes hero-ink-write{from{opacity:0;transform:translateY(.28em);clip-path:inset(0 105% 0 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
-@keyframes hero-ink-stroke{0%{transform:scaleX(0);opacity:.55}70%{transform:scaleX(1);opacity:.4}100%{transform:scaleX(1);opacity:0}}
+.hero-left .hero-title.is-inking .hero-word{animation:hero-ink-write .62s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--w,0)*.1s + .14s)}
+.hero-left .hero-title.is-inking .hero-word::after{content:"";position:absolute;left:0;right:0;bottom:.06em;height:.11em;border-radius:999px;background:linear-gradient(90deg,color-mix(in srgb,var(--primary) 70%,transparent),color-mix(in srgb,var(--secondary) 45%,transparent));transform:scaleX(0);transform-origin:left center;pointer-events:none;animation:hero-ink-stroke .48s ease both;animation-delay:calc(var(--w,0)*.1s + .32s)}
+@keyframes hero-ink-write{from{opacity:0;transform:translateY(.18em);clip-path:inset(0 105% 0 0)}to{opacity:1;transform:none;clip-path:inset(0 0 0 0)}}
+@keyframes hero-ink-stroke{0%{transform:scaleX(0);opacity:.6}65%{transform:scaleX(1);opacity:.35}100%{transform:scaleX(1);opacity:0}}
 .hero-copy-slide.is-active .hero-title.is-inking{animation:none}
-.hero-copy-slide.is-active .hero-title.is-inking~.hero-bar{animation:hero-ink-bar .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--word-count,5)*.09s + .35s);transform-origin:left center}
-.hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:hero-copy-in .5s ease both;animation-delay:calc(var(--word-count,5)*.09s + .45s)}
+.hero-copy-slide.is-active .hero-title.is-inking~.hero-bar{animation:hero-ink-bar .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--word-count,5)*.1s + .4s);transform-origin:left center}
+.hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:hero-copy-in .5s ease both;animation-delay:calc(var(--word-count,5)*.1s + .5s)}
 @keyframes hero-ink-bar{from{transform:scaleX(.25);opacity:.35}to{transform:none;opacity:1}}
+.hero-left .hero-title .hero-pen{position:absolute;top:0;left:0;z-index:4;width:2.05rem;height:2.05rem;margin:0;padding:0;pointer-events:none;opacity:0;transform:translate(-.35rem,.2rem) rotate(-22deg) scale(.85);transition:opacity .18s ease,transform .28s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 2px 4px color-mix(in srgb,var(--primary) 22%,transparent));will-change:transform,opacity}
+.hero-left .hero-title .hero-pen.is-visible{opacity:1}
+.hero-left .hero-title .hero-pen.is-done{opacity:0;transition-duration:.35s}
+.hero-left .hero-title .hero-pen svg{display:block;width:100%;height:100%;overflow:visible}
+.hero-left .hero-title .hero-pen .pen-ink{fill:var(--primary)}
+.hero-left .hero-title .hero-pen .pen-body{fill:color-mix(in srgb,var(--secondary) 55%,var(--primary))}
+.hero-left .hero-title .hero-pen .pen-metal{fill:color-mix(in srgb,var(--foreground,#0f172a) 55%,#94a3b8)}
+.hero-left .hero-title .hero-pen .pen-hand{fill:color-mix(in srgb,#e8b896 72%,#c4896a)}
+.hero-left .hero-title .hero-pen .pen-sleeve{fill:color-mix(in srgb,var(--primary) 35%,#1e293b)}
+@media (max-width:480px){.hero-left .hero-title .hero-pen{width:1.65rem;height:1.65rem}}
 .hero-dots{display:flex;gap:.4rem;margin-top:.25rem;}
 .st-hero-split.hero-no-right .hero-dots{justify-content:center;}
 .hero-dot{width:.5rem;height:.5rem;border-radius:999px;border:0;padding:0;background:var(--h-badge-border);cursor:pointer;}
@@ -327,6 +338,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   .hero-copy-slide.is-active .hero-sub{animation:none;}
   .hero-left .hero-title .hero-word{opacity:1;transform:none;clip-path:none;animation:none!important}
   .hero-left .hero-title .hero-word::after{display:none}
+  .hero-left .hero-title .hero-pen{display:none!important}
   .hero-copy-slide.is-active .hero-title.is-inking~.hero-bar,
   .hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:none!important}
 }
@@ -557,6 +569,77 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 <script>
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var penTimers = [];
+  var PEN_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">'
+    + '<path class="pen-sleeve" d="M28.2 8.4c1.3-1.3 3.4-1.3 4.7 0l.9.9c1.3 1.3 1.3 3.4 0 4.7l-3.2 3.2-5.6-5.6 3.2-3.2z"/>'
+    + '<path class="pen-body" d="M24.2 10.2l5.6 5.6-11.4 11.4-5.6-5.6 11.4-11.4z"/>'
+    + '<path class="pen-metal" d="M11.6 23.4l5.1 5.1-7.4 2.3 2.3-7.4z"/>'
+    + '<path class="pen-ink" d="M7.2 32.8l2.1-1.4 1.4 1.4-3.5 1.1z"/>'
+    + '<path class="pen-hand" d="M30.6 18.8c1.6.4 2.7 1.9 2.5 3.5-.3 2.2-2.4 3.5-4.5 3.1-1.1-.2-1.9-.6-2.6-1.3l4.6-5.3z"/>'
+    + '<path class="pen-hand" d="M27.8 22.8c.7.9 1.1 1.9.9 3-.3 1.7-1.9 2.8-3.6 2.5-1.2-.2-2.1-.9-2.5-1.9 1.5-.2 3.2-1.4 5.2-3.6z"/>'
+    + '</svg>';
+
+  function clearPenTimers(){
+    penTimers.forEach(function(id){ clearTimeout(id); });
+    penTimers = [];
+  }
+  function inkTiming(){
+    var look = (document.documentElement.getAttribute('data-ui-look') || 'soft').toLowerCase();
+    if (look === 'sharp') return { step: 55, base: 60, dur: 380 };
+    if (look === 'editorial') return { step: 110, base: 180, dur: 720 };
+    if (look === 'compact') return { step: 60, base: 80, dur: 420 };
+    return { step: 100, base: 140, dur: 620 };
+  }
+  function ensurePen(title){
+    var pen = title.querySelector('.hero-pen');
+    if (!pen) {
+      pen = document.createElement('span');
+      pen.className = 'hero-pen';
+      pen.setAttribute('aria-hidden', 'true');
+      pen.innerHTML = PEN_SVG;
+      title.appendChild(pen);
+    }
+    return pen;
+  }
+  function placePen(pen, title, word, progress){
+    var tr = title.getBoundingClientRect();
+    var r = word.getBoundingClientRect();
+    var p = Math.max(0.18, Math.min(0.92, progress == null ? 0.72 : progress));
+    var x = r.left - tr.left + (r.width * p) - 6;
+    var y = r.top - tr.top + (r.height * 0.22) - 4;
+    var tilt = -18 - (Math.sin((progress || 0.5) * Math.PI) * 4);
+    pen.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + tilt + 'deg) scale(1)';
+  }
+  function runPen(title){
+    clearPenTimers();
+    var pen = ensurePen(title);
+    pen.classList.remove('is-visible', 'is-done');
+    pen.style.transform = 'translate(-0.35rem,0.2rem) rotate(-22deg) scale(0.85)';
+    var words = title.querySelectorAll('.hero-word');
+    if (!words.length) return;
+    var t = inkTiming();
+    var i;
+    for (i = 0; i < words.length; i++) {
+      (function(word, idx){
+        var at = t.base + (idx * t.step) + 40;
+        penTimers.push(setTimeout(function(){
+          if (!title.classList.contains('is-inking')) return;
+          placePen(pen, title, word, 0.28);
+          pen.classList.add('is-visible');
+          pen.classList.remove('is-done');
+          penTimers.push(setTimeout(function(){
+            if (!title.classList.contains('is-inking')) return;
+            placePen(pen, title, word, 0.88);
+          }, Math.max(90, t.dur * 0.42)));
+        }, at));
+      })(words[i], i);
+    }
+    var doneAt = t.base + (words.length * t.step) + t.dur + 120;
+    penTimers.push(setTimeout(function(){
+      pen.classList.add('is-done');
+      pen.classList.remove('is-visible');
+    }, doneAt));
+  }
   function wrapTitle(title){
     if (!title || title.dataset.inkReady === '1') return title;
     var w = 0;
@@ -585,6 +668,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
           return;
         }
         if (node.nodeType !== Node.ELEMENT_NODE) return;
+        if (node.classList && node.classList.contains('hero-pen')) return;
         // Keep .tg as one ink unit so gradient text-fill stays intact
         if (node.classList && node.classList.contains('tg')) {
           node.classList.add('hero-word');
@@ -606,9 +690,16 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
       title.classList.add('is-inking');
       return;
     }
+    clearPenTimers();
     title.classList.remove('is-inking');
+    var pen = title.querySelector('.hero-pen');
+    if (pen) {
+      pen.classList.remove('is-visible', 'is-done');
+      pen.style.transform = 'translate(-0.35rem,0.2rem) rotate(-22deg) scale(0.85)';
+    }
     void title.offsetWidth;
     title.classList.add('is-inking');
+    runPen(title);
   }
   window.stHeroInkReplay = function(slide){
     var title = slide && slide.querySelector ? slide.querySelector('.hero-title') : null;

@@ -169,14 +169,18 @@ html:not(.dark) .st-hero {
   margin: 0;
 }
 /* Hero title — pen / ink word reveal (all looks; Soft included via pages.css) */
+.hero-left .hero-title {
+  position: relative;
+  overflow: visible;
+}
 .hero-left .hero-title .hero-word {
   display: inline-block;
   position: relative;
   will-change: transform, opacity, clip-path;
 }
 .hero-left .hero-title.is-inking .hero-word {
-  animation: hero-ink-write 0.58s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--w, 0) * 0.09s + 0.12s);
+  animation: hero-ink-write 0.62s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--w, 0) * 0.1s + 0.14s);
 }
 .hero-left .hero-title.is-inking .hero-word::after {
   content: "";
@@ -184,19 +188,19 @@ html:not(.dark) .st-hero {
   left: 0;
   right: 0;
   bottom: 0.06em;
-  height: 0.12em;
+  height: 0.11em;
   border-radius: 999px;
-  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 65%, transparent), color-mix(in srgb, var(--secondary) 45%, transparent));
+  background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 70%, transparent), color-mix(in srgb, var(--secondary) 45%, transparent));
   transform: scaleX(0);
   transform-origin: left center;
   pointer-events: none;
-  animation: hero-ink-stroke 0.42s ease both;
-  animation-delay: calc(var(--w, 0) * 0.09s + 0.28s);
+  animation: hero-ink-stroke 0.48s ease both;
+  animation-delay: calc(var(--w, 0) * 0.1s + 0.32s);
 }
 @keyframes hero-ink-write {
   from {
     opacity: 0;
-    transform: translateY(0.28em);
+    transform: translateY(0.18em);
     clip-path: inset(0 105% 0 0);
   }
   to {
@@ -206,8 +210,8 @@ html:not(.dark) .st-hero {
   }
 }
 @keyframes hero-ink-stroke {
-  0% { transform: scaleX(0); opacity: 0.55; }
-  70% { transform: scaleX(1); opacity: 0.4; }
+  0% { transform: scaleX(0); opacity: 0.6; }
+  65% { transform: scaleX(1); opacity: 0.35; }
   100% { transform: scaleX(1); opacity: 0; }
 }
 .hero-copy-slide.is-active .hero-title.is-inking {
@@ -215,16 +219,68 @@ html:not(.dark) .st-hero {
 }
 .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar {
   animation: hero-ink-bar 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
-  animation-delay: calc(var(--word-count, 5) * 0.09s + 0.35s);
+  animation-delay: calc(var(--word-count, 5) * 0.1s + 0.4s);
   transform-origin: left center;
 }
 .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
   animation: hero-copy-in 0.5s ease both;
-  animation-delay: calc(var(--word-count, 5) * 0.09s + 0.45s);
+  animation-delay: calc(var(--word-count, 5) * 0.1s + 0.5s);
 }
 @keyframes hero-ink-bar {
   from { transform: scaleX(0.25); opacity: 0.35; }
   to { transform: none; opacity: 1; }
+}
+
+/* Tiny hand + pen that follows each word as it “writes” */
+.hero-left .hero-title .hero-pen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 4;
+  width: 2.05rem;
+  height: 2.05rem;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-0.35rem, 0.2rem) rotate(-22deg) scale(0.85);
+  transition: opacity 0.18s ease, transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--primary) 22%, transparent));
+  will-change: transform, opacity;
+}
+.hero-left .hero-title .hero-pen.is-visible {
+  opacity: 1;
+}
+.hero-left .hero-title .hero-pen.is-done {
+  opacity: 0;
+  transition-duration: 0.35s;
+}
+.hero-left .hero-title .hero-pen svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.hero-left .hero-title .hero-pen .pen-ink {
+  fill: var(--primary);
+}
+.hero-left .hero-title .hero-pen .pen-body {
+  fill: color-mix(in srgb, var(--secondary) 55%, var(--primary));
+}
+.hero-left .hero-title .hero-pen .pen-metal {
+  fill: color-mix(in srgb, var(--foreground, #0f172a) 55%, #94a3b8);
+}
+.hero-left .hero-title .hero-pen .pen-hand {
+  fill: color-mix(in srgb, #e8b896 72%, #c4896a);
+}
+.hero-left .hero-title .hero-pen .pen-sleeve {
+  fill: color-mix(in srgb, var(--primary) 35%, #1e293b);
+}
+@media (max-width: 480px) {
+  .hero-left .hero-title .hero-pen {
+    width: 1.65rem;
+    height: 1.65rem;
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-left .hero-title .hero-word {
@@ -235,6 +291,9 @@ html:not(.dark) .st-hero {
   }
   .hero-left .hero-title .hero-word::after {
     display: none;
+  }
+  .hero-left .hero-title .hero-pen {
+    display: none !important;
   }
   .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar,
   .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
