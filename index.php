@@ -235,6 +235,7 @@ html:not(.dark) .st-hero{background:color-mix(in srgb,var(--primary) 9%,var(--ba
 .st-hero-split.hero-no-right .hero-left .hero-actions,
 .st-hero-split.hero-no-right .hero-trust,
 .st-hero-split.hero-no-right .hero-dots{justify-content:center;}
+/* No-photo slide (any look, Soft dashboard off): always center — even if another slide has a photo */
 @media (min-width:769px){
   .st-hero-split{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:1.5rem;}
   .st-hero-split.hero-no-right{grid-template-columns:1fr!important;}
@@ -243,6 +244,23 @@ html:not(.dark) .st-hero{background:color-mix(in srgb,var(--primary) 9%,var(--ba
   .st-hero-split.hero-no-right .hero-left .hero-sub{margin-inline:auto;}
   .st-hero-split.hero-no-right .hero-left .hero-actions{justify-content:center;}
   .st-hero-split.hero-no-right .hero-trust{justify-content:center;}
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]){
+    grid-template-columns:1fr!important;max-width:min(58rem,100%);margin-inline:auto;text-align:center;
+  }
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-right{display:none!important;}
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left{
+    align-items:center;width:100%;max-width:46rem;margin-inline:auto;
+  }
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-badge,
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-bar{margin-inline:auto;}
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-title,
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-sub,
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-copy{
+    text-align:center!important;margin-inline:auto;
+  }
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-trust,
+  .st-hero-split:not([data-soft-dashboard="1"]):has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots{justify-content:center!important;}
 }
 .hero-left{display:flex;flex-direction:column;gap:.75rem;}
 .hero-left .hero-badge{display:inline-flex;align-items:center;gap:.4rem;width:fit-content;padding:.3rem .875rem .3rem .625rem;border-radius:9999px;font-size:var(--text-xs);font-weight:700;background:var(--h-badge-bg);border:1px solid var(--h-badge-border);color:var(--h-badge-color);backdrop-filter:blur(4px);}
@@ -529,12 +547,28 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var ms = (!reduce && n > 1) ? parseInt(root.getAttribute('data-hero-interval') || '5500', 10) : 0;
 
+  function markNoPhoto(idx){
+    if (copies[idx]) copies[idx].setAttribute('data-has-photo', '0');
+    if (visuals[idx]) visuals[idx].setAttribute('data-has-photo', '0');
+  }
   function slideHasVisual(idx){
-    var slide = copies[idx];
-    if (slide && slide.getAttribute('data-has-photo') === '1') return true;
     // Soft dashboard mockup counts as a right visual for every slide
     if (softDash) return true;
-    return false;
+    var vis = visuals[idx];
+    if (vis) {
+      var img = vis.querySelector('img');
+      if (img) {
+        // Broken / empty image → treat as no photo (center layout)
+        if (img.complete && img.naturalWidth === 0) {
+          markNoPhoto(idx);
+          return false;
+        }
+        return true;
+      }
+      if (vis.querySelector('.hero-mockup')) return true;
+    }
+    var slide = copies[idx];
+    return !!(slide && slide.getAttribute('data-has-photo') === '1');
   }
   function syncLayout(idx){
     if (slideHasVisual(idx)) root.classList.remove('hero-no-right');
@@ -552,6 +586,17 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
     syncLayout(i);
     if (window.stHeroInkReplay && copies[i]) window.stHeroInkReplay(copies[i]);
   }
+
+  // If a slide image 404s, fall back to centered (same as slides with no photo)
+  visuals.forEach(function(v, idx){
+    v.querySelectorAll('img').forEach(function(img){
+      img.addEventListener('error', function(){
+        markNoPhoto(idx);
+        try { img.remove(); } catch (e) {}
+        if (i === idx) syncLayout(i);
+      });
+    });
+  });
 
   syncLayout(0);
   dots.forEach(function(d){

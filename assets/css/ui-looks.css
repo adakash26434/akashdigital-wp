@@ -169,7 +169,8 @@ html[data-ui-look="editorial"] .st-hero-grid { display: none; }
     padding: 4.25rem 0 3rem;
     gap: 2.25rem;
   }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) {
+  /* Left split ONLY when the active slide actually has a photo */
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) {
     grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
     text-align: start;
     max-width: none;
@@ -201,18 +202,18 @@ html[data-ui-look="editorial"] .st-hero-grid { display: none; }
   html[data-ui-look="editorial"] .st-hero-split.hero-no-right .hero-dots {
     justify-content: center;
   }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left { align-items: flex-start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .hero-bar { margin-inline: 0; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .hero-sub { margin-inline: 0; text-align: start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .hero-title { text-align: start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .hero-actions { justify-content: flex-start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-trust { justify-content: flex-start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-dots { justify-content: flex-start; }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-right {
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left { align-items: flex-start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left .hero-bar { margin-inline: 0; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left .hero-sub { margin-inline: 0; text-align: start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left .hero-title { text-align: start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left .hero-actions { justify-content: flex-start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-trust { justify-content: flex-start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-dots { justify-content: flex-start; }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-right {
     max-width: none;
     margin-inline: 0;
+    display: flex;
   }
-  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-right { display: flex; }
 }
 
 html[data-ui-look="editorial"] .hero-left .hero-title {
@@ -815,7 +816,7 @@ html[data-ui-look="editorial"] .page-hero__subtitle {
   margin-left: auto;
   margin-right: auto;
 }
-html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left .hero-sub {
+html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right):has(.hero-copy-slide.is-active[data-has-photo="1"]) .hero-left .hero-sub {
   text-align: start;
   margin-left: 0;
   margin-right: 0;
@@ -2332,6 +2333,26 @@ html[data-ui-look="compact"] .hero-visual-slide:empty {
     align-items: center;
     margin-inline: auto;
   }
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-title,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-title,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-title,
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-sub,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-sub,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-sub,
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-copy,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-copy,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-copy {
+    text-align: center !important;
+    margin-inline: auto;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-badge,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-badge,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-badge,
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-bar,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-bar,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-bar {
+    margin-inline: auto;
+  }
   html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
   html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
   html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
@@ -2341,7 +2362,7 @@ html[data-ui-look="compact"] .hero-visual-slide:empty {
   html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots,
   html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots,
   html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots {
-    justify-content: center;
+    justify-content: center !important;
   }
 }
 
