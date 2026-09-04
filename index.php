@@ -222,7 +222,7 @@ html:not(.dark) .st-hero{background:color-mix(in srgb,var(--primary) 9%,var(--ba
 .st-hero-mesh .m3{width:25vw;height:25vw;top:40%;right:30%;background:var(--hero-mesh-3,color-mix(in srgb,var(--primary) 45%,var(--secondary)));animation-delay:-12s;opacity:.2;}
 @keyframes mesh-float{0%{transform:translate(0,0) scale(1);}33%{transform:translate(3%,-4%) scale(1.08);}66%{transform:translate(-2%,3%) scale(.95);}100%{transform:translate(4%,2%) scale(1.05);}}
 .st-hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--h-grid) 1px,transparent 1px),linear-gradient(90deg,var(--h-grid) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;}
-.st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;}
+.st-hero-split{position:relative;z-index:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:center;padding:3rem 0 2rem;transition:padding .28s ease,gap .28s ease,max-width .28s ease;}
 .st-hero-split.hero-no-right{grid-template-columns:1fr!important;max-width:min(58rem,100%);margin-inline:auto;text-align:center;padding-inline:0;}
 .st-hero-split.hero-no-right .hero-right{display:none!important;}
 .st-hero-split.hero-no-right .hero-left{align-items:center;width:100%;max-width:46rem;margin-inline:auto;}
@@ -305,8 +305,8 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 .hero-copy-slide.is-active{display:block;}
 .hero-visual-slide{display:none;width:100%;min-height:8rem;}
 .hero-visual-slide.is-active{display:flex;align-items:center;justify-content:center;}
-.hero-copy-slide.is-active .hero-title,
-.hero-copy-slide.is-active .hero-sub{animation:hero-copy-in .45s ease;}
+.hero-copy-slide.is-active .hero-title{animation:none}
+.hero-copy-slide.is-active .hero-sub{animation:none}
 @keyframes hero-copy-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .hero-left .hero-title{position:relative;overflow:visible}
 .hero-left .hero-title .hero-word{display:inline-block;position:relative}
@@ -316,9 +316,10 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 @keyframes hero-ink-stroke{0%{transform:scaleX(0);opacity:.6}65%{transform:scaleX(1);opacity:.35}100%{transform:scaleX(1);opacity:0}}
 .hero-copy-slide.is-active .hero-title.is-inking{animation:none}
 .hero-copy-slide.is-active .hero-title.is-inking~.hero-bar{animation:hero-ink-bar .55s cubic-bezier(.22,1,.36,1) both;animation-delay:calc(var(--word-count,5)*.1s + .4s);transform-origin:left center}
+.st-hero-split.hero-no-right .hero-title.is-inking~.hero-bar{transform-origin:center center}
 .hero-copy-slide.is-active .hero-title.is-inking~.hero-sub{animation:hero-copy-in .5s ease both;animation-delay:calc(var(--word-count,5)*.1s + .5s)}
 @keyframes hero-ink-bar{from{transform:scaleX(.25);opacity:.35}to{transform:none;opacity:1}}
-.hero-left .hero-title .hero-pen{position:absolute;top:0;left:0;z-index:4;width:2.05rem;height:2.05rem;margin:0;padding:0;pointer-events:none;opacity:0;transform:translate(-.35rem,.2rem) rotate(-22deg) scale(.85);transition:opacity .18s ease,transform .28s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 2px 4px color-mix(in srgb,var(--primary) 22%,transparent));will-change:transform,opacity}
+.hero-left .hero-title .hero-pen{position:absolute;top:0;left:0;z-index:4;width:2.05rem;height:2.05rem;margin:0;padding:0;pointer-events:none;opacity:0;transform:translate(0,0) rotate(-22deg) scale(.85);transform-origin:18% 82%;transition:opacity .18s ease,transform .28s cubic-bezier(.22,1,.36,1);filter:drop-shadow(0 2px 4px color-mix(in srgb,var(--primary) 22%,transparent));will-change:transform,opacity}
 .hero-left .hero-title .hero-pen.is-visible{opacity:1}
 .hero-left .hero-title .hero-pen.is-done{opacity:0;transition-duration:.35s}
 .hero-left .hero-title .hero-pen svg{display:block;width:100%;height:100%;overflow:visible}
@@ -570,6 +571,7 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var penTimers = [];
+  var playGen = 0;
   var PEN_SVG = '<svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">'
     + '<path class="pen-sleeve" d="M28.2 8.4c1.3-1.3 3.4-1.3 4.7 0l.9.9c1.3 1.3 1.3 3.4 0 4.7l-3.2 3.2-5.6-5.6 3.2-3.2z"/>'
     + '<path class="pen-body" d="M24.2 10.2l5.6 5.6-11.4 11.4-5.6-5.6 11.4-11.4z"/>'
@@ -601,20 +603,29 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
     }
     return pen;
   }
+  function hideOtherPens(activeTitle){
+    document.querySelectorAll('.hero-title .hero-pen').forEach(function(p){
+      if (activeTitle && activeTitle.contains(p)) return;
+      p.classList.remove('is-visible');
+      p.classList.add('is-done');
+    });
+  }
   function placePen(pen, title, word, progress){
     var tr = title.getBoundingClientRect();
     var r = word.getBoundingClientRect();
+    if (!tr.width || !r.width) return;
     var p = Math.max(0.18, Math.min(0.92, progress == null ? 0.72 : progress));
-    var x = r.left - tr.left + (r.width * p) - 6;
-    var y = r.top - tr.top + (r.height * 0.22) - 4;
+    // transform-origin is near the nib tip — place tip on the writing point
+    var x = r.left - tr.left + (r.width * p);
+    var y = r.top - tr.top + (r.height * 0.58);
     var tilt = -18 - (Math.sin((progress || 0.5) * Math.PI) * 4);
     pen.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + tilt + 'deg) scale(1)';
   }
-  function runPen(title){
+  function runPen(title, gen){
     clearPenTimers();
     var pen = ensurePen(title);
     pen.classList.remove('is-visible', 'is-done');
-    pen.style.transform = 'translate(-0.35rem,0.2rem) rotate(-22deg) scale(0.85)';
+    pen.style.transform = 'translate(0,0) rotate(-22deg) scale(0.85)';
     var words = title.querySelectorAll('.hero-word');
     if (!words.length) return;
     var t = inkTiming();
@@ -623,12 +634,12 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
       (function(word, idx){
         var at = t.base + (idx * t.step) + 40;
         penTimers.push(setTimeout(function(){
-          if (!title.classList.contains('is-inking')) return;
+          if (gen !== playGen || !title.classList.contains('is-inking')) return;
           placePen(pen, title, word, 0.28);
           pen.classList.add('is-visible');
           pen.classList.remove('is-done');
           penTimers.push(setTimeout(function(){
-            if (!title.classList.contains('is-inking')) return;
+            if (gen !== playGen || !title.classList.contains('is-inking')) return;
             placePen(pen, title, word, 0.88);
           }, Math.max(90, t.dur * 0.42)));
         }, at));
@@ -636,9 +647,16 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
     }
     var doneAt = t.base + (words.length * t.step) + t.dur + 120;
     penTimers.push(setTimeout(function(){
+      if (gen !== playGen) return;
       pen.classList.add('is-done');
       pen.classList.remove('is-visible');
     }, doneAt));
+  }
+  function setWordCount(title, count){
+    var n = String(Math.max(count, 1));
+    title.style.setProperty('--word-count', n);
+    var host = title.closest('.hero-copy-slide') || title.parentElement;
+    if (host) host.style.setProperty('--word-count', n);
   }
   function wrapTitle(title){
     if (!title || title.dataset.inkReady === '1') return title;
@@ -669,7 +687,6 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
         }
         if (node.nodeType !== Node.ELEMENT_NODE) return;
         if (node.classList && node.classList.contains('hero-pen')) return;
-        // Keep .tg as one ink unit so gradient text-fill stays intact
         if (node.classList && node.classList.contains('tg')) {
           node.classList.add('hero-word');
           node.style.setProperty('--w', String(w++));
@@ -679,13 +696,15 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
       });
     }
     walk(title);
-    title.style.setProperty('--word-count', String(Math.max(w, 1)));
+    setWordCount(title, w);
     title.dataset.inkReady = '1';
     return title;
   }
   function play(title){
     if (!title) return;
     wrapTitle(title);
+    var gen = ++playGen;
+    hideOtherPens(title);
     if (reduce) {
       title.classList.add('is-inking');
       return;
@@ -695,18 +714,30 @@ html:not(.dark) .hero-left .hero-title .tg{background:linear-gradient(135deg,var
     var pen = title.querySelector('.hero-pen');
     if (pen) {
       pen.classList.remove('is-visible', 'is-done');
-      pen.style.transform = 'translate(-0.35rem,0.2rem) rotate(-22deg) scale(0.85)';
+      pen.style.transform = 'translate(0,0) rotate(-22deg) scale(0.85)';
     }
     void title.offsetWidth;
-    title.classList.add('is-inking');
-    runPen(title);
+    var start = function(){
+      if (gen !== playGen) return;
+      title.classList.add('is-inking');
+      runPen(title, gen);
+    };
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(function(){
+        requestAnimationFrame(start);
+      });
+    } else {
+      requestAnimationFrame(start);
+    }
   }
   window.stHeroInkReplay = function(slide){
     var title = slide && slide.querySelector ? slide.querySelector('.hero-title') : null;
     play(title);
   };
   function boot(){
-    document.querySelectorAll('.hero-copy-slide.is-active .hero-title, .hero-left > .hero-title').forEach(play);
+    document.querySelectorAll('.hero-copy-slide.is-active .hero-title').forEach(play);
+    var lone = document.querySelector('.hero-left > .hero-title');
+    if (lone && !lone.closest('.hero-copy-slide')) play(lone);
     document.querySelectorAll('.hero-copy-slide:not(.is-active) .hero-title').forEach(wrapTitle);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);

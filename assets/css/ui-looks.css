@@ -1030,10 +1030,6 @@ html[data-ui-look="compact"] .news-card__media--placeholder {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
-@keyframes look-ed-bar {
-  from { transform: scaleX(0.35); opacity: 0.4; }
-  to   { transform: scaleX(1); opacity: 1; }
-}
 @keyframes look-tg-shift {
   0%, 100% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -1098,7 +1094,6 @@ html[data-ui-look="editorial"] .st-hero-mesh span {
 }
 html[data-ui-look="editorial"] .hero-left .hero-bar {
   transform-origin: center;
-  animation: look-ed-bar 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
 }
 /* Ink writing personality — Soft uses pages.css defaults; pen follows in JS */
 html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word {
@@ -1140,6 +1135,27 @@ html[data-ui-look="compact"] .hero-left .hero-title.is-inking .hero-word::after 
 html[data-ui-look="compact"] .hero-left .hero-title .hero-pen {
   width: 1.7rem;
   height: 1.7rem;
+}
+
+/* Bar / sub delays match each look’s ink cadence */
+html[data-ui-look="sharp"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar {
+  animation-delay: calc(var(--word-count, 5) * 0.055s + 0.28s);
+}
+html[data-ui-look="sharp"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
+  animation-delay: calc(var(--word-count, 5) * 0.055s + 0.36s);
+}
+html[data-ui-look="editorial"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar {
+  animation-delay: calc(var(--word-count, 5) * 0.11s + 0.55s);
+  transform-origin: center center;
+}
+html[data-ui-look="editorial"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
+  animation-delay: calc(var(--word-count, 5) * 0.11s + 0.65s);
+}
+html[data-ui-look="compact"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-bar {
+  animation-delay: calc(var(--word-count, 5) * 0.06s + 0.32s);
+}
+html[data-ui-look="compact"] .hero-copy-slide.is-active .hero-title.is-inking ~ .hero-sub {
+  animation-delay: calc(var(--word-count, 5) * 0.06s + 0.4s);
 }
 html[data-ui-look="editorial"] .hero-right .hero-mockup {
   animation: look-ed-bob 8s ease-in-out infinite;
