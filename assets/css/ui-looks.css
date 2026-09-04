@@ -1985,3 +1985,288 @@ html[data-ui-look="sharp"] .btn-white:hover,
 html[data-ui-look="sharp"] .btn-glass:hover {
   transform: none;
 }
+
+/* ════════════════════════════════════════════════════════════
+   Hero personality pass — Soft untouched.
+   Same markup/copy; chrome only so Sharp / Editorial / Compact
+   read differently at first glance (safe CSS).
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Sharp: blueprint / formal notice board ── */
+html[data-ui-look="sharp"] .st-hero {
+  border-top: 3px solid var(--primary);
+  border-bottom: 1px solid var(--border);
+}
+html[data-ui-look="sharp"] .st-hero-grid {
+  background-size: 22px 22px;
+  opacity: 0.9;
+}
+html[data-ui-look="sharp"] .hero-left .hero-title {
+  text-shadow: none;
+  font-weight: 800;
+  letter-spacing: -0.028em;
+}
+html[data-ui-look="sharp"] .hero-left .hero-badge {
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  background: var(--card);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
+  padding: 0.28rem 0.7rem 0.28rem 0.55rem;
+}
+html[data-ui-look="sharp"] .hero-left .hero-actions .btn {
+  border-radius: 0.15rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+html[data-ui-look="sharp"] .hero-left .hero-actions .btn-outline-light {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--h-text);
+}
+html[data-ui-look="sharp"] .hero-left .hero-actions .btn-outline-light:hover {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+html[data-ui-look="sharp"] .hero-trust {
+  margin-top: 0.85rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid var(--border);
+  font-variant-numeric: tabular-nums;
+}
+html[data-ui-look="sharp"] .hero-dots {
+  gap: 0.4rem;
+}
+html[data-ui-look="sharp"] .hero-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 0.05rem;
+}
+html[data-ui-look="sharp"] .hero-dot.is-active {
+  width: 1.1rem;
+  border-radius: 0.05rem;
+}
+@media (min-width: 769px) {
+  html[data-ui-look="sharp"] .st-hero-split:not(.hero-no-right) .hero-left {
+    padding-left: 1rem;
+    border-left: 3px solid var(--primary);
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right {
+    max-width: min(44rem, 100%);
+    padding-top: 3.5rem;
+    padding-bottom: 2.75rem;
+  }
+  html[data-ui-look="sharp"] .st-hero-split.hero-no-right .hero-left {
+    max-width: 40rem;
+  }
+  html[data-ui-look="sharp"] .hero-right .hero-mockup {
+    border: 1px solid var(--border);
+    box-shadow: none;
+  }
+}
+
+/* ── Editorial: calm magazine stack ── */
+html[data-ui-look="editorial"] .st-hero {
+  border-top: none;
+  border-bottom: none;
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--secondary) 12%, var(--background)) 0%,
+      var(--look-paper) 42%,
+      color-mix(in srgb, var(--primary) 5%, var(--background)) 100%
+    ) !important;
+}
+html[data-ui-look="editorial"] .st-hero-mesh {
+  opacity: 0.55;
+}
+html[data-ui-look="editorial"] .hero-left .hero-title {
+  text-shadow: none;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+}
+html[data-ui-look="editorial"] .hero-left .hero-badge {
+  border: none;
+  background: color-mix(in srgb, var(--primary) 9%, transparent);
+  color: var(--primary);
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  text-transform: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0.35rem 0.95rem;
+}
+html[data-ui-look="editorial"] .hero-left .hero-bar {
+  width: 5.5rem;
+  height: 2px;
+  opacity: 0.85;
+}
+html[data-ui-look="editorial"] .hero-left .hero-actions {
+  gap: 0.85rem;
+  margin-top: 0.85rem;
+}
+html[data-ui-look="editorial"] .hero-left .hero-actions .btn {
+  padding: 0.8rem 1.65rem;
+  font-weight: 600;
+}
+html[data-ui-look="editorial"] .hero-left .hero-actions .btn-outline-light {
+  background: transparent;
+  border: 1.5px solid color-mix(in srgb, var(--primary) 28%, var(--border));
+  color: var(--h-text);
+}
+html[data-ui-look="editorial"] .hero-left .hero-actions .btn-outline-light:hover {
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  border-color: var(--primary);
+}
+html[data-ui-look="editorial"] .hero-trust {
+  margin-top: 1.1rem;
+  gap: 0.65rem 1.5rem;
+  border-top: none;
+  padding-top: 0;
+}
+html[data-ui-look="editorial"] .hero-trust span {
+  letter-spacing: 0.01em;
+}
+html[data-ui-look="editorial"] .hero-dots {
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+html[data-ui-look="editorial"] .hero-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  opacity: 0.45;
+}
+html[data-ui-look="editorial"] .hero-dot.is-active {
+  width: 0.5rem;
+  height: 0.5rem;
+  opacity: 1;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+@media (min-width: 769px) {
+  html[data-ui-look="editorial"] .st-hero-split.hero-no-right {
+    max-width: min(52rem, 100%);
+    padding: 5rem 0 3.5rem;
+    gap: 1.75rem;
+  }
+  html[data-ui-look="editorial"] .st-hero-split.hero-no-right .hero-left {
+    max-width: 42rem;
+    gap: 0.95rem;
+  }
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-left {
+    padding-left: 0;
+    border-left: none;
+    gap: 0.9rem;
+  }
+  html[data-ui-look="editorial"] .hero-right .hero-mockup {
+    border: none;
+    border-radius: 1.75rem;
+    box-shadow:
+      0 28px 70px color-mix(in srgb, var(--primary) 14%, transparent),
+      0 0 0 1px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+/* ── Compact: denser utility hero ── */
+html[data-ui-look="compact"] .st-hero {
+  border-top: 1px solid color-mix(in srgb, var(--primary) 18%, var(--border));
+  border-bottom: 1px solid var(--border);
+  background:
+    linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--primary) 7%, var(--background)) 0%,
+      var(--look-wash) 55%,
+      color-mix(in srgb, var(--secondary) 6%, var(--background)) 100%
+    ) !important;
+}
+html[data-ui-look="compact"] .st-hero-grid {
+  display: none;
+}
+html[data-ui-look="compact"] .st-hero-mesh span {
+  opacity: 0.18;
+  filter: blur(48px);
+}
+html[data-ui-look="compact"] .hero-left .hero-title {
+  text-shadow: none;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.12;
+}
+html[data-ui-look="compact"] .hero-left .hero-badge {
+  border-radius: 0.35rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.22rem 0.55rem;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+html[data-ui-look="compact"] .hero-left .hero-actions {
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+html[data-ui-look="compact"] .hero-left .hero-actions .btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.8125rem;
+  border-radius: 0.45rem;
+}
+html[data-ui-look="compact"] .hero-left .hero-actions .btn-outline-light {
+  background: color-mix(in srgb, var(--primary) 5%, var(--card));
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
+}
+html[data-ui-look="compact"] .hero-trust {
+  margin-top: 0.35rem;
+  gap: 0.35rem 0.85rem;
+  padding-top: 0;
+  border-top: none;
+}
+html[data-ui-look="compact"] .hero-trust span {
+  font-size: 0.7rem;
+}
+html[data-ui-look="compact"] .hero-dots {
+  gap: 0.3rem;
+  margin-top: 0.15rem;
+}
+html[data-ui-look="compact"] .hero-dot {
+  width: 0.9rem;
+  height: 0.2rem;
+  border-radius: 999px;
+  opacity: 0.35;
+}
+html[data-ui-look="compact"] .hero-dot.is-active {
+  width: 1.35rem;
+  height: 0.2rem;
+  opacity: 1;
+}
+@media (min-width: 769px) {
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right {
+    max-width: min(38rem, 100%);
+    padding: 2rem 0 1.5rem;
+    gap: 0.85rem;
+  }
+  html[data-ui-look="compact"] .st-hero-split.hero-no-right .hero-left {
+    max-width: 34rem;
+    gap: 0.4rem;
+  }
+  html[data-ui-look="compact"] .st-hero-split:not(.hero-no-right) {
+    padding: 1.5rem 0 1.1rem;
+    gap: 1rem;
+  }
+  html[data-ui-look="compact"] .st-hero-split:not(.hero-no-right) .hero-left {
+    border-left: none;
+    padding-left: 0;
+  }
+  html[data-ui-look="compact"] .hero-right .hero-mockup {
+    max-width: 380px;
+    border-radius: 0.75rem;
+    box-shadow: 0 10px 28px color-mix(in srgb, var(--primary) 10%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-look="editorial"] .hero-dot.is-active {
+    box-shadow: none;
+  }
+}
