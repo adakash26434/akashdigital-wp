@@ -51,7 +51,7 @@ html[data-ui-look="sharp"] #st-navbar.is-scrolled {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--primary);
 }
 html[data-ui-look="sharp"] .nav-pill {
   border-radius: 0;
@@ -2457,21 +2457,15 @@ html[data-ui-look="compact"] .st-hero-split {
 /* ── Sharp: formal text bar + ledger footer ── */
 html[data-ui-look="sharp"] #st-navbar,
 html[data-ui-look="sharp"] #st-navbar.is-scrolled {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 2px solid var(--primary);
   box-shadow: none;
   background: var(--card);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
 }
 html[data-ui-look="sharp"] #st-navbar::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--primary);
-  pointer-events: none;
+  content: none;
+  display: none;
 }
 html[data-ui-look="sharp"] .nav-pill:hover {
   background: transparent;
