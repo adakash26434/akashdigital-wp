@@ -135,11 +135,14 @@ try {
   </div>
 
   <!-- Bottom bar -->
+  <?php $__uiLookFoot = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft'; ?>
   <div class="footer-bottom-bar">
-    <div class="container footer-bottom-bar__inner" style="padding-top:1rem;padding-bottom:1rem;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:0.75rem;">
+    <div class="container footer-bottom-bar__inner">
+      <?php
+        ob_start();
+      ?>
       <p class="footer-bottom-meta">
-        <span class="footer-copy-text">
-        <?php
+        <span class="footer-copy-text"><?php
           $__copyTpl = trim((string)($__s['copyright_text'] ?? ''));
           if ($__copyTpl === '' && function_exists('cms')) {
               $__copyTpl = cms($__s, 'copyright_text', '');
@@ -153,10 +156,12 @@ try {
           } else {
               echo sprintf(e(__('footer_copyright')), date('Y'), e($__s['site_name'] ?? SITE_NAME));
           }
-        ?>
-        </span><span class="footer-dev-credit"> | Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer">Aakash Adhikari</a></span>
+        ?></span><span class="footer-dev-credit">Developed &amp; Design By <a href="https://tankaadhikari.com.np/#about" target="_blank" rel="noopener noreferrer">Aakash Adhikari</a></span>
       </p>
-      <div class="footer-bottom-links" style="display:flex;align-items:center;gap:0.625rem;flex-wrap:wrap;">
+      <?php $__footerMetaHtml = ob_get_clean();
+        ob_start();
+      ?>
+      <div class="footer-bottom-links">
         <a href="<?= url('privacy.php') ?>" class="footer-link">गोपनीयता</a>
         <span class="footer-dot">•</span>
         <a href="<?= url('terms.php') ?>" class="footer-link">सेवाका सर्त</a>
@@ -165,6 +170,16 @@ try {
         <span class="footer-dot">•</span>
         <a href="<?= url('sitemap.php') ?>" class="footer-link">Sitemap</a>
       </div>
+      <?php
+        $__footerLinksHtml = ob_get_clean();
+        // Sharp / Editorial: links first so visual order matches keyboard focus.
+        if (in_array($__uiLookFoot, ['sharp', 'editorial'], true)) {
+          echo $__footerLinksHtml, $__footerMetaHtml;
+        } else {
+          echo $__footerMetaHtml, $__footerLinksHtml;
+        }
+        unset($__footerMetaHtml, $__footerLinksHtml, $__uiLookFoot, $__copyTpl);
+      ?>
     </div>
   </div>
 </footer>

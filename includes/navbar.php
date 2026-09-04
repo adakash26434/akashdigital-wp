@@ -61,13 +61,29 @@ if (!isset($__s)) $__s = siteSettings();
 
     <!-- Desktop primary nav -->
     <ul id="st-desktop-nav" style="list-style:none;margin:0;padding:0;">
-
-      <?php foreach ($navLinks as $l):
-        $active = $__currentPath === $l['href'];
-        $navKey = preg_replace('/\.php$/', '', (string)$l['href']);
-        if ($navKey === 'index') $navKey = 'home';
+      <?php
+        $__uiLookNav = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
+        // Soft default order; other looks match visual + keyboard/tab order.
+        $__deskNavOrder = match ($__uiLookNav) {
+          'sharp'     => ['home', 'products', 'services', 'company', 'contact', 'more'],
+          'editorial' => ['home', 'company', 'products', 'services', 'contact', 'more'],
+          'compact'   => ['home', 'products', 'contact', 'services', 'company', 'more'],
+          default     => ['home', 'products', 'services', 'contact', 'company', 'more'],
+        };
+        $__navByKey = [];
+        foreach ($navLinks as $__nl) {
+          $__k = preg_replace('/\.php$/', '', (string)$__nl['href']);
+          if ($__k === 'index') $__k = 'home';
+          $__navByKey[$__k] = $__nl;
+        }
+        $companyActive = in_array($__currentPath, ['about.php', 'careers.php'], true);
+        $moreActive = in_array($__currentPath, array_column($moreLinks, 'href'), true);
+        foreach ($__deskNavOrder as $__navId):
+          if (isset($__navByKey[$__navId])):
+            $l = $__navByKey[$__navId];
+            $active = $__currentPath === $l['href'];
       ?>
-      <li data-nav="<?= e($navKey) ?>">
+      <li data-nav="<?= e($__navId) ?>">
         <a href="<?= url($l['href']) ?>"
            <?= $active ? 'aria-current="page"' : '' ?>
            class="nav-pill <?= $active ? 'active' : '' ?>">
@@ -77,10 +93,9 @@ if (!isset($__s)) $__s = siteSettings();
           <?= e(__($l['key'])) ?>
         </a>
       </li>
-      <?php endforeach; ?>
-
-      <!-- Company dropdown -->
-      <?php $companyActive = in_array($__currentPath, ['about.php','careers.php']); ?>
+      <?php
+          elseif ($__navId === 'company'):
+      ?>
       <li data-nav="company" class="pos-rel" style="position:relative;" x-data="{companyOpen:false}" @click.outside="companyOpen=false">
         <button @click="companyOpen=!companyOpen"
           :aria-expanded="companyOpen.toString()"
@@ -112,9 +127,9 @@ if (!isset($__s)) $__s = siteSettings();
           <?php endforeach; ?>
         </div>
       </li>
-
-      <!-- More dropdown -->
-      <?php $moreActive = in_array($__currentPath, array_column($moreLinks, 'href')); ?>
+      <?php
+          elseif ($__navId === 'more'):
+      ?>
       <li data-nav="more" class="pos-rel" style="position:relative;" x-data="{moreOpen:false}" @click.outside="moreOpen=false">
         <button @click="moreOpen=!moreOpen"
           :aria-expanded="moreOpen.toString()"
@@ -146,6 +161,11 @@ if (!isset($__s)) $__s = siteSettings();
           <?php endforeach; ?>
         </div>
       </li>
+      <?php
+          endif;
+        endforeach;
+        unset($__uiLookNav, $__deskNavOrder, $__navByKey, $__nl, $__k, $__navId, $l, $active, $companyActive, $moreActive, $ci, $cl, $cActive, $cBadge, $ml, $mActive, $mBadge);
+      ?>
     </ul>
 
     <!-- Desktop actions -->

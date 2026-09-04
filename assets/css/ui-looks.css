@@ -2686,45 +2686,44 @@ html.dark[data-ui-look="editorial"] #st-navbar.is-scrolled {
 }
 
 /* ════════════════════════════════════════════════════════════
-   Nav order + footer credit placement — Soft DOM/order unchanged.
-   Desktop nav only (mobile keeps familiar Soft list order).
+   Nav order + footer credit placement — Soft DOM unchanged.
+   Desktop nav order is PHP (matches keyboard). CSS only styles.
    ════════════════════════════════════════════════════════════ */
 
-/* Soft: Home · Products · Services · Contact · Company · More (DOM)
-   Sharp: Company before Contact (institutional)
-   Editorial: Company early after Home (story / brand)
-   Compact: Contact earlier after Products (conversion) */
-@media (min-width: 1024px) {
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="home"] { order: 1; }
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="products"] { order: 2; }
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="services"] { order: 3; }
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="company"] { order: 4; }
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="contact"] { order: 5; }
-  html[data-ui-look="sharp"] #st-desktop-nav > [data-nav="more"] { order: 6; }
-
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="home"] { order: 1; }
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="company"] { order: 2; }
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="products"] { order: 3; }
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="services"] { order: 4; }
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="contact"] { order: 5; }
-  html[data-ui-look="editorial"] #st-desktop-nav > [data-nav="more"] { order: 6; }
-
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="home"] { order: 1; }
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="products"] { order: 2; }
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="contact"] { order: 3; }
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="services"] { order: 4; }
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="company"] { order: 5; }
-  html[data-ui-look="compact"] #st-desktop-nav > [data-nav="more"] { order: 6; }
+/* Soft: inline “ | Developed…” before credit */
+.footer-bottom-bar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+.footer-bottom-meta { margin: 0; }
+.footer-bottom-links {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  flex-wrap: wrap;
+}
+.footer-dev-credit::before {
+  content: " | ";
+}
+html[data-ui-look="sharp"] .footer-dev-credit::before,
+html[data-ui-look="editorial"] .footer-dev-credit::before,
+html[data-ui-look="compact"] .footer-dev-credit::before {
+  content: none;
 }
 
-/* Footer bottom — Soft keeps copy+dev left, links right */
+/* Sharp: links left, copyright + credit right (DOM already links-first) */
 html[data-ui-look="sharp"] .footer-bottom-bar__inner {
-  flex-direction: row-reverse;
   justify-content: space-between;
 }
 html[data-ui-look="sharp"] .footer-bottom-meta {
   text-align: right;
   margin: 0;
+  margin-left: auto;
 }
 html[data-ui-look="sharp"] .footer-dev-credit {
   display: block;
@@ -2751,7 +2750,6 @@ html[data-ui-look="editorial"] .footer-dev-credit {
 }
 html[data-ui-look="editorial"] .footer-bottom-links {
   justify-content: center;
-  order: -1;
 }
 
 html[data-ui-look="compact"] .footer-bottom-bar__inner {
@@ -2775,6 +2773,9 @@ html[data-ui-look="compact"] .footer-bottom-links {
   width: 100%;
   justify-content: flex-start;
 }
+html[data-ui-look="compact"] .footer-dev-credit::before {
+  content: none;
+}
 
 @media (max-width: 640px) {
   html[data-ui-look="sharp"] .footer-bottom-bar__inner,
@@ -2786,6 +2787,7 @@ html[data-ui-look="compact"] .footer-bottom-links {
   html[data-ui-look="sharp"] .footer-bottom-meta,
   html[data-ui-look="compact"] .footer-bottom-meta {
     text-align: center;
+    margin-left: 0;
   }
   html[data-ui-look="sharp"] .footer-dev-credit,
   html[data-ui-look="compact"] .footer-dev-credit {
@@ -2796,6 +2798,7 @@ html[data-ui-look="compact"] .footer-bottom-links {
   html[data-ui-look="editorial"] .footer-bottom-links {
     justify-content: center;
     width: auto;
+    order: 0;
   }
 }
 
@@ -2968,6 +2971,17 @@ html[data-ui-look="sharp"] .cta-banner .btn-white,
 html[data-ui-look="sharp"] .cta-banner .btn-glass {
   border-radius: 0.15rem;
   box-shadow: none;
+}
+html[data-ui-look="sharp"] .cta-banner .btn-white:hover {
+  background: #fff;
+  color: var(--primary);
+  border-color: #fff;
+  filter: brightness(0.96);
+}
+html[data-ui-look="sharp"] .cta-banner .btn-glass:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.55);
 }
 
 html[data-ui-look="editorial"] .cta-banner {
