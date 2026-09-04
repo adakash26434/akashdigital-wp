@@ -2639,16 +2639,16 @@ html[data-ui-look="compact"] .st-scroll-top {
 }
 
 /* Mobile drawer + quote CTAs stay on-look */
-html[data-ui-look="sharp"] #st-mobile-panel .btn,
-html[data-ui-look="sharp"] #st-mobile-panel .btn-primary {
+html[data-ui-look="sharp"] #mobile-menu .btn,
+html[data-ui-look="sharp"] #mobile-menu .btn-primary {
   border-radius: 0.15rem;
 }
-html[data-ui-look="editorial"] #st-mobile-panel .btn,
-html[data-ui-look="editorial"] #st-mobile-panel .btn-primary {
+html[data-ui-look="editorial"] #mobile-menu .btn,
+html[data-ui-look="editorial"] #mobile-menu .btn-primary {
   border-radius: 999px;
 }
-html[data-ui-look="compact"] #st-mobile-panel .btn,
-html[data-ui-look="compact"] #st-mobile-panel .btn-primary {
+html[data-ui-look="compact"] #mobile-menu .btn,
+html[data-ui-look="compact"] #mobile-menu .btn-primary {
   border-radius: 0.4rem;
 }
 
