@@ -511,17 +511,19 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
 .look-mini--soft{border-radius:0.85rem;background:color-mix(in srgb, var(--primary) 16%, var(--muted));}
 .look-mini--soft .bar,.look-mini--soft .bar2{background:color-mix(in srgb, var(--primary) 50%, var(--foreground));}
 .look-mini--soft .card{border-radius:0.45rem;width:32%;right:8%;background:var(--card);box-shadow:0 0 0 1px var(--border);}
-.look-mini--sharp{border-radius:0;}
+.look-mini--sharp{border-radius:0;background:color-mix(in srgb, var(--primary) 10%, var(--muted));
+  background-image:linear-gradient(color-mix(in srgb, var(--primary) 12%, transparent) 1px, transparent 1px),linear-gradient(90deg, color-mix(in srgb, var(--primary) 12%, transparent) 1px, transparent 1px);
+  background-size:10px 10px;}
 .look-mini--sharp .card{border-radius:0;width:36%;right:6%;box-shadow:inset 3px 0 0 var(--primary);}
 .look-mini--sharp .bar,.look-mini--sharp .bar2{border-radius:0;}
 .look-mini--editorial{border-radius:1.1rem;background:color-mix(in srgb, var(--secondary) 18%, var(--muted));}
-.look-mini--editorial .bar{width:72%;height:8px;left:14%;top:22%;background:var(--primary);}
-.look-mini--editorial .bar2{width:48%;left:26%;top:42%;background:color-mix(in srgb, var(--primary) 40%, var(--foreground));}
-.look-mini--editorial .card{width:70%;height:28%;left:15%;right:auto;bottom:10%;border-radius:0.7rem;background:var(--card);}
+.look-mini--editorial .bar{width:48%;height:8px;left:10%;top:20%;background:var(--primary);}
+.look-mini--editorial .bar2{width:34%;left:10%;top:40%;background:color-mix(in srgb, var(--primary) 40%, var(--foreground));}
+.look-mini--editorial .card{width:34%;height:48%;right:8%;left:auto;bottom:12%;border-radius:0.85rem;background:var(--card);box-shadow:0 0 0 1px color-mix(in srgb, var(--primary) 16%, var(--border));}
 .look-mini--compact{border-radius:0.4rem;}
-.look-mini--compact .bar,.look-mini--compact .bar2{top:10%;height:4px;}
-.look-mini--compact .bar2{top:20%;}
-.look-mini--compact .card{height:22%;width:80%;left:10%;right:auto;bottom:8%;border-radius:0.2rem;}
+.look-mini--compact .bar,.look-mini--compact .bar2{top:14%;height:4px;left:10%;}
+.look-mini--compact .bar2{top:26%;}
+.look-mini--compact .card{height:36%;width:34%;right:8%;left:auto;bottom:14%;border-radius:0.35rem;}
 </style>
 <?php if ($success): ?><div class="alert alert-success mb-1-25"><?= e($success) ?></div><?php endif; ?>
 <?php if ($error):   ?><div class="alert alert-error mb-1-25"  ><?= e($error) ?></div><?php endif; ?>
@@ -1341,7 +1343,7 @@ if (function_exists('isSuperadminRole') && isSuperadminRole()) {
       <?= csrfField() ?><input type="hidden" name="section" value="look">
       <div class="st-card p-card-lg" style="max-width:1100px;">
         <h3 class="h-eyebrow">Public site look</h3>
-        <p class="caption-meta" style="margin-bottom:1rem;">Superadmin only. Pick one layout for visitors. <strong>Brand colors stay the same on every look</strong> — they come from <a href="#brand_colors" @click="tab='brand_colors'; history.replaceState(null,'','#brand_colors')">Brand Colors</a> (plus Homepage mesh colors on Soft / Compact / Editorial). Only spacing, navbar shape, and cards change. Admin and the client portal are not affected.</p>
+        <p class="caption-meta" style="margin-bottom:1rem;">Superadmin only. Pick one layout for visitors. <strong>Brand colors stay the same on every look</strong> — they come from <a href="#brand_colors" @click="tab='brand_colors'; history.replaceState(null,'','#brand_colors')">Brand Colors</a> (plus Homepage mesh colors on Soft / Compact / Editorial). Looks change spacing, navbar shape, cards, hero chrome, and product explorer placement — not page text. Admin and the client portal are not affected.</p>
         <p class="caption-meta" style="margin-bottom:1.25rem;">Live now: <strong><?= e($looks[$currentLook]['label'] ?? 'Soft') ?></strong>. Keep <strong>Soft</strong> to match the current site.</p>
         <div class="look-pick" role="radiogroup" aria-label="Public site look">
           <?php foreach ($looks as $key => $meta):

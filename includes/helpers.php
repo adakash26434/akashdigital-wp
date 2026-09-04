@@ -416,22 +416,22 @@ function stPublicUiLooks(): array {
     return [
         'soft'      => [
             'label' => 'Soft',
-            'hint'  => 'Today’s live layout — rounded cards, split hero, glass navbar.',
+            'hint'  => 'Today’s live layout — rounded cards, split hero + dashboard, glass navbar.',
             'best'  => 'Recommended default. Choose this to keep the site as visitors already know it.',
         ],
         'sharp'     => [
             'label' => 'Sharp',
-            'hint'  => 'Square chrome, left titles, 2-column catalog, product list on the right, striped footer.',
+            'hint'  => 'Blueprint hero, square chrome, 2-column catalog, product list on the right, striped footer.',
             'best'  => 'Best for a formal / government-style feel. Same pages, text, and brand colors.',
         ],
         'editorial' => [
             'label' => 'Editorial',
-            'hint'  => 'Stacked hero, pill nav, product tabs on top, magazine cards, roomy footer.',
+            'hint'  => 'Magazine hero (photo split / centered without), pill nav, top product tabs, roomy footer.',
             'best'  => 'Best for a calmer, story-led look. Same pages, text, and brand colors.',
         ],
         'compact'   => [
             'label' => 'Compact',
-            'hint'  => 'Denser type, top product tabs, 4-column catalog on wide screens, shorter footer.',
+            'hint'  => 'Denser hero and type, top product tabs, 4-column catalog on wide screens, shorter footer.',
             'best'  => 'Best if you want more on one screen. Same pages, text, and brand colors.',
         ],
     ];

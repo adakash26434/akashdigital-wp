@@ -203,11 +203,10 @@ foreach ($_heroSlides as $_hs) {
   }
 }
 unset($_hs);
-$_hasHeroPhoto = $_heroHasSlideImg || $_heroDashboardImage !== '';
 $_uiLookNow = function_exists('stPublicUiLook') ? stPublicUiLook() : 'soft';
 $_softDash = ($_uiLookNow === 'soft' && $_showDashboard);
-// Keep the right rail in the DOM when any slide can show a photo (or Soft dashboard).
-$_showHeroRight = $_softDash || $_hasHeroPhoto;
+// Soft: dashboard (or slide photos). Other looks: only real slide photos — never a lone dashboard fallback.
+$_showHeroRight = $_softDash || $_heroHasSlideImg;
 // Start centered unless the first slide actually has a visual.
 $_firstSlideHasPhoto = !empty($_heroSlides[0]['img']);
 $_firstSlideHasVisual = $_firstSlideHasPhoto || $_softDash;

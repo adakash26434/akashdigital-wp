@@ -2270,3 +2270,151 @@ html[data-ui-look="compact"] .hero-dot.is-active {
     box-shadow: none;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Completion pass — remaining UX (Soft untouched)
+   ════════════════════════════════════════════════════════════ */
+
+/* Hide empty visual shells (no-photo slides on non-Soft) */
+html[data-ui-look="sharp"] .hero-visual-slide:empty,
+html[data-ui-look="editorial"] .hero-visual-slide:empty,
+html[data-ui-look="compact"] .hero-visual-slide:empty {
+  display: none !important;
+  min-height: 0 !important;
+}
+
+/* No-JS / late-JS safety: collapse when active copy has no photo */
+@media (min-width: 769px) {
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]),
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]),
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) {
+    grid-template-columns: 1fr !important;
+    max-width: min(58rem, 100%);
+    margin-inline: auto;
+    text-align: center;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-right,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-right,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-right {
+    display: none !important;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left {
+    align-items: center;
+    margin-inline: auto;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-left .hero-actions,
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-trust,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-trust,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-trust,
+  html[data-ui-look="sharp"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots,
+  html[data-ui-look="editorial"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots,
+  html[data-ui-look="compact"] .st-hero-split:has(.hero-copy-slide.is-active[data-has-photo="0"]) .hero-dots {
+    justify-content: center;
+  }
+}
+
+/* Mobile: stack active photo under copy (Soft keeps hide-right) */
+@media (max-width: 768px) {
+  html[data-ui-look="sharp"] .st-hero-split:not(.hero-no-right) .hero-right,
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-right,
+  html[data-ui-look="compact"] .st-hero-split:not(.hero-no-right) .hero-right {
+    display: flex !important;
+    width: 100%;
+    max-width: min(26rem, 100%);
+    margin: 1.1rem auto 0;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:not(.hero-no-right) .hero-right .hero-mockup,
+  html[data-ui-look="editorial"] .st-hero-split:not(.hero-no-right) .hero-right .hero-mockup,
+  html[data-ui-look="compact"] .st-hero-split:not(.hero-no-right) .hero-right .hero-mockup {
+    transform: none;
+    max-width: 100%;
+  }
+  html[data-ui-look="sharp"] .st-hero-split:not(.hero-no-right) .hero-left {
+    border-left: none;
+    padding-left: 0;
+  }
+  html[data-ui-look="sharp"] .hero-left .hero-badge,
+  html[data-ui-look="editorial"] .hero-left .hero-badge,
+  html[data-ui-look="compact"] .hero-left .hero-badge {
+    margin-inline: auto;
+  }
+}
+
+/* Compact floats match dense chrome */
+html[data-ui-look="compact"] #wa-float-btn,
+html[data-ui-look="compact"] #float-chat-btn {
+  border-radius: 0.45rem;
+}
+
+/* Sharp page-hero CTAs stay square */
+html[data-ui-look="sharp"] .page-hero__actions .btn,
+html[data-ui-look="sharp"] .page-hero__actions .btn-sm,
+html[data-ui-look="sharp"] .page-hero__actions .btn-md,
+html[data-ui-look="sharp"] .page-hero__actions .btn-lg {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="sharp"] .page-hero {
+  border-top: 2px solid var(--primary);
+}
+
+/* Dark: personality chrome uses hero tokens */
+html.dark[data-ui-look="sharp"] .hero-left .hero-badge {
+  background: var(--h-badge-bg);
+  border-color: var(--h-badge-border);
+  border-left-color: var(--primary);
+  color: var(--h-badge-color);
+}
+html.dark[data-ui-look="sharp"] .hero-left .hero-actions .btn-outline-light {
+  background: color-mix(in srgb, var(--h-text) 6%, transparent);
+  border-color: var(--h-badge-border);
+  color: var(--h-text);
+}
+html.dark[data-ui-look="sharp"] .hero-trust {
+  border-top-color: var(--h-badge-border);
+}
+html.dark[data-ui-look="editorial"] .hero-left .hero-badge {
+  background: color-mix(in srgb, var(--primary) 16%, transparent);
+  color: var(--h-badge-color);
+}
+html.dark[data-ui-look="editorial"] .hero-left .hero-actions .btn-outline-light {
+  border-color: var(--h-badge-border);
+  color: var(--h-text);
+}
+html.dark[data-ui-look="compact"] .hero-left .hero-badge {
+  background: var(--h-badge-bg);
+  border-color: var(--h-badge-border);
+  color: var(--h-badge-color);
+}
+html.dark[data-ui-look="compact"] .hero-left .hero-actions .btn-outline-light {
+  background: var(--h-badge-bg);
+  border-color: var(--h-badge-border);
+  color: var(--h-text);
+}
+
+/* Smooth layout swap when rotator toggles photo ↔ center */
+html[data-ui-look="sharp"] .st-hero-split,
+html[data-ui-look="editorial"] .st-hero-split,
+html[data-ui-look="compact"] .st-hero-split {
+  transition: padding 0.28s ease, gap 0.28s ease, max-width 0.28s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-look="sharp"] .st-hero-split,
+  html[data-ui-look="editorial"] .st-hero-split,
+  html[data-ui-look="compact"] .st-hero-split,
+  html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word,
+  html[data-ui-look="editorial"] .hero-left .hero-title.is-inking .hero-word,
+  html[data-ui-look="compact"] .hero-left .hero-title.is-inking .hero-word {
+    transition: none !important;
+    animation: none !important;
+  }
+  html[data-ui-look="sharp"] .hero-left .hero-title.is-inking .hero-word::after,
+  html[data-ui-look="editorial"] .hero-left .hero-title.is-inking .hero-word::after,
+  html[data-ui-look="compact"] .hero-left .hero-title.is-inking .hero-word::after {
+    display: none !important;
+  }
+}
