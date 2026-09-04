@@ -1955,17 +1955,8 @@ html[data-ui-look="editorial"] .cta-banner__bg,
 html[data-ui-look="compact"] .cta-banner__bg {
   display: none;
 }
-html[data-ui-look="sharp"] .cta-banner__eyebrow {
-  border-radius: 0;
-  letter-spacing: 0.12em;
-}
 html[data-ui-look="compact"] .cta-banner {
-  padding-block: 2.25rem;
-}
-html[data-ui-look="editorial"] .cta-banner .btn,
-html[data-ui-look="editorial"] .cta-banner .btn-white,
-html[data-ui-look="editorial"] .cta-banner .btn-glass {
-  border-radius: 999px;
+  padding-block: 1.85rem;
 }
 
 /* Sharp feature-card hover shine off */
@@ -2829,55 +2820,157 @@ html[data-ui-look="compact"] .news-card {
   border-radius: 0.5rem;
 }
 
-/* ── CTA banner personality ── */
+/* ── CTA banner personality (contrast-safe) ──
+   Soft keeps gradient + white ink.
+   Sharp = solid primary (white ink readable).
+   Editorial / Compact = light wash + dark ink. */
 html[data-ui-look="sharp"] .cta-banner {
   border-radius: 0;
-  border: 1px solid var(--border);
-  border-top: 3px solid var(--primary);
+  border: none;
+  border-top: 3px solid color-mix(in srgb, #000 18%, var(--primary));
   box-shadow: none;
-  background: var(--look-paper);
+  background: var(--primary) !important;
 }
+html[data-ui-look="sharp"] .cta-banner__inner,
 html[data-ui-look="sharp"] .cta-banner__title {
+  color: #fff;
   letter-spacing: -0.03em;
   font-weight: 800;
 }
+html[data-ui-look="sharp"] .cta-banner__subtitle,
+html[data-ui-look="sharp"] .cta-banner__trust-item {
+  color: rgba(255, 255, 255, 0.86);
+}
+html[data-ui-look="sharp"] .cta-banner__eyebrow {
+  border-radius: 0;
+  letter-spacing: 0.12em;
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #fff;
+}
 html[data-ui-look="sharp"] .cta-banner .btn,
 html[data-ui-look="sharp"] .cta-banner .btn-primary,
-html[data-ui-look="sharp"] .cta-banner .btn-white {
+html[data-ui-look="sharp"] .cta-banner .btn-white,
+html[data-ui-look="sharp"] .cta-banner .btn-glass {
   border-radius: 0.15rem;
   box-shadow: none;
 }
+
 html[data-ui-look="editorial"] .cta-banner {
   border-radius: 1.75rem;
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 14%, var(--border));
   box-shadow: none;
-  background: var(--look-wash);
+  background: var(--look-wash) !important;
   padding-block: 3.5rem;
 }
+html[data-ui-look="editorial"] .cta-banner__inner,
 html[data-ui-look="editorial"] .cta-banner__title {
+  color: var(--foreground);
   letter-spacing: -0.045em;
   font-weight: 700;
   max-width: 28rem;
   margin-inline: auto;
 }
+html[data-ui-look="editorial"] .cta-banner__subtitle,
+html[data-ui-look="editorial"] .cta-banner__trust-item {
+  color: var(--muted-foreground);
+}
+html[data-ui-look="editorial"] .cta-banner__trust-item [data-lucide],
+html[data-ui-look="editorial"] .cta-banner__trust-item svg {
+  color: var(--primary);
+}
 html[data-ui-look="editorial"] .cta-banner__eyebrow {
   border-radius: 999px;
   letter-spacing: 0.14em;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+  color: var(--primary);
+  backdrop-filter: none;
 }
+html[data-ui-look="editorial"] .cta-banner .btn-white {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
+  border-radius: 999px;
+}
+html[data-ui-look="editorial"] .cta-banner .btn-white:hover {
+  background: var(--primary-dark, color-mix(in srgb, #000 12%, var(--primary)));
+  color: #fff;
+}
+html[data-ui-look="editorial"] .cta-banner .btn-glass {
+  background: transparent;
+  color: var(--foreground);
+  border: 1.5px solid color-mix(in srgb, var(--primary) 28%, var(--border));
+  border-radius: 999px;
+  backdrop-filter: none;
+}
+html[data-ui-look="editorial"] .cta-banner .btn-glass:hover {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border-color: var(--primary);
+  color: var(--foreground);
+}
+
 html[data-ui-look="compact"] .cta-banner {
   border-radius: 0.55rem;
   border: 1px solid color-mix(in srgb, var(--primary) 16%, var(--border));
-  background: color-mix(in srgb, var(--primary) 5%, var(--card));
+  background: color-mix(in srgb, var(--primary) 6%, var(--card)) !important;
   padding-block: 1.85rem;
+  box-shadow: none;
 }
+html[data-ui-look="compact"] .cta-banner__inner,
 html[data-ui-look="compact"] .cta-banner__title {
+  color: var(--foreground);
   font-size: clamp(1.25rem, 2.8vw, 1.7rem);
 }
-html[data-ui-look="compact"] .cta-banner .btn,
-html[data-ui-look="compact"] .cta-banner .btn-sm {
+html[data-ui-look="compact"] .cta-banner__subtitle,
+html[data-ui-look="compact"] .cta-banner__trust-item {
+  color: var(--muted-foreground);
+}
+html[data-ui-look="compact"] .cta-banner__trust-item [data-lucide],
+html[data-ui-look="compact"] .cta-banner__trust-item svg {
+  color: var(--primary);
+}
+html[data-ui-look="compact"] .cta-banner__eyebrow {
+  border-radius: 0.35rem;
+  background: color-mix(in srgb, var(--primary) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 20%, var(--border));
+  color: var(--primary);
+  backdrop-filter: none;
+  letter-spacing: 0.08em;
+}
+html[data-ui-look="compact"] .cta-banner .btn-white {
+  background: var(--primary);
+  color: #fff;
+  border-color: transparent;
   border-radius: 0.4rem;
   padding: 0.45rem 0.9rem;
   font-size: 0.8125rem;
+}
+html[data-ui-look="compact"] .cta-banner .btn-glass {
+  background: var(--card);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 0.4rem;
+  backdrop-filter: none;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.8125rem;
+}
+
+html.dark[data-ui-look="editorial"] .cta-banner,
+html.dark[data-ui-look="compact"] .cta-banner {
+  background: color-mix(in srgb, var(--primary) 14%, var(--card)) !important;
+}
+html.dark[data-ui-look="editorial"] .cta-banner__inner,
+html.dark[data-ui-look="editorial"] .cta-banner__title,
+html.dark[data-ui-look="compact"] .cta-banner__inner,
+html.dark[data-ui-look="compact"] .cta-banner__title {
+  color: var(--foreground);
+}
+html.dark[data-ui-look="editorial"] .cta-banner__subtitle,
+html.dark[data-ui-look="editorial"] .cta-banner__trust-item,
+html.dark[data-ui-look="compact"] .cta-banner__subtitle,
+html.dark[data-ui-look="compact"] .cta-banner__trust-item {
+  color: var(--muted-foreground);
 }
 
 /* ── Page-hero formal / magazine / utility edges ── */
@@ -2944,12 +3037,10 @@ html.dark[data-ui-look="sharp"] .portfolio-card,
 html.dark[data-ui-look="sharp"] .news-card {
   border-color: color-mix(in srgb, var(--primary) 28%, var(--border));
 }
-html.dark[data-ui-look="editorial"] .page-hero,
-html.dark[data-ui-look="editorial"] .cta-banner {
+html.dark[data-ui-look="editorial"] .page-hero {
   background: var(--look-wash);
 }
-html.dark[data-ui-look="compact"] .st-stats .st-stat,
-html.dark[data-ui-look="compact"] .cta-banner {
+html.dark[data-ui-look="compact"] .st-stats .st-stat {
   background: color-mix(in srgb, var(--primary) 10%, var(--card));
   border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
 }
@@ -2962,5 +3053,269 @@ html.dark[data-ui-look="compact"] .cta-banner {
   html[data-ui-look="sharp"] .portfolio-card:hover .portfolio-card__media img,
   html[data-ui-look="compact"] .portfolio-card:hover .portfolio-card__media img {
     transform: none;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Continuation pass — leftover Soft-identical surfaces.
+   Soft untouched. Partners / FAQ / features / testi / pricing / nav dd.
+   ════════════════════════════════════════════════════════════ */
+
+/* ── Partner / trust marquee cards ── */
+html[data-ui-look="sharp"] .st-marq-card,
+html[data-ui-look="sharp"] .ptn-card {
+  border-radius: 0;
+  box-shadow: none;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  transform: none;
+}
+html[data-ui-look="sharp"] .st-marq-card:hover,
+html[data-ui-look="sharp"] .ptn-card:hover {
+  transform: none;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+}
+html[data-ui-look="sharp"] .st-marq-card__logo,
+html[data-ui-look="sharp"] .ptn-card__logo,
+html[data-ui-look="sharp"] .st-marq-card__icon {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] .st-marq-card,
+html[data-ui-look="editorial"] .ptn-card {
+  border-radius: 1.25rem;
+  box-shadow: none;
+  border: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+}
+html[data-ui-look="editorial"] .st-marq-card:hover,
+html[data-ui-look="editorial"] .ptn-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 14px 32px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+html[data-ui-look="editorial"] .st-marq-card__logo,
+html[data-ui-look="editorial"] .ptn-card__logo,
+html[data-ui-look="editorial"] .st-marq-card__icon {
+  border-radius: 999px;
+}
+html[data-ui-look="compact"] .st-marq-card,
+html[data-ui-look="compact"] .ptn-card {
+  border-radius: 0.5rem;
+  box-shadow: none;
+  border: 1px solid var(--border);
+  padding: 0.65rem 0.75rem;
+}
+html[data-ui-look="compact"] .st-marq-card:hover,
+html[data-ui-look="compact"] .ptn-card:hover {
+  transform: none;
+  box-shadow: none;
+  background: var(--muted);
+}
+html[data-ui-look="compact"] .st-marq-card__logo,
+html[data-ui-look="compact"] .ptn-card__logo,
+html[data-ui-look="compact"] .st-marq-card__icon {
+  border-radius: 0.4rem;
+}
+
+/* ── FAQ accordion ── */
+html[data-ui-look="sharp"] .faq-category {
+  border-radius: 0;
+  letter-spacing: 0.1em;
+}
+html[data-ui-look="sharp"] .accordion-item {
+  border-bottom-color: var(--border);
+}
+html[data-ui-look="sharp"] .accordion-trigger {
+  border-radius: 0;
+  font-weight: 600;
+}
+html[data-ui-look="sharp"] .accordion-trigger:hover {
+  background: color-mix(in srgb, var(--primary) 5%, transparent);
+}
+html[data-ui-look="editorial"] .faq-group {
+  margin-bottom: 3rem;
+}
+html[data-ui-look="editorial"] .faq-category {
+  border-radius: 999px;
+  letter-spacing: 0.14em;
+  margin-bottom: 1.25rem;
+}
+html[data-ui-look="editorial"] .accordion-item {
+  border: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--primary) 12%, var(--border));
+  padding-block: 0.15rem;
+}
+html[data-ui-look="editorial"] .accordion-trigger {
+  border-radius: 0.85rem;
+  padding-block: 1rem;
+  font-weight: 600;
+}
+html[data-ui-look="compact"] .faq-group {
+  margin-bottom: 1.5rem;
+}
+html[data-ui-look="compact"] .faq-category {
+  border-radius: 0.35rem;
+  font-size: 0.68rem;
+  margin-bottom: 0.65rem;
+}
+html[data-ui-look="compact"] .accordion-trigger {
+  border-radius: 0.4rem;
+  padding-block: 0.7rem;
+  font-size: 0.9rem;
+}
+html[data-ui-look="compact"] .accordion-content {
+  font-size: 0.875rem;
+  line-height: 1.55;
+}
+
+/* ── Feature-card Soft shine off for Editorial / Compact ── */
+html[data-ui-look="editorial"] .feature-card::after,
+html[data-ui-look="compact"] .feature-card::after {
+  display: none;
+}
+html[data-ui-look="editorial"] .feature-card:hover {
+  transform: translateY(-4px);
+}
+html[data-ui-look="compact"] .feature-card:hover {
+  transform: none;
+}
+html[data-ui-look="editorial"] .feature-card__icon {
+  border-radius: 999px;
+}
+html[data-ui-look="compact"] .feature-card__icon {
+  border-radius: 0.45rem;
+}
+html[data-ui-look="sharp"] .feature-card__icon {
+  border-radius: 0.15rem;
+}
+
+/* ── Testimonials: dark / quote / avatar / hover ── */
+html[data-ui-look="sharp"] .testi-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+html[data-ui-look="sharp"] .testi-card--dark {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--primary);
+  color: var(--foreground);
+}
+html[data-ui-look="sharp"] .testi-card__quote-mark {
+  opacity: 0.12;
+  font-family: var(--font-display);
+}
+html[data-ui-look="sharp"] .testi-card__avatar {
+  border-radius: 0.15rem;
+}
+html[data-ui-look="editorial"] .testi-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 36px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+html[data-ui-look="editorial"] .testi-card--dark {
+  background: color-mix(in srgb, var(--primary) 12%, var(--card));
+  border: none;
+}
+html[data-ui-look="editorial"] .testi-card__quote-mark {
+  opacity: 0.1;
+  font-size: 4rem;
+}
+html[data-ui-look="editorial"] .testi-card__avatar {
+  border-radius: 999px;
+}
+html[data-ui-look="compact"] .testi-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+html[data-ui-look="compact"] .testi-card--dark {
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+  border: 1px solid var(--border);
+}
+html[data-ui-look="compact"] .testi-card__quote-mark {
+  display: none;
+}
+html[data-ui-look="compact"] .testi-card__avatar {
+  border-radius: 0.4rem;
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+/* ── Pricing highlight + hover ── */
+html[data-ui-look="sharp"] .price-card--highlight {
+  background: var(--primary);
+  box-shadow: none;
+  border-radius: 0;
+}
+html[data-ui-look="sharp"] .price-card:not(.price-card--highlight):hover {
+  transform: none;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--primary) 5%, var(--card));
+}
+html[data-ui-look="editorial"] .price-card--highlight {
+  background: linear-gradient(160deg, var(--primary), color-mix(in srgb, var(--secondary) 55%, var(--primary)));
+  border-radius: 1.5rem;
+  box-shadow: 0 20px 44px color-mix(in srgb, var(--primary) 22%, transparent);
+}
+html[data-ui-look="editorial"] .price-card:not(.price-card--highlight):hover {
+  transform: translateY(-5px);
+}
+html[data-ui-look="compact"] .price-card--highlight {
+  background: var(--primary);
+  border-radius: 0.55rem;
+  box-shadow: none;
+}
+html[data-ui-look="compact"] .price-card:not(.price-card--highlight):hover {
+  transform: none;
+  box-shadow: none;
+}
+html[data-ui-look="compact"] .price-card__features {
+  gap: 0.35rem;
+  font-size: 0.8125rem;
+}
+html[data-ui-look="compact"] .price-card__price-row {
+  padding-block: 0.65rem;
+}
+
+/* ── Nav dropdown items + caret ── */
+html[data-ui-look="sharp"] .st-dd-item {
+  border-radius: 0;
+}
+html[data-ui-look="sharp"] .st-dd-item:hover,
+html[data-ui-look="sharp"] .st-dd-item.active {
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+}
+html[data-ui-look="sharp"] .st-dd-caret {
+  border-radius: 0;
+}
+html[data-ui-look="editorial"] .st-dd-item {
+  border-radius: 999px;
+  padding-inline: 0.85rem;
+}
+html[data-ui-look="editorial"] .st-dd-item.active {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+html[data-ui-look="editorial"] .st-dropdown {
+  padding: 0.5rem;
+  box-shadow: 0 16px 40px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+html[data-ui-look="compact"] .st-dd-item {
+  border-radius: 0.4rem;
+  padding-block: 0.4rem;
+  font-size: 0.8125rem;
+}
+html[data-ui-look="compact"] .st-dropdown {
+  padding: 0.3rem;
+  min-width: 11.5rem;
+}
+html[data-ui-look="compact"] .mobile-nav-item {
+  border-radius: 0.4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-look="editorial"] .st-marq-card:hover,
+  html[data-ui-look="editorial"] .ptn-card:hover,
+  html[data-ui-look="editorial"] .feature-card:hover,
+  html[data-ui-look="editorial"] .testi-card:hover,
+  html[data-ui-look="editorial"] .price-card:not(.price-card--highlight):hover {
+    transform: none;
+    box-shadow: none;
   }
 }
