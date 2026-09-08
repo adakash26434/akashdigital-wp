@@ -47,7 +47,7 @@ require_once 'includes/header.php';
   <div style="font-size:0.875rem;color:var(--muted-foreground);margin-bottom:1.5rem;">
     Updated <?= e(date('M j, Y', strtotime($art['updated_at']))) ?> · <?= (int)$art['views'] ?> views
   </div>
-  <div class="kb-body" style="line-height:1.7;color:var(--foreground);"><?= $art['body'] /* admin-trusted HTML */ ?></div>
+  <div class="kb-body" style="line-height:1.7;color:var(--foreground);"><?= stSanitizeRichHtml((string)($art['body'] ?? '')) ?></div>
 
   <div style="margin-top:3rem;padding:1.5rem;background:var(--muted);border-radius:0.75rem;text-align:center;">
     <?php if (!empty($_GET['thanks'])): ?>

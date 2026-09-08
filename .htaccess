@@ -48,9 +48,9 @@ Options -Indexes
   Header always set Permissions-Policy "camera=(), microphone=(), geolocation=()"
   # HSTS — enforced; all assets and fonts are self-hosted so HTTPS is safe to require.
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-  # CSP — enforce mode. All JS/CSS/fonts are self-hosted (no external CDN needed).
-  # img-src allows data: (inline SVG/base64 thumbs) and https: (user-uploaded images via external URLs).
-  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: https:; connect-src 'self'; frame-ancestors 'none'"
+  # CSP — Alpine needs unsafe-eval (standard build). Self-hosted assets only.
+  # Do not drop unsafe-eval without Alpine CSP build migration.
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'"
 </IfModule>
 
 # ── Static asset caching ─────────────────────────────────────────────

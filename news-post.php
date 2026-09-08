@@ -144,7 +144,7 @@ require_once 'includes/header.php';
     <div class="prose" style="text-align:justify;line-height:1.8;">
       <?php
       if (preg_match('/<[a-z][\s\S]*>/i', $rawContent)) {
-        echo $rawContent;
+        echo stSanitizeRichHtml($rawContent);
       } else {
         echo nl2br(e($rawContent));
       }

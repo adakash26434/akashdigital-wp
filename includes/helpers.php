@@ -45,6 +45,67 @@ function e($v): string {
     return htmlspecialchars((string)($v ?? ''), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/**
+ * Soft Soft-safe rich HTML for admin-authored public content (KB / news).
+ * Keeps formatting tags; strips scripts, handlers, and dangerous URLs.
+ */
+function stSanitizeRichHtml(string $html): string {
+    if ($html === '') return '';
+
+    // Drop whole dangerous elements (content included)
+    $html = preg_replace('#<(script|iframe|object|embed|form|link|meta|style|svg|math)\b[^>]*>.*?</\1\s*>#is', '', $html) ?? $html;
+    $html = preg_replace('#<(script|iframe|object|embed|form|link|meta|style|svg|math)\b[^>]*/?>#is', '', $html) ?? $html;
+
+    // Strip inline event handlers (onclick=…)
+    $html = preg_replace('/\son[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/iu', '', $html) ?? $html;
+
+    // Neutralize javascript: / data:text/html URLs in attributes
+    $html = preg_replace('/\s(href|src|xlink:href)\s*=\s*(["\'])\s*javascript:[^"\']*\2/iu', ' $1=$2#$2', $html) ?? $html;
+    $html = preg_replace('/\s(href|src)\s*=\s*(["\'])\s*data:text\/html[^"\']*\2/iu', ' $1=$2#$2', $html) ?? $html;
+
+    $allowed = '<p><br><strong><b><em><i><u><ul><ol><li><a><h2><h3><h4><h5><blockquote><code><pre><table><thead><tbody><tr><th><td><img><hr><span><div>';
+    $html = strip_tags($html, $allowed);
+
+    // Rebuild <a> with safe href only
+    $html = preg_replace_callback('#<a\b([^>]*)>#iu', static function (array $m): string {
+        $attrs = $m[1];
+        if (!preg_match('/\bhref\s*=\s*(["\'])(.*?)\1/iu', $attrs, $hm)) {
+            return '<a>';
+        }
+        $href = trim(html_entity_decode($hm[2], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        if ($href === '' || preg_match('#^\s*(javascript|vbscript|data):#iu', $href)) {
+            return '<a>';
+        }
+        if (!preg_match('#^(https?:)?//|^/|^\#|^mailto:#iu', $href)) {
+            return '<a>';
+        }
+        return '<a href="' . htmlspecialchars($href, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" rel="noopener noreferrer">';
+    }, $html) ?? $html;
+
+    // Rebuild <img> with safe src only
+    $html = preg_replace_callback('#<img\b([^>]*)/?>#iu', static function (array $m): string {
+        $attrs = $m[1];
+        if (!preg_match('/\bsrc\s*=\s*(["\'])(.*?)\1/iu', $attrs, $sm)) {
+            return '';
+        }
+        $src = trim(html_entity_decode($sm[2], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        if ($src === '' || preg_match('#^\s*(javascript|vbscript):#iu', $src)) {
+            return '';
+        }
+        if (!preg_match('#^(https?:)?//|^/|^data:image/(png|jpe?g|gif|webp|svg\+xml)#iu', $src)) {
+            return '';
+        }
+        $alt = '';
+        if (preg_match('/\balt\s*=\s*(["\'])(.*?)\1/iu', $attrs, $am)) {
+            $alt = $am[2];
+        }
+        return '<img src="' . htmlspecialchars($src, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8')
+            . '" alt="' . htmlspecialchars($alt, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '">';
+    }, $html) ?? $html;
+
+    return $html;
+}
+
 // नेपालीमा: Asset (CSS/JS/image) ko full URL banaune
 function asset(string $path): string {
     return rtrim(SITE_URL, '/') . '/assets/' . ltrim($path, '/');

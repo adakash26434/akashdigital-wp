@@ -16,7 +16,8 @@ function apiJsonResponse(int $code, array $data): void {
 function apiBearerToken(): ?string {
     $h = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? '';
     if (stripos($h, 'Bearer ') === 0) return trim(substr($h, 7));
-    return $_GET['token'] ?? null; // optional fallback for diagnostics only
+    // Do not accept ?token= (leaks via logs/Referer). Use Authorization header only.
+    return null;
 }
 
 // नेपालीमा: apiAuthenticate() — yo function le aafno kaam garchha

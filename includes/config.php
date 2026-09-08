@@ -111,8 +111,10 @@ if (!headers_sent()) {
         header('X-Frame-Options: SAMEORIGIN');
     }
     header('Referrer-Policy: strict-origin-when-cross-origin');
-    // Baseline CSP (allows inline scripts for Alpine.js; plan nonce migration later)
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.tailwindcss.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'");
+    // CSP — Alpine.js standard build needs 'unsafe-eval' for x-data expressions.
+    // Do NOT remove unsafe-eval without migrating to Alpine CSP build site-wide.
+    // Align with .htaccess (self-hosted assets; no CDN). Multiple CSP headers all apply.
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; img-src 'self' data: blob: https:; connect-src 'self'; frame-ancestors 'none'");
     // Permissions-Policy: disable unused powerful features
     header('Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=()');
     // HSTS: only send on HTTPS connections (production)
