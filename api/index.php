@@ -268,15 +268,15 @@ if ($route === 'newsletter' && $method === 'POST') {
     if (!empty(trim((string)($d['website'] ?? '')))) {
         ok(['message' => 'Subscribed successfully.'], 201); // honeypot — silent success
     }
-    if (!ipThrottle('newsletter', 8)) {
-        err('rate_limit', 'Too many requests. Please wait and try again.', 429);
-    }
     $email = trim((string)($d['email'] ?? ''));
     $name  = trim((string)($d['name'] ?? ''));
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) err('validation','Valid email required.');
     if ($name !== '') {
         $spam = stContactSpamReason($name, $email, 'Newsletter subscription request from website.', '', '');
         if ($spam) err('validation', $spam);
+    }
+    if (!ipThrottle('newsletter', 8)) {
+        err('rate_limit', 'Too many requests. Please wait and try again.', 429);
     }
     try {
         execute("INSERT INTO subscribers (email,name) VALUES (?,?) ON DUPLICATE KEY UPDATE status='active'", [$email, $name !== '' ? $name : null]);
@@ -295,22 +295,15 @@ if ($route === 'demo-request' && $method === 'POST') {
     $product = trim((string)($d['product'] ?? ''));
     if (!$name || !$email) err('validation','name and email required.');
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) err('validation', 'Valid email required.');
-    $hasMath = trim((string)($d['human_token'] ?? '')) !== '' || isset($d['human_answer']);
-    if ($hasMath) {
-        if (!stMathCaptchaVerify($d['human_token'] ?? '', $d['human_answer'] ?? null)) {
-            err('validation', 'Security check failed. Please solve the sum and try again.');
-        }
-    } else {
-        if (!empty(trim((string)($d['website'] ?? '')))) {
-            ok(['message' => 'Demo request received. Our team will contact you within 24 hours.'], 201);
-        }
-        if (!ipThrottle('demo-api', 5)) {
-            err('rate_limit', 'Too many requests. Please wait and try again.', 429);
-        }
-        $spam = stContactSpamReason($name, $email, $message !== '' ? $message : 'Demo request', 'Demo request', $phone);
-        if ($spam) err('validation', $spam);
+    if (!empty(trim((string)($d['website'] ?? '')))) {
+        ok(['message' => 'Demo request received. Our team will contact you within 24 hours.'], 201);
     }
-    if ($hasMath && !ipThrottle('demo-api', 5)) {
+    if (!stMathCaptchaVerify($d['human_token'] ?? '', $d['human_answer'] ?? null)) {
+        err('validation', 'Security check failed. Please solve the sum and try again.');
+    }
+    $spam = stContactSpamReason($name, $email, $message !== '' ? $message : 'Demo request', 'Demo request', $phone);
+    if ($spam) err('validation', $spam);
+    if (!ipThrottle('demo-api', 5)) {
         err('rate_limit', 'Too many requests. Please wait and try again.', 429);
     }
     execute("INSERT INTO demo_requests (contact_name,email,phone,org_name,product,message) VALUES (?,?,?,?,?,?)",

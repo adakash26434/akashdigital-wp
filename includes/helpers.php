@@ -92,7 +92,7 @@ function stSanitizeRichHtml(string $html): string {
         if ($src === '' || preg_match('#^\s*(javascript|vbscript):#iu', $src)) {
             return '';
         }
-        if (!preg_match('#^(https?:)?//|^/|^data:image/(png|jpe?g|gif|webp|svg\+xml)#iu', $src)) {
+        if (!preg_match('#^(https?:)?//|^/|^data:image/(png|jpe?g|gif|webp)(;|,)#iu', $src)) {
             return '';
         }
         $alt = '';

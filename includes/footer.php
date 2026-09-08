@@ -557,8 +557,10 @@ document.addEventListener('DOMContentLoaded',()=>{
 /* ── Newsletter subscribe ── */
 function stSubscribe(e){
   e.preventDefault();
-  const email = document.getElementById('sub-email-input').value.trim();
+  const emailEl = document.getElementById('sub-email-input');
   const btn   = document.getElementById('sub-submit-btn');
+  if (!emailEl || !btn) return;
+  const email = emailEl.value.trim();
   const website = (document.getElementById('sub-website') || {}).value || '';
   if (!email) return;
   btn.disabled = true; btn.textContent = '…';

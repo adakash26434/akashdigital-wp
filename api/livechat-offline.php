@@ -20,12 +20,6 @@ if (!empty(trim((string)($_POST['website'] ?? '')))) {
     exit;
 }
 
-if (!ipThrottle('livechat-offline', 5)) {
-    http_response_code(429);
-    echo json_encode(['error' => 'rate_limit', 'message' => 'Too many requests. Please wait and try again.']);
-    exit;
-}
-
 $name    = trim($_POST['name']    ?? '');
 $email   = trim($_POST['email']   ?? '');
 $message = trim($_POST['message'] ?? '');
@@ -41,6 +35,12 @@ $spam = stContactSpamReason($name, $email, $message, $subject);
 if ($spam) {
     http_response_code(422);
     echo json_encode(['error' => 'validation', 'message' => $spam]);
+    exit;
+}
+
+if (!ipThrottle('livechat-offline', 5)) {
+    http_response_code(429);
+    echo json_encode(['error' => 'rate_limit', 'message' => 'Too many requests. Please wait and try again.']);
     exit;
 }
 

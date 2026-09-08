@@ -16,13 +16,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Rate limiting - prevent spam
-if (!ipThrottle('chat', 20)) {
-    http_response_code(429);
-    echo json_encode(['error' => 'Too many requests. Please wait a moment.']);
-    exit;
-}
-
 // नेपालीमा: jsonOut() — yo function le aafno kaam garchha
 function jsonOut(array $data, int $status = 200): void {
     http_response_code($status);
@@ -47,6 +40,15 @@ function requireChatToken(int $convId): void {
 
 $method = $_SERVER['REQUEST_METHOD'];
 $action = trim($_GET['action'] ?? $_POST['action'] ?? '');
+
+// Rate-limit start/send/close only — poll runs every ~6s and must not share that bucket
+if (in_array($action, ['start', 'send', 'close'], true)) {
+    if (!ipThrottle('chat', 40)) {
+        http_response_code(429);
+        echo json_encode(['error' => 'Too many requests. Please wait a moment.']);
+        exit;
+    }
+}
 
 // ── START or LOAD a conversation ─────────────────────────────
 if ($action === 'start' && $method === 'POST') {
