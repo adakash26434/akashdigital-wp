@@ -100,17 +100,20 @@ function requireAuth(): array {
     $auth = $_SERVER['HTTP_AUTHORIZATION'] ?? '';
     if (str_starts_with($auth, 'Bearer ')) {
         $token = substr($auth, 7);
-        // Token format: base64(userId:email:hmac:expiry)
-        $decoded = base64_decode($token);
-        $parts   = explode(':', $decoded, 4);
-        if (count($parts) >= 3) {
-            [$uid,$email,$sig,$expiry] = array_pad($parts, 4, '');
-            // Validate expiry if present
-            if ($expiry !== '' && (int)$expiry < time()) {
-                err('token_expired','Access token has expired. Please login again.',401);
+        // Token format: base64(userId:email:hmac:expiry) — HMAC includes expiry
+        $decoded = base64_decode($token, true);
+        $parts   = $decoded !== false ? explode(':', $decoded, 4) : [];
+        if (count($parts) === 4) {
+            [$uid, $email, $sig, $expiry] = $parts;
+            if ($expiry === '' || !ctype_digit((string)$expiry)) {
+                err('unauthorized', 'Invalid or expired access token.', 401);
             }
-            $u = queryOne("SELECT id,display_name,email,role,org_name,phone FROM users WHERE id=? AND email=? AND active=1", [(int)$uid,$email]);
-            if ($u && hash_equals(hash_hmac('sha256', $uid.':'.$email, SESSION_SECRET), $sig)) return $u;
+            if ((int)$expiry < time()) {
+                err('token_expired', 'Access token has expired. Please login again.', 401);
+            }
+            $u = queryOne("SELECT id,display_name,email,role,org_name,phone FROM users WHERE id=? AND email=? AND active=1", [(int)$uid, $email]);
+            $expected = hash_hmac('sha256', $uid . ':' . $email . ':' . $expiry, SESSION_SECRET);
+            if ($u && hash_equals($expected, $sig)) return $u;
         }
     }
     err('unauthorized','Authentication required.',401);
@@ -129,9 +132,30 @@ function inputJSON(): array {
 
 /* ── Public Routes ───────────────────────────────────────────── */
 
-// Site settings
+// Site settings — public allowlist only (never secrets / SMTP / API keys)
 if ($route === 'site-settings' && $method === 'GET') {
-    ok(siteSettings());
+    $all = siteSettings();
+    $allow = [
+        'site_name', 'company_name', 'tagline', 'site_tagline', 'logo_url', 'favicon_url',
+        'contact_phone', 'contact_email', 'contact_address', 'address',
+        'whatsapp_number', 'public_ui_look',
+        'brand_primary', 'brand_secondary', 'primary_color', 'secondary_color',
+        'social_links', 'copyright_text', 'copyright_text_np',
+        'facebook', 'twitter', 'linkedin', 'instagram', 'youtube',
+    ];
+    $secretRe = '/secret|api_key|password|smtp|turnstile_secret|token|mail_pass|ai_chat/i';
+    $out = [];
+    foreach ($allow as $k) {
+        if (!array_key_exists($k, $all) || preg_match($secretRe, $k)) continue;
+        $out[$k] = $all[$k];
+    }
+    if (!isset($out['tagline']) && isset($out['site_tagline'])) {
+        $out['tagline'] = $out['site_tagline'];
+    }
+    if (!isset($out['contact_address']) && isset($out['address'])) {
+        $out['contact_address'] = $out['address'];
+    }
+    ok($out);
 }
 
 // Services
@@ -156,9 +180,9 @@ if ($route === 'products' && $method === 'GET') {
     ok($rows);
 }
 
-// Team
+// Team (no private emails on public API)
 if ($route === 'team' && $method === 'GET') {
-    $rows = query("SELECT id,name,role,bio,photo_url,email,linkedin_url,is_leadership,active,position FROM team_members WHERE active=1 ORDER BY position,id");
+    $rows = query("SELECT id,name,role,bio,photo_url,linkedin_url,is_leadership,active,position FROM team_members WHERE active=1 ORDER BY position,id");
     ok($rows);
 }
 
@@ -241,10 +265,21 @@ if ($route === 'contact' && $method === 'POST') {
 // Newsletter
 if ($route === 'newsletter' && $method === 'POST') {
     $d     = inputJSON();
-    $email = trim($d['email'] ?? '');
+    if (!empty(trim((string)($d['website'] ?? '')))) {
+        ok(['message' => 'Subscribed successfully.'], 201); // honeypot — silent success
+    }
+    if (!ipThrottle('newsletter', 8)) {
+        err('rate_limit', 'Too many requests. Please wait and try again.', 429);
+    }
+    $email = trim((string)($d['email'] ?? ''));
+    $name  = trim((string)($d['name'] ?? ''));
     if (!$email || !filter_var($email, FILTER_VALIDATE_EMAIL)) err('validation','Valid email required.');
+    if ($name !== '') {
+        $spam = stContactSpamReason($name, $email, 'Newsletter subscription request from website.', '', '');
+        if ($spam) err('validation', $spam);
+    }
     try {
-        execute("INSERT INTO subscribers (email,name) VALUES (?,?) ON DUPLICATE KEY UPDATE status='active'", [$email, $d['name']??null]);
+        execute("INSERT INTO subscribers (email,name) VALUES (?,?) ON DUPLICATE KEY UPDATE status='active'", [$email, $name !== '' ? $name : null]);
         ok(['message'=>'Subscribed successfully.'],201);
     } catch(\Throwable $e) { err('error','Could not subscribe.',500); }
 }
@@ -252,33 +287,41 @@ if ($route === 'newsletter' && $method === 'POST') {
 // Demo request
 if ($route === 'demo-request' && $method === 'POST') {
     $d = inputJSON();
-    $name  = trim($d['name'] ?? '');
-    $email = trim($d['email'] ?? '');
+    $name    = trim((string)($d['name'] ?? ''));
+    $email   = trim((string)($d['email'] ?? ''));
+    $message = trim((string)($d['message'] ?? ''));
+    $phone   = trim((string)($d['phone'] ?? ''));
+    $org     = trim((string)($d['org_name'] ?? ($d['company'] ?? 'N/A')));
+    $product = trim((string)($d['product'] ?? ''));
     if (!$name || !$email) err('validation','name and email required.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) err('validation', 'Valid email required.');
+    $hasMath = trim((string)($d['human_token'] ?? '')) !== '' || isset($d['human_answer']);
+    if ($hasMath) {
+        if (!stMathCaptchaVerify($d['human_token'] ?? '', $d['human_answer'] ?? null)) {
+            err('validation', 'Security check failed. Please solve the sum and try again.');
+        }
+    } else {
+        if (!empty(trim((string)($d['website'] ?? '')))) {
+            ok(['message' => 'Demo request received. Our team will contact you within 24 hours.'], 201);
+        }
+        if (!ipThrottle('demo-api', 5)) {
+            err('rate_limit', 'Too many requests. Please wait and try again.', 429);
+        }
+        $spam = stContactSpamReason($name, $email, $message !== '' ? $message : 'Demo request', 'Demo request', $phone);
+        if ($spam) err('validation', $spam);
+    }
+    if ($hasMath && !ipThrottle('demo-api', 5)) {
+        err('rate_limit', 'Too many requests. Please wait and try again.', 429);
+    }
     execute("INSERT INTO demo_requests (contact_name,email,phone,org_name,product,message) VALUES (?,?,?,?,?,?)",
-        [$name,$email,$d['phone']??null,$d['org_name']??($d['company']??'N/A'),$d['product']??null,$d['message']??null]);
+        [$name, $email, $phone !== '' ? $phone : null, $org !== '' ? $org : 'N/A', $product !== '' ? $product : null, $message !== '' ? $message : null]);
     ok(['message'=>'Demo request received. Our team will contact you within 24 hours.'],201);
 }
 
 /* ── Auth Routes ─────────────────────────────────────────────── */
 
 if ($route === 'auth/signup' && $method === 'POST') {
-    $d            = inputJSON();
-    $email        = strtolower(trim($d['email'] ?? '')); // Force lowercase to prevent case-sensitivity issues
-    $password     = $d['password'] ?? '';
-    $display_name = trim($d['display_name'] ?? '');
-    if (!$email || !$password) err('validation','email and password required.');
-    if (strlen($password) < 8) err('validation','Password must be at least 8 characters.');
-    if (!filter_var($email,FILTER_VALIDATE_EMAIL)) err('validation','Invalid email address.');
-    $exists = queryOne("SELECT id FROM users WHERE email=?",[$email]);
-    if ($exists) err('conflict','An account with this email already exists.',409);
-    $hash = password_hash($password, PASSWORD_BCRYPT, ['cost'=>12]);
-    $id   = execute("INSERT INTO users (email,password_hash,display_name,role) VALUES (?,?,?,'client')",[$email,$hash,$display_name?:explode('@',$email)[0]]);
-    $user = queryOne("SELECT id,email,display_name,role FROM users WHERE id=?",[$id]);
-    // Issue token with 7-day expiry
-    $expiry = time() + (7 * 24 * 60 * 60);
-    $token = base64_encode($id.':'.$email.':'.hash_hmac('sha256',$id.':'.$email,SESSION_SECRET).':'.$expiry);
-    ok(['user'=>$user,'access_token'=>$token,'expires_in'=>$expiry],201);
+    err('forbidden', 'Portal signup is only available via the website with a Client ID.', 403);
 }
 
 if ($route === 'auth/login' && $method === 'POST') {
@@ -304,11 +347,20 @@ if ($route === 'auth/login' && $method === 'POST') {
     execute("UPDATE users SET last_login_at=NOW() WHERE id=?",[$user['id']]);
     // Set session too
     if (session_status()===PHP_SESSION_NONE) session_start();
+    session_regenerate_id(true);
     $_SESSION['user_id'] = $user['id'];
-    // Issue token with 7-day expiry
+    // Issue token with 7-day expiry (HMAC includes expiry)
     $expiry = time() + (7 * 24 * 60 * 60);
-    $token = base64_encode($user['id'].':'.$user['email'].':'.hash_hmac('sha256',$user['id'].':'.$user['email'],SESSION_SECRET).':'.$expiry);
-    $out   = array_diff_key($user,array_flip(['password_hash']));
+    $sig = hash_hmac('sha256', $user['id'] . ':' . $user['email'] . ':' . $expiry, SESSION_SECRET);
+    $token = base64_encode($user['id'] . ':' . $user['email'] . ':' . $sig . ':' . $expiry);
+    $out = [
+        'id'           => (int)$user['id'],
+        'email'        => $user['email'],
+        'display_name' => $user['display_name'] ?? '',
+        'role'         => $user['role'] ?? 'client',
+        'org_name'     => $user['org_name'] ?? null,
+        'phone'        => $user['phone'] ?? null,
+    ];
     ok(['user'=>$out,'access_token'=>$token,'expires_in'=>$expiry]);
 }
 

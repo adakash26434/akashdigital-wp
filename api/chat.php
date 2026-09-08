@@ -2,7 +2,7 @@
 /**
  * Live Chat AJAX API
  * Used by the floating chat widget on public pages.
- * No authentication required for visitors.
+ * Visitors prove ownership via chat_token (session-bound visitor_token).
  */
 header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
@@ -11,6 +11,10 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../includes/helpers.php';
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Rate limiting - prevent spam
 if (!ipThrottle('chat', 20)) {
@@ -24,6 +28,21 @@ function jsonOut(array $data, int $status = 200): void {
     http_response_code($status);
     echo json_encode($data, JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+/** Require matching visitor chat_token for an existing conversation. */
+function requireChatToken(int $convId): void {
+    if ($convId <= 0) {
+        jsonOut(['error' => 'Missing conv_id.'], 422);
+    }
+    $token = trim((string)($_POST['chat_token'] ?? $_GET['chat_token'] ?? ''));
+    if ($token === '') {
+        jsonOut(['error' => 'Missing chat token.'], 403);
+    }
+    $stored = $_SESSION['chat_tokens'][$convId] ?? '';
+    if ($stored === '' || !hash_equals((string)$stored, $token)) {
+        jsonOut(['error' => 'Invalid chat token.'], 403);
+    }
 }
 
 $method = $_SERVER['REQUEST_METHOD'];
@@ -42,7 +61,12 @@ if ($action === 'start' && $method === 'POST') {
              VALUES (?,?,'open', NOW())",
             [$visitor_name, $visitor_email ?: null]
         );
-        jsonOut(['ok'=>true, 'id'=>$id, 'visitor_name'=>$visitor_name]);
+        $visitor_token = bin2hex(random_bytes(16));
+        if (!isset($_SESSION['chat_tokens']) || !is_array($_SESSION['chat_tokens'])) {
+            $_SESSION['chat_tokens'] = [];
+        }
+        $_SESSION['chat_tokens'][(int)$id] = $visitor_token;
+        jsonOut(['ok'=>true, 'id'=>$id, 'visitor_name'=>$visitor_name, 'chat_token'=>$visitor_token]);
     } catch(\Throwable $e) {
         jsonOut(['error'=>'Could not start chat session.'], 500);
     }
@@ -54,6 +78,7 @@ if ($action === 'send' && $method === 'POST') {
     $message = trim($_POST['message'] ?? '');
 
     if (!$conv_id || !$message) jsonOut(['error'=>'Missing fields.'], 422);
+    requireChatToken($conv_id);
 
     try {
         $conv = queryOne("SELECT id, status FROM support_conversations WHERE id=?", [$conv_id]);
@@ -79,6 +104,7 @@ if ($action === 'poll' && $method === 'GET') {
     $since_id = (int)($_GET['since_id'] ?? 0);
 
     if (!$conv_id) jsonOut(['error'=>'conv_id required.'], 422);
+    requireChatToken($conv_id);
 
     try {
         $messages = query(
@@ -98,6 +124,7 @@ if ($action === 'poll' && $method === 'GET') {
 if ($action === 'close' && $method === 'POST') {
     $conv_id = (int)($_POST['conv_id'] ?? 0);
     if (!$conv_id) jsonOut(['error'=>'Missing conv_id.'], 422);
+    requireChatToken($conv_id);
     try {
         execute("UPDATE support_conversations SET status='closed' WHERE id=?", [$conv_id]);
         jsonOut(['ok'=>true]);

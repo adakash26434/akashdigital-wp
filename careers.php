@@ -4,6 +4,7 @@ require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
 require_once 'includes/mailer.php';
+require_once 'includes/contact-antispam.php';
 $__s = siteSettings();
 $pageTitle = 'Careers — ' . stCompanyName();
 $pageDesc  = 'Join ' . stCompanyName() . ' — open positions in software engineering, QA, design, and IT services.';
@@ -42,6 +43,7 @@ if ($featuredJob) {
 
 $apply_success = false;
 $apply_error   = '';
+$__applyMathCaptcha = stMathCaptchaIssue();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
     verifyCsrf();
@@ -62,8 +64,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
             [$job_id]
         ); 
     } catch (\Throwable $e) {}
+
+    $safeHttpUrl = static function (string $url): bool {
+        if ($url === '') return true;
+        if (!preg_match('#^https?://#i', $url)) return false;
+        $parts = parse_url($url);
+        return !empty($parts['scheme']) && in_array(strtolower($parts['scheme']), ['http', 'https'], true)
+            && !empty($parts['host']);
+    };
     
-    if (!$job) {
+    if (!empty($_POST['website'])) {
+        $apply_success = true; // honeypot — silent success
+    } elseif (!$job) {
         $apply_error = 'This job posting is no longer available.';
     } elseif (isJobListingExpired($job)) {
         $apply_error = 'Application deadline has passed for this position.';
@@ -73,6 +85,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
         $apply_error = 'Please enter a valid email address.';
     } elseif (!$resume && !$cv_file) {
         $apply_error = 'Please upload your CV (PDF) or provide a resume link.';
+    } elseif ($resume !== '' && !$safeHttpUrl($resume)) {
+        $apply_error = 'Resume URL must be a valid http or https link.';
+        $__applyMathCaptcha = stMathCaptchaIssue();
+    } elseif ($cv_file !== '' && preg_match('#^[a-z][a-z0-9+.-]*:#i', $cv_file) && !$safeHttpUrl($cv_file)) {
+        $apply_error = 'CV link must be a valid http or https URL.';
+        $__applyMathCaptcha = stMathCaptchaIssue();
+    } elseif (!stMathCaptchaVerify($_POST['human_token'] ?? '', $_POST['human_answer'] ?? '')) {
+        $apply_error = 'Security check failed. Please solve the sum and try again.';
+        $__applyMathCaptcha = stMathCaptchaIssue();
+    } elseif (!ipThrottle('careers-apply', 8)) {
+        $apply_error = 'Too many applications from this network. Please wait and try again.';
+        $__applyMathCaptcha = stMathCaptchaIssue();
     } else {
         try {
             $appId = execute(
@@ -87,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !empty($_POST['apply_job_id'])) {
             notifyApplicantJobConfirmation($submittedApp, $job);
         } catch (\Throwable $e) {
             $apply_error = 'Something went wrong. Please try again.';
+            $__applyMathCaptcha = stMathCaptchaIssue();
         }
     }
 }
@@ -375,6 +400,8 @@ ob_start(); ?>
               <label class="form-label sr-only" for="apply-cover">Cover letter</label>
               <textarea id="apply-cover" name="cover_letter" class="form-input careers-apply-textarea" rows="5" placeholder="Tell us why you are a great fit for this role..."><?= e($_POST['cover_letter'] ?? '') ?></textarea>
             </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" placeholder="Website">
+            <?= stMathCaptchaFieldsHtml($__applyMathCaptcha) ?>
           </div>
 
           <div class="careers-apply-actions">

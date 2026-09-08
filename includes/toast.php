@@ -25,7 +25,13 @@ function showToast(msg,type='success'){
   var c=colors[type]||colors.info;
   var t=document.createElement('div');
   t.style.cssText='display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.125rem;border-radius:0.75rem;box-shadow:0 8px 32px rgba(15,23,42,0.15);font-size:0.875rem;font-weight:500;border:1px solid var(--border);background:var(--card);color:var(--foreground);max-width:380px;animation:toast-in 0.25s cubic-bezier(0.34,1.56,0.64,1);pointer-events:auto;';
-  t.innerHTML='<span style="display:flex;align-items:center;color:'+c+'">'+(icons[type]||icons.info)+'</span><span>'+msg+'</span>';
+  var icon=document.createElement('span');
+  icon.style.cssText='display:flex;align-items:center;color:'+c;
+  icon.innerHTML=icons[type]||icons.info;
+  var text=document.createElement('span');
+  text.textContent=String(msg==null?'':msg);
+  t.appendChild(icon);
+  t.appendChild(text);
   document.getElementById('toast-container').appendChild(t);
   setTimeout(function(){t.style.opacity='0';t.style.transform='translateX(1rem)';t.style.transition='all 0.3s';setTimeout(function(){t.remove();},300);},4000);
 }

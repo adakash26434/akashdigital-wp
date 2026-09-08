@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
             } catch (\Throwable $e) {
-                $error = 'Registration failed. Please try again. (' . $e->getMessage() . ')';
+                $error = 'Registration failed. Please try again.';
             }
         }
     }

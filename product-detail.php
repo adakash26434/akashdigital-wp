@@ -3,6 +3,7 @@ require_once 'includes/config.php';
 require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
+require_once 'includes/contact-antispam.php';
 
 $slug = trim($_GET['slug'] ?? '');
 if (!$slug) { header('Location: ' . url('products.php')); exit; }
@@ -53,6 +54,7 @@ $lucideIcon = stRowLucideIcon($product, 'package');
 // Demo request
 $demo_success = false;
 $demo_error   = '';
+$__demoMathCaptcha = stMathCaptchaIssue();
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['demo_product'])) {
     verifyCsrf();
     $org   = trim($_POST['org_name'] ?? '');
@@ -60,10 +62,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['demo_product'])) {
     $email = trim($_POST['contact_email'] ?? '');
     $phone = trim($_POST['contact_phone'] ?? '');
     $msg   = trim($_POST['message'] ?? '');
-    if (!$org || !$name || !$email) {
+    if (!empty($_POST['website'])) {
+        $demo_success = true; // honeypot — silent success
+    } elseif (!$org || !$name || !$email) {
         $demo_error = 'Organization, name and email are required.';
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $demo_error = 'Please enter a valid email address.';
+    } elseif (!stMathCaptchaVerify($_POST['human_token'] ?? '', $_POST['human_answer'] ?? '')) {
+        $demo_error = 'Security check failed. Please solve the sum and try again.';
+        $__demoMathCaptcha = stMathCaptchaIssue();
+    } elseif ($spamReason = stContactSpamReason($name, $email, $msg !== '' ? $msg : 'Demo request for ' . ($product['name'] ?? 'product'), 'Demo request', $phone)) {
+        $demo_error = $spamReason;
+        $__demoMathCaptcha = stMathCaptchaIssue();
+    } elseif (!ipThrottle('demo-product', 5)) {
+        $demo_error = 'Too many requests. Please wait and try again.';
+        $__demoMathCaptcha = stMathCaptchaIssue();
     } else {
         $inserted = false;
         // Live schema: product, org_name, contact_name, email, phone, message
@@ -98,6 +111,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['demo_product'])) {
             }
         } else {
             $demo_error = 'Something went wrong. Please try again.';
+            $__demoMathCaptcha = stMathCaptchaIssue();
         }
     }
 }
@@ -251,6 +265,8 @@ require_once 'includes/header.php';
               <label class="form-label" style="font-size:var(--text-xs);">Any specific requirements?</label>
               <textarea name="message" class="form-input" rows="3" style="font-size:var(--text-sm);" placeholder="Number of members, branches, etc."></textarea>
             </div>
+            <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" placeholder="Website">
+            <?= stMathCaptchaFieldsHtml($__demoMathCaptcha) ?>
             <button type="submit" class="btn btn-primary w-100">Book My Demo →</button>
           </form>
           <p style="text-align:center;font-size:var(--text-xs);color:var(--muted-foreground);margin-top:0.75rem;">Free, no-obligation. We'll call you.</p>

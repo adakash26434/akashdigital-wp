@@ -316,7 +316,13 @@ function showToast(msg, type='success') {
   };
   const t=document.createElement('div');
   t.style.cssText='display:flex;align-items:center;gap:0.75rem;padding:0.875rem 1.125rem;border-radius:0.75rem;box-shadow:0 8px 32px rgba(15,23,42,0.15);font-size:var(--text-sm);font-weight:500;border:1px solid;pointer-events:auto;max-width:380px;background:#fff;color:#1e293b;border-color:var(--border);animation:toast-in 0.25s cubic-bezier(0.34,1.56,0.64,1);';
-  t.innerHTML=`<span style="color:${colors[type]}">${icons[type]}</span><span>${msg}</span>`;
+  const icon=document.createElement('span');
+  icon.style.color=colors[type]||colors.info;
+  icon.innerHTML=icons[type]||icons.info;
+  const text=document.createElement('span');
+  text.textContent=String(msg??'');
+  t.appendChild(icon);
+  t.appendChild(text);
   document.getElementById('toast-container').appendChild(t);
   setTimeout(()=>{t.style.transition='all 0.3s';t.style.opacity='0';t.style.transform='translateX(1rem)';setTimeout(()=>t.remove(),300);},4000);
 }
@@ -435,6 +441,7 @@ function stAiSend() {
 
 /* ── Live Chat ── */
 let stConvId = localStorage.getItem('st_conv_id') ? parseInt(localStorage.getItem('st_conv_id')) : 0;
+let stChatToken = localStorage.getItem('st_chat_token') || '';
 let stLastMsgId = 0;
 let stPollTimer = null;
 const CHAT_URL = '<?= url('api/chat.php') ?>';
@@ -459,7 +466,7 @@ function stChatToggle() {
     const ab = document.getElementById('st-ai-btn');
     if (ab) ab.setAttribute('aria-expanded', 'false');
   }
-  if (!isOpen && stConvId) { stChatShowThread(); stStartPoll(); }
+  if (!isOpen && stConvId && stChatToken) { stChatShowThread(); stStartPoll(); }
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
@@ -474,7 +481,9 @@ function stChatStart() {
     .then(data=>{
       if (data.ok) {
         stConvId = data.id;
+        stChatToken = data.chat_token || '';
         localStorage.setItem('st_conv_id', stConvId);
+        if (stChatToken) localStorage.setItem('st_chat_token', stChatToken);
         stChatShowThread();
         stAddMsg('admin','Hi, '+data.visitor_name+'! Thanks for reaching out. Our team will respond shortly. You can also open a tracked support ticket from the Client Portal.',true);
         stStartPoll();
@@ -490,11 +499,11 @@ function stChatShowThread() {
 function stChatSend() {
   const input = document.getElementById('st-msg-input');
   const msg   = input.value.trim();
-  if (!msg || !stConvId) return;
+  if (!msg || !stConvId || !stChatToken) return;
   input.value = '';
   stAddMsg('visitor', msg, true);
   const fd = new FormData();
-  fd.append('action','send'); fd.append('conv_id',stConvId); fd.append('message',msg);
+  fd.append('action','send'); fd.append('conv_id',stConvId); fd.append('message',msg); fd.append('chat_token',stChatToken);
   fetch(CHAT_URL,{method:'POST',body:fd}).catch(()=>{});
 }
 
@@ -513,13 +522,13 @@ function stAddMsg(sender, text, isNew=false) {
 
 function stStartPoll() {
   if (stPollTimer) clearInterval(stPollTimer);
-  if (!stConvId) return;
+  if (!stConvId || !stChatToken) return;
   stPollTimer = setInterval(stPoll, 6000);
 }
 
 function stPoll() {
-  if (!stConvId) return;
-  fetch(CHAT_URL+'?action=poll&conv_id='+stConvId+'&since_id='+stLastMsgId)
+  if (!stConvId || !stChatToken) return;
+  fetch(CHAT_URL+'?action=poll&conv_id='+stConvId+'&since_id='+stLastMsgId+'&chat_token='+encodeURIComponent(stChatToken))
     .then(r=>r.json())
     .then(data=>{
       if (data.ok && data.messages?.length) {
@@ -527,12 +536,22 @@ function stPoll() {
           if (m.sender==='admin') stAddMsg('admin', m.message);
           stLastMsgId = Math.max(stLastMsgId, m.id);
         });
+      } else if (data.error && /token/i.test(String(data.error))) {
+        localStorage.removeItem('st_conv_id');
+        localStorage.removeItem('st_chat_token');
+        stConvId = 0;
+        stChatToken = '';
+        if (stPollTimer) clearInterval(stPollTimer);
       }
     }).catch(()=>{});
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
-  if (stConvId) { stChatShowThread(); stPoll(); stStartPoll(); }
+  if (stConvId && stChatToken) { stChatShowThread(); stPoll(); stStartPoll(); }
+  else if (stConvId && !stChatToken) {
+    localStorage.removeItem('st_conv_id');
+    stConvId = 0;
+  }
 });
 
 /* ── Newsletter subscribe ── */
@@ -540,12 +559,13 @@ function stSubscribe(e){
   e.preventDefault();
   const email = document.getElementById('sub-email-input').value.trim();
   const btn   = document.getElementById('sub-submit-btn');
+  const website = (document.getElementById('sub-website') || {}).value || '';
   if (!email) return;
   btn.disabled = true; btn.textContent = '…';
   fetch('<?= url('api/index.php') ?>?r=newsletter', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({email})
+    body: JSON.stringify({email, website})
   }).then(r=>r.json()).then(d=>{
     if (d.data) { showToast('Subscribed! Thank you.','success'); document.getElementById('sub-email-input').value=''; }
     else         showToast(d.message||'Could not subscribe.','error');

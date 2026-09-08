@@ -12,10 +12,14 @@ Options -Indexes
 
   # Block direct web access to PHP includes, cache, config, cron, and artifact dirs
   RewriteRule ^(includes|cron|\.cache|\.agents|\.local|\.replit-artifact)/  - [F,L]
+
+  # Block download of dumps, docs, deploy scripts, and composer manifests
+  RewriteRule ^(database\.sql|SETUP\.md|README\.md|deploy\.sh|composer\.json|composer\.lock)$ - [F,L]
+  RewriteRule \.sql$ - [F,L]
 </IfModule>
 
 # ── Protect individual sensitive files ───────────────────────────────
-<FilesMatch "^(dev-config\.php|\.env|composer\.(json|lock))$">
+<FilesMatch "^(dev-config\.php|\.env|composer\.(json|lock)|database\.sql|SETUP\.md|README\.md|deploy\.sh|.*\.sql)$">
   <IfModule mod_authz_core.c>
     Require all denied
   </IfModule>
