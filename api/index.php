@@ -215,9 +215,6 @@ if ($route === 'pricing' && $method === 'GET') {
 
 // Contact
 if ($route === 'contact' && $method === 'POST') {
-    if (!ipThrottle('api-contact', 5)) {
-        err('rate_limit', 'Too many messages. Please wait and try again.', 429);
-    }
     $d = inputJSON();
     $name    = trim((string)($d['name'] ?? ''));
     $email   = trim((string)($d['email'] ?? ''));
@@ -233,6 +230,9 @@ if ($route === 'contact' && $method === 'POST') {
     }
     $spam = stContactSpamReason($name, $email, $message, $subject, $phone);
     if ($spam) err('validation', $spam);
+    if (!ipThrottle('api-contact', 5)) {
+        err('rate_limit', 'Too many messages. Please wait and try again.', 429);
+    }
     execute("INSERT INTO contact_submissions (name,email,phone,org_name,subject,message) VALUES (?,?,?,?,?,?)",
         [$name, $email, $phone !== '' ? $phone : null, $org !== '' ? $org : null, $subject !== '' ? $subject : 'General Enquiry', $message]);
     ok(['message' => 'Your message has been received. We will respond within 24 hours.'], 201);

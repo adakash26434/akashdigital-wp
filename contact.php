@@ -22,12 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       exit;
     }
 
-    // Rate limit: max 5 contact posts / IP / hour
-    if (!ipThrottle('contact-form', 5)) {
-      $error = isNepali()
-        ? 'धेरै पटक प्रयास भयो। कृपया केही बेरपछि फेरि प्रयास गर्नुहोस्।'
-        : 'Too many messages from your network. Please wait a while and try again.';
-    } elseif (!stMathCaptchaVerify($_POST['human_token'] ?? '', $_POST['human_answer'] ?? '')) {
+    if (!stMathCaptchaVerify($_POST['human_token'] ?? '', $_POST['human_answer'] ?? '')) {
       $error = isNepali()
         ? 'सुरक्षा जाँच गलत भयो। जोडफल फेरि लेख्नुहोस्।'
         : 'Security check failed. Please answer the sum again.';
@@ -49,6 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Please enter a valid email address.';
       } elseif ($spamReason = stContactSpamReason($name, $email, $message, $subject, $phone)) {
         $error = $spamReason;
+      } elseif (!ipThrottle('contact-form', 5)) {
+        // Count only after human + content checks pass
+        $error = isNepali()
+          ? 'धेरै पटक प्रयास भयो। कृपया केही बेरपछि फेरि प्रयास गर्नुहोस्।'
+          : 'Too many messages from your network. Please wait a while and try again.';
       } else {
         try {
           execute("INSERT INTO contact_submissions (name,email,phone,subject,message,org_name) VALUES (?,?,?,?,?,?)",

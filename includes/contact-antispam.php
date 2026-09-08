@@ -15,9 +15,12 @@ function stMathCaptchaIssue(): array {
     if (!isset($_SESSION['st_math_captcha']) || !is_array($_SESSION['st_math_captcha'])) {
         $_SESSION['st_math_captcha'] = [];
     }
-    // Keep at most 8 pending challenges
+    // Keep at most 8 pending challenges (drop oldest keys)
     if (count($_SESSION['st_math_captcha']) > 8) {
-        $_SESSION['st_math_captcha'] = array_slice($_SESSION['st_math_captcha'], -4, null, true);
+        $keys = array_keys($_SESSION['st_math_captcha']);
+        foreach (array_slice($keys, 0, count($keys) - 4) as $oldKey) {
+            unset($_SESSION['st_math_captcha'][$oldKey]);
+        }
     }
     $_SESSION['st_math_captcha'][$token] = [
         'sum' => $a + $b,
