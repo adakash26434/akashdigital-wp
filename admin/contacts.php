@@ -36,6 +36,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } catch (\Throwable $e) { setFlash('error', 'Delete failed.'); }
         redirect('admin/contacts.php');
     }
+
+    if ($action === 'bulk_delete') {
+        $ids = $_POST['ids'] ?? [];
+        if (!is_array($ids)) $ids = [];
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids), fn($n) => $n > 0)));
+        if (empty($ids)) {
+            setFlash('error', 'Select at least one submission to delete.');
+        } elseif (count($ids) > 200) {
+            setFlash('error', 'Please delete at most 200 at a time.');
+        } else {
+            try {
+                $placeholders = implode(',', array_fill(0, count($ids), '?'));
+                execute("DELETE FROM contact_submissions WHERE id IN ($placeholders)", $ids);
+                setFlash('success', count($ids) . ' submission(s) deleted.');
+            } catch (\Throwable $e) {
+                setFlash('error', 'Bulk delete failed.');
+            }
+        }
+        $redir = 'admin/contacts.php';
+        $qs = [];
+        if (!empty($_POST['return_status'])) $qs['status'] = preg_replace('/[^a-z_]/', '', (string)$_POST['return_status']);
+        if (!empty($_POST['return_q'])) $qs['q'] = trim((string)$_POST['return_q']);
+        if ($qs) $redir .= '?' . http_build_query($qs);
+        redirect($redir);
+    }
 }
 
 // CSV export
@@ -61,7 +86,7 @@ $perPage       = 20;
 $where  = [];
 $params = [];
 if ($status_filter) { $where[] = 'status=?'; $params[] = $status_filter; }
-if ($search)        { $where[] = '(name LIKE ? OR email LIKE ? OR org_name LIKE ? OR subject LIKE ?)'; $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%"]); }
+if ($search)        { $where[] = '(name LIKE ? OR email LIKE ? OR org_name LIKE ? OR subject LIKE ? OR message LIKE ?)'; $params = array_merge($params, ["%$search%","%$search%","%$search%","%$search%","%$search%"]); }
 $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $total = queryOne("SELECT COUNT(*) as cnt FROM contact_submissions $whereSQL", $params)['cnt'] ?? 0;
@@ -90,9 +115,9 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
 
 <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;margin-bottom:1.25rem;">
   <div>
-    <h2 style="font-family:var(--font-display);font-size:1.0625rem;font-weight:700;color:var(--foreground);">Contact Submissions (<?= $total ?>)</h2>
+    <h2 style="font-family:var(--font-display);font-size:1.0625rem;font-weight:700;color:var(--foreground);">Contact Submissions (<?= (int)$total ?>)</h2>
     <?php if ($counts['new'] ?? 0): ?>
-    <p style="font-size:0.8125rem;color:var(--danger-fg);margin-top:0.25rem;font-weight:500;">● <?= $counts['new'] ?> unread</p>
+    <p style="font-size:0.8125rem;color:var(--danger-fg);margin-top:0.25rem;font-weight:500;">● <?= (int)$counts['new'] ?> unread</p>
     <?php endif; ?>
   </div>
   <a href="?export=csv" class="btn btn-outline btn-sm">⬇ Export CSV</a>
@@ -102,18 +127,18 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
 <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.25rem;align-items:center;">
   <form method="GET" style="display:flex;gap:0.5rem;flex:1;min-width:200px;">
     <?php if ($status_filter): ?><input type="hidden" name="status" value="<?= e($status_filter) ?>"><?php endif; ?>
-    <input type="text" name="q" value="<?= e($search) ?>" placeholder="Search name, email, org…" class="form-input flex-1">
+    <input type="text" name="q" value="<?= e($search) ?>" placeholder="Search name, email, org, message…" class="form-input flex-1">
     <button type="submit" class="btn btn-outline btn-sm">Search</button>
-    <?php if ($search): ?><a href="?<?= $status_filter ? 'status='.urlencode($status_filter) : '' ?>" class="btn btn-outline btn-sm"></a><?php endif; ?>
+    <?php if ($search): ?><a href="?<?= $status_filter ? 'status='.urlencode($status_filter) : '' ?>" class="btn btn-outline btn-sm">Clear</a><?php endif; ?>
   </form>
   <div style="display:flex;flex-wrap:wrap;gap:0.375rem;">
-    <a href="?<?= $search ? 'q='.urlencode($search) : '' ?>" class="btn btn-sm <?= !$status_filter ? 'btn-primary' : 'btn-outline' ?>">All (<?= array_sum($counts) ?>)</a>
+    <a href="?<?= $search ? 'q='.urlencode($search) : '' ?>" class="btn btn-sm <?= !$status_filter ? 'btn-primary' : 'btn-outline' ?>">All (<?= (int)array_sum($counts) ?>)</a>
     <?php foreach ($statuses as $s):
       [$bg,$col,$lbl] = $STATUS[$s] ?? ['var(--muted)','var(--muted-foreground)',$s];
     ?>
     <a href="?status=<?= $s ?><?= $search ? '&q='.urlencode($search) : '' ?>"
        class="btn btn-sm" style="<?= $status_filter===$s ? "background:$bg;color:$col;border-color:$col;" : 'border:1px solid var(--border);background:var(--card);color:var(--foreground);' ?>">
-      <?= $lbl ?> <?= isset($counts[$s]) ? '('.$counts[$s].')' : '' ?>
+      <?= e($lbl) ?> <?= isset($counts[$s]) ? '('.(int)$counts[$s].')' : '' ?>
     </a>
     <?php endforeach; ?>
   </div>
@@ -121,36 +146,62 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
 
 <?php if (empty($items)): ?>
 <div style="border:2px dashed var(--border);border-radius:1rem;padding:4rem 2rem;text-align:center;color:var(--muted-foreground);">
-  <div class="fs-3rem"></div>
   <div style="font-weight:600;margin-bottom:0.375rem;">No submissions <?= ($status_filter || $search) ? 'match your filter' : 'yet' ?></div>
   <p class="fs-md">Submissions from the public contact form will appear here.</p>
 </div>
 <?php else: ?>
+<div id="contacts-bulk-bar" style="display:none;align-items:center;flex-wrap:wrap;gap:0.625rem;margin-bottom:0.875rem;padding:0.75rem 1rem;border-radius:0.75rem;border:1px solid var(--danger-border);background:color-mix(in srgb, var(--danger) 6%, var(--card));">
+  <span id="contacts-bulk-count" style="font-size:0.8125rem;font-weight:600;color:var(--danger);">0 selected</span>
+  <form method="POST" id="contacts-bulk-form" style="display:inline-flex;gap:0.5rem;align-items:center;flex-wrap:wrap;" onsubmit="return prepareContactsBulk(this);">
+    <?= csrfField() ?>
+    <input type="hidden" name="action" value="bulk_delete">
+    <input type="hidden" name="return_status" value="<?= e($status_filter) ?>">
+    <input type="hidden" name="return_q" value="<?= e($search) ?>">
+    <div id="contacts-bulk-ids"></div>
+    <button type="submit" class="btn btn-sm" style="border:1px solid var(--danger-border);color:#fff;background:var(--danger);">Delete selected</button>
+    <button type="button" class="btn btn-outline btn-sm" onclick="clearContactsBulk()">Clear</button>
+  </form>
+</div>
+
+<div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+  <label style="display:inline-flex;align-items:center;gap:0.4rem;font-size:0.8125rem;color:var(--muted-foreground);cursor:pointer;">
+    <input type="checkbox" id="contacts-select-all-top" style="width:1rem;height:1rem;"> Select page
+  </label>
+  <span style="font-size:0.75rem;color:var(--muted-foreground);">Tip: select spam, then Delete selected</span>
+</div>
+
 <div style="display:flex;flex-direction:column;gap:0.75rem;">
 <?php foreach ($items as $c):
   [$sbg,$scol,$slbl] = $STATUS[$c['status']] ?? ['var(--muted)','var(--muted-foreground)','Unknown'];
+  $looksSpam = (bool)preg_match('~https?://|telegra\.ph|promo code|jackpot|\$\s*\d{2,}~iu', (string)$c['message']);
 ?>
-<div class="st-card" style="padding:1.25rem 1.5rem;">
+<div class="st-card" style="padding:1.25rem 1.5rem;<?= $looksSpam ? 'border-color:color-mix(in srgb, var(--danger) 35%, var(--border));' : '' ?>">
   <div style="display:flex;flex-wrap:wrap;gap:0.875rem;align-items:flex-start;justify-content:space-between;margin-bottom:0.75rem;">
 
-    <!-- Left: contact info -->
-    <div class="flex-1-min">
+    <div class="flex-1-min" style="display:flex;gap:0.75rem;align-items:flex-start;">
+      <label style="margin-top:0.2rem;cursor:pointer;" title="Select for bulk delete">
+        <input type="checkbox" value="<?= (int)$c['id'] ?>" class="contact-row-check" style="width:1rem;height:1rem;" onchange="updateContactsBulk()">
+      </label>
+      <div style="flex:1;min-width:0;">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0.625rem;margin-bottom:0.25rem;">
         <span style="font-family:var(--font-display);font-weight:700;font-size:0.9375rem;color:var(--foreground);"><?= e($c['name']) ?></span>
-        <span style="font-size:0.6875rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:9999px;background:<?=$sbg?>;color:<?=$scol?>;"><?= $slbl ?></span>
-        <span class="fs-xs-mt"><?= timeAgo($c['created_at']) ?></span>
+        <span style="font-size:0.6875rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:9999px;background:<?=$sbg?>;color:<?=$scol?>;"><?= e($slbl) ?></span>
+        <?php if ($looksSpam): ?>
+        <span style="font-size:0.6875rem;font-weight:700;padding:0.2rem 0.6rem;border-radius:9999px;background:color-mix(in srgb, var(--danger) 12%, transparent);color:var(--danger);">Possible spam</span>
+        <?php endif; ?>
+        <span class="fs-xs-mt"><?= e(timeAgo($c['created_at'])) ?></span>
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:0.75rem;font-size:0.8125rem;color:var(--muted-foreground);">
         <a href="mailto:<?= e($c['email']) ?>" style="color:var(--primary);text-decoration:none;"><?= e($c['email']) ?></a>
-        <?php if ($c['phone']): ?><span> <?= e($c['phone']) ?></span><?php endif; ?>
-        <?php if ($c['org_name']): ?><span> <?= e($c['org_name']) ?></span><?php endif; ?>
+        <?php if ($c['phone']): ?><span><?= e($c['phone']) ?></span><?php endif; ?>
+        <?php if ($c['org_name']): ?><span><?= e($c['org_name']) ?></span><?php endif; ?>
       </div>
       <?php if ($c['subject']): ?>
       <div style="font-size:0.8125rem;font-weight:600;color:var(--foreground);margin-top:0.375rem;">Re: <?= e($c['subject']) ?></div>
       <?php endif; ?>
+      </div>
     </div>
 
-    <!-- Right: status changer -->
     <form method="POST" style="display:flex;align-items:center;gap:0.375rem;flex-shrink:0;">
       <?= csrfField() ?>
       <input type="hidden" name="action" value="status">
@@ -163,12 +214,10 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
     </form>
   </div>
 
-  <!-- Message -->
-  <div style="background:var(--background);border:1px solid var(--border);border-radius:0.625rem;padding:0.875rem;font-size:0.875rem;line-height:1.65;color:var(--foreground);margin-bottom:0.875rem;">
+  <div style="background:var(--background);border:1px solid var(--border);border-radius:0.625rem;padding:0.875rem;font-size:0.875rem;line-height:1.65;color:var(--foreground);margin-bottom:0.875rem;overflow-wrap:anywhere;">
     <?= nl2br(e($c['message'])) ?>
   </div>
 
-  <!-- Notes + delete row -->
   <div style="display:flex;flex-wrap:wrap;gap:0.625rem;align-items:flex-start;">
     <form method="POST" style="flex:1;display:flex;gap:0.5rem;min-width:200px;">
       <?= csrfField() ?>
@@ -181,7 +230,7 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
       <?= csrfField() ?>
       <input type="hidden" name="action" value="delete">
       <input type="hidden" name="id" value="<?= (int)$c['id'] ?>">
-      <button type="submit" class="btn btn-sm" style="border:1px solid var(--danger-border);color:var(--danger);background:transparent;" aria-label="Delete" onclick="return confirm('Delete?')"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
+      <button type="submit" class="btn btn-sm" style="border:1px solid var(--danger-border);color:var(--danger);background:transparent;" aria-label="Delete"><i data-lucide="trash-2" style="width:14px;height:14px;pointer-events:none;"></i></button>
     </form>
   </div>
   <?php if ($c['notes']): ?>
@@ -190,6 +239,46 @@ foreach ($counts_raw as $c) $counts[$c['status']] = $c['cnt'];
 </div>
 <?php endforeach; ?>
 </div>
+
+<script>
+(function(){
+  var bar = document.getElementById('contacts-bulk-bar');
+  var countEl = document.getElementById('contacts-bulk-count');
+  var topAll = document.getElementById('contacts-select-all-top');
+  var idsBox = document.getElementById('contacts-bulk-ids');
+  function boxes(){ return Array.prototype.slice.call(document.querySelectorAll('.contact-row-check')); }
+  window.updateContactsBulk = function(){
+    var n = boxes().filter(function(b){ return b.checked; }).length;
+    if (countEl) countEl.textContent = n + ' selected';
+    if (bar) bar.style.display = n ? 'flex' : 'none';
+  };
+  window.clearContactsBulk = function(){
+    boxes().forEach(function(b){ b.checked = false; });
+    if (topAll) topAll.checked = false;
+    updateContactsBulk();
+  };
+  window.prepareContactsBulk = function(form){
+    var selected = boxes().filter(function(b){ return b.checked; });
+    if (!selected.length) { alert('Select at least one submission.'); return false; }
+    if (!confirm('Delete ' + selected.length + ' selected submission(s)? This cannot be undone.')) return false;
+    if (idsBox) {
+      idsBox.innerHTML = '';
+      selected.forEach(function(b){
+        var inp = document.createElement('input');
+        inp.type = 'hidden';
+        inp.name = 'ids[]';
+        inp.value = b.value;
+        idsBox.appendChild(inp);
+      });
+    }
+    return true;
+  };
+  if (topAll) topAll.addEventListener('change', function(){
+    boxes().forEach(function(b){ b.checked = topAll.checked; });
+    updateContactsBulk();
+  });
+})();
+</script>
 
 <?php if ($pg['pages'] > 1): ?>
 <div class="pagination" style="margin-top:1.5rem;">

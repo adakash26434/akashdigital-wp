@@ -46,6 +46,7 @@ require_once __DIR__ . '/../includes/config.php';
 require_once __DIR__ . '/../includes/db.php';
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/contact-antispam.php';
 
 $route  = trim($_GET['r'] ?? '');
 $method = $_SERVER['REQUEST_METHOD'];
@@ -214,14 +215,27 @@ if ($route === 'pricing' && $method === 'GET') {
 
 // Contact
 if ($route === 'contact' && $method === 'POST') {
+    if (!ipThrottle('api-contact', 5)) {
+        err('rate_limit', 'Too many messages. Please wait and try again.', 429);
+    }
     $d = inputJSON();
-    $name    = trim($d['name'] ?? '');
-    $email   = trim($d['email'] ?? '');
-    $message = trim($d['message'] ?? '');
-    if (!$name || !$email || !$message) err('validation','name, email, message are required.');
+    $name    = trim((string)($d['name'] ?? ''));
+    $email   = trim((string)($d['email'] ?? ''));
+    $message = trim((string)($d['message'] ?? ''));
+    $phone   = trim((string)($d['phone'] ?? ''));
+    $subject = trim((string)($d['subject'] ?? 'General Enquiry'));
+    $org     = trim((string)($d['org_name'] ?? ''));
+    if (!$name || !$email || !$message) err('validation', 'name, email, message are required.');
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) err('validation', 'Valid email required.');
+    // Same human check as the public form (session math token)
+    if (!stMathCaptchaVerify($d['human_token'] ?? '', $d['human_answer'] ?? null)) {
+        err('validation', 'Security check failed. Open the contact page, solve the sum, and retry.');
+    }
+    $spam = stContactSpamReason($name, $email, $message, $subject, $phone);
+    if ($spam) err('validation', $spam);
     execute("INSERT INTO contact_submissions (name,email,phone,org_name,subject,message) VALUES (?,?,?,?,?,?)",
-        [$name,$email,$d['phone']??null,$d['org_name']??null,$d['subject']??'General Enquiry',$message]);
-    ok(['message'=>'Your message has been received. We will respond within 24 hours.'],201);
+        [$name, $email, $phone !== '' ? $phone : null, $org !== '' ? $org : null, $subject !== '' ? $subject : 'General Enquiry', $message]);
+    ok(['message' => 'Your message has been received. We will respond within 24 hours.'], 201);
 }
 
 // Newsletter

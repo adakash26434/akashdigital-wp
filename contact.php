@@ -4,46 +4,68 @@ require_once 'includes/db.php';
 require_once 'includes/auth.php';
 require_once 'includes/helpers.php';
 require_once 'includes/mailer.php';
+require_once 'includes/contact-antispam.php';
+require_once 'includes/captcha.php';
 $__s = siteSettings();
 $pageTitle = 'Contact ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' — Get in Touch';
 $pageDesc  = 'Get in touch with ' . ($__s['company_name'] ?? (defined('SITE_NAME') ? SITE_NAME : 'Company')) . ' for a free demo, pricing quote or product enquiry. We respond within 2 business hours.';
 
 $success = $error = '';
+$__mathCaptcha = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (!verifyCsrf($_POST['csrf_token'] ?? '')) {
     $error = 'Security token mismatch. Please refresh and try again.';
   } else {
-    // Honeypot spam protection
-    if (!empty($_POST['website'])) {
-      // Bot detected - silently "succeed" but don't actually save
+    // Honeypot spam protection (bots fill hidden fields)
+    if (!empty($_POST['website']) || !empty($_POST['company_url'])) {
       header('Location: ' . url('contact.php?sent=1'));
       exit;
     }
-    
-    $name    = trim($_POST['name']    ?? '');
-    $email   = trim($_POST['email']   ?? '');
-    $phone   = trim($_POST['phone']   ?? '');
-    $subject = trim($_POST['subject'] ?? 'General Enquiry');
-    $message = trim($_POST['message'] ?? '');
-    $org     = trim($_POST['org']     ?? '');
 
-    if (!$name || !$email || !$message) {
-      $error = 'Name, email and message are required.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-      $error = 'Please enter a valid email address.';
+    // Rate limit: max 5 contact posts / IP / hour
+    if (!ipThrottle('contact-form', 5)) {
+      $error = isNepali()
+        ? 'धेरै पटक प्रयास भयो। कृपया केही बेरपछि फेरि प्रयास गर्नुहोस्।'
+        : 'Too many messages from your network. Please wait a while and try again.';
+    } elseif (!stMathCaptchaVerify($_POST['human_token'] ?? '', $_POST['human_answer'] ?? '')) {
+      $error = isNepali()
+        ? 'सुरक्षा जाँच गलत भयो। जोडफल फेरि लेख्नुहोस्।'
+        : 'Security check failed. Please answer the sum again.';
+    } elseif (turnstile_enabled() && !turnstile_verify()) {
+      $error = isNepali()
+        ? 'CAPTCHA असफल भयो। फेरि प्रयास गर्नुहोस्।'
+        : 'CAPTCHA verification failed. Please try again.';
     } else {
-      try {
-        execute("INSERT INTO contact_submissions (name,email,phone,subject,message,org_name) VALUES (?,?,?,?,?,?)",
-          [$name, $email, $phone ?: null, $subject, $message, $org ?: null]);
-        notifyAdminNewContact(['name'=>$name,'email'=>$email,'org_name'=>$org,'subject'=>$subject,'message'=>$message]);
-        setFlash('success','Your message has been sent! We\'ll respond within 2 business hours.');
-        header('Location: ' . url('contact.php'));
-        exit;
-      } catch (\Throwable $e) {
-        $error = 'Something went wrong. Please try again or call us directly.';
+      $name    = trim($_POST['name']    ?? '');
+      $email   = trim($_POST['email']   ?? '');
+      $phone   = trim($_POST['phone']   ?? '');
+      $subject = trim($_POST['subject'] ?? 'General Enquiry');
+      $message = trim($_POST['message'] ?? '');
+      $org     = trim($_POST['org']     ?? '');
+
+      if (!$name || !$email || !$message) {
+        $error = 'Name, email and message are required.';
+      } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = 'Please enter a valid email address.';
+      } elseif ($spamReason = stContactSpamReason($name, $email, $message, $subject, $phone)) {
+        $error = $spamReason;
+      } else {
+        try {
+          execute("INSERT INTO contact_submissions (name,email,phone,subject,message,org_name) VALUES (?,?,?,?,?,?)",
+            [$name, $email, $phone ?: null, $subject, $message, $org ?: null]);
+          notifyAdminNewContact(['name'=>$name,'email'=>$email,'org_name'=>$org,'subject'=>$subject,'message'=>$message]);
+          setFlash('success','Your message has been sent! We\'ll respond within 2 business hours.');
+          header('Location: ' . url('contact.php'));
+          exit;
+        } catch (\Throwable $e) {
+          $error = 'Something went wrong. Please try again or call us directly.';
+        }
       }
     }
   }
+}
+if ($__mathCaptcha === null) {
+  $__mathCaptcha = stMathCaptchaIssue();
 }
 $__s         = siteSettings();
 $csrf        = generateCsrf();
@@ -171,6 +193,11 @@ ob_start(); ?>
             </div>
 
             <input type="text" name="website" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" placeholder="Website">
+            <input type="text" name="company_url" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" placeholder="Company URL" style="position:absolute;left:-9999px;height:0;width:0;opacity:0;" value="">
+            <?= stMathCaptchaFieldsHtml($__mathCaptcha) ?>
+            <?php if (turnstile_enabled()): ?>
+            <div class="st-form__group"><?= turnstile_widget(isset($_COOKIE['theme']) && $_COOKIE['theme'] === 'dark' ? 'dark' : 'light') ?></div>
+            <?php endif; ?>
             <div class="st-form-actions">
               <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center;">
                 <i data-lucide="send" class="ic-16"></i>
