@@ -10,6 +10,9 @@ Options -Indexes
   RewriteEngine On
   RewriteBase /
 
+  # Old short URL → canonical filename Google already indexed
+  RewriteRule ^privacy\.php$ privacypolicy.php [R=301,L]
+
   # Block direct web access to PHP includes, cache, config, cron, and artifact dirs
   RewriteRule ^(includes|cron|\.cache|\.agents|\.local|\.replit-artifact)/  - [F,L]
 

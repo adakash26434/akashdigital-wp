@@ -4,7 +4,7 @@ require_once '../includes/admin-layout.php';
 
 $success = $error = '';
 $pages = [
-    'legal_privacy' => ['Privacy Policy',    'shield',      'privacy.php', 'गोपनीयता'],
+    'legal_privacy' => ['Privacy Policy',    'shield',      'privacypolicy.php', 'गोपनीयता'],
     'legal_terms'   => ['Terms of Service',  'file-text',   'terms.php',   'सेवाका सर्त'],
     'legal_cookie'  => ['Cookie Policy',     'cookie',      'cookie-policy.php', 'कुकी नीति'],
 ];

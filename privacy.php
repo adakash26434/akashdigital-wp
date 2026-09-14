@@ -1,31 +1,10 @@
 <?php
-require_once 'includes/config.php';
-require_once 'includes/db.php';
-require_once 'includes/auth.php';
-require_once 'includes/helpers.php';
-$pageTitle = 'Privacy Policy — ' . stSiteName();
-$legal = stLegalPage('legal_privacy');
-$content = $legal['content'];
-$updated = $legal['updated'];
-require_once 'includes/header.php';
-$heroEyebrow = 'Legal'; $heroEyebrowIcon = 'shield';
-$heroTitle = 'Privacy Policy';
-$heroSubtitle = 'How we collect, use and protect your information.';
-include 'includes/page-hero.php';
-?>
-<section class="st-section">
-  <div class="container" style="max-width:760px;">
-    <?php if($updated):?>
-    <p style="font-size:.8125rem;color:var(--muted-foreground);margin-bottom:1.75rem;">
-      <i data-lucide="clock" style="width:13px;height:13px;vertical-align:-.15em;"></i>
-      Last updated: <?=e($updated)?>
-    </p>
-    <?php endif;?>
-    <?php if($content): ?>
-    <div class="prose-legal"><?= $content ?></div>
-    <?php else: ?>
-    <div class="p-empty"><p>Privacy Policy coming soon.</p></div>
-    <?php endif; ?>
-  </div>
-</section>
-<?php require_once 'includes/footer.php'; ?>
+/**
+ * Legacy URL — Google and old links used privacypolicy.php.
+ * Keep this file so privacy.php still works via 301.
+ */
+require_once __DIR__ . '/includes/config.php';
+$dest = rtrim(SITE_URL, '/') . '/privacypolicy.php';
+header('Location: ' . $dest, true, 301);
+header('X-Robots-Tag: noindex, follow');
+exit;

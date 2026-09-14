@@ -32,6 +32,9 @@ $staticPages = [
     ['tools.php'  , 'Free Tools',        'monthly' , '0.5'],
     ['faq.php'    , 'FAQ',               'monthly' , '0.6'],
     ['contact.php' ,'Contact',           'monthly' , '0.6'],
+    ['privacypolicy.php', 'Privacy Policy', 'yearly', '0.3'],
+    ['terms.php',         'Terms of Service', 'yearly', '0.3'],
+    ['cookie-policy.php', 'Cookie Policy', 'yearly', '0.3'],
 ];
 
 $dynamicPages = [];

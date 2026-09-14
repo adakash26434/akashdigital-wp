@@ -162,7 +162,7 @@ try {
         ob_start();
       ?>
       <div class="footer-bottom-links">
-        <a href="<?= url('privacy.php') ?>" class="footer-link" lang="en">Privacy</a>
+        <a href="<?= url('privacypolicy.php') ?>" class="footer-link" lang="en">Privacy</a>
         <span class="footer-dot">•</span>
         <a href="<?= url('terms.php') ?>" class="footer-link" lang="en">Terms</a>
         <span class="footer-dot">•</span>
