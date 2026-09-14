@@ -75,8 +75,20 @@ $__s = siteSettings(true);
       <input type="hidden" name="page_key" value="<?=e($key)?>">
 
       <div style="margin-bottom:.875rem;">
-        <label class="form-label">Page Content <span class="caption-meta">(Safe HTML: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;a&gt; — scripts are stripped)</span></label>
-        <textarea name="content" rows="22" class="form-input" maxlength="100000" style="font-family:monospace;font-size:.8rem;line-height:1.6;resize:vertical;"><?=e($editorVal)?></textarea>
+        <label class="form-label">Page Content <span class="caption-meta">Type or paste as normal text — Word/Google Docs paste works. Scripts are stripped on save.</span></label>
+        <div class="lp-editor-wrap">
+          <div class="lp-toolbar" role="toolbar" aria-label="Formatting">
+            <button type="button" data-cmd="bold" title="Bold"><strong>B</strong></button>
+            <button type="button" data-cmd="italic" title="Italic"><em>I</em></button>
+            <button type="button" data-cmd="formatBlock" data-value="h2" title="Heading">H2</button>
+            <button type="button" data-cmd="formatBlock" data-value="h3" title="Subheading">H3</button>
+            <button type="button" data-cmd="insertUnorderedList" title="Bullet list">List</button>
+            <button type="button" data-cmd="createLink" title="Link">Link</button>
+            <button type="button" data-cmd="formatBlock" data-value="p" title="Paragraph">P</button>
+          </div>
+          <div class="lp-visual prose-legal" contenteditable="true" spellcheck="true"><?= stSanitizeRichHtml($editorVal) ?></div>
+          <textarea name="content" class="lp-source" hidden maxlength="100000"><?=e($editorVal)?></textarea>
+        </div>
       </div>
 
       <div style="display:flex;gap:.75rem;align-items:center;">
@@ -173,5 +185,73 @@ function defaultLegalContent(string $key, string $label, string $siteName, strin
     return $templates[$key] ?? '';
 }
 ?>
+
+<style>
+.lp-editor-wrap { border:1px solid var(--border); border-radius:var(--radius); background:var(--card); overflow:hidden; }
+.lp-toolbar { display:flex; flex-wrap:wrap; gap:.25rem; padding:.5rem .625rem; border-bottom:1px solid var(--border); background:var(--muted); }
+.lp-toolbar button { font-size:.75rem; font-weight:600; padding:.25rem .5rem; border:1px solid var(--border); border-radius:var(--radius); background:var(--card); color:var(--foreground); cursor:pointer; }
+.lp-toolbar button:hover { background:var(--background); }
+.lp-visual { min-height:22rem; padding:1rem 1.1rem; outline:none; font-size:.9rem; line-height:1.7; }
+.lp-visual:focus { box-shadow:inset 0 0 0 2px color-mix(in srgb, var(--primary) 35%, transparent); }
+</style>
+<script>
+(function () {
+  function esc(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
+    });
+  }
+  function plainToHtml(text) {
+    return text.split(/\n{2,}/).map(function (p) {
+      return '<p>' + esc(p).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+  }
+  document.querySelectorAll('.lp-editor-wrap').forEach(function (wrap) {
+    var visual = wrap.querySelector('.lp-visual');
+    var source = wrap.querySelector('.lp-source');
+    var form = wrap.closest('form');
+    if (!visual || !source || !form) return;
+
+    wrap.querySelectorAll('.lp-toolbar button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        visual.focus();
+        var cmd = btn.getAttribute('data-cmd');
+        var val = btn.getAttribute('data-value') || null;
+        if (cmd === 'createLink') {
+          var url = window.prompt('Link URL', 'https://');
+          if (!url) return;
+          document.execCommand('createLink', false, url);
+          return;
+        }
+        if (cmd === 'formatBlock') {
+          document.execCommand('formatBlock', false, val);
+          return;
+        }
+        document.execCommand(cmd, false, val);
+      });
+    });
+
+    visual.addEventListener('paste', function (e) {
+      e.preventDefault();
+      var html = (e.clipboardData || window.clipboardData).getData('text/html');
+      var text = (e.clipboardData || window.clipboardData).getData('text/plain');
+      var insert = '';
+      if (html) {
+        var tmp = document.createElement('div');
+        tmp.innerHTML = html;
+        tmp.querySelectorAll('script,style,iframe,object,embed,meta,link').forEach(function (n) { n.remove(); });
+        insert = tmp.innerHTML;
+      } else {
+        insert = plainToHtml(text || '');
+      }
+      document.execCommand('insertHTML', false, insert);
+    });
+
+    form.addEventListener('submit', function () {
+      source.value = visual.innerHTML;
+    });
+  });
+})();
+</script>
 
 <?php require_once '../includes/admin-layout-close.php'; ?>
