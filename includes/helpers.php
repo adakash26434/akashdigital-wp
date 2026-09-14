@@ -106,6 +106,19 @@ function stSanitizeRichHtml(string $html): string {
     return $html;
 }
 
+/** Legal page HTML from admin (Privacy / Terms / Cookie), sanitized for output. */
+function stLegalPage(string $key): array {
+    $allowed = ['legal_privacy', 'legal_terms', 'legal_cookie'];
+    if (!in_array($key, $allowed, true)) {
+        return ['content' => '', 'updated' => null];
+    }
+    $s = siteSettings();
+    return [
+        'content' => stSanitizeRichHtml((string)($s[$key] ?? '')),
+        'updated' => $s[$key . '_updated'] ?? null,
+    ];
+}
+
 // नेपालीमा: Asset (CSS/JS/image) ko full URL banaune
 function asset(string $path): string {
     return rtrim(SITE_URL, '/') . '/assets/' . ltrim($path, '/');

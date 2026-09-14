@@ -3,54 +3,61 @@ $pageTitle = 'Legal Pages';
 require_once '../includes/admin-layout.php';
 
 $success = $error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    verifyCsrf();
-    $key = $_POST['page_key'] ?? '';
-    $allowed = ['legal_privacy','legal_terms','legal_cookie'];
-    if (in_array($key, $allowed)) {
-        $content   = $_POST['content']  ?? '';
-        $lastUpd   = date('d M Y');
-        try {
-            foreach ([$key => $content, $key.'_updated' => $lastUpd] as $k => $v) {
-                execute(
-                    "INSERT INTO site_settings (setting_key, setting_val) VALUES (?,?)
-                     ON CONFLICT(setting_key) DO UPDATE SET setting_val=excluded.setting_val",
-                    [$k, $v]
-                );
-            }
-            $success = 'Page saved.';
-        } catch(\Throwable $e) { $error = 'Save failed: '.$e->getMessage(); }
-    }
-}
-
-$__s = siteSettings();
 $pages = [
-    'legal_privacy' => ['Privacy Policy',    'shield',      'privacy.php'],
-    'legal_terms'   => ['Terms of Service',  'file-text',   'terms.php'],
-    'legal_cookie'  => ['Cookie Policy',     'cookie',      'cookie-policy.php'],
+    'legal_privacy' => ['Privacy Policy',    'shield',      'privacy.php', 'गोपनीयता'],
+    'legal_terms'   => ['Terms of Service',  'file-text',   'terms.php',   'सेवाका सर्त'],
+    'legal_cookie'  => ['Cookie Policy',     'cookie',      'cookie-policy.php', 'कुकी नीति'],
 ];
 
 $afActive = $_GET['tab'] ?? 'legal_privacy';
 if (!isset($pages[$afActive])) $afActive = 'legal_privacy';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
+    $key = $_POST['page_key'] ?? '';
+    if (isset($pages[$key])) {
+        $afActive = $key;
+        $raw = (string)($_POST['content'] ?? '');
+        if (strlen($raw) > 100000) {
+            $error = 'Content is too long (max 100,000 characters).';
+        } else {
+            $content = stSanitizeRichHtml($raw);
+            $lastUpd = date('d M Y');
+            try {
+                saveSetting($key, $content);
+                saveSetting($key . '_updated', $lastUpd);
+                $success = 'Saved. The live page now shows this content.';
+            } catch (\Throwable $e) {
+                $error = 'Save failed: ' . $e->getMessage();
+            }
+        }
+    } else {
+        $error = 'Invalid page.';
+    }
+}
+
+$__s = siteSettings(true);
 ?>
 
 <?php if($success):?><div class="alert alert-success mb-1"><?=e($success)?></div><?php endif;?>
 <?php if($error):?><div class="alert alert-error mb-1"><?=e($error)?></div><?php endif;?>
 
 <div class="af-page-tabs">
-  <?php foreach ($pages as $key => [$label, $icon, $slug]):?>
-  <a href="?tab=<?=$key?>" class="af-page-tab <?=$afActive===$key?'active':''?>">
-    <i data-lucide="<?=$icon?>" style="width:13px;height:13px;"></i> <?=e($label)?>
+  <?php foreach ($pages as $key => [$label, $icon, $slug, $ne]):?>
+  <a href="?tab=<?=e($key)?>" class="af-page-tab <?=$afActive===$key?'active':''?>">
+    <i data-lucide="<?=$icon?>" style="width:13px;height:13px;"></i> <?=e($label)?> <span class="caption-meta">(<?=e($ne)?>)</span>
   </a>
   <?php endforeach;?>
 </div>
 
-<?php foreach ($pages as $key => [$label, $icon, $slug]):?>
-<div id="lp-<?=$key?>" style="<?=$afActive===$key?'':'display:none'?>">
+<?php foreach ($pages as $key => [$label, $icon, $slug, $ne]):
+  $published = isset($__s[$key]) && trim((string)$__s[$key]) !== '';
+  $editorVal = $published ? (string)$__s[$key] : defaultLegalContent($key, $label, stSiteName(), stContactEmail(), stAddress());
+?>
+<div id="lp-<?=e($key)?>" style="<?=$afActive===$key?'':'display:none'?>">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
     <div>
-      <h2 class="h-eyebrow-flat" style="margin:0;"><?=e($label)?></h2>
+      <h2 class="h-eyebrow-flat" style="margin:0;"><?=e($label)?> <span class="caption-meta" lang="ne"><?=e($ne)?></span></h2>
       <?php $upd = $__s[$key.'_updated'] ?? null; if($upd):?>
       <p style="font-size:.75rem;color:var(--muted-foreground);margin:.25rem 0 0;">Last updated: <?=e($upd)?></p>
       <?php endif;?>
@@ -58,14 +65,18 @@ if (!isset($pages[$afActive])) $afActive = 'legal_privacy';
     <a href="<?=url($slug)?>" target="_blank" class="btn btn-ghost btn-sm">View page ↗</a>
   </div>
 
+  <?php if(!$published):?>
+  <div class="alert alert-warning mb-1">This page is not published yet. The text below is a starter template — click Save to show it on the live site (<?=e($slug)?>).</div>
+  <?php endif;?>
+
   <div class="st-card p-tile">
-    <form method="POST">
+    <form method="POST" action="?tab=<?=e($key)?>">
       <?=csrfField()?>
-      <input type="hidden" name="page_key" value="<?=$key?>">
+      <input type="hidden" name="page_key" value="<?=e($key)?>">
 
       <div style="margin-bottom:.875rem;">
-        <label class="form-label">Page Content <span class="caption-meta">(HTML supported — &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;a&gt; tags)</span></label>
-        <textarea name="content" rows="22" class="form-input" style="font-family:monospace;font-size:.8rem;line-height:1.6;resize:vertical;"><?=e($__s[$key] ?? defaultLegalContent($key, $label, stSiteName(), stContactEmail(), stAddress()))?></textarea>
+        <label class="form-label">Page Content <span class="caption-meta">(Safe HTML: &lt;h2&gt;, &lt;p&gt;, &lt;ul&gt;, &lt;strong&gt;, &lt;a&gt; — scripts are stripped)</span></label>
+        <textarea name="content" rows="22" class="form-input" maxlength="100000" style="font-family:monospace;font-size:.8rem;line-height:1.6;resize:vertical;"><?=e($editorVal)?></textarea>
       </div>
 
       <div style="display:flex;gap:.75rem;align-items:center;">
